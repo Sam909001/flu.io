@@ -1,87 +1,143 @@
-<!-- How to Buy Section -->
-<section id="how-to-buy" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-  <h2 class="text-3xl font-bold mb-6 text-center">How to Buy $FLUFFI</h2>
-  
-  <div class="grid md:grid-cols-2 gap-8">
-    <!-- Left Column -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Buy $FLUFFI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+    }
+    .dark {
+      background: #111827;
+      color: white;
+    }
+    .step-card {
+      transition: all 0.3s ease;
+    }
+    .step-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body class="text-gray-800 dark:text-white">
+  <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-bold mb-4">How to Buy $FLUFFI</h1>
+      <p class="text-xl text-gray-600 dark:text-gray-300">Your complete guide to getting FLUFFI tokens</p>
+    </header>
+
+    <!-- Steps Container -->
     <div class="space-y-8">
       <!-- Step 1 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">1</span>
-          <h3 class="text-xl font-semibold">Set Up Your Wallet</h3>
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">1</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Set Up Your Wallet</h2>
+            <p class="mb-4">Start by setting up your digital wallet with MetaMask or Trust Wallet. Download the extension and charge ahead.</p>
+            <div class="flex flex-wrap gap-4">
+              <a href="https://metamask.io/" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition duration-200">
+                Download Metamask
+              </a>
+
+              
+              <a href="https://trustwallet.com/" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition duration-200">
+                Download Trust Wallet
+              </a>
+            </div>
+          </div>
         </div>
-        <p class="mb-4">Start by setting up your digital wallet with MetaMask or Trust Wallet. Download the extension and charge ahead.</p>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <a href="https://metamask.io/" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded transition duration-200 text-center">
-            <div class="flex items-center justify-center">
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.5C6.201 1.5 1.5 6.201 1.5 12S6.201 22.5 12 22.5 22.5 17.799 22.5 12 17.799 1.5 12 1.5zm5.143 5.357h1.91v1.91h-1.91v-1.91zm0 3.82h1.91v1.91h-1.91v-1.91zm-3.82-3.82h1.91v1.91h-1.91v-1.91zm0 3.82h1.91v1.91h-1.91v-1.91zm-3.819 0h1.91v1.91h-1.91v-1.91zm0-3.82h1.91v1.91h-1.91v-1.91z"/>
-              </svg>
-              Download MetaMask
-            </div>
-          </a>
-          <a href="https://trustwallet.com/" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition duration-200 text-center">
-            <div class="flex items-center justify-center">
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-              </svg>
-              Download Trust Wallet
-            </div>
-          </a>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">2</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Load Your Wallet</h2>
+            <p>Load your wallet with BNB or ETH. These funds will power your move to grab $FLUFFI tokens.</p>
+          </div>
         </div>
       </div>
 
       <!-- Step 3 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">3</span>
-          <h3 class="text-xl font-semibold">Connect Your Wallet</h3>
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">3</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Connect Your Wallet</h2>
+            <p class="mb-4">Head to the buy page during the presale and purchase FLUFFI with BNB, ETH, or USDT.</p>
+            <a href="index.html#presale" class="bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition duration-200 inline-block">
+              Go to Presale
+            </a>
+          </div>
         </div>
-        <p class="mb-4">Head to the buy page during the presale and purchase FLUFFI with BNB, ETH, or USDT. Stake your tokens and watch your rewards grow.</p>
-        <a href="#presale" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition duration-200 inline-block">
-          Buy Now
-        </a>
-      </div>
-
-      <!-- Step 5 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">5</span>
-          <h3 class="text-xl font-semibold">Receive Your FLUFFI</h3>
-        </div>
-        <p>Once the presale ends, claim your $FLUFFI coins and enjoy your staking rewards. Your FLUFFIEST journey is just beginning!</p>
-      </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="space-y-8">
-      <!-- Step 2 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">2</span>
-          <h3 class="text-xl font-semibold">Load Your Wallet with BNB or ETH</h3>
-        </div>
-        <p>Load your MetaMask with BNB or ETH. These funds will power your move to grab $FLUFFI tokens.</p>
       </div>
 
       <!-- Step 4 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">4</span>
-          <h3 class="text-xl font-semibold">Buy FLUFFI</h3>
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">4</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Buy FLUFFI</h2>
+            <p>Select the currency you wish to use, enter the amount, click buy and confirm the transaction in your wallet.</p>
+          </div>
         </div>
-        <p>Select the currency you wish to use to purchase, enter the amount, click on buy and confirm the transaction when prompted by your wallet.</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">5</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Receive Your FLUFFI</h2>
+            <p>Once presale ends, claim your $FLUFFI coins and enjoy your staking rewards. Your FLUFFIEST journey begins!</p>
+          </div>
+        </div>
       </div>
 
       <!-- Step 6 -->
-      <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-        <div class="flex items-center mb-3">
-          <span class="bg-blue-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mr-3">6</span>
-          <h3 class="text-xl font-semibold">Stay Updated</h3>
+      <div class="step-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div class="flex items-start">
+          <div class="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl flex-shrink-0">6</div>
+          <div>
+            <h2 class="text-2xl font-bold mb-3">Stay Updated</h2>
+            <p>Staked $FLUFFI rewards will be vested for a set period from launch. Purchased tokens available to claim before listing.</p>
+          </div>
         </div>
-        <p>Staked $FLUFFI rewards and tokens earned via the game will be vested for a set period from launch. Tokens purchased would be available to claim before listing.</p>
       </div>
     </div>
+
+    <!-- Footer CTA -->
+    <div class="mt-12 text-center">
+      <a href="index.html#presale" class="bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-4 px-8 rounded-full text-lg inline-block transition duration-200">
+        Start Buying $FLUFFI Now
+      </a>
+    </div>
   </div>
-</section>
+
+  <script>
+    // Simple dark mode toggle for this standalone page
+    document.addEventListener('DOMContentLoaded', function() {
+      const darkModeToggle = document.createElement('button');
+      darkModeToggle.className = 'fixed bottom-4 right-4 bg-gray-200 dark:bg-gray-700 p-3 rounded-full shadow-lg';
+      darkModeToggle.innerHTML = '🌙';
+      darkModeToggle.onclick = function() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        this.innerHTML = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+      };
+      document.body.appendChild(darkModeToggle);
+      
+      // Check for saved dark mode preference
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        darkModeToggle.innerHTML = '☀️';
+      }
+    });
+  </script>
+</body>
+</html>
