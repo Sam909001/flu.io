@@ -62,73 +62,7 @@
       <a href="#staking" class="hover:underline">Staking</a>
       <a href="#tokenomics" class="hover:underline">Tokenomics</a>
       <a href="#faq" class="hover:underline">FAQ</a>
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="hover:underline">Whitepaper</a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
-    </nav>
-  </header>
-
-  <main class="p-6 max-w-4xl mx-auto">
-    <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
-      <h2 class="section-title">Presale is Live!</h2>
-      <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
-      <p id="priceInfo" class="mb-2">Price: $0.000100</p>
-      <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
-      <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-        <div class="bg-green-500 h-4 rounded-full transition-all duration-700 ease-in-out" id="progressBar" style="width: 10%"></div>
-      </div>
-      <p class="mb-4 timer" id="countdown"></p>
-
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-2 border rounded text-black" />
-        <select id="currencySelect" class="p-2 border rounded text-black">
-          <option value="USD">USD</option>
-          <option value="ETH">ETH</option>
-        </select>
-      </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-2 border rounded mb-4 text-black" />
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Buy Now</button>
-    </section>
-
-    <!-- Claim Section -->
-    <section class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Claim $FLUFFI</h2>
-      <p class="mb-2">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Claim Tokens</button>
-    </section>
-
-    <!-- Staking Section -->
-    <section id="staking" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Stake Your $FLUFFI</h2>
-      <p class="mb-2">APY: <strong>90%</strong> | Ends at Listing Date</p>
-      <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-2 border rounded mb-2 text-black" />
-      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">Stake</button>
-    </section>
-
-    <!-- Tokenomics -->
-    <section id="tokenomics" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Tokenomics</h2>
-      <ul class="list-disc pl-5 space-y-1">
-        <li>Total Supply: 10,000,000,000 FLUFFI</li>
-        <li>Presale: 40%</li>
-        <li>Liquidity: 30% (Locked)</li>
-        <li>Staking: 20%</li>
-        <li>Marketing: 5%</li>
-        <li>Team: 5% (Locked)</li>
-      </ul>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">FAQ</h2>
-      <details class="mb-2"><summary>How do I buy $FLUFFI?</summary><p class="pl-4">Connect your wallet, enter amount in USD, and click "Buy Now".</p></details>
-      <details class="mb-2"><summary>When does staking end?</summary><p class="pl-4">Staking ends at the official listing date.</p></details>
-      <details class="mb-2"><summary>What chains are supported?</summary><p class="pl-4">BNB, ETH, SOL, and USDC.</p></details>
-    </section>
-  </main>
-
-  <!-- How to Buy Section -->
+        <!-- How to Buy Section -->
 <section id="how-to-buy" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
   <h2 class="text-3xl font-bold mb-6 text-center">How to Buy $FLUFFI</h2>
   
@@ -205,6 +139,71 @@
     </div>
   </div>
 </section>
+      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="hover:underline">Whitepaper</a>
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
+      <button onclick="connectWallet()" id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
+    </nav>
+  </header>
+
+  <main class="p-6 max-w-4xl mx-auto">
+    <!-- Presale Section -->
+    <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
+      <h2 class="section-title">Presale is Live!</h2>
+      <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
+      <p id="priceInfo" class="mb-2">Price: $0.000100</p>
+      <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
+      <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+        <div class="bg-green-500 h-4 rounded-full transition-all duration-700 ease-in-out" id="progressBar" style="width: 10%"></div>
+      </div>
+      <p class="mb-4 timer" id="countdown"></p>
+
+      <div class="flex gap-2 mb-4">
+        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-2 border rounded text-black" />
+        <select id="currencySelect" class="p-2 border rounded text-black">
+          <option value="USD">USD</option>
+          <option value="ETH">ETH</option>
+        </select>
+      </div>
+      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-2 border rounded mb-4 text-black" />
+      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Buy Now</button>
+    </section>
+
+    <!-- Claim Section -->
+    <section class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
+      <h2 class="section-title">Claim $FLUFFI</h2>
+      <p class="mb-2">Once the presale ends, you can claim your purchased tokens here.</p>
+      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Claim Tokens</button>
+    </section>
+
+    <!-- Staking Section -->
+    <section id="staking" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
+      <h2 class="section-title">Stake Your $FLUFFI</h2>
+      <p class="mb-2">APY: <strong>90%</strong> | Ends at Listing Date</p>
+      <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-2 border rounded mb-2 text-black" />
+      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">Stake</button>
+    </section>
+
+    <!-- Tokenomics -->
+    <section id="tokenomics" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
+      <h2 class="section-title">Tokenomics</h2>
+      <ul class="list-disc pl-5 space-y-1">
+        <li>Total Supply: 10,000,000,000 FLUFFI</li>
+        <li>Presale: 40%</li>
+        <li>Liquidity: 30% (Locked)</li>
+        <li>Staking: 20%</li>
+        <li>Marketing: 5%</li>
+        <li>Team: 5% (Locked)</li>
+      </ul>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
+      <h2 class="section-title">FAQ</h2>
+      <details class="mb-2"><summary>How do I buy $FLUFFI?</summary><p class="pl-4">Connect your wallet, enter amount in USD, and click "Buy Now".</p></details>
+      <details class="mb-2"><summary>When does staking end?</summary><p class="pl-4">Staking ends at the official listing date.</p></details>
+      <details class="mb-2"><summary>What chains are supported?</summary><p class="pl-4">BNB, ETH, SOL, and USDC.</p></details>
+    </section>
+  </main>
   
   <footer class="flex justify-between px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
     <div>© 2025 $FLUFFI Token</div>
