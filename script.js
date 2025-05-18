@@ -233,3 +233,26 @@ alert("✅ Purchase successful!");
 const raised = await contract.totalRaised();
 const progress = (raised / goal) * 100;
 document.getElementById('progressBar').style.width = `${progress}%`;
+
+async function buyFluffi() {
+  const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+  try {
+    buyBtn.disabled = true;
+    buyBtn.textContent = 'Processing...';
+    
+    // ... existing contract code ...
+    
+    // Add referral tracking
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    const refAddr = refParam || document.getElementById('refInput').value || ethers.constants.AddressZero;
+    
+    await contract.contribute(refAddr, { 
+      value: ethers.utils.parseEther(amount) 
+    });
+    
+  } finally {
+    buyBtn.disabled = false;
+    buyBtn.textContent = 'Buy Now';
+  }
+}
