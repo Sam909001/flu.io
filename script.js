@@ -228,3 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
 alert("Transaction sent! Please wait for confirmation...");
 await tx.wait();
 alert("✅ Purchase successful!");
+
+// Example: show progress based on totalRaised
+const raised = await contract.totalRaised();
+const progress = (raised / goal) * 100;
+document.getElementById('progressBar').style.width = `${progress}%`;
