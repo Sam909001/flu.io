@@ -7,363 +7,320 @@
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
   <meta name="author" content="FLUFFI Team" />
-  <!-- Favicons -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
-  <!-- Preload Resources -->
-  <link rel="preload" href="fluffi.jpg" as="image">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <!-- CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <!-- Security -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://bsc-testnet.publicnode.com;">
-  <!-- Social Meta -->
-  <meta property="og:title" content="$FLUFFI - Solana Meme Token Presale">
-  <meta property="og:image" content="https://yourdomain.com/fluffi-preview.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" defer></script>
   <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
-    }
-    .timer {
-      font-family: monospace;
-    }
-    .section-title {
-      @apply text-2xl font-bold mb-4;
+      font-family: 'Inter', sans-serif;
     }
     .dark {
       background: #111827;
       color: white;
     }
-    .dark .text-gray-800 {
-      color: white !important;
-    }
     .dark .bg-white {
       background-color: #1f2937 !important;
     }
-    .dark .text-gray-600 {
-      color: #d1d5db !important;
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 8px;
+      vertical-align: middle;
     }
-    .dark .bg-gray-200 {
-      background-color: #374151 !important;
-    }
-    .dark .text-blue-600 {
-      color: #60a5fa !important;
-    }
-    /* Mobile fixes */
-    @media (max-width: 640px) {
-      #amountInput, #stakeInput {
-        font-size: 16px; /* Prevent zoom on focus */
-      }
-      nav {
-        gap: 0.5rem;
-      }
-    }
-    /* Smooth scrolling */
-    html {
-      scroll-behavior: smooth;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 shadow sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
-      <h1 class="text-xl font-bold">$FLUFFI</h1>
+  <header class="bg-white dark:bg-gray-900 shadow sticky top-0 z-10 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-10 h-10">
+        <span class="text-xl font-bold">$FLUFFI</span>
+      </div>
+      <nav class="flex items-center space-x-4">
+        <a href="#presale" class="hover:underline">Presale</a>
+        <a href="#staking" class="hover:underline">Staking</a>
+        <a href="#referral" class="hover:underline">Referral</a>
+        <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">🌙</button>
+        <button id="connectButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Connect Wallet
+        </button>
+      </nav>
     </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm">
-      <a href="#presale" class="hover:underline">Presale</a>
-      <a href="#staking" class="hover:underline">Staking</a>
-      <a href="#faq" class="hover:underline">FAQ</a>
-      <a href="referral.html" target="_blank" class="hover:underline">Referral</a>
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-        How to Buy FLUFFI
-      </a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
-    </nav>
   </header>
 
-  <main class="p-6 max-w-4xl mx-auto">
+  <main class="container mx-auto p-6 max-w-4xl">
+    
     <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
-      <h2 class="section-title">Presale is Live!</h2>
-      <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
-      <p id="priceInfo" class="mb-2">Price: $0.000100</p>
-      <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
-      <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-        <div class="bg-green-500 h-4 rounded-full transition-all duration-700 ease-in-out" id="progressBar" style="width: 10%"></div>
+    <section id="presale" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Presale is Live!</h2>
+      <div class="space-y-4">
+        <p>Stage: <span id="stageDisplay">1/15</span></p>
+        <p>Price: <span id="priceDisplay">$0.0001</span></p>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div id="progressBar" class="bg-green-500 h-4 rounded-full" style="width: 10%"></div>
+        </div>
+        <p id="countdown" class="font-mono">Ends in: 29d 23h 59m 59s</p>
+        
+        <div class="flex space-x-2">
+          <input type="number" id="purchaseAmount" placeholder="Amount" class="flex-1 p-3 border rounded">
+          <select id="currencySelect" class="p-3 border rounded">
+            <option value="USD">USD</option>
+            <option value="ETH">ETH</option>
+          </select>
+        </div>
+        
+        <input type="text" id="referralCode" placeholder="Referral code (optional)" class="w-full p-3 border rounded">
+        
+        <button id="buyButton" class="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded font-medium">
+          <span id="buyButtonText">Buy Now</span>
+          <span id="buyButtonSpinner" class="loader hidden"></span>
+        </button>
       </div>
-      <p class="mb-4 timer" id="countdown"></p>
-
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-2 border rounded text-black" />
-        <select id="currencySelect" class="p-2 border rounded text-black">
-          <option value="USD">USD</option>
-          <option value="ETH">ETH</option>
-        </select>
-      </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-2 border rounded mb-4 text-black" />
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
-        <span id="buyText">Buy Now</span>
-        <span id="buySpinner" class="hidden ml-2 inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-      </button>
-    </section>
-
-    <!-- Claim Section -->
-    <section class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Claim $FLUFFI</h2>
-      <p class="mb-2">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Claim Tokens</button>
     </section>
 
     <!-- Staking Section -->
-    <section id="staking" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Stake Your $FLUFFI</h2>
-      <p class="mb-2">APY: <strong>90%</strong> | Ends at Listing Date</p>
-      <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-2 border rounded mb-2 text-black" />
-      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">
-        <span id="stakeText">Stake</span>
-        <span id="stakeSpinner" class="hidden ml-2 inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-      </button>
-    </section>
-
-    <!-- Tokenomics -->
-    <section id="tokenomics" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Tokenomics</h2>
-      <ul class="list-disc pl-5 space-y-1">
-        <li>Total Supply: 10,000,000,000 FLUFFI</li>
-        <li>Presale: 40%</li>
-        <li>Liquidity: 30% (Locked)</li>
-        <li>Staking: 20%</li>
-        <li>Marketing: 5%</li>
-        <li>Team: 5% (Locked)</li>
-      </ul>
-    </section>
-
-    <!-- Referral Dashboard -->
-    <section id="referral" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">Your Referral Program</h2>
-      <div id="referralConnected" class="hidden">
-        <div class="mb-4">
-          <label class="block mb-2">Your referral link:</label>
-          <div class="flex">
-            <input type="text" id="referralLink" class="flex-grow p-2 border rounded-l text-black dark:bg-gray-700" readonly>
-            <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">Copy</button>
-          </div>
-        </div>
-        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-4">
-          <p>👥 <span id="refCount">0</span> people joined via your link</p>
-          <p>💰 Earned: <span id="refEarnings">0 FLUFFI</span></p>
-        </div>
-      </div>
-      <div id="referralDisconnected">
-        <p class="mb-4">Connect your wallet to generate a referral link and earn 10% from every purchase!</p>
-        <button onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Connect Wallet</button>
+    <section id="staking" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Stake $FLUFFI</h2>
+      <div class="space-y-4">
+        <p>APY: <strong>90%</strong></p>
+        <input type="number" id="stakeAmount" placeholder="Amount to stake" class="w-full p-3 border rounded">
+        <button id="stakeButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded font-medium">
+          <span id="stakeButtonText">Stake Tokens</span>
+          <span id="stakeButtonSpinner" class="loader hidden"></span>
+        </button>
       </div>
     </section>
-    
-    <!-- FAQ -->
-    <section id="faq" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
-      <h2 class="section-title">FAQ</h2>
-      <details class="mb-2"><summary>How do I buy $FLUFFI?</summary><p class="pl-4">Connect your wallet, enter amount in USD, and click "Buy Now".</p></details>
-      <details class="mb-2"><summary>When does staking end?</summary><p class="pl-4">Staking ends at the official listing date.</p></details>
-      <details class="mb-2"><summary>What chains are supported?</summary><p class="pl-4">BNB, ETH, SOL, and USDC.</p></details>
+
+    <!-- Referral Section -->
+    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Earn with Referrals</h2>
+      <div id="referralSection">
+        <p class="mb-4">Connect your wallet to access your referral link</p>
+        <button onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Connect Wallet
+        </button>
+      </div>
     </section>
+
   </main>
-  
-  <footer class="flex justify-between px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-    <div>© 2025 $FLUFFI Token</div>
-    <div class="flex gap-4">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" title="Telegram">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5">
-      </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" title="Twitter">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5">
-      </a>
+
+  <footer class="bg-white dark:bg-gray-900 py-6">
+    <div class="container mx-auto flex justify-between items-center px-6">
+      <p>© 2025 $FLUFFI Token</p>
+      <div class="flex space-x-4">
+        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" class="w-5 h-5" alt="Telegram">
+        </a>
+        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/twitter.svg" class="w-5 h-5" alt="Twitter">
+        </a>
+      </div>
     </div>
   </footer>
 
   <script>
-    // State Management
-    let userWalletAddress = null;
-    const initialPrice = 0.0001;
+    // State
+    let userWallet = null;
     const stages = 15;
-    const stageDuration = 1000 * 60 * 60 * 48;
+    let currentStage = 1;
+    const stageDuration = 1000 * 60 * 60 * 24 * 2; // 2 days per stage
     const startTime = Date.now();
 
     // DOM Elements
-    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-    const stakeBtn = document.querySelector('button[onclick="stakeFluffi()"]');
+    const connectBtn = document.getElementById('connectButton');
+    const buyBtn = document.getElementById('buyButton');
+    const stakeBtn = document.getElementById('stakeButton');
+    const referralSection = document.getElementById('referralSection');
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      updateStage();
-      updateCountdown();
-      setInterval(updateStage, 1000);
-      setInterval(updateCountdown, 1000);
+      updateStageInfo();
+      startCountdown();
+      
+      // Load dark mode preference
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+      }
       
       // Check for referral in URL
       const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get('ref');
-      if (ref && /^0x[a-fA-F0-9]{40}$/.test(ref)) {
-        localStorage.setItem('fluffiReferrer', ref);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        localStorage.setItem('referralCode', refCode);
       }
     });
 
-    function updateStage() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-      const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
-      document.getElementById('stageInfo').textContent = `Stage: ${stage + 1} / ${stages}`;
-      document.getElementById('priceInfo').textContent = `Price: $${price}`;
-      document.getElementById('progressBar').style.width = `${((stage + 1) / stages) * 100}%`;
+    // Functions
+    function updateStageInfo() {
+      const elapsed = Date.now() - startTime;
+      currentStage = Math.min(Math.floor(elapsed / stageDuration) + 1, stages);
+      const price = (0.0001 * Math.pow(1.05, currentStage - 1)).toFixed(6);
+      
+      document.getElementById('stageDisplay').textContent = `${currentStage}/${stages}`;
+      document.getElementById('priceDisplay').textContent = `$${price}`;
+      document.getElementById('progressBar').style.width = `${(currentStage / stages) * 100}%`;
     }
 
-    function updateCountdown() {
-      const end = startTime + 30 * 24 * 60 * 60 * 1000;
-      const left = end - Date.now();
-      const days = Math.floor(left / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((left / (1000 * 60)) % 60);
-      const seconds = Math.floor((left / 1000) % 60);
-      document.getElementById('countdown').textContent = `Ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    function startCountdown() {
+      const endTime = startTime + (stageDuration * stages);
+      
+      function update() {
+        const now = Date.now();
+        const remaining = endTime - now;
+        
+        if (remaining <= 0) {
+          document.getElementById('countdown').textContent = "Presale ended";
+          return;
+        }
+        
+        const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        
+        document.getElementById('countdown').textContent = 
+          `Ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+      
+      update();
+      setInterval(update, 1000);
     }
 
     async function connectWallet() {
       if (window.ethereum) {
         try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected';
+          connectBtn.disabled = true;
+          connectBtn.textContent = "Connecting...";
           
-          // Show referral section
-          document.getElementById('referralDisconnected').classList.add('hidden');
-          document.getElementById('referralConnected').classList.remove('hidden');
-          document.getElementById('referralLink').value = 
-            `${window.location.origin}?ref=${userWalletAddress}`;
-            
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWallet = accounts[0];
+          
+          connectBtn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+          
+          // Show referral UI
+          referralSection.innerHTML = `
+            <div class="space-y-4">
+              <div>
+                <label class="block mb-2">Your referral link:</label>
+                <div class="flex">
+                  <input type="text" id="userReferralLink" 
+                         value="${window.location.origin}?ref=${userWallet}" 
+                         class="flex-1 p-2 border rounded-l" readonly>
+                  <button onclick="copyReferralLink()" 
+                          class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+                <p>Total referrals: <span id="referralCount">0</span></p>
+                <p>Earnings: <span id="referralEarnings">0 FLUFFI</span></p>
+              </div>
+            </div>
+          `;
+          
         } catch (error) {
-          alert('Wallet connection error: ' + error.message);
+          console.error("Connection error:", error);
+          alert("Wallet connection failed");
+          connectBtn.disabled = false;
+          connectBtn.textContent = "Connect Wallet";
         }
       } else {
-        alert('Please install MetaMask!');
+        alert("Please install MetaMask or another Ethereum wallet");
       }
     }
 
     function copyReferralLink() {
-      const linkInput = document.getElementById('referralLink');
+      const linkInput = document.getElementById('userReferralLink');
       linkInput.select();
       document.execCommand('copy');
-      alert('Copied: ' + linkInput.value);
+      alert("Copied to clipboard!");
     }
 
-    async function buyFluffi() {
-      if (!userWalletAddress) {
-        alert('Please connect wallet first');
+    async function buyTokens() {
+      if (!userWallet) {
+        alert("Please connect your wallet first");
         return;
       }
-
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value || localStorage.getItem('fluffiReferrer') || null;
-
+      
+      const amount = document.getElementById('purchaseAmount').value;
       if (!amount || isNaN(amount)) {
-        alert('Invalid amount');
+        alert("Please enter a valid amount");
         return;
       }
-
+      
       try {
-        // Show loading state
-        document.getElementById('buyText').textContent = 'Processing...';
-        document.getElementById('buySpinner').classList.remove('hidden');
         buyBtn.disabled = true;
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const contractAbi = [/* Your ABI */];
-        const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-
-        // Convert amount
-        let ethValue;
-        if (currency === 'USD') {
-          const usdToEth = 3000;
-          ethValue = (Number(amount) / usdToEth).toFixed(6);
-        } else {
-          ethValue = amount;
-        }
-
-        // Process referral
-        const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : ethers.constants.AddressZero;
-
-        const tx = await contract.contribute(refAddr, {
-          value: ethers.utils.parseEther(ethValue.toString())
-        });
-
-        await tx.wait();
-        alert(`Success! TX: ${tx.hash}`);
-
-      } catch (err) {
-        alert('Error: ' + (err.message || err));
+        document.getElementById('buyButtonText').textContent = "Processing...";
+        document.getElementById('buyButtonSpinner').classList.remove('hidden');
+        
+        // Simulate transaction (replace with actual contract call)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        alert("Purchase successful!");
+        
+      } catch (error) {
+        console.error("Purchase error:", error);
+        alert("Transaction failed");
       } finally {
-        document.getElementById('buyText').textContent = 'Buy Now';
-        document.getElementById('buySpinner').classList.add('hidden');
         buyBtn.disabled = false;
+        document.getElementById('buyButtonText').textContent = "Buy Now";
+        document.getElementById('buyButtonSpinner').classList.add('hidden');
       }
     }
 
-    async function stakeFluffi() {
-      if (!userWalletAddress) {
-        alert('Please connect wallet first');
+    async function stakeTokens() {
+      if (!userWallet) {
+        alert("Please connect your wallet first");
         return;
       }
-
-      const amount = document.getElementById('stakeInput').value;
+      
+      const amount = document.getElementById('stakeAmount').value;
       if (!amount || isNaN(amount)) {
-        alert('Invalid amount');
+        alert("Please enter a valid amount");
         return;
       }
-
+      
       try {
-        document.getElementById('stakeText').textContent = 'Processing...';
-        document.getElementById('stakeSpinner').classList.remove('hidden');
         stakeBtn.disabled = true;
-
-        // Add your staking logic here
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate tx
-        alert(`Staked ${amount} FLUFFI successfully`);
-
-      } catch (err) {
-        alert('Error: ' + err.message);
+        document.getElementById('stakeButtonText').textContent = "Processing...";
+        document.getElementById('stakeButtonSpinner').classList.remove('hidden');
+        
+        // Simulate transaction (replace with actual contract call)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        alert("Tokens staked successfully!");
+        
+      } catch (error) {
+        console.error("Staking error:", error);
+        alert("Staking failed");
       } finally {
-        document.getElementById('stakeText').textContent = 'Stake';
-        document.getElementById('stakeSpinner').classList.add('hidden');
         stakeBtn.disabled = false;
+        document.getElementById('stakeButtonText').textContent = "Stake Tokens";
+        document.getElementById('stakeButtonSpinner').classList.add('hidden');
       }
     }
 
     function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', isDark);
     }
 
-    // Initialize dark mode
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.documentElement.classList.add('dark');
-    }
+    // Event Listeners
+    buyBtn.addEventListener('click', buyTokens);
+    stakeBtn.addEventListener('click', stakeTokens);
+    connectBtn.addEventListener('click', connectWallet);
   </script>
 </body>
 </html>
