@@ -66,7 +66,7 @@
   How to Buy FLUFFI
 </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
-      <button id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="connectWallet()" id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
     </nav>
   </header>
 
@@ -175,7 +175,6 @@
     </div>
   </footer>
 </body>
-  
 <script>
     let userWalletAddress = null;
     const initialPrice = 0.0001;
@@ -280,35 +279,5 @@
 
     updateStage();
     updateCountdown();
-</script>
-  <script type="module">
-  import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@6.8.1/+esm';
-
-  let provider, signer, userWalletAddress;
-
-  async function connectWallet() {
-    if (typeof window.ethereum === 'undefined') {
-      alert('MetaMask is not installed.');
-      return;
-    }
-
-    try {
-      provider = new ethers.BrowserProvider(window.ethereum);
-      signer = await provider.getSigner();
-      userWalletAddress = await signer.getAddress();
-      console.log('Connected wallet:', userWalletAddress);
-
-      const walletButton = document.getElementById('walletButton');
-      walletButton.textContent = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
-      walletButton.disabled = true;
-
-    } catch (err) {
-      console.error('Wallet connection failed:', err);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('walletButton').addEventListener('click', connectWallet);
-  });
 </script>
 </html>
