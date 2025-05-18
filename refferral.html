@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$FLUFFI Referral Program</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" defer></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+      font-family: 'Inter', sans-serif;
+    }
+    .dark {
+      background: #111827;
+      color: white;
+    }
+    .dark .bg-white {
+      background-color: #1f2937 !important;
+    }
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="text-gray-800 dark:text-white">
+  <header class="bg-white dark:bg-gray-900 shadow sticky top-0 z-10 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-10 h-10">
+        <span class="text-xl font-bold">$FLUFFI Referral</span>
+      </div>
+      <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">🌙</button>
+    </div>
+  </header>
+
+  <main class="container mx-auto p-6 max-w-4xl">
+    <!-- Referral Section -->
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Earn with Referrals</h2>
+      <div id="referralSection">
+        <p class="mb-4">Connect your wallet to access your referral link</p>
+        <button onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Connect Wallet
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-white dark:bg-gray-900 py-6">
+    <div class="container mx-auto flex justify-between items-center px-6">
+      <p>© 2025 $FLUFFI Token</p>
+      <div class="flex space-x-4">
+        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" class="w-5 h-5" alt="Telegram">
+        </a>
+        <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/twitter.svg" class="w-5 h-5" alt="Twitter">
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // State
+    let userWallet = null;
+    const referralSection = document.getElementById('referralSection');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load dark mode preference
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // Check for referral in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        localStorage.setItem('referralCode', refCode);
+      }
+    });
+
+    // Referral Functions
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const connectBtn = document.querySelector('#referralSection button');
+          connectBtn.disabled = true;
+          connectBtn.textContent = "Connecting...";
+          
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWallet = accounts[0];
+          
+          // Show referral UI
+          referralSection.innerHTML = `
+            <div class="space-y-4">
+              <div>
+                <label class="block mb-2">Your referral link:</label>
+                <div class="flex">
+                  <input type="text" id="userReferralLink" 
+                         value="${window.location.origin}?ref=${userWallet}" 
+                         class="flex-1 p-2 border rounded-l" readonly>
+                  <button onclick="copyReferralLink()" 
+                          class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+                <p>Total referrals: <span id="referralCount">0</span></p>
+                <p>Earnings: <span id="referralEarnings">0 FLUFFI</span></p>
+              </div>
+            </div>
+          `;
+          
+        } catch (error) {
+          console.error("Connection error:", error);
+          alert("Wallet connection failed");
+          const connectBtn = document.querySelector('#referralSection button');
+          connectBtn.disabled = false;
+          connectBtn.textContent = "Connect Wallet";
+        }
+      } else {
+        alert("Please install MetaMask or another Ethereum wallet");
+      }
+    }
+
+    function copyReferralLink() {
+      const linkInput = document.getElementById('userReferralLink');
+      linkInput.select();
+      document.execCommand('copy');
+      alert("Copied to clipboard!");
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', isDark);
+    }
+  </script>
+</body>
+</html>
