@@ -296,3 +296,64 @@ if (window.location.search.includes('ref=')) {
   localStorage.setItem('lastReferrer', 
     new URLSearchParams(window.location.search).get('ref'));
 }
+
+// Add to your existing script
+document.getElementById('connectReferralButton').addEventListener('click', connectWalletForReferrals);
+
+async function connectWalletForReferrals() {
+  if (window.ethereum) {
+    try {
+      const connectBtn = document.getElementById('connectReferralButton');
+      connectBtn.disabled = true;
+      connectBtn.textContent = "Connecting...";
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWallet = accounts[0];
+      
+      // Update both connect buttons if they exist
+      if (connectBtn) connectBtn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+      if (connectButton) connectButton.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+      
+      // Show referral UI
+      referralSection.innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="userReferralLink" 
+                     value="${window.location.origin}?ref=${userWallet}" 
+                     class="flex-1 p-2 border rounded-l" readonly>
+              <button onclick="copyReferralLink()" 
+                      class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+                Copy
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+            <p>Total referrals: <span id="referralCount">0</span></p>
+            <p>Earnings: <span id="referralEarnings">0 FLUFFI</span></p>
+          </div>
+        </div>
+      `;
+      
+    } catch (error) {
+      console.error("Connection error:", error);
+      alert("Wallet connection failed");
+      const connectBtn = document.getElementById('connectReferralButton');
+      if (connectBtn) {
+        connectBtn.disabled = false;
+        connectBtn.textContent = "Connect Wallet";
+      }
+    }
+  } else {
+    alert("Please install MetaMask or another Ethereum wallet");
+  }
+}
+
+// Keep your existing copyReferralLink function
+function copyReferralLink() {
+  const linkInput = document.getElementById('userReferralLink');
+  linkInput.select();
+  document.execCommand('copy');
+  alert("Copied to clipboard!");
+}
