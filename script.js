@@ -225,3 +225,6 @@ async function buyFluffi() {
 document.addEventListener('DOMContentLoaded', () => {
   checkReferral();
 });
+alert("Transaction sent! Please wait for confirmation...");
+await tx.wait();
+alert("✅ Purchase successful!");
