@@ -357,3 +357,87 @@ function copyReferralLink() {
   document.execCommand('copy');
   alert("Copied to clipboard!");
 }
+// Add these variables to your existing state
+let userWallet = null;
+const referralSection = document.getElementById('referralSection');
+
+// Unified wallet connection function (replace any existing connect functions)
+async function connectWallet() {
+  try {
+    // Disable all connect buttons
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.disabled = true;
+      btn.innerHTML = btn.innerHTML.replace('Connect Wallet', 'Connecting...');
+    });
+
+    // Request accounts
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    userWallet = accounts[0];
+    
+    // Update all connect buttons
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+      btn.disabled = false;
+    });
+
+    // Generate referral UI if section exists
+    if (referralSection) {
+      generateReferralUI();
+    }
+    
+  } catch (error) {
+    console.error("Connection error:", error);
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.disabled = false;
+      btn.textContent = "Connect Wallet";
+    });
+  }
+}
+
+// Generate referral UI
+function generateReferralUI() {
+  referralSection.innerHTML = `
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-2">Your referral link:</label>
+        <div class="flex">
+          <input type="text" id="userReferralLink" 
+                 value="${window.location.origin}${window.location.pathname}?ref=${userWallet}" 
+                 class="flex-1 p-2 border rounded-l" readonly>
+          <button onclick="copyReferralLink()" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+        <p>Total referrals: <span id="referralCount">0</span></p>
+        <p>Earnings: <span id="referralEarnings">0 FLUFFI</span></p>
+      </div>
+    </div>
+  `;
+}
+
+// Copy referral link
+function copyReferralLink() {
+  const linkInput = document.getElementById('userReferralLink');
+  linkInput.select();
+  document.execCommand('copy');
+  alert("Copied to clipboard!");
+}
+
+// Initialize (add to your existing DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+  // Check for existing connection
+  if (window.ethereum?.selectedAddress) {
+    userWallet = window.ethereum.selectedAddress;
+    if (referralSection) generateReferralUI();
+  }
+  
+  // Check URL for referral parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  if (refCode) {
+    localStorage.setItem('referralCode', refCode);
+  }
+});
