@@ -145,42 +145,83 @@ const startTime = new Date("2025-05-05T12:00:00Z").getTime();
     updateCountdown();
   }, 1000);
 </script>
-// Add these new functions
-function generateReferralLink(walletAddress) {
-  return `https://yourwebsite.com/?ref=${walletAddress}`;
+// Generate referral link from wallet address
+function generateReferralLink(address) {
+  const baseUrl = window.location.href.split('?')[0];
+  return `${baseUrl}?ref=${address}`;
 }
 
+// Check for referral parameter on page load
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const refAddress = urlParams.get('ref');
+  
+  if (refAddress && /^0x[a-fA-F0-9]{40}$/.test(refAddress)) {
+    localStorage.setItem('fluffiReferrer', refAddress);
+    alert(`You're joining via ${refAddress}'s referral!`);
+  }
+}
+
+// Copy to clipboard
 function copyReferralLink() {
   const linkInput = document.getElementById('referralLink');
   linkInput.select();
   document.execCommand('copy');
-  alert('Referral link copied!');
+  alert('Copied: ' + linkInput.value);
 }
 
-// Update connectWallet() function
+// Modified connectWallet()
 async function connectWallet() {
   if (window.ethereum) {
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       userWalletAddress = accounts[0];
-      document.getElementById('walletButton').textContent = 'Connected';
       
-      // Show referral section
-      document.getElementById('connectForReferral').classList.add('hidden');
-      document.getElementById('referralContent').classList.remove('hidden');
+      // Update UI
+      document.getElementById('walletButton').textContent = 'Connected';
+      document.getElementById('referralDisconnected').classList.add('hidden');
+      document.getElementById('referralConnected').classList.remove('hidden');
       
       // Generate and display referral link
       const referralLink = generateReferralLink(userWalletAddress);
       document.getElementById('referralLink').value = referralLink;
       
-      // In a real app, you would fetch referral stats from your contract here
-      // document.getElementById('refCount').textContent = await getReferralCount(userWalletAddress);
-      // document.getElementById('refEarnings').textContent = await getReferralEarnings(userWalletAddress);
-      
     } catch (error) {
-      alert('Wallet connection denied.');
+      alert('Wallet connection error: ' + error.message);
     }
   } else {
-    alert('MetaMask not detected.');
+    alert('Please install MetaMask!');
   }
 }
+
+// Modified buyFluffi() to handle referrals
+async function buyFluffi() {
+  if (!userWalletAddress) {
+    alert('Please connect wallet first');
+    return;
+  }
+
+  const amount = document.getElementById('amountInput').value;
+  if (!amount || isNaN(amount)) {
+    alert('Invalid amount');
+    return;
+  }
+
+  // Get referrer from localStorage
+  const referrer = localStorage.getItem('fluffiReferrer') || '0x0000000000000000000000000000000000000000';
+
+  try {
+    const tx = await contract.contribute(referrer, { 
+      value: ethers.utils.parseEther(amount) 
+    });
+    
+    alert(`Success! TX: ${tx.hash}`);
+  } catch (err) {
+    alert('Error: ' + (err.message || err));
+  }
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  checkReferral();
+});
