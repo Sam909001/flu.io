@@ -256,3 +256,43 @@ async function buyFluffi() {
     buyBtn.textContent = 'Buy Now';
   }
 }
+
+// Add contract validation
+let contract;
+async function initContract() {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  try {
+    const code = await provider.getCode(contractAddress);
+    if (code === '0x') throw new Error('Contract not deployed');
+    contract = new ethers.Contract(contractAddress, contractAbi, provider.getSigner());
+  } catch (err) {
+    alert('Contract error: ' + err.message);
+  }
+}
+
+// Poll for contract updates
+setInterval(async () => {
+  if (contract && userWalletAddress) {
+    const earned = await contract.referralEarnings(userWalletAddress);
+    document.getElementById('refEarnings').textContent = 
+      ethers.utils.formatEther(earned) + ' FLUFFI';
+  }
+}, 30000);
+
+// Wrap contract calls with better errors
+async function safeContractCall(fn, args) {
+  try {
+    return await fn(...args);
+  } catch (err) {
+    if (err.code === 'CALL_EXCEPTION') {
+      throw new Error('Transaction reverted - check gas limit');
+    }
+    throw err;
+  }
+}
+
+// Track referrals in localStorage
+if (window.location.search.includes('ref=')) {
+  localStorage.setItem('lastReferrer', 
+    new URLSearchParams(window.location.search).get('ref'));
+}
