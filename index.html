@@ -121,26 +121,34 @@
       </ul>
     </section>
 
-    <!-- Referral Section -->
+ <!-- Referral Dashboard -->
 <section id="referral" class="p-4 bg-white dark:bg-gray-800 rounded shadow mb-6">
   <h2 class="section-title">Your Referral Program</h2>
-  <div id="referralContent" class="hidden">
-    <p class="mb-2">Share this link and earn 10% of all purchases:</p>
-    <div class="flex gap-2 mb-4">
-      <input type="text" id="referralLink" class="w-full p-2 border rounded text-black" readonly>
-      <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-        Copy
-      </button>
+  
+  <!-- Connected Wallet State -->
+  <div id="referralConnected" class="hidden">
+    <div class="mb-4">
+      <label class="block mb-2">Your referral link:</label>
+      <div class="flex">
+        <input type="text" id="referralLink" 
+               class="flex-grow p-2 border rounded-l text-black dark:bg-gray-700" readonly>
+        <button onclick="copyReferralLink()" 
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+          Copy
+        </button>
+      </div>
     </div>
-    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
-      <p class="font-semibold">Your referral stats:</p>
-      <p>Total Referrals: <span id="refCount">0</span></p>
-      <p>Earned: <span id="refEarnings">0 FLUFFI</span></p>
+    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-4">
+      <p>👥 <span id="refCount">0</span> people joined via your link</p>
+      <p>💰 Earned: <span id="refEarnings">0 FLUFFI</span></p>
     </div>
   </div>
-  <div id="connectForReferral" class="text-center py-4">
-    <p class="mb-2">Connect your wallet to access referral program</p>
-    <button onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+
+  <!-- Disconnected State -->
+  <div id="referralDisconnected">
+    <p class="mb-4">Connect your wallet to generate a referral link and earn 10% from every purchase!</p>
+    <button onclick="connectWallet()" 
+            class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
       Connect Wallet
     </button>
   </div>
