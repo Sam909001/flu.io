@@ -145,3 +145,42 @@ const startTime = new Date("2025-05-05T12:00:00Z").getTime();
     updateCountdown();
   }, 1000);
 </script>
+// Add these new functions
+function generateReferralLink(walletAddress) {
+  return `https://yourwebsite.com/?ref=${walletAddress}`;
+}
+
+function copyReferralLink() {
+  const linkInput = document.getElementById('referralLink');
+  linkInput.select();
+  document.execCommand('copy');
+  alert('Referral link copied!');
+}
+
+// Update connectWallet() function
+async function connectWallet() {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      document.getElementById('walletButton').textContent = 'Connected';
+      
+      // Show referral section
+      document.getElementById('connectForReferral').classList.add('hidden');
+      document.getElementById('referralContent').classList.remove('hidden');
+      
+      // Generate and display referral link
+      const referralLink = generateReferralLink(userWalletAddress);
+      document.getElementById('referralLink').value = referralLink;
+      
+      // In a real app, you would fetch referral stats from your contract here
+      // document.getElementById('refCount').textContent = await getReferralCount(userWalletAddress);
+      // document.getElementById('refEarnings').textContent = await getReferralEarnings(userWalletAddress);
+      
+    } catch (error) {
+      alert('Wallet connection denied.');
+    }
+  } else {
+    alert('MetaMask not detected.');
+  }
+}
