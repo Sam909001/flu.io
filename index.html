@@ -77,10 +77,19 @@
       <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
       <p id="priceInfo" class="mb-2">Price: $0.000100</p>
       <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
-      <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-      </div>
-      <p class="mb-4 timer" id="countdown"></p>
-
+      <!-- Animated Progress Bar + Timer Combo -->
+<div class="mb-4 space-y-2">
+  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+    <div id="progressBar" 
+         class="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full transition-all duration-1000 ease-out" 
+         style="width: 10%">
+    </div>
+  </div>
+  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    Stage <span id="stageDisplay">1</span>/<span id="totalStages">15</span> • 
+    <span id="countdown" class="font-mono"></span>
+  </p>
+</div>
       <div class="flex gap-2 mb-4">
         <input type="number" placeholder="Amount" id="amountInput" class="w-full p-2 border rounded text-black" />
         <select id="currencySelect" class="p-2 border rounded text-black">
