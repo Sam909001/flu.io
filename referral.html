@@ -170,6 +170,71 @@
       document.documentElement.classList.add('dark');
       darkModeToggle.innerHTML = '☀️';
     }
+ async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          document.getElementById('walletButton').textContent = 'Connected';
+        } catch (error) {
+          alert('Wallet connection denied.');
+        }
+      } else {
+        alert('MetaMask not detected.');
+      }
+    }
+
+    async function buyFluffi() {
+      const amount = document.getElementById('amountInput').value;
+      const currency = document.getElementById('currencySelect').value;
+      const ref = document.getElementById('refInput').value;
+      if (!userWalletAddress) {
+        alert('Please connect your wallet first.');
+        return;
+      }
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+      let ethValue;
+      if (currency === 'USD') {
+        // Simple static USD to ETH rate for demo purposes
+        const usdToEth = 3000; // 1 ETH = 3000 USD, update as needed
+        ethValue = (Number(amount) / usdToEth).toFixed(6);
+      } else {
+        ethValue = Number(amount).toFixed(6);
+      }
+      try {
+        // Ethers.js provider
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        // Contract details
+        const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+        // Referral: empty or invalid address = null address
+        const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
+        // Show pending message
+        const buyBtn = document.querySelector('button[onclick=\"buyFluffi()\"]');
+        const prevText = buyBtn.textContent;
+        buyBtn.textContent = 'Processing...';
+        buyBtn.disabled = true;
+        // Send ETH to contract's contribute function
+        const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
+        await tx.wait();
+        buyBtn.textContent = prevText;
+        buyBtn.disabled = false;
+        alert('Purchase successful! Transaction hash: ' + tx.hash);
+      } catch (err) {
+        const buyBtn = document.querySelector('button[onclick=\"buyFluffi()\"]');
+        if (buyBtn) {buyBtn.textContent = 'Buy Now'; buyBtn.disabled = false;}
+        if (err && err.message) {
+          alert('Transaction failed: ' + err.message);
+        } else {
+          alert('Transaction failed.');
+        }
+      }
+    }
   </script>
 </body>
 </html>
