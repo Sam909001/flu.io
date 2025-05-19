@@ -144,6 +144,47 @@ const startTime = new Date("2025-05-05T12:00:00Z").getTime();
     updateStage();
     updateCountdown();
   }, 1000);
+// Progress Bar Animation
+function updateProgress() {
+  const progressPercent = (currentStage / stages) * 100;
+  const progressBar = document.getElementById('progressBar');
+  
+  // Animate width
+  progressBar.style.width = `${progressPercent}%`;
+  
+  // Change color at thresholds
+  if (progressPercent >= 50) {
+    progressBar.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 h-2.5 rounded-full transition-all duration-1000 ease-out';
+  }
+  if (progressPercent >= 90) {
+    progressBar.className = 'bg-gradient-to-r from-red-400 to-red-600 h-2.5 rounded-full transition-all duration-1000 ease-out';
+  }
+}
+
+// Modify your existing countdown function:
+function startCountdown() {
+  const endTime = startTime + (stageDuration * stages);
+  
+  function update() {
+    const now = Date.now();
+    const remaining = endTime - now;
+    
+    if (remaining <= 0) {
+      document.getElementById('countdown').textContent = "Presale completed!";
+      return;
+    }
+    
+    // Update progress bar
+    updateProgress();
+    
+    // Existing countdown logic
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+    
+    document.getElementById('countdown').textContent = 
+      `${
 </script>
 // Generate referral link from wallet address
 function generateReferralLink(address) {
