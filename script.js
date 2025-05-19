@@ -291,6 +291,70 @@ function verifyOnEtherscan() {
   const address = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
   window.open(`https://etherscan.io/verifyContract?a=${address}`, '_blank');
 }
+// Price Simulation Configuration
+let currentPrice = 0.0001;
+const BASE_PRICE = 0.0001;
+let lastUpdateTime = Date.now();
+
+function simulatePriceMovement() {
+  const now = Date.now();
+  const timeDiff = (now - lastUpdateTime) / 1000; // Seconds
+  
+  // Only update every 5-15 seconds randomly
+  if (timeDiff < 5 + Math.random() * 10) return;
+  
+  lastUpdateTime = now;
+  
+  // Calculate price change (-2% to +3% range)
+  const changePercent = (Math.random() * 5 - 2) / 100;
+  const newPrice = currentPrice * (1 + changePercent);
+  
+  // Ensure price doesn't go below base
+  currentPrice = Math.max(BASE_PRICE * 0.9, newPrice);
+  
+  updatePriceDisplay(currentPrice, changePercent);
+}
+
+function updatePriceDisplay(price, changePercent) {
+  const priceElement = document.getElementById('currentPrice');
+  const changeElement = document.getElementById('changePercent');
+  const iconElement = document.getElementById('changeIcon');
+  
+  // Visual feedback
+  priceElement.classList.add('price-update');
+  setTimeout(() => priceElement.classList.remove('price-update'), 500);
+  
+  // Update values
+  priceElement.textContent = price.toFixed(6);
+  const percentDisplay = (changePercent * 100).toFixed(2);
+  changeElement.textContent = `${Math.abs(percentDisplay)}%`;
+  
+  // Set direction styling
+  const container = document.getElementById('priceChange');
+  if (changePercent >= 0) {
+    container.classList.remove('price-down');
+    container.classList.add('price-up');
+    document.getElementById('changeArrow').setAttribute('d', 'M5 10l7-7m0 0l7 7m-7-7v18');
+  } else {
+    container.classList.remove('price-up');
+    container.classList.add('price-down');
+    document.getElementById('changeArrow').setAttribute('d', 'M19 14l-7 7m0 0l-7-7m7 7V3');
+  }
+  
+  // Show icon
+  iconElement.classList.remove('hidden');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  // Start simulation (replace with real API calls)
+  setInterval(simulatePriceMovement, 1000);
+  
+  // Optional: Add currency switcher
+  document.querySelector('.currency').addEventListener('click', () => {
+    alert("Would switch between USD/ETH/SOL in real implementation");
+  });
+});
 </script>
 
         
