@@ -78,7 +78,6 @@
       <p id="priceInfo" class="mb-2">Price: $0.000100</p>
       <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
       <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-        <div class="bg-green-500 h-4 rounded-full transition-all duration-700 ease-in-out" id="progressBar" style="width: 10%"></div>
       </div>
       <p class="mb-4 timer" id="countdown"></p>
 
@@ -92,11 +91,111 @@
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-2 border rounded mb-4 text-black" />
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Buy Now</button>
     </section>
+<script>
+  // State
+  let userWallet = null;
+  const referralSection = document.getElementById('referralSection');
 
-    <!-- Presale Section -->
-<section id="presale" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-  <!-- Your existing presale content -->
-</section>
+  // Unified connection handler
+  async function handleWalletConnection() {
+    try {
+      if (typeof window.ethereum === 'undefined') {
+        alert('Please install MetaMask or another Web3 wallet');
+        window.open('https://metamask.io/download.html', '_blank');
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.connect-button, #connectReferralButton');
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.innerHTML = 'Connecting...';
+      });
+
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWallet = accounts[0];
+      
+      buttons.forEach(btn => {
+        btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+        btn.disabled = false;
+      });
+
+      generateReferralUI();
+      
+    } catch (error) {
+      console.error("Connection error:", error);
+      alert(`Connection failed: ${error.message}`);
+      document.querySelectorAll('.connect-button, #connectReferralButton').forEach(btn => {
+        btn.disabled = false;
+        btn.textContent = "Connect Wallet";
+      });
+    }
+  }
+
+  function generateReferralUI() {
+    if (!userWallet || !referralSection) return;
+    
+    referralSection.innerHTML = `
+      <div class="space-y-4">
+        <div>
+          <label class="block mb-2">Your referral link:</label>
+          <div class="flex">
+            <input type="text" id="userReferralLink" 
+                   value="${getReferralLink()}" 
+                   class="flex-1 p-2 border rounded-l" readonly>
+            <button onclick="copyReferralLink()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+              Copy
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+          <p>Total referrals: <span id="referralCount">0</span></p>
+          <p>Earnings: <span id="referralEarnings">0 FLUFFI</span></p>
+        </div>
+      </div>
+    `;
+  }
+
+  function getReferralLink() {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    params.set('ref', userWallet);
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  function copyReferralLink() {
+    const linkInput = document.getElementById('userReferralLink');
+    if (!linkInput) return;
+    
+    linkInput.select();
+    document.execCommand('copy');
+    alert("Copied to clipboard!");
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    // Event listeners
+    if (document.getElementById('connectButton')) {
+      document.getElementById('connectButton').addEventListener('click', handleWalletConnection);
+    }
+    if (document.getElementById('connectReferralButton')) {
+      document.getElementById('connectReferralButton').addEventListener('click', handleWalletConnection);
+    }
+    
+    // Check existing connection
+    if (window.ethereum?.selectedAddress) {
+      userWallet = window.ethereum.selectedAddress;
+      generateReferralUI();
+    }
+    
+    // Check URL for referral parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('referralCode', refCode);
+    }
+  });
+</script>
 
 <!-- Referral Section -->
 <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
