@@ -336,3 +336,41 @@ transition-all {
 .stage-transition {
   animation: stagePulse 0.5s ease-in-out;
 }
+.price-ticker {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.dark .price-ticker {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.change-indicator {
+  transition: all 0.5s ease;
+}
+
+.price-up {
+  color: #10B981; /* Tailwind green-500 */
+}
+
+.price-up svg {
+  transform: rotate(0deg);
+}
+
+.price-down {
+  color: #EF4444; /* Tailwind red-500 */
+}
+
+.price-down svg {
+  transform: rotate(180deg);
+}
+
+@keyframes pulseUpdate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.price-update {
+  animation: pulseUpdate 0.5s ease;
+}
