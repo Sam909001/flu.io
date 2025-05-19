@@ -209,6 +209,27 @@ document.addEventListener('DOMContentLoaded', () => {
   startTokenCounter();
   // Your other init code...
 });
+        // Contract Verification Functions
+function copyContractAddress() {
+  const address = "0x7f5c764cbc14f9669b88837ca1490cca17c31607"; // Replace with your actual contract address
+  navigator.clipboard.writeText(address);
+  
+  // Visual feedback
+  const button = event.currentTarget;
+  button.innerHTML = `Copied!`;
+  setTimeout(() => {
+    button.innerHTML = `0x7f5...3a4b 
+      <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+      </svg>`;
+  }, 2000);
+}
+
+// Optional: Verify contract on click
+function verifyOnEtherscan() {
+  const address = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+  window.open(`https://etherscan.io/verifyContract?a=${address}`, '_blank');
+}
 </script>
 
         
