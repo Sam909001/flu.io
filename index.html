@@ -71,9 +71,30 @@
   </header>
 
   <main class="p-6 max-w-4xl mx-auto">
+    <!-- Presale Section -->
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
       <h2 class="section-title">Presale is Live!</h2>
-      <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
+      <!-- Dynamic Stage Indicator -->
+<div class="stage-indicator mb-4">
+  <div class="flex justify-between items-center mb-1">
+    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+      Stage <span id="currentStage">1</span>/<span id="totalStages">15</span>
+    </span>
+    <span class="text-xs font-mono text-gray-500" id="stageTimer">23:59:59</span>
+  </div>
+  
+  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+    <div id="stageProgress" 
+         class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500 ease-out" 
+         style="width: 6.66%">
+    </div>
+  </div>
+  
+  <div class="flex justify-between mt-1">
+    <span class="text-xs text-gray-500">Start</span>
+    <span class="text-xs text-gray-500">Stage End</span>
+  </div>
+</div>
       <p id="priceInfo" class="mb-2">Price: $0.000100</p>
 <div class="flex items-center mt-2">
   <svg class="w-5 h-5 mr-1 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
