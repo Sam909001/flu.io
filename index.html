@@ -92,7 +92,7 @@
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Buy Now</button>
     </section>
 
-    <!-- ======= PASTE THIS RIGHT AFTER YOUR PRESALE SECTION ======= -->
+<!-- ======= PASTE THIS UNDER PRESALE SECTION ======= -->
 <!-- Referral Section -->
 <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
   <h2 class="text-2xl font-bold mb-4">Earn with Referrals</h2>
@@ -105,91 +105,67 @@
 </section>
 
 <script>
-// ======= REFERRAL SYSTEM - WORKS OUT OF THE BOX =======
-(function() {
-  // Check if already initialized
-  if (window.fluffiReferralInitialized) return;
-  window.fluffiReferralInitialized = true;
+// ======= SELF-CONTAINED REFERRAL SYSTEM =======
+document.addEventListener('DOMContentLoaded', function() {
+  // Prevent duplicate initialization
+  if (window.referralSystemLoaded) return;
+  window.referralSystemLoaded = true;
   
   const referralSection = document.getElementById('referralSection');
   const connectBtn = document.getElementById('referralConnectBtn');
   
   if (!referralSection || !connectBtn) return;
   
-  // Handle wallet connection
+  // Main wallet connection handler
   async function connectWallet() {
     try {
       if (typeof window.ethereum === 'undefined') {
         alert('Please install MetaMask!');
-        window.open('https://metamask.io/download.html', '_blank');
         return;
       }
       
       connectBtn.disabled = true;
-      connectBtn.innerHTML = 'Connecting... <span class="loader"></span>';
+      connectBtn.innerHTML = 'Connecting...';
       
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const wallet = accounts[0];
       
-      // Update UI
-      connectBtn.textContent = `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
-      connectBtn.disabled = false;
-      
       // Generate referral UI
-      referralSection.innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-2">Your referral link:</label>
-            <div class="flex">
-              <input type="text" id="fluffiReferralLink" 
-                     value="${window.location.href.split('?')[0]}?ref=${wallet}" 
-                     class="flex-1 p-2 border rounded-l" readonly>
-              <button onclick="copyFluffiReferral()" 
-                      class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
-                Copy
-              </button>
-            </div>
-          </div>
-          <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
-            <p>Total referrals: <span id="fluffiRefCount">0</span></p>
-            <p>Earnings: <span id="fluffiRefEarnings">0 FLUFFI</span></p>
-          </div>
-        </div>
-      `;
-      
-      // Check for existing ref code
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('ref')) {
-        localStorage.setItem('fluffiReferral', urlParams.get('ref'));
-      }
+      showReferralUI(wallet);
       
     } catch (error) {
-      console.error("Wallet connection failed:", error);
+      console.error("Connection failed:", error);
       connectBtn.disabled = false;
       connectBtn.textContent = "Connect Wallet";
-      alert("Connection failed: " + (error.message || error));
     }
   }
   
-  // Copy function
-  window.copyFluffiReferral = function() {
-    const input = document.getElementById('fluffiReferralLink');
-    if (!input) return;
-    input.select();
-    document.execCommand('copy');
-    alert("Copied referral link to clipboard!");
-  };
-  
-  // Attach click handler
-  connectBtn.addEventListener('click', connectWallet);
-  
-  // Auto-connect if already connected
-  if (window.ethereum?.selectedAddress) {
-    connectWallet();
-  }
-})();
-</script>
-<!-- ======= END OF REFERRAL SECTION ======= -->
+  // Show referral interface after connection
+  function showReferralUI(wallet) {
+    const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+    
+    referralSection.innerHTML = `
+      <div class="space-y-4">
+        <div>
+          <label class="block mb-2">Your referral link:</label>
+          <div class="flex">
+            <input type="text" id="fluffiReferralLink" 
+                   value="${referralLink}" 
+                   class="flex-1 p-2 border rounded-l" readonly>
+            <button id="copyReferralBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+              Copy
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+          <p>Total referrals: <span id="fluffiRefCount">0</span></p>
+          <p>Earnings: <span id="fluffiRefEarnings">0 FLUFFI</span></p>
+        </div>
+        
+        <!-- Social Sharing Buttons -->
+        <div class="mt-4">
+          <p class="text-sm mb-2">Share your link:</p>
+          <div class="flex space-x-3
     
 <!-- Staking Section -->
 <section id="staking" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
