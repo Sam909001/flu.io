@@ -144,6 +144,60 @@ const startTime = new Date("2025-05-05T12:00:00Z").getTime();
     updateStage();
     updateCountdown();
   }, 1000);
+// Stage Configuration
+const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours per stage in ms
+const TOTAL_STAGES = 15;
+let currentStage = 1;
+let stageEndTime = Date.now() + STAGE_DURATION;
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateStageIndicator();
+  startStageTimer();
+});
+
+function updateStageIndicator() {
+  // Calculate progress (0-100)
+  const elapsed = Math.max(0, Date.now() - (stageEndTime - STAGE_DURATION));
+  const progress = Math.min(100, (elapsed / STAGE_DURATION) * 100);
+  
+  // Update UI
+  document.getElementById('currentStage').textContent = currentStage;
+  document.getElementById('totalStages').textContent = TOTAL_STAGES;
+  document.getElementById('stageProgress').style.width = `${progress}%`;
+  
+  // Change color at thresholds
+  const progressBar = document.getElementById('stageProgress');
+  if (progress >= 85) {
+    progressBar.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all duration-500 ease-out';
+  } else {
+    progressBar.className = 'bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500 ease-out';
+  }
+}
+
+function startStageTimer() {
+  setInterval(() => {
+    const now = Date.now();
+    const remaining = stageEndTime - now;
+    
+    // Stage completion check
+    if (remaining <= 0) {
+      currentStage = Math.min(currentStage + 1, TOTAL_STAGES);
+      stageEndTime = now + STAGE_DURATION;
+    }
+    
+    // Update timer display
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+    
+    document.getElementById('stageTimer').textContent = 
+      `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    // Update progress bar
+    updateStageIndicator();
+  }, 1000);
+}
 // Progress Bar Animation
 function updateProgress() {
   const progressPercent = (currentStage / stages) * 100;
