@@ -95,26 +95,29 @@
     <span class="text-xs text-gray-500">Stage End</span>
   </div>
 </div>
-  <!-- Real-Time Price Ticker -->
-<div class="price-ticker bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6">
-  <div class="flex justify-between items-center">
+  <!-- Real-Time Price Ticker (Fixed Version) -->
+<div class="price-ticker bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6 border border-gray-200 dark:border-gray-700">
+  <div class="flex justify-between items-start">
+    <!-- Left Side - Token Info -->
     <div>
-      <h3 class="font-bold text-lg flex items-center">
-        <span class="mr-2">$FLUFFI</span>
-        <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-full">
+      <div class="flex items-center mb-1">
+        <h3 class="font-bold text-lg mr-2">$FLUFFI</h3>
+        <span class="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full flex items-center">
+          <span class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
           LIVE
         </span>
-      </h3>
+      </div>
       <p class="text-sm text-gray-500 dark:text-gray-400">Current Price</p>
     </div>
     
+    <!-- Right Side - Price Data -->
     <div class="text-right">
-      <div class="price-display flex items-center justify-end">
-        <span class="text-2xl font-mono" id="currentPrice">0.0001</span>
-        <span class="ml-2 text-sm currency">USD</span>
+      <div class="flex items-center justify-end">
+        <span class="text-2xl font-mono font-bold" id="currentPrice">0.0001</span>
+        <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">USD</span>
       </div>
-      <div id="priceChange" class="change-indicator text-sm flex items-center justify-end mt-1">
-        <svg class="w-4 h-4 mr-1 hidden" id="changeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div id="priceChange" class="flex items-center justify-end mt-1 text-sm">
+        <svg id="changeIcon" class="w-4 h-4 mr-1 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path id="changeArrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
         </svg>
         <span id="changePercent">0.00%</span>
@@ -122,9 +125,9 @@
     </div>
   </div>
   
-  <!-- Optional 24h Chart Placeholder -->
+  <!-- Chart Placeholder -->
   <div class="mt-4 h-24 bg-gray-50 dark:bg-gray-700 rounded flex items-center justify-center">
-    <p class="text-gray-400 text-sm">Price chart loading...</p>
+    <p class="text-gray-400 text-sm">Chart loading...</p>
   </div>
 </div>
       <p id="priceInfo" class="mb-2">Price: $0.000100</p>
