@@ -185,7 +185,14 @@ function startStageTimer() {
       currentStage = Math.min(currentStage + 1, TOTAL_STAGES);
       stageEndTime = now + STAGE_DURATION;
     }
-    
+
+    if (remaining <= 0) {
+  document.getElementById('stageProgress').classList.add('stage-transition');
+  setTimeout(() => {
+    document.getElementById('stageProgress').classList.remove('stage-transition');
+  }, 500);
+  // ... existing stage transition code
+}
     // Update timer display
     const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
