@@ -62,48 +62,21 @@
 </head>
 <body class="text-gray-800 dark:text-white">
   <div class="container mx-auto px-4 py-12 max-w-6xl">
-   <!-- Wallet Connection Bar -->
+<!-- Wallet Connection Bar -->
 <div class="flex justify-end mb-6">
-  <div class="flex flex-wrap gap-3" id="walletConnectContainer">
-    <!-- Ethereum Button with MetaMask Icon -->
-    <button id="connectEthBtn" class="wallet-btn bg-[#627EEA] hover:bg-[#4561C0] text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 group">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-5 h-5 mr-2" alt="MetaMask">
-      <span>Ethereum</span>
-      <span class="ml-2 opacity-80 group-hover:opacity-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11 2L4 7l7 5l7-5l-7-5m0 7L4 12l7 5l7-5l-7-5m0 7L4 19l7 5l7-5l-7-5"/>
-        </svg>
-      </span>
-    </button>
-
-    <!-- BSC Button with Binance Wallet Icon -->
-    <button id="connectBscBtn" class="wallet-btn bg-[#F0B90B] hover:bg-[#D8A60A] text-gray-900 px-4 py-2 rounded-lg flex items-center transition-all duration-200 group">
-      <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=025" class="w-5 h-5 mr-2" alt="BSC">
-      <span>Binance</span>
-      <span class="ml-2 opacity-80 group-hover:opacity-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m7 7l-3 3l3 3l3-3l-3-3Z"/>
-        </svg>
-      </span>
-    </button>
-
-    <!-- Solana Button with Phantom Icon -->
-    <button id="connectSolBtn" class="wallet-btn bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:from-[#7B36CC] hover:to-[#11C97D] text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 group">
-      <img src="https://phantom.app/favicon.ico" class="w-5 h-5 mr-2" alt="Phantom">
-      <span>Solana</span>
-      <span class="ml-2 opacity-80 group-hover:opacity-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L4 7l8 5l8-5l-8-5m0 7L4 12l8 5l8-5l-8-5m0 7L4 19l8 5l8-5l-8-5"/>
-        </svg>
-      </span>
+  <div id="walletConnectContainer">
+    <!-- WalletConnect Button Only -->
+    <button id="connectWalletBtn" class="wallet-btn bg-[#3b99fc] hover:bg-[#2a7dd1] text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200">
+      <img src="https://walletconnect.com/walletconnect-logo.png" class="w-5 h-5 mr-2" alt="WalletConnect">
+      <span>Connect Wallet</span>
     </button>
   </div>
 
   <!-- Connected Wallet Display -->
   <div id="connectedWallet" class="hidden items-center bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-lg">
-    <img id="connectedWalletIcon" src="" class="w-5 h-5 mr-2">
+    <img id="connectedWalletIcon" src="https://walletconnect.com/walletconnect-logo.png" class="w-5 h-5 mr-2">
     <span id="walletAddress" class="font-mono text-sm"></span>
-    <span id="chainIndicator" class="chain-indicator ml-2"></span>
+    <span id="chainIndicator" class="chain-indicator ml-2">Ethereum</span>
     <button id="disconnectBtn" class="text-red-500 hover:text-red-700 dark:hover:text-red-400 ml-3">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -115,7 +88,7 @@
 <style>
   .wallet-btn {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-width: 140px;
+    min-width: 180px;
   }
   .wallet-btn:hover {
     transform: translateY(-1px);
@@ -125,61 +98,91 @@
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
     border-radius: 9999px;
+    background-color: #3b99fc;
     color: white;
-  }
-  .eth-indicator {
-    background-color: #627EEA;
-  }
-  .bsc-indicator {
-    background-color: #F0B90B;
-    color: #1E2026;
-  }
-  .sol-indicator {
-    background: linear-gradient(135deg, #9945FF, #14F195);
   }
 </style>
 
 <script>
-  // Update wallet icon in connected state
-  function updateWalletUI() {
-    const walletIcon = document.getElementById('connectedWalletIcon');
+// WalletConnect Integration
+let walletConnectProvider = null;
+
+async function connectWallet() {
+  try {
+    // Initialize WalletConnect provider
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        1: "https://mainnet.infura.io/v3/YOUR_INFURA_ID", // Ethereum Mainnet
+        5: "https://goerli.infura.io/v3/YOUR_INFURA_ID"  // Goerli Testnet
+      },
+      chainId: 1 // Default to Ethereum Mainnet
+    });
+
+    // Enable session
+    await walletConnectProvider.enable();
     
-    if (walletType === 'ethereum') {
-      walletIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg';
-      walletIcon.alt = 'MetaMask';
-      document.getElementById('chainIndicator').className = 'chain-indicator eth-indicator';
-      document.getElementById('chainIndicator').textContent = getNetworkName(currentChainId);
-    } 
-    else if (walletType === 'bsc') {
-      walletIcon.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png?v=025';
-      walletIcon.alt = 'Binance Chain';
-      document.getElementById('chainIndicator').className = 'chain-indicator bsc-indicator';
-      document.getElementById('chainIndicator').textContent = 'BSC';
-    }
-    else if (walletType === 'solana') {
-      walletIcon.src = 'https://phantom.app/favicon.ico';
-      walletIcon.alt = 'Phantom';
-      document.getElementById('chainIndicator').className = 'chain-indicator sol-indicator';
-      document.getElementById('chainIndicator').textContent = 'Solana';
-    }
+    // Get accounts
+    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+    currentWallet = accounts[0];
     
-    // Format wallet address
-    document.getElementById('walletAddress').textContent = 
-      walletType === 'solana' 
-        ? `${currentWallet.substring(0, 4)}...${currentWallet.substring(currentWallet.length - 4)}`
-        : `${currentWallet.substring(0, 6)}...${currentWallet.substring(38)}`;
+    // Get chain ID
+    currentChainId = await walletConnectProvider.request({ method: 'eth_chainId' });
     
-    // Show connected UI
+    // Update UI
+    updateWalletUI();
+    
+    // Subscribe to events
+    walletConnectProvider.on("accountsChanged", (accounts) => {
+      currentWallet = accounts[0] || null;
+      updateWalletUI();
+    });
+    
+    walletConnectProvider.on("chainChanged", (chainId) => {
+      currentChainId = chainId;
+      updateWalletUI();
+    });
+    
+    walletConnectProvider.on("disconnect", () => {
+      disconnectWallet();
+    });
+    
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    alert("Connection failed: " + error.message);
+  }
+}
+
+function updateWalletUI() {
+  if (currentWallet) {
     document.getElementById('walletConnectContainer').classList.add('hidden');
     document.getElementById('connectedWallet').classList.remove('hidden');
+    document.getElementById('walletAddress').textContent = 
+      `${currentWallet.substring(0, 6)}...${currentWallet.substring(38)}`;
     
-    // Update referral link
+    // Update referral link if exists
     if (document.getElementById('referralLink')) {
-      const refParam = walletType === 'solana' ? `sol:${currentWallet}` : `eth:${currentWallet}`;
       document.getElementById('referralLink').value = 
-        `${window.location.origin}${window.location.pathname}?ref=${refParam}`;
+        `${window.location.origin}${window.location.pathname}?ref=eth:${currentWallet}`;
     }
+  } else {
+    document.getElementById('walletConnectContainer').classList.remove('hidden');
+    document.getElementById('connectedWallet').classList.add('hidden');
   }
+}
+
+function disconnectWallet() {
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
+    walletConnectProvider = null;
+  }
+  currentWallet = null;
+  currentChainId = null;
+  updateWalletUI();
+}
+
+// Event Listeners
+document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+document.getElementById('disconnectBtn').addEventListener('click', disconnectWallet);
 </script>
 
     <!-- Header -->
