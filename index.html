@@ -71,33 +71,20 @@
   </header>
 
   <main class="p-6 max-w-4xl mx-auto">
-    <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
+<section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
       <h2 class="section-title">Presale is Live!</h2>
       <p id="stageInfo" class="mb-2">Stage: 1 / 15</p>
       <p id="priceInfo" class="mb-2">Price: $0.000100</p>
-<div class="flex items-center mt-3">
-      <div class="flex items-center mt-2">
-  <svg class="w-5 h-5 mr-1 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-  </svg>
-  <span class="font-mono" id="tokensSold">8,421,509</span>
-  <span class="ml-1 text-sm text-gray-500">FLUFFI sold</span>
-</div>
       <p class="mb-2">Referral Bonus: <strong>10%</strong></p>
-      <!-- Animated Progress Bar + Timer Combo -->
-<div class="mb-4 space-y-2">
-  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-    <div id="progressBar" 
-         class="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full transition-all duration-1000 ease-out" 
-         style="width: 10%">
-    </div>
+      <!-- Animated Progress Bar -->
+<div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+  <div id="progressBar" 
+       class="bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full transition-all duration-1000 ease-out" 
+       style="width: 10%">
   </div>
-  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-    Stage <span id="stageDisplay">1</span>/<span id="totalStages">15</span> • 
-    <span id="countdown" class="font-mono"></span>
-  </p>
 </div>
+      <p class="mb-4 timer" id="countdown"></p>
+
       <div class="flex gap-2 mb-4">
         <input type="number" placeholder="Amount" id="amountInput" class="w-full p-2 border rounded text-black" />
         <select id="currencySelect" class="p-2 border rounded text-black">
@@ -108,6 +95,7 @@
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-2 border rounded mb-4 text-black" />
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Buy Now</button>
     </section>
+
 
 <!-- ======= REFERRAL SECTION ======= -->
 <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
