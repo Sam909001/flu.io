@@ -1,10 +1,3 @@
-// ====== MAIN FIXES ======
-// 1. Consolidated duplicate wallet connection functions
-// 2. Fixed referral tracking logic
-// 3. Added proper error handling
-// 4. Resolved variable scope issues
-// 5. Improved UI updates
-
 // --- Global State ---
 let userWallet = null;
 const leaderboard = JSON.parse(localStorage.getItem('fluffiLeaderboard')) || {};
