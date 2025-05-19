@@ -185,7 +185,33 @@ function startCountdown() {
     
     document.getElementById('countdown').textContent = 
       `${
+        // Live Token Counter Simulation
+function startTokenCounter() {
+  const counter = document.getElementById('tokensSold');
+  let count = 8421509; // Starting value
+  
+  // Update every 2 seconds with random increment
+  setInterval(() => {
+    const increment = Math.floor(Math.random() * 500) + 100;
+    count += increment;
+    counter.textContent = count.toLocaleString();
+    
+    // Add visual feedback on update
+    counter.classList.add('scale-110', 'text-green-500');
+    setTimeout(() => {
+      counter.classList.remove('scale-110', 'text-green-500');
+    }, 300);
+  }, 2000);
+}
+
+// Initialize when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  startTokenCounter();
+  // Your other init code...
+});
 </script>
+
+        
 // Generate referral link from wallet address
 function generateReferralLink(address) {
   const baseUrl = window.location.href.split('?')[0];
