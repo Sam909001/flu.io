@@ -6,9 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Referral Program</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <!-- Wallet Connection SDKs -->
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@1.70.1/lib/index.iife.min.js"></script>
   <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+      font-family: 'Inter', sans-serif;
     }
     .dark {
       background: #111827;
@@ -23,10 +28,61 @@
     .dark .leaderboard-row:nth-child(odd) {
       background-color: rgba(31, 41, 55, 0.5);
     }
+    .wallet-btn {
+      transition: all 0.3s ease;
+    }
+    .wallet-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #walletAddress {
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .token-logo {
+      width: 20px;
+      height: 20px;
+    }
+    .chain-indicator {
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+    }
+    .eth-chain {
+      background-color: #627EEA;
+      color: white;
+    }
+    .sol-chain {
+      background-color: #9945FF;
+      color: white;
+    }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
   <div class="container mx-auto px-4 py-12 max-w-6xl">
+    <!-- Wallet Connection Bar -->
+    <div class="flex justify-end mb-6">
+      <div class="flex space-x-3" id="walletConnectContainer">
+        <button id="connectEthBtn" class="wallet-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+          <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" class="token-logo mr-2" alt="ETH">
+          Connect Ethereum
+        </button>
+        <button id="connectSolBtn" class="wallet-btn bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center">
+          <img src="https://cryptologos.cc/logos/solana-sol-logo.png" class="token-logo mr-2" alt="SOL">
+          Connect Solana
+        </button>
+      </div>
+      <div id="connectedWallet" class="hidden items-center bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-lg">
+        <span id="walletAddress" class="font-mono mr-3"></span>
+        <span id="chainIndicator" class="chain-indicator"></span>
+        <button id="disconnectBtn" class="text-red-500 hover:text-red-700 dark:hover:text-red-400 ml-2">
+          Disconnect
+        </button>
+      </div>
+    </div>
+
     <!-- Header -->
     <header class="text-center mb-12">
       <h1 class="text-4xl font-bold mb-4">$FLUFFI Referral Program</h1>
@@ -47,7 +103,6 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Sample data - in real app this would be dynamic -->
             <tr class="leaderboard-row border-b border-gray-200 dark:border-gray-700">
               <td class="py-3 px-4">1</td>
               <td class="py-3 px-4">0x7f...3a4b</td>
@@ -60,7 +115,6 @@
               <td class="py-3 px-4">$9,870</td>
               <td class="py-3 px-4">197</td>
             </tr>
-            <!-- Add more rows up to 25 -->
           </tbody>
         </table>
       </div>
@@ -127,22 +181,181 @@
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="mt-8 text-center">
-        <p class="text-lg">
-          By participating in our referral program, you can help spread the word about $FLUFFI and earn extra rewards along the way. 
-          Join us in making $FLUFFI a success!
-        </p>
+    <!-- Referral Link Section (shown when connected) -->
+    <section id="referralSection" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-8">
+      <h2 class="text-2xl font-bold mb-4">Your Referral Link</h2>
+      <div class="flex">
+        <input type="text" id="referralLink" readonly 
+               class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600">
+        <button id="copyReferralBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-r-lg">
+          Copy
+        </button>
+      </div>
+      <div class="mt-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Share this link to earn 10% of all purchases made through it</p>
       </div>
     </section>
   </div>
 
   <script>
-    // Simple wallet connection for demo purposes
-    document.getElementById('connectWalletBtn').addEventListener('click', function() {
-      alert('Wallet connection would be implemented here with Web3');
+    // ====== Wallet Connection Logic ======
+    let currentWallet = null;
+    let walletType = null;
+    let currentChainId = null;
+
+    // Ethereum Connection
+    async function connectEthereum() {
+      try {
+        if (window.ethereum) {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          currentWallet = accounts[0];
+          walletType = 'ethereum';
+          
+          // Get chain ID
+          currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+          
+          // Set up listeners
+          window.ethereum.on('accountsChanged', (accounts) => {
+            currentWallet = accounts[0] || null;
+            updateWalletUI();
+          });
+          
+          window.ethereum.on('chainChanged', (chainId) => {
+            currentChainId = chainId;
+            updateWalletUI();
+            window.location.reload();
+          });
+          
+          updateWalletUI();
+          
+        } else {
+          alert('Ethereum wallet not detected! Install MetaMask or another Web3 provider.');
+        }
+      } catch (error) {
+        console.error("Ethereum connection error:", error);
+        alert("Connection failed: " + error.message);
+      }
+    }
+
+    // Solana Connection
+    async function connectSolana() {
+      try {
+        if (window.solana && window.solana.isPhantom) {
+          const response = await window.solana.connect();
+          currentWallet = response.publicKey.toString();
+          walletType = 'solana';
+          currentChainId = 'solana-mainnet';
+          
+          // Listen for account changes
+          window.solana.on('accountChanged', (publicKey) => {
+            currentWallet = publicKey ? publicKey.toString() : null;
+            updateWalletUI();
+          });
+          
+          updateWalletUI();
+          
+        } else {
+          alert('Phantom wallet not found! Please install it from https://phantom.app/');
+        }
+      } catch (error) {
+        console.error("Solana connection error:", error);
+        alert("Connection failed: " + error.message);
+      }
+    }
+
+    // Update UI after connection
+    function updateWalletUI() {
+      const connectContainer = document.getElementById('walletConnectContainer');
+      const connectedDisplay = document.getElementById('connectedWallet');
+      const referralSection = document.getElementById('referralSection');
+      const chainIndicator = document.getElementById('chainIndicator');
+      
+      if (currentWallet) {
+        connectContainer.classList.add('hidden');
+        connectedDisplay.classList.remove('hidden');
+        
+        // Format wallet address
+        document.getElementById('walletAddress').textContent = 
+          walletType === 'ethereum' 
+            ? `${currentWallet.substring(0, 6)}...${currentWallet.substring(38)}`
+            : `${currentWallet.substring(0, 4)}...${currentWallet.substring(currentWallet.length - 4)}`;
+        
+        // Set chain indicator
+        if (walletType === 'ethereum') {
+          chainIndicator.textContent = getNetworkName(currentChainId);
+          chainIndicator.className = 'chain-indicator eth-chain';
+        } else {
+          chainIndicator.textContent = 'Solana';
+          chainIndicator.className = 'chain-indicator sol-chain';
+        }
+        
+        // Show referral section with chain-specific link
+        referralSection.classList.remove('hidden');
+        const refParam = walletType === 'ethereum' ? `eth:${currentWallet}` : `sol:${currentWallet}`;
+        document.getElementById('referralLink').value = 
+          `${window.location.origin}${window.location.pathname}?ref=${refParam}`;
+        
+      } else {
+        connectContainer.classList.remove('hidden');
+        connectedDisplay.classList.add('hidden');
+        referralSection.classList.add('hidden');
+      }
+    }
+
+    // Helper: Get Ethereum network name
+    function getNetworkName(chainId) {
+      const networks = {
+        '0x1': 'Ethereum',
+        '0x5': 'Goerli',
+        '0xaa36a7': 'Sepolia',
+        '0x89': 'Polygon',
+        '0xa86a': 'AVAX',
+        'solana-mainnet': 'Solana'
+      };
+      return networks[chainId] || `Chain ${chainId}`;
+    }
+
+    // Disconnect wallet
+    function disconnectWallet() {
+      if (walletType === 'solana' && window.solana) {
+        window.solana.disconnect();
+      }
+      currentWallet = null;
+      walletType = null;
+      currentChainId = null;
+      updateWalletUI();
+    }
+
+    // Copy referral link
+    document.getElementById('copyReferralBtn').addEventListener('click', () => {
+      const linkInput = document.getElementById('referralLink');
+      linkInput.select();
+      document.execCommand('copy');
+      
+      // Visual feedback
+      const btn = document.getElementById('copyReferralBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
     });
-    
+
+    // Check for existing referral in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    if (refParam) {
+      localStorage.setItem('fluffiReferral', refParam);
+      console.log('Referral detected:', refParam);
+    }
+
+    // Event listeners
+    document.getElementById('connectEthBtn').addEventListener('click', connectEthereum);
+    document.getElementById('connectSolBtn').addEventListener('click', connectSolana);
+    document.getElementById('disconnectBtn').addEventListener('click', disconnectWallet);
+
     // Dark mode toggle
     const darkModeToggle = document.createElement('button');
     darkModeToggle.className = 'fixed bottom-4 right-4 bg-gray-200 dark:bg-gray-700 p-3 rounded-full shadow-lg';
@@ -158,6 +371,16 @@
     if (localStorage.getItem('darkMode') === 'true') {
       document.documentElement.classList.add('dark');
       darkModeToggle.innerHTML = '☀️';
+    }
+
+    // Initialize (check if already connected)
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      currentWallet = window.ethereum.selectedAddress;
+      walletType = 'ethereum';
+      window.ethereum.request({ method: 'eth_chainId' }).then(chainId => {
+        currentChainId = chainId;
+        updateWalletUI();
+      });
     }
   </script>
 </body>
