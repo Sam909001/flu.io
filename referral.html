@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Referral Program</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <!-- Add WalletConnect client -->
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.7.1/dist/umd/index.min.js"></script>
   <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
@@ -23,12 +25,39 @@
     .dark .leaderboard-row:nth-child(odd) {
       background-color: rgba(31, 41, 55, 0.5);
     }
+    .wallet-btn {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      min-width: 180px;
+    }
+    .wallet-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .wallet-btn.connected {
+      background-color: #4CAF50;
+    }
+    .wallet-btn.connected:hover {
+      background-color: #3e8e41;
+    }
+    .chain-indicator {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      background-color: #3b99fc;
+      color: white;
+    }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
   <div class="container mx-auto px-4 py-12 max-w-6xl">
-    <!-- Header -->
-    <header class="text-center mb-12">
+    <!-- Header with Wallet Connect Button -->
+    <header class="text-center mb-12 relative">
+      <div class="absolute top-0 right-0">
+        <button id="walletBtn" class="wallet-btn bg-[#3b99fc] hover:bg-[#2a7dd1] text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200">
+          <img src="https://walletconnect.com/walletconnect-logo.png" class="w-5 h-5 mr-2" alt="WalletConnect">
+          <span id="walletBtnText">Connect Wallet</span>
+        </button>
+      </div>
       <h1 class="text-4xl font-bold mb-4">$FLUFFI Referral Program</h1>
       <p class="text-xl text-gray-600 dark:text-gray-300">Earn rewards by spreading the word about FLUFFI</p>
     </header>
@@ -86,6 +115,14 @@
             <div>
               <h3 class="text-xl font-semibold mb-2">Connect Your Wallet</h3>
               <p class="mb-4">Visit the buy page and connect your wallet. Once connected, you will receive a unique referral code.</p>
+              <!-- Added referral link display for connected wallets -->
+              <div id="referralSection" class="hidden bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4">
+                <p class="font-semibold mb-2">Your referral link:</p>
+                <div class="flex">
+                  <input id="referralLink" type="text" readonly class="flex-grow bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-l-lg px-3 py-2">
+                  <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg">Copy</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="text-center text-3xl my-2">↓</div>
@@ -138,11 +175,115 @@
   </div>
 
   <script>
-    // Simple wallet connection for demo purposes
-    document.getElementById('connectWalletBtn').addEventListener('click', function() {
-      alert('Wallet connection would be implemented here with Web3');
-    });
-    
+    // WalletConnect Integration
+    let walletConnectProvider = null;
+    let currentWallet = null;
+    let currentChainId = null;
+
+    async function toggleWalletConnection() {
+      const walletBtn = document.getElementById('walletBtn');
+      
+      if (currentWallet) {
+        // Disconnect if already connected
+        disconnectWallet();
+        walletBtn.classList.remove('connected');
+        document.getElementById('walletBtnText').textContent = 'Connect Wallet';
+        document.getElementById('referralSection').classList.add('hidden');
+      } else {
+        // Connect if not connected
+        try {
+          // Initialize WalletConnect provider
+          walletConnectProvider = new WalletConnectProvider.default({
+            rpc: {
+              1: "https://mainnet.infura.io/v3/YOUR_INFURA_ID", // Ethereum Mainnet
+              5: "https://goerli.infura.io/v3/YOUR_INFURA_ID", // Goerli Testnet
+              56: "https://bsc-dataseed.binance.org/", // Binance Smart Chain
+              137: "https://polygon-rpc.com/" // Polygon
+            },
+            chainId: 1 // Default to Ethereum Mainnet
+          });
+
+          // Enable session
+          await walletConnectProvider.enable();
+          
+          // Get accounts
+          const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+          currentWallet = accounts[0];
+          
+          // Get chain ID
+          currentChainId = await walletConnectProvider.request({ method: 'eth_chainId' });
+          
+          // Update UI
+          walletBtn.classList.add('connected');
+          document.getElementById('walletBtnText').textContent = 
+            `${currentWallet.substring(0, 6)}...${currentWallet.substring(38)}`;
+          
+          // Show referral section
+          document.getElementById('referralSection').classList.remove('hidden');
+          document.getElementById('referralLink').value = 
+            `${window.location.origin}${window.location.pathname}?ref=${currentWallet}`;
+          
+          // Subscribe to events
+          walletConnectProvider.on("accountsChanged", (accounts) => {
+            currentWallet = accounts[0] || null;
+            if (!currentWallet) {
+              disconnectWallet();
+              walletBtn.classList.remove('connected');
+              document.getElementById('walletBtnText').textContent = 'Connect Wallet';
+              document.getElementById('referralSection').classList.add('hidden');
+            } else {
+              document.getElementById('walletBtnText').textContent = 
+                `${currentWallet.substring(0, 6)}...${currentWallet.substring(38)}`;
+              document.getElementById('referralLink').value = 
+                `${window.location.origin}${window.location.pathname}?ref=${currentWallet}`;
+            }
+          });
+          
+          walletConnectProvider.on("chainChanged", (chainId) => {
+            currentChainId = chainId;
+            // You can add chain-specific logic here if needed
+          });
+          
+          walletConnectProvider.on("disconnect", () => {
+            disconnectWallet();
+            walletBtn.classList.remove('connected');
+            document.getElementById('walletBtnText').textContent = 'Connect Wallet';
+            document.getElementById('referralSection').classList.add('hidden');
+          });
+          
+        } catch (error) {
+          console.error("WalletConnect error:", error);
+          alert("Connection failed: " + error.message);
+        }
+      }
+    }
+
+    function disconnectWallet() {
+      if (walletConnectProvider) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+      currentWallet = null;
+      currentChainId = null;
+    }
+
+    function copyReferralLink() {
+      const referralInput = document.getElementById('referralLink');
+      referralInput.select();
+      document.execCommand('copy');
+      
+      // Show temporary feedback
+      const copyBtn = referralInput.nextElementSibling;
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    }
+
+    // Event Listener for Wallet Button
+    document.getElementById('walletBtn').addEventListener('click', toggleWalletConnection);
+
     // Dark mode toggle
     const darkModeToggle = document.createElement('button');
     darkModeToggle.className = 'fixed bottom-4 right-4 bg-gray-200 dark:bg-gray-700 p-3 rounded-full shadow-lg';
