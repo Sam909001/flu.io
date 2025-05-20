@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
+  +   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
++   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
   <meta name="author" content="FLUFFI Team" />
@@ -32,6 +34,17 @@
       background: #111827;
       color: white;
     }
+    +   h1, h2, h3 {
++     font-weight: 600;
++     letter-spacing: -0.025em;
++   }
++   .font-mono {
++     font-family: 'Space Mono', monospace;
++   }
++   .price-ticker {
++     font-family: 'Space Mono', monospace;
++   }
+  </style>
     .dark .text-gray-800 {
       color: white !important;
     }
@@ -48,28 +61,191 @@
       color: #60a5fa !important;
     }
   </style>
-</head>
-<body class="text-gray-800 dark:text-green">
-  <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 shadow sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
-      <h1 class="text-xl font-bold">$FLUFFI</h1>
+  
+<section class="hero bg-gradient-to-r from-purple-600 to-blue-500 text-white py-16 px-4 text-center">
+  <div class="container mx-auto max-w-4xl">
+    <div class="flex justify-center mb-6">
+      <img src="fluffi-logo-animated.gif" alt="$FLUFFI Logo" class="w-24 h-24">
     </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm">
-  <a href="#presale" class="hover:underline">Presale</a>
-  <a href="#staking" class="hover:underline">Staking</a>
-  <a href="#faq" class="hover:underline">FAQ</a>
-        <a href="referral.html" target="_blank" class="hover:underline">Referral</a>
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-green-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-  How to Buy FLUFFI
-</a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Connect Wallet</button>
-    </nav>
-  </header>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">The Next Big Meme Token on <span class="text-yellow-300">Solana</span></h1>
+    <p class="text-xl mb-8">Join the presale now and get <span class="font-bold">10% bonus tokens</span>!</p>
+    
+    <!-- Animated Countdown Timer -->
+    <div class="countdown-timer bg-black bg-opacity-20 rounded-lg p-4 inline-block mb-8">
+      <p class="text-sm mb-2">PRESALE ENDS IN:</p>
+      <div class="flex justify-center space-x-4">
+        <div class="time-block">
+          <span id="days" class="text-3xl font-mono font-bold">05</span>
+          <span class="text-xs">DAYS</span>
+        </div>
+        <div class="time-block">
+          <span id="hours" class="text-3xl font-mono font-bold">12</span>
+          <span class="text-xs">HOURS</span>
+        </div>
+        <div class="time-block">
+          <span id="minutes" class="text-3xl font-mono font-bold">45</span>
+          <span class="text-xs">MIN</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Wallet Connection Component -->
+<div class="wallet-connector">
+  <button id="walletBtn" class="flex items-center space-x-2 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-medium py-2 px-4 rounded-full transition-all duration-300 shadow-md">
+    <span id="walletStatusText">Connect Wallet</span>
+    <span id="walletStatusIcon">🔗</span>
+  </button>
+  
+  <!-- Connection Dropdown (appears when connected) -->
+  <div id="walletDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 p-3 border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center space-x-3 mb-3">
+      <img id="walletTypeIcon" src="metamask.svg" class="w-6 h-6">
+      <span id="walletAddress" class="font-mono text-sm truncate"></span>
+    </div>
+    <div class="flex justify-between text-xs mb-2">
+      <span>Network:</span>
+      <span id="networkName" class="font-medium">Ethereum Mainnet</span>
+    </div>
+    <div class="flex justify-between text-xs mb-3">
+      <span>Balance:</span>
+      <span id="walletBalance" class="font-medium">0.42 ETH</span>
+    </div>
+    <button id="disconnectBtn" class="w-full py-1 px-3 bg-red-500 hover:bg-red-600 text-white text-xs rounded">
+      Disconnect
+    </button>
+  </div>
+</div>
 
+<script>
+  // Enhanced Wallet Connection Logic
+  let walletConnected = false;
+  const walletBtn = document.getElementById('walletBtn');
+  const walletDropdown = document.getElementById('walletDropdown');
+  
+  walletBtn.addEventListener('click', async () => {
+    if(walletConnected) {
+      walletDropdown.classList.toggle('hidden');
+      return;
+    }
+    
+    try {
+      walletBtn.disabled = true;
+      document.getElementById('walletStatusText').textContent = "Connecting...";
+      document.getElementById('walletStatusIcon').innerHTML = '<div class="loader"></div>';
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const balance = await getWalletBalance(accounts[0]);
+      const network = await getNetworkName();
+      
+      // Update UI
+      walletConnected = true;
+      document.getElementById('walletStatusText').textContent = "Connected";
+      document.getElementById('walletStatusIcon').textContent = "✓";
+      document.getElementById('walletAddress').textContent = `${accounts[0].substring(0,6)}...${accounts[0].substring(38)}`;
+      document.getElementById('walletBalance').textContent = `${balance} ETH`;
+      document.getElementById('networkName').textContent = network;
+      
+      // Show dropdown briefly
+      walletDropdown.classList.remove('hidden');
+      setTimeout(() => walletDropdown.classList.add('hidden'), 2000);
+      
+    } catch (error) {
+      console.error(error);
+      resetWalletButton();
+    }
+  });
+  
+  // Helper functions
+  async function getWalletBalance(address) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const balance = await provider.getBalance(address);
+    return ethers.utils.formatEther(balance).slice(0,6);
+  }
+  
+  async function getNetworkName() {
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    return {
+      '0x1': 'Ethereum Mainnet',
+      '0x89': 'Polygon',
+      '0x38': 'BSC'
+    }[chainId] || `Chain ID: ${chainId}`;
+  }
+  
+  function resetWalletButton() {
+    walletConnected = false;
+    walletBtn.disabled = false;
+    document.getElementById('walletStatusText').textContent = "Connect Wallet";
+    document.getElementById('walletStatusIcon').textContent = "🔗";
+  }
+</script>
+      Connect Wallet to Participate
+    </button>
+  </div>
+</section>
+
+<!-- Add these in head -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --font-main: 'Poppins', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+  
+  body {
+    font-family: var(--font-main);
+    letter-spacing: 0.025em;
+  }
+  
+  h1, h2, h3 {
+    @apply font-bold tracking-tight;
+  }
+  
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  
+  /* Price ticker example */
+  .price-ticker {
+    font-family: var(--font-mono);
+    @apply text-xl font-bold;
+  }
+</style>
+
+<style>
+  .hero {
+    background-image: url('grid-pattern.svg');
+    background-blend-mode: overlay;
+  }
+  .time-block {
+    @apply flex flex-col items-center px-3;
+  }
+  .cta-button {
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(255, 214, 10, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 214, 10, 0); }
+  }
+</style>
+
+<script>
+  // Countdown Timer Functionality
+  function updateCountdown() {
+    const endDate = new Date("2025-01-31T00:00:00").getTime();
+    const now = new Date().getTime();
+    const distance = endDate - now;
+    
+    document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+    document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    document.getElementById("minutes").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  }
+  setInterval(updateCountdown, 60000);
+  updateCountdown();
+</script>
+  
   <main class="p-6 max-w-4xl mx-auto">
     <!-- Presale Section -->
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
@@ -113,7 +289,8 @@
     <!-- Right Side - Price Data -->
     <div class="text-right">
       <div class="flex items-center justify-end">
-        <span class="text-2xl font-mono font-bold" id="currentPrice">0.0001</span>
+        +   <span class="text-2xl font-mono font-bold tracking-tighter" id="currentPrice">0.0001</span>
+  </div>
         <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">USD</span>
       </div>
       <div id="priceChange" class="flex items-center justify-end mt-1 text-sm">
