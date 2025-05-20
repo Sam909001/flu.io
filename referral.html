@@ -51,6 +51,180 @@
 <body class="text-gray-800 dark:text-white">
   <div class="container mx-auto px-4 py-12 max-w-6xl">
 
+    <!-- Referral System HTML (place this where you want the referral section) -->
+<section class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+  <h2 class="text-2xl font-bold mb-4">Earn with Referrals</h2>
+  <div id="referralSection">
+    <p class="mb-4">Connect your wallet to access your referral link</p>
+    <button id="connectWalletBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+      Connect Wallet
+    </button>
+  </div>
+</section>
+
+<!-- Referral System JavaScript (place this before </body>) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+  // Referral System State
+  let userWallet = null;
+  const referralSection = document.getElementById('referralSection');
+  const connectWalletBtn = document.getElementById('connectWalletBtn');
+
+  // Initialize on DOM load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check for existing referral code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('fluffiReferral', refCode);
+    }
+
+    // Check if wallet is already connected
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      connectWalletBtn.textContent = "Connecting...";
+      handleWalletConnect(window.ethereum.selectedAddress);
+    }
+
+    // Set up wallet connection handler
+    connectWalletBtn.addEventListener('click', connectWallet);
+  });
+
+  // Wallet Connection Function
+  async function connectWallet() {
+    if (window.ethereum) {
+      try {
+        connectWalletBtn.disabled = true;
+        connectWalletBtn.textContent = "Connecting...";
+        
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        handleWalletConnect(accounts[0]);
+        
+        // Set up listeners for wallet changes
+        window.ethereum.on('accountsChanged', (newAccounts) => {
+          if (newAccounts.length > 0) {
+            handleWalletConnect(newAccounts[0]);
+          } else {
+            handleWalletDisconnect();
+          }
+        });
+        
+      } catch (error) {
+        console.error("Connection error:", error);
+        resetWalletButton();
+        alert("Wallet connection failed");
+      }
+    } else {
+      alert("Please install MetaMask or another Ethereum wallet");
+    }
+  }
+
+  // Handle Successful Connection
+  function handleWalletConnect(walletAddress) {
+    userWallet = walletAddress;
+    
+    // Update UI with referral information
+    referralSection.innerHTML = `
+      <div class="space-y-4">
+        <div>
+          <label class="block mb-2 text-sm font-medium">Your referral link:</label>
+          <div class="flex">
+            <input type="text" id="userReferralLink" 
+                   value="${generateReferralLink(walletAddress)}" 
+                   class="flex-1 p-2 border rounded-l dark:bg-gray-700 dark:border-gray-600" 
+                   readonly>
+            <button onclick="copyReferralLink()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
+              Copy
+            </button>
+          </div>
+        </div>
+        
+        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+          <div class="flex justify-between">
+            <p>Total referrals:</p>
+            <span id="referralCount" class="font-medium">0</span>
+          </div>
+          <div class="flex justify-between">
+            <p>Your earnings:</p>
+            <span id="referralEarnings" class="font-medium">0 FLUFFI</span>
+          </div>
+        </div>
+        
+        <div class="pt-2">
+          <p class="text-sm mb-2">Share your link:</p>
+          <div class="flex space-x-2">
+            <button onclick="shareOnTwitter()" class="flex items-center bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white px-3 py-1.5 rounded text-sm">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+              </svg>
+              Twitter
+            </button>
+            <button onclick="shareOnTelegram()" class="flex items-center bg-[#0088cc] hover:bg-[#0077b3] text-white px-3 py-1.5 rounded text-sm">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              </svg>
+              Telegram
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Handle Wallet Disconnection
+  function handleWalletDisconnect() {
+    userWallet = null;
+    referralSection.innerHTML = `
+      <p class="mb-4">Connect your wallet to access your referral link</p>
+      <button id="connectWalletBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+        Connect Wallet
+      </button>
+    `;
+    document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+  }
+
+  // Reset Wallet Button State
+  function resetWalletButton() {
+    connectWalletBtn.disabled = false;
+    connectWalletBtn.textContent = "Connect Wallet";
+  }
+
+  // Generate Referral Link
+  function generateReferralLink(walletAddress) {
+    return `${window.location.origin}${window.location.pathname}?ref=${walletAddress}`;
+  }
+
+  // Copy Referral Link
+  function copyReferralLink() {
+    const linkInput = document.getElementById('userReferralLink');
+    linkInput.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const copyBtn = linkInput.nextElementSibling;
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 2000);
+  }
+
+  // Share on Twitter
+  function shareOnTwitter() {
+    const link = encodeURIComponent(document.getElementById('userReferralLink').value);
+    window.open(`https://twitter.com/intent/tweet?text=Join%20the%20$FLUFFI%20referral%20program!%20Use%20my%20link%20for%20bonus%20rewards:%20${link}%20%23FluffiArmy`, '_blank');
+  }
+
+  // Share on Telegram
+  function shareOnTelegram() {
+    const link = encodeURIComponent(document.getElementById('userReferralLink').value);
+    window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20-%20use%20my%20referral%20link%20for%20bonus%20rewards!`, '_blank');
+  }
+</script>
+    
     <!-- Wallet Connect Button (add this where you want the button to appear) -->
 <button id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">
   Connect Wallet
