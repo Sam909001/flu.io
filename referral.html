@@ -50,7 +50,80 @@
 </head>
 <body class="text-gray-800 dark:text-white">
   <div class="container mx-auto px-4 py-12 max-w-6xl">
-  
+
+    <!-- Wallet Connect Button (add this where you want the button to appear) -->
+<button id="walletButton" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">
+  Connect Wallet
+</button>
+
+<!-- Wallet Connect Script (add this in your <head> or before closing </body>) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+  let userWalletAddress = null;
+
+  async function connectWallet() {
+    if (window.ethereum) {
+      try {
+        // Request account access
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        // Store the wallet address
+        userWalletAddress = accounts[0];
+        
+        // Update button text
+        document.getElementById('walletButton').textContent = 
+          `${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}`;
+        
+        // Optional: Listen for account changes
+        window.ethereum.on('accountsChanged', (newAccounts) => {
+          if (newAccounts.length === 0) {
+            // Wallet disconnected
+            userWalletAddress = null;
+            document.getElementById('walletButton').textContent = 'Connect Wallet';
+          } else {
+            // Account changed
+            userWalletAddress = newAccounts[0];
+            document.getElementById('walletButton').textContent = 
+              `${newAccounts[0].substring(0, 6)}...${newAccounts[0].substring(38)}`;
+          }
+        });
+        
+        // Optional: Listen for chain changes
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload(); // Recommended to reload on chain change
+        });
+        
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        alert('Wallet connection denied or failed.');
+      }
+    } else {
+      alert('Ethereum wallet not detected. Please install MetaMask or another Web3 wallet.');
+    }
+  }
+
+  // Initialize the button
+  document.getElementById('walletButton').addEventListener('click', connectWallet);
+
+  // Optional: Check if wallet is already connected on page load
+  window.addEventListener('load', async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          userWalletAddress = accounts[0];
+          document.getElementById('walletButton').textContent = 
+            `${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}`;
+        }
+      } catch (error) {
+        console.error("Error checking connected accounts:", error);
+      }
+    }
+  });
+</script>
+    
     <!-- Leaderboard Section -->
     <section class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
       <h2 class="text-2xl font-bold mb-6">Top Referrals</h2>
