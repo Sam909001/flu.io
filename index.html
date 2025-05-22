@@ -404,3 +404,121 @@
             </div>
         </footer>
     </div>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script>
+        let userWalletAddress = null;
+        const initialPrice = 0.0001;
+        const stages = 15;
+        const stageDuration = 1000 * 60 * 60 * 48;
+        const startTime = Date.now();
+
+        function updateStage() {
+            const now = Date.now();
+            const elapsed = now - startTime;
+            const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
+            const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+            document.getElementById('priceInfo').textContent = `Price: $${price}`;
+            document.getElementById('progressBar').style.width = `${((stage + 1) / stages) * 100}%`;
+        }
+
+        function updateCountdown() {
+            const end = startTime + 30 * 24 * 60 * 60 * 1000;
+            const left = end - Date.now();
+            if (left <= 0) {
+                document.getElementById('countdown').textContent = 'Presale Ended';
+                return;
+            }
+            const days = Math.floor(left / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((left / (1000 * 60)) % 60);
+            const seconds = Math.floor((left / 1000) % 60);
+            document.getElementById('countdown').textContent = `Ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userWalletAddress = accounts[0];
+                    document.getElementById('walletButton').textContent = 'Connected';
+                    document.getElementById('walletButton').classList.remove('bg-green-500');
+                    document.getElementById('walletButton').classList.add('bg-blue-500');
+                    document.getElementById('walletButton').classList.add('text-white');
+                } catch (error) {
+                    console.error('Wallet connection failed:', error);
+                    alert('Wallet connection denied.');
+                }
+            } else {
+                alert('MetaMask not detected. Please install MetaMask to connect.');
+            }
+        }
+
+        async function buyFluffi() {
+            const amount = document.getElementById('amountInput').value;
+            const currency = document.getElementById('currencySelect').value;
+            const ref = document.getElementById('refInput').value;
+            
+            if (!userWalletAddress) {
+                alert('Please connect your wallet first.');
+                return;
+            }
+
+            if (!amount || isNaN(amount) || Number(amount) <= 0) {
+                alert('Please enter a valid amount.');
+                return;
+            }
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                
+                const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+                const contractAbi = [
+                    {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+                    {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},
+                    {"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+                    {"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"}
+                ];
+
+                const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+                const refAddr = ref ? ref : '0x0000000000000000000000000000000000000000';
+                
+                const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+                const prevText = buyBtn.textContent;
+                buyBtn.textContent = 'Processing...';
+                buyBtn.disabled = true;
+
+                const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(amount.toString()) });
+                await tx.wait();
+
+                buyBtn.textContent = prevText;
+                buyBtn.disabled = false;
+                alert('Purchase successful! Transaction hash: ' + tx.hash);
+            } catch (err) {
+                console.error('Transaction failed:', err);
+                const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+                if (buyBtn) {
+                    buyBtn.textContent = 'Buy Now';
+                    buyBtn.disabled = false;
+                }
+                alert('Transaction failed: ' + (err.message || 'Unknown error'));
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const button = document.querySelector('button[onclick="toggleDarkMode()"]');
+            button.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+        }
+
+        setInterval(() => {
+            updateStage();
+            updateCountdown();
+        }, 1000);
+
+        updateStage();
+        updateCountdown();
+    </script>
+</body>
+</html>
