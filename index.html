@@ -567,5 +567,29 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Logo animation applied:', logo.style.animation);
   }
 </script>
+  <script>
+  // DELETE ANY EXISTING ANIMATION FIRST
+  const logo = document.querySelector('img[src="fluffi.jpg"]');
+  if (logo) {
+    logo.style.animation = 'none';
+    
+    // WAIT 1 FRAME
+    requestAnimationFrame(() => {
+      // CREATE KEYFRAMES
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes force-float {
+          0%, 100% { transform: translateY(0) rotate(0); }
+          50% { transform: translateY(-20px) rotate(3deg); }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // REAPPLY ANIMATION
+      logo.style.animation = 'force-float 1.5s ease-in-out infinite';
+      logo.style.transform = 'translateZ(0)'; // Force GPU acceleration
+    });
+  }
+</script>
   </body>
 </html>
