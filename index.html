@@ -548,5 +548,24 @@ document.addEventListener('DOMContentLoaded', function() {
         will-change: transform;
       `;
     }
+    <script>
+  // 1. FIRST CREATE THE ANIMATION KEYFRAMES
+  const styleTag = document.createElement('style');
+  styleTag.textContent = `
+    @keyframes fluffi-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+  `;
+  document.head.appendChild(styleTag);
+
+  // 2. FORCE-APPLY THE ANIMATION TO LOGO
+  const logo = document.querySelector('img[src="fluffi.jpg"]');
+  if (logo) {
+    logo.style.animation = 'fluffi-float 2s ease-in-out infinite';
+    // Debugging check
+    console.log('Logo animation applied:', logo.style.animation);
+  }
+</script>
   </body>
 </html>
