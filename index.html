@@ -47,6 +47,27 @@
     .dark .text-blue-600 {
       color: #60a5fa !important;
     }
+    /* ===== FOOLPROOF FLOATING LOGO FIX ===== */
+.logo {
+  display: inline-block !important; /* Overrides any display conflicts */
+  animation: float 3s ease-in-out infinite !important; 
+  will-change: transform; /* Optimizes performance */
+  position: relative; /* Ensures proper stacking */
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) !important; 
+  }
+  50% { 
+    transform: translateY(-10px) !important; 
+  }
+}
+
+/* Force override any conflicting transforms */
+img.logo {
+  transform: none !important;
+}
   </style>
 </head>
 <body class="text-gray-800 dark:text-green">
