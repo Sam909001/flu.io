@@ -480,4 +480,35 @@ document.addEventListener('DOMContentLoaded', function() {
     updateStage();
     updateCountdown();
 </script>
+  <script>
+  // WAIT FOR PAGE TO LOAD
+  document.addEventListener('DOMContentLoaded', function() {
+    // FIND THE LOGO
+    const logo = document.querySelector('img[src*="fluffi.jpg"]');
+    
+    // ADD INLINE STYLES THAT CAN'T BE OVERRIDDEN
+    if (logo) {
+      logo.style.display = 'block';
+      logo.style.position = 'relative';
+      logo.style.animation = 'fluffi-float 2s ease-in-out infinite';
+      logo.style.willChange = 'transform';
+      
+      // CREATE KEYFRAMES DYNAMICALLY
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fluffi-float {
+          0%, 100% { transform: translateY(0) scale(1) rotate(0); }
+          50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // DEBUG CONFIRMATION
+      console.log('Logo animation applied!', logo);
+    } else {
+      console.error('Logo not found! Check image src');
+    }
+  });
+</script>
+  </body>
 </html>
