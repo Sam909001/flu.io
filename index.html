@@ -19,47 +19,49 @@
     gtag('config', 'G-XXXXXXXXXX');
   </script>
   <style>
-    body {
-      img[src*='fluffi.jpg'] {
-  display: block !important;
-  position: relative !important;
-  animation: fluffi-float 2s ease-in-out infinite !important;
-  transform: none !important;
-  will-change: transform;
-}
+  body {
+    background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+  }
+  .timer {
+    font-family: monospace;
+  }
+  .section-title {
+    @apply text-2xl font-bold mb-4;
+  }
+  .dark {
+    background: #111827;
+    color: white;
+  }
+  .dark .text-gray-800 {
+    color: white !important;
+  }
+  .dark .bg-white {
+    background-color: #1f2937 !important;
+  }
+  .dark .text-gray-600 {
+    color: #d1d5db !important;
+  }
+  .dark .bg-gray-200 {
+    background-color: #374151 !important;
+  }
+  .dark .text-blue-600 {
+    color: #60a5fa !important;
+  }
 
-@keyframes fluffi-float {
-  0%, 100% { transform: translateY(0) scale(1) rotate(0); }
-  50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
-}
-      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
-    }
-    .timer {
-      font-family: monospace;
-    }
-    .section-title {
-      @apply text-2xl font-bold mb-4;
-    }
-    .dark {
-      background: #111827;
-      color: white;
-    }
-    .dark .text-gray-800 {
-      color: white !important;
-    }
-    .dark .bg-white {
-      background-color: #1f2937 !important;
-    }
-    .dark .text-gray-600 {
-      color: #d1d5db !important;
-    }
-    .dark .bg-gray-200 {
-      background-color: #374151 !important;
-    }
-    .dark .text-blue-600 {
-      color: #60a5fa !important;
-    }
-  </style>
+  /* ===== ADD THIS AT THE BOTTOM ===== */
+  img[src*='fluffi.jpg'] {
+    display: block !important;
+    position: relative !important;
+    animation: fluffi-float 2s ease-in-out infinite !important;
+    transform: none !important;
+    will-change: transform;
+  }
+
+  @keyframes fluffi-float {
+    0%, 100% { transform: translateY(0) scale(1) rotate(0); }
+    50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+  }
+</style>
 </head>
 <body class="text-gray-800 dark:text-green">
   <!-- Header -->
