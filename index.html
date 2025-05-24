@@ -383,15 +383,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const startTime = Date.now();
 
     function updateStage() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-      const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
-      document.getElementById('stageInfo').textContent = `Stage: ${stage + 1} / ${stages}`;
-      document.getElementById('priceInfo').textContent = `Price: $${price}`;
-      document.getElementById('progressBar').style.width = `${((stage + 1) / stages) * 100}%`;
-    }
-
+  const now = Date.now();
+  const elapsed = now - startTime;
+  const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
+  const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+  
+  // ADD NULL CHECKS:
+  const stageInfoEl = document.getElementById('stageInfo');
+  const priceInfoEl = document.getElementById('priceInfo');
+  const progressBarEl = document.getElementById('progressBar');
+  
+  if (stageInfoEl) stageInfoEl.textContent = `Stage: ${stage + 1} / ${stages}`;
+  if (priceInfoEl) priceInfoEl.textContent = `Price: $${price}`;
+  if (progressBarEl) progressBarEl.style.width = `${((stage + 1) / stages) * 100}%`;
+}
+  
     function updateCountdown() {
       const end = startTime + 30 * 24 * 60 * 60 * 1000;
       const left = end - Date.now();
@@ -510,5 +516,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 </script>
+  <!-- ===== ADD THIS ANIMATION SCRIPT HERE ===== -->
+  <script>
+    // FLOATING LOGO SOLUTION
+    function initLogoAnimation() {
+      const logo = document.querySelector('img[src*="fluffi.jpg"]');
+      if (!logo) {
+        console.log("Logo image not found");
+        return;
+      }
+
+      // Create style element if it doesn't exist
+      let styleEl = document.getElementById('fluffi-animation-style');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'fluffi-animation-style';
+        styleEl.textContent = `
+          @keyframes fluffi-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+          }
+        `;
+        document.head.appendChild(styleEl);
+      }
+
+      // Apply animation directly
+      logo.style.cssText = `
+        display: block !important;
+        position: relative !important;
+        animation: fluffi-float 2s ease-in-out infinite !important;
+        will-change: transform;
+      `;
+    }
   </body>
 </html>
