@@ -20,16 +20,6 @@
   </script>
   <style>
     body {
-      <!-- TEMPORARY TEST - PUT THIS RIGHT AFTER <body> -->
-<div style="
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 100px;
-  height: 100px;
-  background: red;
-  animation: float 3s ease-in-out infinite;
-"></div>
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
     }
     .timer {
@@ -57,26 +47,17 @@
     .dark .text-blue-600 {
       color: #60a5fa !important;
     }
-    /* ===== FOOLPROOF FLOATING LOGO FIX ===== */
-.logo {
-  display: inline-block !important; /* Overrides any display conflicts */
-  animation: float 3s ease-in-out infinite !important; 
-  will-change: transform; /* Optimizes performance */
-  position: relative; /* Ensures proper stacking */
-}
-
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0) !important; 
-  }
-  50% { 
-    transform: translateY(-10px) !important; 
-  }
-}
-
-/* Force override any conflicting transforms */
-img.logo {
+img[src*='fluffi.jpg'] {
+  display: block !important;
+  position: relative !important;
+  animation: fluffi-float 2s ease-in-out infinite !important;
   transform: none !important;
+  will-change: transform;
+}
+
+@keyframes fluffi-float {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0); }
+  50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
 }
   </style>
 </head>
