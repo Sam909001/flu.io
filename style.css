@@ -463,3 +463,23 @@ iframe.demo {
 .hero p {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
+.sticky-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
+  padding: 10px 20px;
+  z-index: 1000; /* Ensures it stays above other content */
+}
+.sticky-header a {
+  color: white;
+  margin: 0 15px;
+  text-decoration: none;
+}
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+  button, input[type="range"] {
+    padding: 12px;
+    font-size: 16px;
+  }
+}
