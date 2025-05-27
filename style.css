@@ -449,3 +449,9 @@ body {
 img.logo {
   transform: none !important;
 }
+/* Ensure demo iframe doesn't overflow on mobile */
+iframe.demo {
+  max-width: 100%;
+  height: auto;  /* Maintain aspect ratio */
+  border: none;  /* Remove default iframe border */
+}
