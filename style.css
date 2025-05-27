@@ -483,3 +483,31 @@ iframe.demo {
     font-size: 16px;
   }
 }
+.sticky-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.9);
+  padding: 10px 20px;
+  z-index: 1000;
+}
+.tooltip { 
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background: #222;
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1;
+}
+.tooltip:hover .tooltip-text { visibility: visible; }
+body {
+  overflow-x: hidden;  /* Prevents horizontal scroll */
+  width: 100%;
+}
