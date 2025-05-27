@@ -455,3 +455,11 @@ iframe.demo {
   height: auto;  /* Maintain aspect ratio */
   border: none;  /* Remove default iframe border */
 }
+/* Hero section text contrast */
+.hero h1 {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); /* Dark shadow for light text */
+}
+
+.hero p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
