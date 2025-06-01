@@ -56,15 +56,7 @@ h1, h2, h3, h4 {
 
 /* ===== HEADER & NAVIGATION ===== */
 header {
-  background: linear-gradient(135deg, 
-    #00ff88 0%, 
-    #00e676 25%, 
-    #00b050 50%, 
-    #00e676 75%, 
-    #00ff88 100%);
-  background-size: 200% 200%;
-  animation: gradientPulse 8s ease infinite;
-}
+background: linear-gradient(135deg, #00ff9d, #00c853);
 
 @keyframes gradientPulse {
   0% { background-position: 0% 50%; }
