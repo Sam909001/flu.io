@@ -188,17 +188,3 @@ h2 {
     font-size: 2rem;
   }
 }
-
-/* Temporary verification style - remove after confirming */
-body::after {
-  content: "✅ CSS is properly linked!";
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--accent);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  z-index: 1000;
-  font-weight: bold;
-}
