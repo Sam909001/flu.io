@@ -41,7 +41,7 @@ body {
 .main-header {
   width: 100%;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, #10B981, #059669) !important;
   color: var(--text-light);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: sticky;
