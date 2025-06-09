@@ -1,8 +1,8 @@
 /* ====== CORE RESET & VARIABLES ====== */
 :root {
-  --primary: #6e8efb;
-  --primary-dark: #5b7ce8;
-  --secondary: #a777e3;
+  --primary: #10B981;
+  --primary-dark: #059669;
+  --secondary: #059669;
   --accent: #10b981;
   --text-light: #f8fafc;
   --text-dark: #1e293b;
@@ -55,11 +55,18 @@ body {
 .main-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
+  gap: 1.5rem; /* Reduced from 2rem */
+  padding: 1.5rem; /* Reduced from 2rem */
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* Tight layout for right column sections */
+.main-content > div:last-child {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 0.75rem; /* Tight gap between sections */
 }
 
 /* For modern browsers supporting subgrid */
@@ -77,11 +84,13 @@ body {
     gap: 1rem;
   }
 }
+
 .content-section {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 0; /* Remove default bottom margin */
 }
 
 .dark .content-section {
@@ -89,18 +98,12 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-.content-section {
-  flex: 1;
-  padding: 2rem;
-  background-color: var(--card-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.dark .content-section {
-  background-color: var(--card-dark);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+/* Specific section adjustments */
+#referral,
+#claim, 
+#tokenomics {
+  padding: 1.25rem; /* Slightly reduced padding */
+  margin-bottom: 0;
 }
 
 /* ====== NAVIGATION ====== */
@@ -132,10 +135,7 @@ h1, h2, h3, h4 {
 
 h1 {
   font-size: 2.5rem;
-background: linear-gradient(90deg, #10B981, #059669);
-/* OR for solid color: */
-color: #10B981;
-background: none;
+  background: linear-gradient(90deg, #10B981, #059669);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -168,12 +168,12 @@ h2 {
 .btn-primary {
   background: linear-gradient(135deg, #10B981, #059669);
   color: white;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
 }
 
 .btn-secondary {
@@ -200,132 +200,6 @@ h2 {
   animation: pulse 1.5s infinite;
 }
 
-/* ====== RESPONSIVE DESIGN ====== */
-@media (max-width: 768px) {
-  .main-header {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .main-content {
-    flex-direction: column;
-    padding: 1rem;
-  }
-  
-  .content-section {
-    padding: 1.5rem;
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-}
-header {
-  position: static !important;
-  width: 100% !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1rem 2rem !important;
-}
-/* ===== GRID LAYOUT ENHANCEMENTS ===== */
-/* Main container grid */
-main.p-6 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  align-items: start;
-}
-
-/* Section styling */
-section {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-/* Dark mode sections */
-.dark section {
-  background: #1f2937;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  main.p-6 {
-    grid-template-columns: 1fr;
-    padding: 1rem !important;
-  }
-  
-  section {
-    padding: 1.25rem;
-  }
-}
-section {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-/* Ensure full height for right column sections */
-.grid > div {
-  display: flex;
-  flex-direction: column;
-}
-
-.grid > div > section {
-  flex: 1;
-}
-
-/* Smooth shadow transitions */
-section {
-  transition: box-shadow 0.3s ease;
-}
-
-section:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode enhancements */
-.dark section:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-}
-header {
-  position: static !important;
-  width: 100vw !important;
-  left: 0 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1rem 2rem !important;
-  background-image: 
-  linear-gradient(135deg, #10B981, #059669),
-  radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%);
-}
-@media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-    width: 100%;
-  }
-}
-section {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 
-    0 4px 6px rgba(0,0,0,0.05),
-    0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 7px 14px rgba(0,0,0,0.1),
-    0 3px 6px rgba(0,0,0,0.08);
-}
 .price-update {
   animation: pulseUpdate 0.5s ease;
 }
@@ -334,36 +208,52 @@ section:hover {
   0% { transform: scale(1); }
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
-}body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
 }
 
-h1, h2, h3 {
-  font-family: 'Inter Tight', sans-serif;
-  font-weight: 700;
-}
-.btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: all 0.2s ease;
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .content-section {
+    padding: 1.25rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
-  color: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(0,0,0,0.15);
-}
+/* Header fixes */
 header {
-  /* Add subtle texture */
+  position: static !important;
+  width: 100vw !important;
+  left: 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
   background-image: 
     linear-gradient(135deg, #10B981, #059669),
-    radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%);
+    radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%) !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+}
+
+/* Section hover effects */
+section {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0,0,0,0.1);
 }
