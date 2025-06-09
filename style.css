@@ -267,3 +267,26 @@ section:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+/* Ensure full height for right column sections */
+.grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid > div > section {
+  flex: 1;
+}
+
+/* Smooth shadow transitions */
+section {
+  transition: box-shadow 0.3s ease;
+}
+
+section:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode enhancements */
+.dark section:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
