@@ -242,3 +242,14 @@ function simulatePriceMovement() {
   currentPrice = Math.max(0.00009, currentPrice + change);
   elements.currentPrice.textContent = currentPrice.toFixed(6);
 }
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'primary-green': '#10B981',
+        'dark-green': '#059669'
+      }
+    }
+  }
+}
