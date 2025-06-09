@@ -41,10 +41,6 @@
   .section-title {
     @apply text-2xl font-bold mb-4;
   }
-  .dark {
-  background: #111827;
-  color: white; /* Fixed text color for dark mode */
-}
   .dark .text-white-800 {
     color: white !important;
   }
@@ -74,6 +70,48 @@
     0%, 100% { transform: translateY(0) scale(1) rotate(0); }
     50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
   }
+    /* ===== TEXT VISIBILITY FIXES ===== */
+/* Base colors */
+body {
+  color: #1a1a1a; /* Dark gray in light mode */
+}
+.dark body {
+  color: #f0f0f0; /* Soft white in dark mode */
+}
+
+/* Section titles */
+.section-title,
+h2, h3 {
+  color: inherit; /* Inherits from body */
+  font-weight: 700;
+}
+
+/* Specific sections */
+#presale,
+#referral,
+.tokenomics-section,
+#faq {
+  color: inherit;
+}
+
+/* Buttons always white */
+.btn, button {
+  color: white !important;
+}
+
+/* Dark mode grays */
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+/* Corrected dark mode */
+.dark {
+  background: #111827;
+  color: white; /* Fixed from black */
+}
 </style>
 </head>
 <body class="text-gray-800 dark:text-green">
