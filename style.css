@@ -225,3 +225,38 @@ header {
   justify-content: space-between !important;
   padding: 1rem 2rem !important;
 }
+/* ===== GRID LAYOUT ENHANCEMENTS ===== */
+/* Main container grid */
+main.p-6 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+/* Section styling */
+section {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+/* Dark mode sections */
+.dark section {
+  background: #1f2937;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  main.p-6 {
+    grid-template-columns: 1fr;
+    padding: 1rem !important;
+  }
+  
+  section {
+    padding: 1.25rem;
+  }
+}
