@@ -53,10 +53,40 @@ body {
 }
 
 .main-content {
-  display: flex;
-  flex: 1;
-  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* For modern browsers supporting subgrid */
+@supports (grid-template-columns: subgrid) {
+  .main-content {
+    grid-template-columns: subgrid;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+.content-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dark .content-section {
+  background: #1e293b;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .content-section {
@@ -187,4 +217,11 @@ h2 {
   h1 {
     font-size: 2rem;
   }
+}
+header {
+  position: static !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
 }
