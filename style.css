@@ -257,3 +257,7 @@ section:hover {
   transform: translateY(-2px);
   box-shadow: 0 7px 14px rgba(0,0,0,0.1);
 }
+body {
+  color: white !important; /* Changes all text to white */
+  font-weight: 600 !important; /* Makes all text thicker */
+}
