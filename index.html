@@ -138,13 +138,13 @@ h2, h3 {
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
       <h2 class="section-title">Presale is Live!</h2>
       <!-- Dynamic Stage Indicator -->
-<div class="stage-indicator mb-4">
-  <div class="flex justify-between items-center mb-1">
-    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-      Stage <span id="currentStage">1</span>/<span id="totalStages">15</span>
-    </span>
-    <span class="text-xs font-mono text-gray-500" id="stageTimer">23:59:59</span>
-  </div>
+<div class="stage-timer">
+  <div class="stage-info">Stage <span id="currentStage">1</span>/15</div>
+  <div class="timer-display">23:59:59</div>
+  <button id="startTimer">Start</button>
+  <button id="resetTimer">Reset Stage</button>
+  <button id="resetAll">Reset All</button>
+</div>
   
   <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
     <div id="stageProgress" 
