@@ -319,3 +319,8 @@ h1, h2, h3 {
   font-weight: 700 !important; /* Extra bold */
   font-size: 2.2rem !important; /* Increase size */
 }
+body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
