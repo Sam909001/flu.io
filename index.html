@@ -56,7 +56,45 @@
   .dark .text-blue-600 {
     color: #60a5fa !important;
   }
+/* ===== LIGHT MODE TEXT FIXES ===== */
+/* Base text colors */
+body {
+  color: #1a1a1a !important; /* Dark gray for light mode */
+}
 
+.dark body {
+  color: #f0f0f0 !important; /* Soft white for dark mode */
+}
+
+/* Section titles */
+.section-title,
+h2, h3 {
+  color: inherit !important; /* Inherits from body */
+}
+
+/* Content sections */
+#presale,
+#referral,
+.tokenomics-section,
+#faq,
+.stage-indicator,
+.price-ticker {
+  color: inherit !important;
+}
+
+/* Dark mode text adjustments */
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+/* Corrected dark mode background */
+.dark {
+  background: #111827 !important;
+  color: white !important; /* Ensures text stays white */
+}
   /* ===== ADD THIS AT THE BOTTOM ===== */
   img[src*='fluffi.jpg'] {
     display: block !important;
@@ -70,48 +108,6 @@
     0%, 100% { transform: translateY(0) scale(1) rotate(0); }
     50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
   }
-    /* ===== TEXT VISIBILITY FIXES ===== */
-/* Base colors */
-body {
-  color: #1a1a1a; /* Dark gray in light mode */
-}
-.dark body {
-  color: #f0f0f0; /* Soft white in dark mode */
-}
-
-/* Section titles */
-.section-title,
-h2, h3 {
-  color: inherit; /* Inherits from body */
-  font-weight: 700;
-}
-
-/* Specific sections */
-#presale,
-#referral,
-.tokenomics-section,
-#faq {
-  color: inherit;
-}
-
-/* Buttons always white */
-.btn, button {
-  color: white !important;
-}
-
-/* Dark mode grays */
-.dark .text-gray-500 {
-  color: #9ca3af !important;
-}
-.dark .text-gray-700 {
-  color: #d1d5db !important;
-}
-
-/* Corrected dark mode */
-.dark {
-  background: #111827;
-  color: white; /* Fixed from black */
-}
 </style>
 </head>
 <body class="text-gray-800 dark:text-green">
@@ -140,7 +136,7 @@ h2, h3 {
   <main class="p-6 mx-auto w-full max-w-7xl"> <!-- Increased max-width -->
     <!-- Presale Section -->
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
-      <h2 class="section-title dark:text-white text-black">Presale is Live!</h2>
+      <h2 class="section-title">Presale is Live!</h2>
       <!-- Dynamic Stage Indicator -->
 <div class="stage-indicator mb-4">
   <div class="flex justify-between items-center mb-1">
