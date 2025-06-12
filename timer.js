@@ -1,73 +1,49 @@
-// Timer Configuration
+// Configuration
 const TOTAL_STAGES = 15;
-const STAGE_DURATION = 86399; // 23:59:59 in seconds
+const STAGE_DURATION = 24 * 60 * 60; // 24h in seconds
 
-// State Management
+// Elements
+const stageDisplay = document.getElementById("currentStage");
+const timerDisplay = document.getElementById("timer");
+const progressFill = document.querySelector(".progress-fill");
+
+// State
 let currentStage = 1;
 let timeLeft = STAGE_DURATION;
-let timerInterval;
 
-// DOM Elements
-const stageDisplay = document.getElementById("currentStage");
-const timerDisplay = document.querySelector(".timer-display");
-const startBtn = document.getElementById("startTimer");
-const resetStageBtn = document.getElementById("resetTimer");
-const resetAllBtn = document.getElementById("resetAll");
-
-// Update Timer Display
-function updateTimerDisplay() {
+// Update Display
+function updateDisplay() {
+  // Update timer
   const hours = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
   const seconds = timeLeft % 60;
-  timerDisplay.textContent = 
-    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-// Start Timer
-function startTimer() {
-  if (!timerInterval && currentStage <= TOTAL_STAGES) {
-    timerInterval = setInterval(() => {
-      if (timeLeft > 0) {
-        timeLeft--;
-        updateTimerDisplay();
-      } else {
-        clearInterval(timerInterval);
-        if (currentStage < TOTAL_STAGES) {
-          currentStage++;
-          stageDisplay.textContent = currentStage;
-          timeLeft = STAGE_DURATION;
-          updateTimerDisplay();
-          alert(`Stage ${currentStage - 1} completed! Starting Stage ${currentStage}.`);
-        } else {
-          alert("All stages completed! 🎉");
-        }
-      }
-    }, 1000);
-  }
-}
-
-// Reset Current Stage
-function resetStage() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timeLeft = STAGE_DURATION;
-  updateTimerDisplay();
-}
-
-// Reset All Progress
-function resetAll() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  currentStage = 1;
+  timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  
+  // Update progress bar
+  progressFill.style.width = `${(currentStage / TOTAL_STAGES) * 100}%`;
   stageDisplay.textContent = currentStage;
-  timeLeft = STAGE_DURATION;
-  updateTimerDisplay();
 }
 
-// Event Listeners
-startBtn.addEventListener("click", startTimer);
-resetStageBtn.addEventListener("click", resetStage);
-resetAllBtn.addEventListener("click", resetAll);
+// Start Countdown
+function startCountdown() {
+  updateDisplay();
+  
+  const timer = setInterval(() => {
+    timeLeft--;
+    
+    if (timeLeft <= 0) {
+      if (currentStage < TOTAL_STAGES) {
+        currentStage++;
+        timeLeft = STAGE_DURATION;
+      } else {
+        clearInterval(timer);
+        timerDisplay.textContent = "COMPLETED!";
+      }
+    }
+    
+    updateDisplay();
+  }, 1000);
+}
 
-// Initialize
-updateTimerDisplay();
+// Start immediately on page load
+startCountdown();
