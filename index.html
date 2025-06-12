@@ -137,13 +137,25 @@ h2, h3 {
     <!-- Presale Section -->
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
       <h2 class="section-title">Presale is Live!</h2>
-      <div class="stage-progress-container">
-  <div class="progress-bar">
-    <div class="progress-fill"></div>
+
+  <div class="fluio-status-container">
+  <div class="stage-progress">
+    <div class="progress-info">
+      <span class="stage-label">Stage <span id="currentStage">1</span>/15</span>
+      <span class="timer" id="timer">23:59:59</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
   </div>
-  <div class="stage-info">
-    Stage <span id="currentStage">1</span>/15
-    <span id="timer">23:59:59</span>
+  
+  <div class="fluio-price">
+    <div class="price-header">
+      <span>$FLUFFI</span>
+      <span class="live-badge">LIVE</span>
+    </div>
+    <div class="current-price">0.0001 USD</div>
+    <div class="price-change">0.00%</div>
   </div>
 </div>
   
