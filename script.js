@@ -23,14 +23,8 @@ const elements = {
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
   initReferralSystem();
-  updateStage();
-  updateCountdown();
   startTokenCounter();
   renderLeaderboard();
-  
-  // Set up intervals
-  setInterval(updateStage, 1000);
-  setInterval(updateCountdown, 1000);
   setInterval(simulatePriceMovement, 5000);
 });
 
@@ -188,34 +182,59 @@ function renderLeaderboard() {
 }
 
 // --- Stage & Price Logic ---
-function updateStage() {
-  const now = Date.now();
-  const elapsed = now - startTime;
-  const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-  const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+// --- Stage & Price Logic ---
+const TOTAL_STAGES = 15;
+const STAGE_DURATION = 24 * 60 * 60; // 24h in seconds
+
+// Get Elements
+const stageDisplay = document.getElementById("currentStage");
+const timerDisplay = document.getElementById("timer");
+const progressFill = document.getElementById("progressFill");
+
+// State
+let currentStage = 1;
+let timeLeft = STAGE_DURATION;
+
+// Update Display
+function updateDisplay() {
+  // Update timer
+  const hours = Math.floor(timeLeft / 3600);
+  const minutes = Math.floor((timeLeft % 3600) / 60);
+  const seconds = timeLeft % 60;
+  if (timerDisplay) {
+    timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
   
-  if (elements.stageInfo) elements.stageInfo.textContent = `Stage: ${stage + 1}/${stages}`;
+  // Update progress (6.66% per stage)
+  if (progressFill) progressFill.style.width = `${(currentStage / TOTAL_STAGES) * 100}%`;
+  if (stageDisplay) stageDisplay.textContent = currentStage;
+  
+  // Update price
+  const price = (initialPrice * Math.pow(1.05, currentStage - 1)).toFixed(6);
   if (elements.priceInfo) elements.priceInfo.textContent = `Price: $${price}`;
 }
 
-function updateCountdown() {
-  const endTime = startTime + (stageDuration * stages);
-  const remaining = endTime - Date.now();
+// Start Countdown
+function startCountdown() {
+  updateDisplay();
   
-  if (remaining <= 0) {
-    if (elements.countdown) elements.countdown.textContent = "Presale ended";
-    return;
-  }
-  
-  const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-  const secs = Math.floor((remaining % (1000 * 60)) / 1000);
-  
-  if (elements.countdown) {
-    elements.countdown.textContent = `Ends in: ${days}d ${hours}h ${mins}m ${secs}s`;
-  }
+  const timer = setInterval(() => {
+    timeLeft--;
+    
+    if (timeLeft <= 0 && currentStage < TOTAL_STAGES) {
+      currentStage++;
+      timeLeft = STAGE_DURATION;
+    } else if (timeLeft <= 0) {
+      clearInterval(timer);
+      if (timerDisplay) timerDisplay.textContent = "COMPLETED";
+    }
+    
+    updateDisplay();
+  }, 1000);
 }
+
+// Initialize
+document.addEventListener('DOMContentLoaded', startCountdown);
 
 // --- Token Counter ---
 function startTokenCounter() {
@@ -223,15 +242,6 @@ function startTokenCounter() {
   if (!counter) return;
   
   let count = 8421509;
-  setInterval(() => {
-    count += Math.floor(Math.random() * 500) + 100;
-    counter.textContent = count.toLocaleString();
-    counter.classList.add('text-green-500', 'scale-110');
-    setTimeout(() => {
-      counter.classList.remove('text-green-500', 'scale-110');
-    }, 300);
-  }, 2000);
-}
 
 // --- Price Simulation ---
 let currentPrice = 0.0001;
