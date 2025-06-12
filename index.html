@@ -137,13 +137,14 @@ h2, h3 {
     <!-- Presale Section -->
 <section id="presale" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
       <h2 class="section-title">Presale is Live!</h2>
-      <!-- Dynamic Stage Indicator -->
-<div class="stage-timer">
-  <div class="stage-info">Stage <span id="currentStage">1</span>/15</div>
-  <div class="timer-display">23:59:59</div>
-  <button id="startTimer">Start</button>
-  <button id="resetTimer">Reset Stage</button>
-  <button id="resetAll">Reset All</button>
+      <div class="stage-progress-container">
+  <div class="progress-bar">
+    <div class="progress-fill"></div>
+  </div>
+  <div class="stage-info">
+    Stage <span id="currentStage">1</span>/15
+    <span id="timer">23:59:59</span>
+  </div>
 </div>
   
   <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
