@@ -112,19 +112,21 @@ h2, h3 {
   background: #111827 !important;
   color: white !important; /* Ensures text stays white */
 }
-  /* ===== ADD THIS AT THE BOTTOM ===== */
-  img[src*='fluffi.jpg'] {
-    display: block !important;
-    position: relative !important;
-    animation: fluffi-float 2s ease-in-out infinite !important;
-    transform: none !important;
-    will-change: transform;
-  }
+ img[src*='fluffi.jpg'] {
+  display: block;
+  position: relative;
+  animation: fluffi-float 3s ease-in-out infinite;
+  will-change: transform;
+}
 
-  @keyframes fluffi-float {
-    0%, 100% { transform: translateY(0) scale(1) rotate(0); }
-    50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+@keyframes fluffi-float {
+  0%, 100% { 
+    transform: translateY(0) scale(1) rotate(0deg); 
   }
+  50% { 
+    transform: translateY(-15px) scale(1.05) rotate(2deg); 
+  }
+}
 </style>
 </head>
 <body class="text-gray-800 dark:text-green">
