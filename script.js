@@ -1,265 +1,363 @@
-// --- Global State ---
-let userWallet = null;
-const leaderboard = JSON.parse(localStorage.getItem('fluffiLeaderboard')) || {};
-const initialPrice = 0.0001;
-const stages = 15;
-const stageDuration = 1000 * 60 * 60 * 48; // 48 hours
-const startTime = new Date("2025-05-05T12:00:00Z").getTime();
 
-// --- DOM Elements ---
-const elements = {
-  walletButton: document.getElementById('walletButton'),
-  amountInput: document.getElementById('amountInput'),
-  stakeInput: document.getElementById('stakeInput'),
-  refInput: document.getElementById('refInput'),
-  currentPrice: document.getElementById('currentPrice'),
-  stageInfo: document.getElementById('stageInfo'),
-  priceInfo: document.getElementById('priceInfo'),
-  countdown: document.getElementById('countdown'),
-  leaderboard: document.getElementById('leaderboard'),
-  referralSection: document.getElementById('referralSection')
-};
-
-// --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
-  initReferralSystem();
-  startTokenCounter();
-  renderLeaderboard();
-  setInterval(simulatePriceMovement, 5000);
-});
-
-// --- Unified Wallet Connection ---
-async function connectWallet() {
-  if (!window.ethereum) {
-    alert('Please install MetaMask!');
-    return;
-  }
-
-  try {
-    // Disable all connect buttons
-    document.querySelectorAll('[id*="connect"]').forEach(btn => {
-      btn.disabled = true;
-      btn.textContent = "Connecting...";
-    });
-
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    userWallet = accounts[0];
-    
-    // Update UI
-    document.querySelectorAll('[id*="connect"]').forEach(btn => {
-      btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
-      btn.disabled = false;
-    });
-
-    // Update referral section if exists
-    if (elements.referralSection) {
-      generateReferralUI();
-    }
-    
-  } catch (error) {
-    console.error("Connection failed:", error);
-    alert(`Error: ${error.message}`);
-    document.querySelectorAll('[id*="connect"]').forEach(btn => {
-      btn.disabled = false;
-      btn.textContent = "Connect Wallet";
-    });
-  }
+/* ====== CORE RESET & VARIABLES ====== */
+:root {
+  --primary: #10B981;
+  --primary-dark: #059669;
+  --secondary: #059669;
+  --accent: #10b981;
+  --text-light: #f8fafc;
+  --text-dark: #1e293b;
+  --bg-light: #f8fafc;
+  --bg-dark: #0f172a;
+  --card-light: #ffffff;
+  --card-dark: #1e293b;
+  --border-light: #e2e8f0;
+  --border-dark: #334155;
 }
 
-// --- Referral System ---
-function initReferralSystem() {
-  // Check URL for referral parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get('ref');
-  
-  if (refCode && /^0x[a-fA-F0-9]{40}$/.test(refCode)) {
-    localStorage.setItem('fluffiRef', refCode);
-    console.log(`Referral detected: ${refCode}`);
-  }
-  
-  // Apply to input field if exists
-  if (elements.refInput) {
-    elements.refInput.value = localStorage.getItem('fluffiRef') || '';
+/* ====== BASE STYLES ====== */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.dark body {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+/* ====== LAYOUT STRUCTURE ====== */
+.site-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-header {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #10B981, #059669) !important;
+  color: var(--text-light);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem; /* Reduced from 2rem */
+  padding: 1.5rem; /* Reduced from 2rem */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tight layout for right column sections */
+.main-content > div:last-child {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 0.75rem; /* Tight gap between sections */
+}
+
+/* For modern browsers supporting subgrid */
+@supports (grid-template-columns: subgrid) {
+  .main-content {
+    grid-template-columns: subgrid;
   }
 }
 
-function generateReferralUI() {
-  if (!userWallet || !elements.referralSection) return;
-  
-  elements.referralSection.innerHTML = `
-    <div class="space-y-4">
-      <div>
-        <label class="block mb-2">Your referral link:</label>
-        <div class="flex">
-          <input type="text" id="userReferralLink" 
-                value="${window.location.origin}?ref=${userWallet}" 
-                class="flex-1 p-2 border rounded-l dark:bg-gray-700" readonly>
-          <button onclick="copyReferralLink()" 
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
-            Copy
-          </button>
-        </div>
-      </div>
-      <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
-        <p>Total referrals: <span id="referralCount">${leaderboard[userWallet]?.toFixed(2) || 0}</span></p>
-        <p>Earnings: <span id="referralEarnings">${(leaderboard[userWallet] * 0.1)?.toFixed(2) || 0} FLUFFI</span></p>
-      </div>
-    </div>
-  `;
-}
-
-function copyReferralLink() {
-  const input = document.getElementById('userReferralLink');
-  if (!input) return;
-  
-  input.select();
-  document.execCommand('copy');
-  
-  // Visual feedback
-  const button = input.nextElementSibling;
-  button.textContent = 'Copied!';
-  setTimeout(() => {
-    button.textContent = 'Copy';
-  }, 2000);
-}
-
-// --- Purchase Function ---
-async function buyFluffi() {
-  if (!userWallet) {
-    alert('Please connect wallet first');
-    return;
-  }
-
-  const amount = parseFloat(elements.amountInput.value);
-  if (isNaN(amount) || amount <= 0) {
-    alert('Please enter valid amount');
-    return;
-  }
-
-  try {
-    // Get referrer from localStorage or input
-    const ref = localStorage.getItem('fluffiRef') || elements.refInput?.value;
-    
-    // Simulate purchase (replace with actual contract call)
-    if (ref && ref !== userWallet) {
-      const reward = amount * 0.1; // 10% referral reward
-      leaderboard[ref] = (leaderboard[ref] || 0) + reward;
-      localStorage.setItem('fluffiLeaderboard', JSON.stringify(leaderboard));
-      alert(`Purchase successful! Referrer earned $${reward.toFixed(2)} bonus.`);
-    } else {
-      alert('Purchase successful!');
-    }
-    
-    // Update UI
-    renderLeaderboard();
-    if (elements.referralSection) generateReferralUI();
-    
-  } catch (error) {
-    console.error("Purchase failed:", error);
-    alert(`Error: ${error.message}`);
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
   }
 }
 
-// --- Leaderboard ---
-function renderLeaderboard() {
-  if (!elements.leaderboard) return;
-  
-  const sorted = Object.entries(leaderboard)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-
-  elements.leaderboard.innerHTML = `
-    <h3 class="text-lg font-bold mb-2">Top Referrers</h3>
-    ${sorted.length ? 
-      sorted.map(([addr, amt], i) => `
-        <p class="text-sm">
-          ${i+1}. ${addr.slice(0, 6)}...${addr.slice(-4)} - $${amt.toFixed(2)}
-        </p>
-      `).join('') : 
-      '<p class="text-sm text-gray-500">No referrals yet</p>'
-    }
-  `;
+.content-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 0; /* Remove default bottom margin */
 }
 
-// --- Stage & Price Logic ---
-// --- Stage & Price Logic ---
-const TOTAL_STAGES = 15;
-const STAGE_DURATION = 24 * 60 * 60; // 24h in seconds
+.dark .content-section {
+  background: #1e293b;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 
-// Get Elements
-const stageDisplay = document.getElementById("currentStage");
-const timerDisplay = document.getElementById("timer");
-const progressFill = document.getElementById("progressFill");
+/* Specific section adjustments */
+#referral,
+#claim, 
+#tokenomics {
+  padding: 1.25rem; /* Slightly reduced padding */
+  margin-bottom: 0;
+}
 
-// State
-let currentStage = 1;
-let timeLeft = STAGE_DURATION;
+/* ====== NAVIGATION ====== */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
 
-// Update Display
-function updateDisplay() {
-  // Update timer
-  const hours = Math.floor(timeLeft / 3600);
-  const minutes = Math.floor((timeLeft % 3600) / 60);
-  const seconds = timeLeft % 60;
-  if (timerDisplay) {
-    timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+.site-nav a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.site-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ====== TYPOGRAPHY ====== */
+/* Base text colors */
+body {
+  color: var(--text-dark); /* Black in light mode */
+}
+
+.dark body {
+  color: var(--text-light); /* White in dark mode */
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4 {
+  color: var(--text-light);
+}
+
+/* Section titles */
+.section-title {
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.dark .section-title {
+  color: var(--text-light);
+}
+
+/* Specific element adjustments */
+#presale,
+#referral,
+.price-ticker,
+.tokenomics-section {
+  color: var(--text-dark);
+}
+
+.dark #presale,
+.dark #referral,
+.dark .price-ticker,
+.dark .tokenomics-section {
+  color: var(--text-light);
+}
+
+/* Forced white text elements (e.g., buttons) */
+.always-light-text {
+  color: white !important;
+}
+
+/* Forced dark text elements */
+.always-dark-text {
+  color: var(--text-dark) !important;
+}
+body, h1, h2, h3, h4, .section-title,
+#presale, #referral, .price-ticker, .tokenomics-section {
+  transition: color 0.3s ease;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #10B981, #059669);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: var(--primary);
+}
+
+.dark h2 {
+  color: var(--secondary);
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.btn-secondary {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* ====== SPECIAL EFFECTS ====== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pulse:hover {
+  animation: pulse 1.5s infinite;
+}
+
+.price-update {
+  animation: pulseUpdate 0.5s ease;
+}
+
+@keyframes pulseUpdate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
   }
   
-  // Update progress (6.66% per stage)
-  if (progressFill) progressFill.style.width = `${(currentStage / TOTAL_STAGES) * 100}%`;
-  if (stageDisplay) stageDisplay.textContent = currentStage;
-  
-  // Update price
-  const price = (initialPrice * Math.pow(1.05, currentStage - 1)).toFixed(6);
-  if (elements.priceInfo) elements.priceInfo.textContent = `Price: $${price}`;
-}
-
-// Start Countdown
-function startCountdown() {
-  updateDisplay();
-  
-  const timer = setInterval(() => {
-    timeLeft--;
-    
-    if (timeLeft <= 0 && currentStage < TOTAL_STAGES) {
-      currentStage++;
-      timeLeft = STAGE_DURATION;
-    } else if (timeLeft <= 0) {
-      clearInterval(timer);
-      if (timerDisplay) timerDisplay.textContent = "COMPLETED";
-    }
-    
-    updateDisplay();
-  }, 1000);
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', startCountdown);
-
-// --- Token Counter ---
-function startTokenCounter() {
-  const counter = document.getElementById('tokensSold');
-  if (!counter) return;
-  
-  let count = 8421509;
-
-// --- Price Simulation ---
-let currentPrice = 0.0001;
-function simulatePriceMovement() {
-  if (!elements.currentPrice) return;
-  
-  const change = (Math.random() * 0.00002) - 0.00001;
-  currentPrice = Math.max(0.00009, currentPrice + change);
-  elements.currentPrice.textContent = currentPrice.toFixed(6);
-}
-// tailwind.config.js
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        'primary-green': '#10B981',
-        'dark-green': '#059669'
-      }
-    }
+  .content-section {
+    padding: 1.25rem;
   }
+  
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Header fixes */
+header {
+  position: static !important;
+  width: 100vw !important;
+  left: 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
+  background-image: 
+    linear-gradient(135deg, #10B981, #059669),
+    radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+}
+
+/* Section hover effects */
+section {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0,0,0,0.1);
+}
+h1, h2, h3 {
+  color: white !important;
+  font-weight: 700 !important; /* Extra bold */
+  font-size: 2.2rem !important; /* Increase size */
+}
+body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+.container, .row {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.stage-progress-container {
+  max-width: 600px;
+  margin: 20px auto;
+  font-family: sans-serif;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 6.66%; /* 1/15th (100/15) */
+  background: #4CAF50;
+  transition: width 0.3s;
+}
+
+.stage-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2em;
+}
+
+#timer {
+  font-family: monospace;
 }
