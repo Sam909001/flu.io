@@ -2,9 +2,6 @@
 let userWallet = null;
 const leaderboard = JSON.parse(localStorage.getItem('fluffiLeaderboard')) || {};
 const initialPrice = 0.0001;
-const stages = 15;
-const stageDuration = 1000 * 60 * 60 * 48; // 48 hours
-const startTime = new Date("2025-05-05T12:00:00Z").getTime();
 
 // --- DOM Elements ---
 const elements = {
@@ -23,14 +20,10 @@ const elements = {
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
   initReferralSystem();
-  updateStage();
-  updateCountdown();
   startTokenCounter();
   renderLeaderboard();
   
   // Set up intervals
-  setInterval(updateStage, 1000);
-  setInterval(updateCountdown, 1000);
   setInterval(simulatePriceMovement, 5000);
 });
 
@@ -188,35 +181,80 @@ function renderLeaderboard() {
 }
 
 // --- Stage & Price Logic ---
-function updateStage() {
-  const now = Date.now();
-  const elapsed = now - startTime;
-  const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-  const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+// --- Stage & Price Logic ---
+const TOTAL_STAGES = 15;
+const STAGE_DURATION = 24 * 60 * 60; // 24h in seconds
+
+// Load or initialize timer state
+const savedState = JSON.parse(localStorage.getItem('fluffiTimer')) || {
+  startTime: Math.floor(Date.now() / 1000),
+  currentStage: 1
+};
+
+// Calculate current state
+const now = Math.floor(Date.now() / 1000);
+const elapsedSeconds = now - savedState.startTime;
+let currentStage = Math.min(
+  savedState.currentStage + Math.floor(elapsedSeconds / STAGE_DURATION), 
+  TOTAL_STAGES
+);
+let timeLeft = STAGE_DURATION - (elapsedSeconds % STAGE_DURATION);
+
+// Update display
+function updateTimerDisplay() {
+  const hours = Math.floor(timeLeft / 3600);
+  const minutes = Math.floor((timeLeft % 3600) / 60);
+  const seconds = timeLeft % 60;
   
-  if (elements.stageInfo) elements.stageInfo.textContent = `Stage: ${stage + 1}/${stages}`;
+  // Update 24h timer
+  if (document.getElementById("timer")) {
+    document.getElementById("timer").textContent = 
+      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+  
+  // Update progress bar
+  if (document.getElementById("progressFill")) {
+    document.getElementById("progressFill").style.width = `${(currentStage / TOTAL_STAGES) * 100}%`;
+  }
+  
+  // Update stage counter
+  if (document.getElementById("currentStage")) {
+    document.getElementById("currentStage").textContent = currentStage;
+  }
+  
+  // Update price
+  const price = (initialPrice * Math.pow(1.05, currentStage - 1)).toFixed(6);
   if (elements.priceInfo) elements.priceInfo.textContent = `Price: $${price}`;
-}
-
-function updateCountdown() {
-  const endTime = startTime + (stageDuration * stages);
-  const remaining = endTime - Date.now();
   
-  if (remaining <= 0) {
-    if (elements.countdown) elements.countdown.textContent = "Presale ended";
-    return;
-  }
-  
-  const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-  const secs = Math.floor((remaining % (1000 * 60)) / 1000);
-  
+  // Update days counter (preserve this functionality)
+  const daysLeft = Math.floor(((TOTAL_STAGES - currentStage) * STAGE_DURATION + timeLeft) / 86400);
   if (elements.countdown) {
-    elements.countdown.textContent = `Ends in: ${days}d ${hours}h ${mins}m ${secs}s`;
+    elements.countdown.textContent = `Ends in: ${daysLeft}d`;
   }
 }
 
+// Start the countdown
+function startCountdown() {
+  updateTimerDisplay();
+  
+  const timer = setInterval(() => {
+    timeLeft--;
+    
+    if (timeLeft <= 0 && currentStage < TOTAL_STAGES) {
+      currentStage++;
+      timeLeft = STAGE_DURATION;
+      localStorage.setItem('fluffiTimer', JSON.stringify({
+        startTime: Math.floor(Date.now() / 1000),
+        currentStage: currentStage
+      }));
+    }
+    
+    updateTimerDisplay();
+  }, 1000);
+}
+
+// Initialize timer
+document.addEventListener('DOMContentLoaded', startCountdown);
 // --- Token Counter ---
 function startTokenCounter() {
   const counter = document.getElementById('tokensSold');
