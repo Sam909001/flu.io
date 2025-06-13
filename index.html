@@ -211,7 +211,6 @@ h2, h3 {
 
 <script>
 // ======= SELF-CONTAINED REFERRAL SYSTEM =======
-document.addEventListener('DOMContentLoaded', function() {
   if (window.referralSystemLoaded) return;
   window.referralSystemLoaded = true;
   
@@ -509,111 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateStage();
     updateCountdown();
-</script>
-  <script>
-  // WAIT FOR PAGE TO LOAD
-  document.addEventListener('DOMContentLoaded', function() {
-    // FIND THE LOGO
-    const logo = document.querySelector('img[src*="fluffi.jpg"]');
-    
-    // ADD INLINE STYLES THAT CAN'T BE OVERRIDDEN
-    if (logo) {
-      logo.style.display = 'block';
-      logo.style.position = 'relative';
-      logo.style.animation = 'fluffi-float 2s ease-in-out infinite';
-      logo.style.willChange = 'transform';
-      
-      // CREATE KEYFRAMES DYNAMICALLY
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes fluffi-float {
-          0%, 100% { transform: translateY(0) scale(1) rotate(0); }
-          50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
-        }
-      `;
-      document.head.appendChild(style);
-      
-      // DEBUG CONFIRMATION
-      console.log('Logo animation applied!', logo);
-    } else {
-      console.error('Logo not found! Check image src');
-    }
-  });
-</script>
-  <!-- ===== ADD THIS ANIMATION SCRIPT HERE ===== -->
-  <script>
-    // FLOATING LOGO SOLUTION
-    function initLogoAnimation() {
-      const logo = document.querySelector('img[src*="fluffi.jpg"]');
-      if (!logo) {
-        console.log("Logo image not found");
-        return;
-      }
-
-      // Create style element if it doesn't exist
-      let styleEl = document.getElementById('fluffi-animation-style');
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'fluffi-animation-style';
-        styleEl.textContent = `
-          @keyframes fluffi-float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-          }
-        `;
-        document.head.appendChild(styleEl);
-      }
-
-      // Apply animation directly
-      logo.style.cssText = `
-        display: block !important;
-        position: relative !important;
-        animation: fluffi-float 2s ease-in-out infinite !important;
-        will-change: transform;
-      `;
-    }
-    <script>
-  // 1. FIRST CREATE THE ANIMATION KEYFRAMES
-  const styleTag = document.createElement('style');
-  styleTag.textContent = `
-    @keyframes fluffi-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-  `;
-  document.head.appendChild(styleTag);
-
-  // 2. FORCE-APPLY THE ANIMATION TO LOGO
-  const logo = document.querySelector('img[src="fluffi.jpg"]');
-  if (logo) {
-    logo.style.animation = 'fluffi-float 2s ease-in-out infinite';
-    // Debugging check
-    console.log('Logo animation applied:', logo.style.animation);
-  }
-</script>
-  <script>
-  // DELETE ANY EXISTING ANIMATION FIRST
-  const logo = document.querySelector('img[src="fluffi.jpg"]');
-  if (logo) {
-    logo.style.animation = 'none';
-    
-    // WAIT 1 FRAME
-    requestAnimationFrame(() => {
-      // CREATE KEYFRAMES
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes force-float {
-          0%, 100% { transform: translateY(0) rotate(0); }
-          50% { transform: translateY(-20px) rotate(3deg); }
-        }
-      `;
-      document.head.appendChild(style);
-      
-      // REAPPLY ANIMATION
-      logo.style.animation = 'force-float 1.5s ease-in-out infinite';
-      logo.style.transform = 'translateZ(0)'; // Force GPU acceleration
-    });
-  }
 </script>
   </body>
 </html>
