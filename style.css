@@ -485,3 +485,6 @@ header {
 .hidden {
   display: none !important;
 }
+.animate-float {
+  animation: fluffi-float 3s ease-in-out infinite;
+}
