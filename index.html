@@ -404,35 +404,56 @@ h2, h3 {
     let userWalletAddress = null;
     const initialPrice = 0.0001;
     const stages = 15;
-    const stageDuration = 1000 * 60 * 60 * 48;
+    const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
+    const presaleDuration = 30 * 24 * 60 * 60 * 1000; // 30 days total
     const startTime = Date.now();
 
     function updateStage() {
-  const now = Date.now();
-  const elapsed = now - startTime;
-  const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-  const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
-  
-  // ADD NULL CHECKS:
-  const stageInfoEl = document.getElementById('stageInfo');
-  const priceInfoEl = document.getElementById('priceInfo');
-  const progressBarEl = document.getElementById('progressBar');
-  
-  if (stageInfoEl) stageInfoEl.textContent = `Stage: ${stage + 1} / ${stages}`;
-  if (priceInfoEl) priceInfoEl.textContent = `Price: $${price}`;
-  if (progressBarEl) progressBarEl.style.width = `${((stage + 1) / stages) * 100}%`;
-}
-  
-    function updateCountdown() {
-      const end = startTime + 30 * 24 * 60 * 60 * 1000;
-      const left = end - Date.now();
-      const days = Math.floor(left / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((left / (1000 * 60)) % 60);
-      const seconds = Math.floor((left / 1000) % 60);
-      document.getElementById('countdown').textContent = `Ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const currentStage = Math.min(Math.floor(elapsed / stageDuration) + 1;
+        const stageProgress = (elapsed % stageDuration) / stageDuration;
+        const price = (initialPrice * Math.pow(1.05, currentStage - 1)).toFixed(6);
+
+        // Update stage display
+        document.getElementById('currentStage').textContent = currentStage;
+        document.getElementById('priceInfo').textContent = `Price: $${price}`;
+        document.getElementById('progressFill').style.width = `${stageProgress * 100}%`;
+
+        // Update stage timer (48h countdown)
+        const stageTimeLeft = stageDuration - (elapsed % stageDuration);
+        updateTimerDisplay(stageTimeLeft, 'timer');
     }
 
+    function updatePresaleCountdown() {
+        const timeLeft = (startTime + presaleDuration) - Date.now();
+        updateTimerDisplay(timeLeft, 'presaleTimer'); // You'll need to add this element
+    }
+
+    function updateTimerDisplay(timeLeft, elementId) {
+        const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24;
+        const minutes = Math.floor((timeLeft / (1000 * 60)) % 60;
+        const seconds = Math.floor((timeLeft / 1000) % 60;
+        
+        // Format as HH:MM:SS
+        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = formattedTime;
+        }
+    }
+
+    // Update both timers every second
+    setInterval(() => {
+        updateStage();
+        updatePresaleCountdown();
+    }, 1000);
+
+    // Initialize timers immediately
+    updateStage();
+    updatePresaleCountdown();
+    
     async function connectWallet() {
       if (window.ethereum) {
         try {
