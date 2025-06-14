@@ -35,23 +35,55 @@
     /* Dark mode styles */
     .dark {
       background: #111827 !important;
-      color: white !important;
+      color: #f0f0f0 !important;
     }
-    
+
     .dark .bg-white {
       background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
     }
-    
+
     .dark .text-gray-600 {
       color: #d1d5db !important;
     }
-    
+
+    .dark .text-gray-500 {
+      color: #9ca3af !important;
+    }
+
     .dark .bg-gray-200 {
       background-color: #374151 !important;
     }
-    
+
     .dark .text-blue-600 {
       color: #60a5fa !important;
+    }
+    
+    /* Dark mode text fixes - Force all text to be visible */
+    .dark h1,
+    .dark h2,
+    .dark h3,
+    .dark .section-title,
+    .dark p,
+    .dark span,
+    .dark div,
+    .dark li,
+    .dark summary,
+    .dark .timer,
+    .dark .stage-label,
+    .dark .font-mono,
+    .dark .font-bold,
+    .dark .font-semibold {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark .text-gray-600.dark\\:text-gray-300 {
+      color: #d1d5db !important;
     }
 
     /* Logo animation */
@@ -157,7 +189,7 @@
 </head>
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 shadow sticky top-0 z-10">
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
       <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
@@ -170,11 +202,11 @@
       <a href="#faq" class="text-white hover:underline">FAQ</a>
       <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
       <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+      <a href="how-to-buy.html" target="_blank" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
         How to Buy FLUFFI
       </a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
+      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
     </nav>
   </header>
 
@@ -191,6 +223,10 @@
           </div>
           <div class="progress-bar">
             <div class="progress-fill" id="progressBar" style="width: 6.67%"></div>
+          </div>
+          <div class="mt-2 text-sm text-center">
+            <span class="font-semibold">Stage Timer: </span>
+            <span class="timer font-mono" id="stageTimer">47h 59m 59s</span>
           </div>
         </div>
         
@@ -209,7 +245,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
         </svg>
         <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-        <span class="ml-2 text-sm text-gray-500">FLUFFI sold</span>
+        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
       </div>
 
       <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
@@ -295,7 +331,7 @@
     let userWalletAddress = null;
     const initialPrice = 0.0001;
     const stages = 15;
-    const stageDuration = 1000 * 60 * 60 * 48;
+    const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
     const startTime = Date.now();
 
     function updateStage() {
@@ -324,6 +360,31 @@
       const countdownEl = document.getElementById('countdown');
       if (countdownEl) {
         countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+    }
+
+    function updateStageTimer() {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const currentStageIndex = Math.floor(elapsed / stageDuration);
+      const stageStartTime = startTime + (currentStageIndex * stageDuration);
+      const stageEndTime = stageStartTime + stageDuration;
+      const stageTimeLeft = stageEndTime - now;
+      
+      if (stageTimeLeft > 0) {
+        const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((stageTimeLeft / (1000 * 60)) % 60);
+        const seconds = Math.floor((stageTimeLeft / 1000) % 60);
+        
+        const stageTimerEl = document.getElementById('stageTimer');
+        if (stageTimerEl) {
+          stageTimerEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
+        }
+      } else {
+        const stageTimerEl = document.getElementById('stageTimer');
+        if (stageTimerEl) {
+          stageTimerEl.textContent = "Stage Complete";
+        }
       }
     }
 
@@ -366,8 +427,8 @@
           </div>
           
           <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p>👥 Total referrals: <span class="font-bold">0</span></p>
-            <p>💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
           </div>
           
           <div class="mt-4">
@@ -475,9 +536,11 @@
     setInterval(() => {
       updateStage();
       updateCountdown();
+      updateStageTimer();
     }, 1000);
 
     updateStage();
     updateCountdown();
+    updateStageTimer();
 </script>
 </html>
