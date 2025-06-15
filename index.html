@@ -463,19 +463,66 @@
       window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
     }
 
-    async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
-      if (!userWalletAddress) {
-        alert('Please connect your wallet first.');
-        return;
-      }
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
+async function buyFluffi() {
+    try {
+        // 1. Validate inputs
+        const amount = document.getElementById('amountInput').value;
+        if (!amount || isNaN(amount) || Number(amount) <= 0) {
+            alert("Please enter a valid amount greater than 0");
+            return;
+        }
+
+        // 2. Check wallet connection
+        if (!userWalletAddress) {
+            await connectWallet();
+            return;
+        }
+
+        // 3. Check network (BSC Testnet)
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        if (chainId !== "0x61") {
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x61' }], // BSC Testnet
+            });
+            return;
+        }
+
+        // 4. Initialize contract
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+            "0xYourDeployedContractAddress", // REPLACE WITH YOUR CONTRACT ADDRESS
+            contractAbi,
+            signer
+        );
+
+        // 5. Update UI
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+        buyBtn.disabled = true;
+        buyBtn.textContent = "Processing...";
+
+        // 6. Call buyTokens() with BNB amount
+        const tx = await contract.buyTokens({
+            value: ethers.utils.parseEther(amount.toString()),
+            gasLimit: 300000
+        });
+
+        // 7. Wait for transaction
+        await tx.wait();
+        alert(`Success! Transaction hash: ${tx.hash}`);
+
+    } catch (error) {
+        console.error("Buy failed:", error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+        if (buyBtn) {
+            buyBtn.disabled = false;
+            buyBtn.textContent = "🚀 Buy Now";
+        }
+    }
+}
       
       let ethValue;
       if (currency === 'USD') {
@@ -489,7 +536,78 @@
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contractAddress = "0xd976e9E2da70810A290d1FFA05500AbE66F53C05";
-        const contractAbi = [{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"name":"recoverERC20","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"togglePresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        const contractAbi = const contractAbi = [
+    {
+        "inputs": [],
+        "name": "buyTokens",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "recoverERC20",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "togglePresale",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "presaleActive",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "tokenPrice",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "stateMutability": "payable",
+        "type": "receive"
+    }
+];
         const contract = new ethers.Contract(contractAddress, contractAbi, signer);
         const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
         
