@@ -29,54 +29,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Unified Wallet Connection ---
 async function connectWallet() {
+  if (!window.ethereum) {
+    alert('Please install MetaMask!');
+    return;
+  }
+
   try {
-    // 1. Check if MetaMask is installed
-    if (!window.ethereum) {
-      alert("Please install MetaMask!");
-      return;
-    }
+    // Disable all connect buttons
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.disabled = true;
+      btn.textContent = "Connecting...";
+    });
 
-    // 2. Request account access
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    userWalletAddress = accounts[0];
+    userWallet = accounts[0];
     
-    // 3. Check if on BSC (Mainnet or Testnet)
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== "0x38" && chainId !== "0x61") { 
-      // 4. Switch to BSC Mainnet if on wrong network
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x38' }], // BSC Mainnet
-      });
-    }
+    // Update UI
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+      btn.disabled = false;
+    });
 
-    // 5. Update UI
-    document.getElementById('walletButton').textContent = "Connected";
-    document.getElementById('walletButton').style.backgroundColor = "#4CAF50";
+    // Update referral section if exists
+    if (elements.referralSection) {
+      generateReferralUI();
+    }
     
   } catch (error) {
     console.error("Connection failed:", error);
     alert(`Error: ${error.message}`);
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.disabled = false;
+      btn.textContent = "Connect Wallet";
+    });
   }
 }
-
-async function updateNetworkStatus() {
-  if (!window.ethereum) return;
-  
-  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-  let networkName;
-  
-  switch (chainId) {
-    case "0x38": networkName = "BSC Mainnet"; break;
-    case "0x61": networkName = "BSC Testnet"; break;
-    default: networkName = "Wrong Network";
-  }
-  
-  document.getElementById('network-status').textContent = `Network: ${networkName}`;
-}
-
-// Call this when wallet connects
-window.ethereum?.on('chainChanged', updateNetworkStatus);
 
 // --- Referral System ---
 function initReferralSystem() {
@@ -137,44 +124,37 @@ function copyReferralLink() {
 
 // --- Purchase Function ---
 async function buyFluffi() {
+  if (!userWallet) {
+    alert('Please connect wallet first');
+    return;
+  }
+
+  const amount = parseFloat(elements.amountInput.value);
+  if (isNaN(amount) || amount <= 0) {
+    alert('Please enter valid amount');
+    return;
+  }
+
   try {
-    // 1. Validate inputs
-    const amount = document.getElementById('amountInput').value;
-    if (!amount || isNaN(amount)) {
-      alert("Enter a valid amount!");
-      return;
+    // Get referrer from localStorage or input
+    const ref = localStorage.getItem('fluffiRef') || elements.refInput?.value;
+    
+    // Simulate purchase (replace with actual contract call)
+    if (ref && ref !== userWallet) {
+      const reward = amount * 0.1; // 10% referral reward
+      leaderboard[ref] = (leaderboard[ref] || 0) + reward;
+      localStorage.setItem('fluffiLeaderboard', JSON.stringify(leaderboard));
+      alert(`Purchase successful! Referrer earned $${reward.toFixed(2)} bonus.`);
+    } else {
+      alert('Purchase successful!');
     }
-
-    // 2. Check wallet connection
-    if (!userWalletAddress) {
-      await connectWallet(); // Auto-connect if not already
-      return;
-    }
-
-    // 3. Check network (BSC Mainnet/Testnet)
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== "0x38" && chainId !== "0x61") {
-      alert("Please switch to Binance Smart Chain (BSC)!");
-      return;
-    }
-
-    // 4. Initialize ethers.js
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-
-    // 5. Send transaction (with gas limit)
-    const tx = await contract.contribute("0xREFERRAL_ADDRESS", {
-      value: ethers.utils.parseEther(amount),
-      gasLimit: 300000, // Prevents "out of gas" errors
-    });
-
-    // 6. Show success message
-    alert(`Success! TX Hash: ${tx.hash}`);
-    console.log("Transaction:", tx);
-
+    
+    // Update UI
+    renderLeaderboard();
+    if (elements.referralSection) generateReferralUI();
+    
   } catch (error) {
-    console.error("Buy failed:", error);
+    console.error("Purchase failed:", error);
     alert(`Error: ${error.message}`);
   }
 }
