@@ -336,13 +336,24 @@
     align-items: flex-start;
   }
 
-  /* Team Section - Left Side */
-  #team {
+  /* Both Sections Same Width */
+  #team, #about {
     flex: 1;
     background: #1A1A1A;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  /* Section Headings */
+  #about h2, #team h2 {
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+    color: #00FF00; /* Green */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 900; /* Thicker */
   }
 
   .team-grid {
@@ -359,8 +370,8 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #FF00FF;
-    filter: grayscale(100%) contrast(120%);
+    border: 3px solid #00FF00; /* Green border */
+    filter: grayscale(10%) contrast(110%);
   }
 
   .team-member h3 {
@@ -369,31 +380,20 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #FFFFFF;
+    font-weight: bold;
   }
 
   .team-member p {
     font-size: 1rem;
     color: #CCCCCC;
     line-height: 1.5;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 
-  /* About Section - Right Side */
-  #about {
-    flex: 1.2;
-    background: #1A1A1A;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
-
-  #about h2, #team h2 {
-    font-size: 2rem;
-    margin-bottom: 25px;
-    color: #FF00FF;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  .team-member a i {
+    font-size: 1.4rem;
+    color: #00FF00;
+    font-weight: bold;
   }
 
   .about-content {
@@ -426,41 +426,42 @@
   }
 
   .about-content li:nth-child(1):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF00FF"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300FF00"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
   }
 
   .about-content li:nth-child(2):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF00FF"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300FF00"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
   }
 
   .about-content li:nth-child(3):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF00FF"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300FF00"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
   }
 
   @media (max-width: 768px) {
     .split-sections {
       flex-direction: column;
     }
-    
+
     #team, #about {
       width: 100%;
     }
   }
 </style>
 
+<!-- Content Layout -->
 <div class="split-sections">
-  <!-- Team Section - Left Side -->
+  <!-- Team Section -->
   <section id="team">
     <h2>OUR TEAM</h2>
     <div class="team-grid">
       <div class="team-member">
-        <img src="https://i.imgur.com/J6lxXyP.png" alt="CEO"> <!-- Anonymous silhouette image -->
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="CEO">
         <h3>JOHN DOE</h3>
         <p>Ex-Google, 10+ years in blockchain development. Smart contract security specialist.</p>
         <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
       </div>
       <div class="team-member">
-        <img src="https://i.imgur.com/J6lxXyP.png" alt="CTO"> <!-- Same anonymous image -->
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CTO">
         <h3>JANE SMITH</h3>
         <p>Former Chainlink core developer. Solidity expert with 50+ deployed contracts.</p>
         <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -468,7 +469,7 @@
     </div>
   </section>
 
-  <!-- About Section - Right Side -->
+  <!-- About Section -->
   <section id="about">
     <h2>WHY FLUFFI COIN?</h2>
     <div class="about-content">
@@ -482,6 +483,10 @@
     </div>
   </section>
 </div>
+
+<!-- Load Font Awesome for Twitter Icon -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
   
   <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
     <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
