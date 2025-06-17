@@ -348,14 +348,14 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  function isDarkMode() {
-    return document.documentElement.classList.contains('dark') ||
-           window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-
   const ctx = document.getElementById('tokenChart').getContext('2d');
 
-  new Chart(ctx, {
+  // Detect initial dark mode
+  function getLabelColor() {
+    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+  }
+
+  let chartConfig = {
     type: 'doughnut',
     data: {
       labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
@@ -378,7 +378,7 @@
         legend: {
           position: 'bottom',
           labels: {
-            color: isDarkMode() ? '#ffffff' : '#111827',
+            color: getLabelColor(),
             font: {
               size: 14,
               family: "'Inter', sans-serif"
@@ -390,6 +390,20 @@
       responsive: true,
       maintainAspectRatio: false
     }
+  };
+
+  let tokenChart = new Chart(ctx, chartConfig);
+
+  // Optional: update legend color when theme is toggled
+  const observer = new MutationObserver(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
   });
 </script>
     
