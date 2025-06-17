@@ -328,36 +328,36 @@
   </main>
 
   <style>
-  body {
-    background: #0f0f0f;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
+  /* Split Layout Container */
   .split-sections {
     display: flex;
     gap: 40px;
     margin: 60px 0;
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
+  /* Shared Section Styles */
   #team, #about {
     flex: 1;
-    background: #121212;
+    min-width: 320px;
+    background: #ffffff;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 255, 0, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   }
 
-  #about h2, #team h2 {
-    font-size: 2.2rem;
+  #team h2, #about h2 {
+    font-size: 2rem;
     margin-bottom: 25px;
-    color: #00FF00;
+    color: #28a745; /* Green accent */
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-weight: 900;
+    font-weight: 700;
   }
 
+  /* Team Section */
   .team-grid {
     display: grid;
     gap: 30px;
@@ -372,36 +372,35 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #00FF00;
+    border: 3px solid #28a745;
     filter: grayscale(0%) contrast(110%);
   }
 
   .team-member h3 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin: 15px 0 5px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #FFFFFF;
-    font-weight: bold;
+    color: #333333;
+    font-weight: 600;
   }
 
   .team-member p {
     font-size: 1rem;
-    color: #CCCCCC;
+    color: #555555;
     line-height: 1.5;
     margin-bottom: 10px;
   }
 
   .team-member a i {
-    font-size: 1.4rem;
-    color: #00FF00;
-    font-weight: bold;
+    color: #28a745;
+    font-size: 1.2rem;
   }
 
+  /* About Section */
   .about-content {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     line-height: 1.7;
-    color: #EEEEEE;
+    color: #444444;
   }
 
   .about-content ul {
@@ -425,18 +424,19 @@
     height: 20px;
     background-size: contain;
     background-repeat: no-repeat;
+    filter: brightness(0) saturate(100%) invert(55%) sepia(62%) saturate(703%) hue-rotate(92deg) brightness(96%) contrast(88%);
   }
 
   .about-content li:nth-child(1):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2300FF00" viewBox="0 0 24 24"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
   }
 
   .about-content li:nth-child(2):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2300FF00" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
   }
 
   .about-content li:nth-child(3):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2300FF00" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
   }
 
   @media (max-width: 768px) {
@@ -450,22 +450,21 @@
   }
 </style>
 
-<!-- HTML -->
 <div class="split-sections">
   <!-- Team Section -->
   <section id="team">
-    <h2>OUR TEAM</h2>
+    <h2>Our Team</h2>
     <div class="team-grid">
       <div class="team-member">
-        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Alex Rivera - CEO">
-        <h3>Alex Rivera</h3>
-        <p>Blockchain architect & former Google Cloud lead. Expert in smart contract security & scalability.</p>
+        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="CEO">
+        <h3>Michael Lee</h3>
+        <p>Ex-Google engineer with 10+ years of blockchain development experience. Smart contract security expert.</p>
         <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
       </div>
       <div class="team-member">
-        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Sophia Liang - CTO">
-        <h3>Sophia Liang</h3>
-        <p>Ex-Chainlink senior dev. Solidity veteran and pioneer in DeFi protocol design.</p>
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CTO">
+        <h3>Sara Kim</h3>
+        <p>Former Chainlink developer. Built over 50+ smart contracts across DeFi and NFT ecosystems.</p>
         <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
       </div>
     </div>
@@ -473,21 +472,18 @@
 
   <!-- About Section -->
   <section id="about">
-    <h2>WHY FLUFFI COIN?</h2>
+    <h2>Why Fluffi Coin?</h2>
     <div class="about-content">
-      <p>Fluffi Coin represents the evolution of meme tokens by combining viral appeal with substantive utility:</p>
+      <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
       <ul>
-        <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 – Earn rewards by staking Fluffi NFTs</li>
-        <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Token holders vote on treasury allocations and protocol upgrades</li>
-        <li><strong>DEFLATIONARY MECHANICS</strong><br>1% permanent burn on all transactions reduces supply over time</li>
+        <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
+        <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
+        <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
       </ul>
-      <p>We're bridging the gap between meme culture and sustainable DeFi infrastructure.</p>
+      <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
     </div>
   </section>
 </div>
-
-<!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
   
   <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
