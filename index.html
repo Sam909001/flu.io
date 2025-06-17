@@ -301,20 +301,40 @@
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
     </section>
     
-    <!-- Tokenomics Section -->
+   <!-- Tokenomics Section -->
 <section id="tokenomics" class="px-6 py-10 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-xl mb-12">
-  <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">📊 Tokenomics</h2>
+  <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
+    📊 Tokenomics
+  </h2>
 
   <div class="grid md:grid-cols-2 gap-10 items-center">
     <!-- Token Details -->
     <div>
-      <ul class="space-y-4 text-gray-700 dark:text-gray-200 text-lg">
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span> 10,000,000,000 FLUFFI</li>
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Presale:</span> 40%</li>
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span> 30% (Locked)</li>
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Staking:</span> 20%</li>
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span> 5%</li>
-        <li><span class="font-semibold text-green-700 dark:text-green-400">Team:</span> 5% (Locked)</li>
+      <ul class="space-y-4 text-lg">
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
+          <span class="text-gray-800 dark:text-gray-100">10,000,000,000 FLUFFI</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
+          <span class="text-gray-800 dark:text-gray-100">40%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
+          <span class="text-gray-800 dark:text-gray-100">30% (Locked)</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
+          <span class="text-gray-800 dark:text-gray-100">20%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
+          <span class="text-gray-800 dark:text-gray-100">5%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
+          <span class="text-gray-800 dark:text-gray-100">5% (Locked)</span>
+        </li>
       </ul>
     </div>
 
@@ -325,7 +345,7 @@
   </div>
 </section>
 
-<!-- Chart.js CDN -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const ctx = document.getElementById('tokenChart').getContext('2d');
