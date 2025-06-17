@@ -302,6 +302,51 @@
     </section>
     
     <!-- Tokenomics -->
+    <!-- Tokenomics Section -->
+<section id="tokenomics">
+  <h2>TOKENOMICS</h2>
+  <div class="chart-container">
+    <canvas id="tokenChart"></canvas>
+  </div>
+</section>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Initialize chart
+  const ctx = document.getElementById('tokenChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Presale (50%)', 'Liquidity (30%)', 'Marketing (15%)', 'Team (5%)'],
+      datasets: [{
+        data: [50, 30, 15, 5],
+        backgroundColor: [
+          '#FF6384', // Pink
+          '#36A2EB', // Blue
+          '#FFCE56', // Yellow
+          '#4BC0C0'  // Teal
+        ],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            font: {
+              size: 14,
+              family: "'Inter', sans-serif"
+            },
+            color: '#FFFFFF'
+          }
+        }
+      }
+    }
+  });
+</script>
     <section id="tokenomics" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">📊 Tokenomics</h2>
       <div class="grid md:grid-cols-2 gap-4">
