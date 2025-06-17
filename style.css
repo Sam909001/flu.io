@@ -495,3 +495,9 @@ header {
 .dark .network-badge {
   background: #333;
 }
+.trust-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
