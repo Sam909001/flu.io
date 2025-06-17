@@ -327,8 +327,7 @@
     </section>
   </main>
 
-  <style>
-  /* Split Layout Container */
+<style>
   .split-sections {
     display: flex;
     gap: 40px;
@@ -337,7 +336,6 @@
     flex-wrap: wrap;
   }
 
-  /* Shared Section Styles */
   #team, #about {
     flex: 1;
     min-width: 320px;
@@ -345,19 +343,19 @@
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    color: #333333;
   }
 
   #team h2, #about h2 {
     font-size: 2rem;
     margin-bottom: 25px;
-    color: #28a745; /* Green accent */
+    color: #28a745;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
   }
 
-  /* Team Section */
   .team-grid {
     display: grid;
     gap: 30px;
@@ -396,7 +394,6 @@
     font-size: 1.2rem;
   }
 
-  /* About Section */
   .about-content {
     font-size: 1.05rem;
     line-height: 1.7;
@@ -446,6 +443,25 @@
 
     #team, #about {
       width: 100%;
+    }
+  }
+
+  /* 🌙 Dark Mode Styles */
+  @media (prefers-color-scheme: dark) {
+    #team, #about {
+      background: #1c1c1c;
+      color: #eeeeee;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
+    }
+
+    .team-member h3,
+    .team-member p,
+    .about-content {
+      color: #eeeeee;
+    }
+
+    .about-content li:before {
+      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(190deg) brightness(150%) contrast(90%);
     }
   }
 </style>
