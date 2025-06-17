@@ -540,3 +540,19 @@ header {
 .team-member img {
   border-radius: 50%;
 }
+/* Tokenomics Section */
+#tokenomics {
+  background: #1A1A1A;
+  padding: 40px;
+  border-radius: 12px;
+  margin: 40px 0;
+}
+
+.chart-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#tokenChart {
+  max-height: 400px;
+}
