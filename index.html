@@ -301,8 +301,8 @@
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
     </section>
     
-   <!-- Tokenomics Section -->
-<section id="tokenomics" class="px-6 py-10 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-xl mb-12">
+  <!-- Tokenomics Section -->
+<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
   <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
     📊 Tokenomics
   </h2>
@@ -313,34 +313,34 @@
       <ul class="space-y-4 text-lg">
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
-          <span class="text-gray-800 dark:text-gray-100">10,000,000,000 FLUFFI</span>
+          <span class="text-gray-900 dark:text-white">10,000,000,000 FLUFFI</span>
         </li>
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
-          <span class="text-gray-800 dark:text-gray-100">40%</span>
+          <span class="text-gray-900 dark:text-white">40%</span>
         </li>
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
-          <span class="text-gray-800 dark:text-gray-100">30% (Locked)</span>
+          <span class="text-gray-900 dark:text-white">30% (Locked)</span>
         </li>
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
-          <span class="text-gray-800 dark:text-gray-100">20%</span>
+          <span class="text-gray-900 dark:text-white">20%</span>
         </li>
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
-          <span class="text-gray-800 dark:text-gray-100">5%</span>
+          <span class="text-gray-900 dark:text-white">5%</span>
         </li>
         <li>
           <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
-          <span class="text-gray-800 dark:text-gray-100">5% (Locked)</span>
+          <span class="text-gray-900 dark:text-white">5% (Locked)</span>
         </li>
       </ul>
     </div>
 
     <!-- Chart -->
     <div class="flex justify-center">
-      <canvas id="tokenChart" width="300" height="300"></canvas>
+      <canvas id="tokenChart" width="280" height="280"></canvas>
     </div>
   </div>
 </section>
@@ -348,7 +348,13 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+  function isDarkMode() {
+    return document.documentElement.classList.contains('dark') ||
+           window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
   const ctx = document.getElementById('tokenChart').getContext('2d');
+
   new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -372,7 +378,7 @@
         legend: {
           position: 'bottom',
           labels: {
-            color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#ffffff' : '#111827',
+            color: isDarkMode() ? '#ffffff' : '#111827',
             font: {
               size: 14,
               family: "'Inter', sans-serif"
