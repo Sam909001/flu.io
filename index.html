@@ -553,12 +553,15 @@
     filter: grayscale(0%) contrast(110%);
   }
 
-.team-member h3 {
-  background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+.team-member h3::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  bottom: -5px;
+  left: 25%;
+  border-radius: 2px;
 }
   
   .team-member h3 {
