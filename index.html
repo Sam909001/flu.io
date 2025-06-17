@@ -301,31 +301,46 @@
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
     </section>
     
-    <!-- Tokenomics -->
     <!-- Tokenomics Section -->
-<section id="tokenomics">
-  <h2>TOKENOMICS</h2>
-  <div class="chart-container">
-    <canvas id="tokenChart"></canvas>
+<section id="tokenomics" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+  <h2 class="text-2xl font-bold text-green-600 dark:text-green-400 text-center mb-6">📊 Tokenomics</h2>
+
+  <div class="grid md:grid-cols-2 gap-6 items-center">
+    <!-- Tokenomics List -->
+    <div>
+      <ul class="list-disc pl-5 space-y-2 text-gray-800 dark:text-gray-200">
+        <li><strong>Total Supply:</strong> 10,000,000,000 FLUFFI</li>
+        <li><strong>Presale:</strong> 40%</li>
+        <li><strong>Liquidity:</strong> 30% (Locked)</li>
+        <li><strong>Staking:</strong> 20%</li>
+        <li><strong>Marketing:</strong> 5%</li>
+        <li><strong>Team:</strong> 5% (Locked)</li>
+      </ul>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container w-full max-w-sm mx-auto">
+      <canvas id="tokenChart"></canvas>
+    </div>
   </div>
 </section>
 
 <!-- Load Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Initialize chart
   const ctx = document.getElementById('tokenChart').getContext('2d');
   new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Presale (50%)', 'Liquidity (30%)', 'Marketing (15%)', 'Team (5%)'],
+      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
       datasets: [{
-        data: [50, 30, 15, 5],
+        data: [40, 30, 20, 5, 5],
         backgroundColor: [
-          '#FF6384', // Pink
-          '#36A2EB', // Blue
-          '#FFCE56', // Yellow
-          '#4BC0C0'  // Teal
+          '#4BC0C0', // Teal - Presale
+          '#36A2EB', // Blue - Liquidity
+          '#FFCE56', // Yellow - Staking
+          '#FF6384', // Pink - Marketing
+          '#9966FF'  // Purple - Team
         ],
         borderWidth: 0
       }]
@@ -334,34 +349,19 @@
       cutout: '70%',
       plugins: {
         legend: {
-          position: 'right',
+          position: 'bottom',
           labels: {
+            color: getComputedStyle(document.documentElement).classList.contains('dark') ? '#ffffff' : '#333333',
             font: {
-              size: 14,
+              size: 13,
               family: "'Inter', sans-serif"
-            },
-            color: '#FFFFFF'
+            }
           }
         }
       }
     }
   });
 </script>
-    <section id="tokenomics" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">📊 Tokenomics</h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong>Total Supply:</strong> 10,000,000,000 FLUFFI</li>
-          <li><strong>Presale:</strong> 40%</li>
-          <li><strong>Liquidity:</strong> 30% (Locked)</li>
-        </ul>
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong>Staking:</strong> 20%</li>
-          <li><strong>Marketing:</strong> 5%</li>
-          <li><strong>Team:</strong> 5% (Locked)</li>
-        </ul>
-      </div>
-    </section>
     
     <!-- FAQ -->
     <section id="faq" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
