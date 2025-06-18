@@ -212,60 +212,116 @@
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
     </nav>
   </header>
-
-  <main class="p-6 mx-auto w-full max-w-6xl">
     
-    <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 class="section-title">🚀 Presale is Live!</h2>
+    <!-- Updated Presale Section -->
+<section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+  <h2 class="section-title text-center text-2xl font-bold text-gray-800 dark:text-white">🚀 Presale is Live!</h2>
 
-      <div class="fluio-status-container">
-        <div class="stage-progress">
-          <div class="progress-info">
-            <span class="stage-label">Stage <span id="currentStage">1</span>/15</span>
-            <span class="timer" id="countdown">Loading...</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressBar" style="width: 6.67%"></div>
-          </div>
-          <div class="mt-2 text-sm text-center">
-            <span class="font-semibold">Stage Timer: </span>
-            <span class="timer font-mono" id="stageTimer">47h 59m 59s</span>
-          </div>
-        </div>
-        
-        <div class="fluio-price">
-          <div class="price-header">
-            <span>$FLUFFI</span>
-            <span class="live-badge">LIVE</span>
-          </div>
-          <div class="current-price" id="currentPrice">$0.000100</div>
-          <div class="price-change">+0.00%</div>
-        </div>
-      </div>
+  <!-- 30-Day Countdown Timer -->
+  <div id="countdown" class="text-center my-6 bg-gray-100 dark:bg-gray-900 p-4 rounded-xl">
+    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-2">Presale Ends In:</h3>
+    <div id="mainTimer" class="text-2xl font-mono text-green-600 dark:text-green-400">
+      <span id="days">00</span>d <span id="hours">00</span>h <span id="minutes">00</span>m <span id="seconds">00</span>s
+    </div>
+  </div>
 
-      <div class="flex items-center mt-4 mb-4">
-        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-        </svg>
-        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
-      </div>
+  <!-- Stage Info -->
+  <div class="stage-progress">
+    <div class="progress-info flex justify-between items-center">
+      <span class="text-sm text-gray-800 dark:text-gray-200">Stage <span id="currentStage">1</span>/15</span>
+      <span class="text-sm text-gray-800 dark:text-gray-200">⏳ Stage Timer: <span id="stageTimer">48:00:00</span></span>
+    </div>
+    <div class="progress-bar w-full h-2 bg-gray-300 dark:bg-gray-700 mt-2 rounded">
+      <div class="progress-fill h-2 bg-green-500 rounded" id="progressBar" style="width: 6.67%"></div>
+    </div>
+  </div>
 
-      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+  <!-- Price Info -->
+  <div class="fluio-price my-6 text-center">
+    <div class="text-gray-600 dark:text-gray-300">Current Price</div>
+    <div class="text-3xl font-bold text-green-600 dark:text-green-400" id="currentPrice">$0.000100</div>
+  </div>
 
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="USD">USD</option>
-          <option value="ETH">ETH</option>
-        </select>
-      </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-        🚀 Buy Now
-      </button>
-    </section>
+  <!-- Referral and Amount Input -->
+  <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+
+  <div class="flex flex-col md:flex-row gap-3 mb-4">
+    <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black" />
+    <select id="currencySelect" class="p-3 border rounded-lg text-black">
+      <option value="USD">USD</option>
+      <option value="ETH">ETH</option>
+    </select>
+  </div>
+  <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black" />
+  <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+    🚀 Buy Now
+  </button>
+</section>
+
+<script>
+  // 30-day timer
+  const countdownDate = new Date("2025-06-25T00:00:00Z").getTime();
+  const updateCountdown = () => {
+    const now = new Date().getTime();
+    const distance = countdownDate - now;
+    if (distance <= 0) {
+      document.getElementById("mainTimer").innerHTML = "🎉 Presale Ended!";
+      return;
+    }
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    document.getElementById("days").innerText = String(days).padStart(2, '0');
+    document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+    document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+    document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+  };
+  setInterval(updateCountdown, 1000);
+
+  // Dynamic 48-hour stage timer (per stage)
+  const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
+  const totalStages = 15;
+
+  function getStageInfo() {
+    let stageStart = localStorage.getItem('stageStart');
+    let stageIndex = parseInt(localStorage.getItem('stageIndex') || '1');
+    if (!stageStart) {
+      stageStart = Date.now();
+      localStorage.setItem('stageStart', stageStart);
+      localStorage.setItem('stageIndex', '1');
+    }
+    const now = Date.now();
+    const elapsed = now - parseInt(stageStart);
+    if (elapsed > STAGE_DURATION) {
+      stageIndex = Math.min(stageIndex + 1, totalStages);
+      localStorage.setItem('stageStart', now);
+      localStorage.setItem('stageIndex', stageIndex);
+    }
+    return { stageIndex, remaining: Math.max(STAGE_DURATION - elapsed, 0) };
+  }
+
+  function updateStageTimer() {
+    const { stageIndex, remaining } = getStageInfo();
+    document.getElementById('currentStage').textContent = stageIndex;
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+    document.getElementById("stageTimer").textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    document.getElementById("progressBar").style.width = `${(stageIndex / totalStages) * 100}%`;
+  }
+  setInterval(updateStageTimer, 1000);
+
+  // Wallet connection and live price (basic template)
+  async function buyFluffi() {
+    alert('Simulated buy function. Connect wallet and interact with contract here.');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCountdown();
+    updateStageTimer();
+  });
+</script>
 
     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
