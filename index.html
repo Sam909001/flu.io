@@ -215,7 +215,8 @@
 
   <main class="p-6 mx-auto w-full max-w-6xl">
     
- <!-- Updated Timer Section -->
+ 
+<!-- Updated Timer Section -->
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
@@ -227,7 +228,7 @@
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
     <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Timer:</h4>
-    <div id="stage-timer" class="text-xl font-mono text-green-600 dark:text-green-300">
+    <div id="stage-timer" class="text-xl font-mono text-green-600 dark:text-green-300 space-x-2">
       <span id="stage-hours">48</span><span class="text-sm">h</span>
       <span id="stage-minutes">00</span><span class="text-sm">m</span>
       <span id="stage-seconds">00</span><span class="text-sm">s</span>
@@ -282,7 +283,7 @@ function updateTimers(startTime) {
   // Presale Countdown
   updatePresaleCountdown(now, presaleEndTime);
   
-  // Stage Timer
+  // Stage Timer - Fixed calculation
   updateStageTimer(now, startTime);
 }
 
@@ -291,6 +292,7 @@ function updatePresaleCountdown(now, endTime) {
   
   if (distance <= 0) {
     document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+    document.getElementById('stage-timer').innerHTML = "All Stages Complete";
     return;
   }
   
@@ -308,13 +310,18 @@ function updatePresaleCountdown(now, endTime) {
 function updateStageTimer(now, startTime) {
   const elapsed = now - startTime;
   const currentStage = Math.min(Math.floor(elapsed / STAGE_DURATION), TOTAL_STAGES - 1);
-  const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
+  const stageStartTime = startTime + (currentStage * STAGE_DURATION);
+  const stageEndTime = stageStartTime + STAGE_DURATION;
   const stageTimeLeft = stageEndTime - now;
   
   document.getElementById('current-stage').textContent = currentStage + 1;
   
   if (stageTimeLeft <= 0) {
-    document.getElementById('stage-timer').innerHTML = "Stage Complete!";
+    if (currentStage >= TOTAL_STAGES - 1) {
+      document.getElementById('stage-timer').innerHTML = "Final Stage Complete";
+    } else {
+      document.getElementById('stage-timer').innerHTML = "Stage Complete!";
+    }
   } else {
     const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
     const minutes = Math.floor((stageTimeLeft % (1000 * 60 * 60)) / (1000 * 60));
