@@ -215,7 +215,7 @@
 
   <main class="p-6 mx-auto w-full max-w-6xl">
     
-  <!-- Updated Timer Section -->
+ <!-- Updated Timer Section -->
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
@@ -241,26 +241,49 @@
 const PRESALE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
 const TOTAL_STAGES = 15;
-let presaleStartTime = Date.now();
+
+// Get or set presale start time from localStorage
+function getPresaleStartTime() {
+  let startTime = localStorage.getItem('presaleStartTime');
+  
+  if (!startTime) {
+    // First visit - set start time to now
+    startTime = Date.now();
+    localStorage.setItem('presaleStartTime', startTime);
+  } else {
+    startTime = parseInt(startTime);
+    
+    // Check if presale has already ended
+    if (Date.now() > startTime + PRESALE_DURATION) {
+      // Presale ended - reset for demo purposes (remove this in production)
+      startTime = Date.now();
+      localStorage.setItem('presaleStartTime', startTime);
+    }
+  }
+  
+  return startTime;
+}
 
 // Initialize Timers
 function initTimers() {
+  const presaleStartTime = getPresaleStartTime();
+  
   // Set timers immediately
-  updateTimers();
+  updateTimers(presaleStartTime);
   
   // Update every second
-  setInterval(updateTimers, 1000);
+  setInterval(() => updateTimers(presaleStartTime), 1000);
 }
 
-function updateTimers() {
+function updateTimers(startTime) {
   const now = Date.now();
-  const presaleEndTime = presaleStartTime + PRESALE_DURATION;
+  const presaleEndTime = startTime + PRESALE_DURATION;
   
   // Presale Countdown
   updatePresaleCountdown(now, presaleEndTime);
   
   // Stage Timer
-  updateStageTimer(now);
+  updateStageTimer(now, startTime);
 }
 
 function updatePresaleCountdown(now, endTime) {
@@ -282,10 +305,10 @@ function updatePresaleCountdown(now, endTime) {
   document.getElementById('presale-seconds').textContent = String(seconds).padStart(2, '0');
 }
 
-function updateStageTimer(now) {
-  const elapsed = now - presaleStartTime;
+function updateStageTimer(now, startTime) {
+  const elapsed = now - startTime;
   const currentStage = Math.min(Math.floor(elapsed / STAGE_DURATION), TOTAL_STAGES - 1);
-  const stageEndTime = presaleStartTime + ((currentStage + 1) * STAGE_DURATION);
+  const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
   const stageTimeLeft = stageEndTime - now;
   
   document.getElementById('current-stage').textContent = currentStage + 1;
@@ -305,7 +328,18 @@ function updateStageTimer(now) {
 
 // Start timers when DOM is ready
 document.addEventListener('DOMContentLoaded', initTimers);
+
+/* For testing purposes - you can add this button temporarily */
+function resetTimer() {
+  localStorage.removeItem('presaleStartTime');
+  location.reload();
+}
 </script>
+
+<!-- Temporary reset button (remove in production) -->
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+  Reset Timer (For Testing)
+</button>
     
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
