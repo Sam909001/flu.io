@@ -216,7 +216,7 @@
   <main class="p-6 mx-auto w-full max-w-6xl">
     
  
-<!-- Updated Timer Section -->
+<!-- Timer Section -->
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
@@ -239,111 +239,92 @@
 
 <script>
 // Timer Configuration
-const PRESALE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
-const TOTAL_STAGES = 15;
+const PRESALE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
+const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours
+const TOTAL_STAGES = Math.floor(PRESALE_DURATION / STAGE_DURATION); // 15 stages
 
-// Get or set presale start time from localStorage
+// Get or create presale start time
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
   
   if (!startTime) {
-    // First visit - set start time to now
     startTime = Date.now();
     localStorage.setItem('presaleStartTime', startTime);
-  } else {
-    startTime = parseInt(startTime);
-    
-    // Check if presale has already ended
-    if (Date.now() > startTime + PRESALE_DURATION) {
-      // Presale ended - reset for demo purposes (remove this in production)
-      startTime = Date.now();
-      localStorage.setItem('presaleStartTime', startTime);
-    }
+    return startTime;
   }
   
-  return startTime;
+  return parseInt(startTime);
 }
 
-// Initialize Timers
-function initTimers() {
-  const presaleStartTime = getPresaleStartTime();
-  
-  // Set timers immediately
-  updateTimers(presaleStartTime);
-  
-  // Update every second
-  setInterval(() => updateTimers(presaleStartTime), 1000);
+// Format time values to 2 digits
+function formatTime(value) {
+  return String(Math.floor(value)).padStart(2, '0');
 }
 
-function updateTimers(startTime) {
+// Update both timers
+function updateTimers() {
   const now = Date.now();
-  const presaleEndTime = startTime + PRESALE_DURATION;
-  
-  // Presale Countdown
-  updatePresaleCountdown(now, presaleEndTime);
-  
-  // Stage Timer - Fixed calculation
-  updateStageTimer(now, startTime);
-}
+  const startTime = getPresaleStartTime();
+  const endTime = startTime + PRESALE_DURATION;
+  const timeLeft = endTime - now;
 
-function updatePresaleCountdown(now, endTime) {
-  const distance = endTime - now;
-  
-  if (distance <= 0) {
+  // Update presale timer
+  if (timeLeft <= 0) {
     document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
     document.getElementById('stage-timer').innerHTML = "All Stages Complete";
     return;
   }
-  
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-  
-  document.getElementById('presale-days').textContent = String(days).padStart(2, '0');
-  document.getElementById('presale-hours').textContent = String(hours).padStart(2, '0');
-  document.getElementById('presale-minutes').textContent = String(minutes).padStart(2, '0');
-  document.getElementById('presale-seconds').textContent = String(seconds).padStart(2, '0');
-}
 
-function updateStageTimer(now, startTime) {
-  const elapsed = now - startTime;
-  const currentStage = Math.min(Math.floor(elapsed / STAGE_DURATION), TOTAL_STAGES - 1);
-  const stageStartTime = startTime + (currentStage * STAGE_DURATION);
-  const stageEndTime = stageStartTime + STAGE_DURATION;
+  // Calculate presale time
+  const presaleDays = timeLeft / (1000 * 60 * 60 * 24);
+  const presaleHours = (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+  const presaleMinutes = (timeLeft % (1000 * 60 * 60)) / (1000 * 60);
+  const presaleSeconds = (timeLeft % (1000 * 60)) / 1000;
+
+  document.getElementById('presale-days').textContent = formatTime(presaleDays);
+  document.getElementById('presale-hours').textContent = formatTime(presaleHours);
+  document.getElementById('presale-minutes').textContent = formatTime(presaleMinutes);
+  document.getElementById('presale-seconds').textContent = formatTime(presaleSeconds);
+
+  // Calculate stage timer
+  const currentStage = Math.min(
+    Math.floor((now - startTime) / STAGE_DURATION),
+    TOTAL_STAGES - 1
+  );
+  
+  const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
   const stageTimeLeft = stageEndTime - now;
-  
+
   document.getElementById('current-stage').textContent = currentStage + 1;
-  
+
   if (stageTimeLeft <= 0) {
-    if (currentStage >= TOTAL_STAGES - 1) {
-      document.getElementById('stage-timer').innerHTML = "Final Stage Complete";
-    } else {
-      document.getElementById('stage-timer').innerHTML = "Stage Complete!";
-    }
+    document.getElementById('stage-timer').innerHTML = 
+      currentStage >= TOTAL_STAGES - 1 ? "Final Stage Complete" : "Stage Complete!";
   } else {
-    const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
-    const minutes = Math.floor((stageTimeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((stageTimeLeft % (1000 * 60)) / 1000);
-    
-    document.getElementById('stage-hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('stage-minutes').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('stage-seconds').textContent = String(seconds).padStart(2, '0');
+    const stageHours = stageTimeLeft / (1000 * 60 * 60);
+    const stageMinutes = (stageTimeLeft % (1000 * 60 * 60)) / (1000 * 60);
+    const stageSeconds = (stageTimeLeft % (1000 * 60)) / 1000;
+
+    document.getElementById('stage-hours').textContent = formatTime(stageHours);
+    document.getElementById('stage-minutes').textContent = formatTime(stageMinutes);
+    document.getElementById('stage-seconds').textContent = formatTime(stageSeconds);
   }
 }
 
-// Start timers when DOM is ready
-document.addEventListener('DOMContentLoaded', initTimers);
+// Initialize timers
+document.addEventListener('DOMContentLoaded', () => {
+  updateTimers(); // Initial update
+  setInterval(updateTimers, 1000); // Update every second
+});
 
-/* For testing purposes - you can add this button temporarily */
+/* Testing function - remove in production */
 function resetTimer() {
   localStorage.removeItem('presaleStartTime');
   location.reload();
 }
 </script>
 
-<!-- Temporary reset button (remove in production) -->
+<!-- Testing button - remove in production -->
 <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
   Reset Timer (For Testing)
 </button>
