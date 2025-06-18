@@ -540,13 +540,6 @@ header {
 .team-member img {
   border-radius: 50%;
 }
-/* Tokenomics Section */
-#tokenomics {
-  background: #1A1A1A;
-  padding: 40px;
-  border-radius: 12px;
-  margin: 40px 0;
-}
 
 .chart-container {
   max-width: 600px;
@@ -556,7 +549,6 @@ header {
 #tokenChart {
   max-height: 400px;
 }
-/* Add to CSS */
 .connect-wallet-btn {
   background: linear-gradient(90deg, #FF00FF 0%, #8A2BE2 100%);
   box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
