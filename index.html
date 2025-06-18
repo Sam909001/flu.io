@@ -215,15 +215,97 @@
 
   <main class="p-6 mx-auto w-full max-w-6xl">
     
-    <div id="countdown">
-  <h3>PRESALE ENDS IN:</h30>
-  <div id="timer">
-    <span id="days">00</span>d 
-    <span id="hours">00</span>h 
-    <span id="minutes">00</span>m 
-    <span id="seconds">00</span>s
+  <!-- Updated Timer Section -->
+<div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
+  <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
+    <span id="presale-days">00</span><span class="text-sm">d</span>
+    <span id="presale-hours">00</span><span class="text-sm">h</span>
+    <span id="presale-minutes">00</span><span class="text-sm">m</span>
+    <span id="presale-seconds">00</span><span class="text-sm">s</span>
+  </div>
+  
+  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Timer:</h4>
+    <div id="stage-timer" class="text-xl font-mono text-green-600 dark:text-green-300">
+      <span id="stage-hours">48</span><span class="text-sm">h</span>
+      <span id="stage-minutes">00</span><span class="text-sm">m</span>
+      <span id="stage-seconds">00</span><span class="text-sm">s</span>
+    </div>
+    <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">Stage <span id="current-stage">1</span>/15</p>
   </div>
 </div>
+
+<script>
+// Timer Configuration
+const PRESALE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
+const TOTAL_STAGES = 15;
+let presaleStartTime = Date.now();
+
+// Initialize Timers
+function initTimers() {
+  // Set timers immediately
+  updateTimers();
+  
+  // Update every second
+  setInterval(updateTimers, 1000);
+}
+
+function updateTimers() {
+  const now = Date.now();
+  const presaleEndTime = presaleStartTime + PRESALE_DURATION;
+  
+  // Presale Countdown
+  updatePresaleCountdown(now, presaleEndTime);
+  
+  // Stage Timer
+  updateStageTimer(now);
+}
+
+function updatePresaleCountdown(now, endTime) {
+  const distance = endTime - now;
+  
+  if (distance <= 0) {
+    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+    return;
+  }
+  
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+  document.getElementById('presale-days').textContent = String(days).padStart(2, '0');
+  document.getElementById('presale-hours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('presale-minutes').textContent = String(minutes).padStart(2, '0');
+  document.getElementById('presale-seconds').textContent = String(seconds).padStart(2, '0');
+}
+
+function updateStageTimer(now) {
+  const elapsed = now - presaleStartTime;
+  const currentStage = Math.min(Math.floor(elapsed / STAGE_DURATION), TOTAL_STAGES - 1);
+  const stageEndTime = presaleStartTime + ((currentStage + 1) * STAGE_DURATION);
+  const stageTimeLeft = stageEndTime - now;
+  
+  document.getElementById('current-stage').textContent = currentStage + 1;
+  
+  if (stageTimeLeft <= 0) {
+    document.getElementById('stage-timer').innerHTML = "Stage Complete!";
+  } else {
+    const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((stageTimeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((stageTimeLeft % (1000 * 60)) / 1000);
+    
+    document.getElementById('stage-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('stage-minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('stage-seconds').textContent = String(seconds).padStart(2, '0');
+  }
+}
+
+// Start timers when DOM is ready
+document.addEventListener('DOMContentLoaded', initTimers);
+</script>
     
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
