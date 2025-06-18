@@ -215,46 +215,6 @@
 
   <main class="p-6 mx-auto w-full max-w-6xl">
     
-    <div id="countdown" class="text-center my-10 bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
-  <div id="timer" class="text-2xl font-mono text-purple-600 dark:text-purple-400 space-x-2">
-    <span id="days">00</span><span class="text-sm">d</span>
-    <span id="hours">00</span><span class="text-sm">h</span>
-    <span id="minutes">00</span><span class="text-sm">m</span>
-    <span id="seconds">00</span><span class="text-sm">s</span>
-  </div>
-</div>
-
-<script>
-  // 🕓 Set your actual presale end date here (UTC format recommended)
-  const countdownDate = new Date("2025-06-25T00:00:00Z").getTime();
-
-  const updateCountdown = () => {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-
-    if (distance <= 0) {
-      document.getElementById("timer").innerHTML = "🎉 Presale Ended!";
-      return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById("days").innerText = String(days).padStart(2, '0');
-    document.getElementById("hours").innerText = String(hours).padStart(2, '0');
-    document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
-    document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
-  };
-
-  // Initial run
-  updateCountdown();
-  // Update every second
-  setInterval(updateCountdown, 1000);
-</script>
-    
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
