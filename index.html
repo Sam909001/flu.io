@@ -330,52 +330,51 @@ function resetTimer() {
 </button>
     
     <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 class="section-title">🚀 Presale is Live!</h2>
+<section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+  <h2 class="section-title">🚀 Presale is Live!</h2>
 
-      <div class="fluio-status-container">
-        <div class="stage-progress">
-          <div class="progress-info">
-            <span class="stage-label">Stage <span id="currentStage">1</span>/15</span>
-             <span class="timer" id="countdown">Loading...</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressBar" style="width: 6.67%"></div>
-          </div>
-        </div>
-        
-        <div class="fluio-price">
-          <div class="price-header">
-            <span>$FLUFFI</span>
-            <span class="live-badge">LIVE</span>
-          </div>
-          <div class="current-price" id="currentPrice">$0.000100</div>
-          <div class="price-change">+0.00%</div>
-        </div>
+  <div class="fluio-status-container">
+    <div class="stage-progress">
+      <div class="progress-info">
+        <span class="stage-label">Stage <span id="currentStage">1</span>/15</span>
       </div>
-
-      <div class="flex items-center mt-4 mb-4">
-        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-        </svg>
-        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 6.67%"></div>
       </div>
-
-      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
-
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="USD">USD</option>
-          <option value="ETH">ETH</option>
-        </select>
+    </div>
+    
+    <div class="fluio-price">
+      <div class="price-header">
+        <span>$FLUFFI</span>
+        <span class="live-badge">LIVE</span>
       </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-        🚀 Buy Now
-      </button>
-    </section>
+      <div class="current-price" id="currentPrice">$0.000100</div>
+      <div class="price-change">+0.00%</div>
+    </div>
+  </div>
+
+  <div class="flex items-center mt-4 mb-4">
+    <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+    </svg>
+    <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
+    <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+  </div>
+
+  <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+
+  <div class="flex gap-2 mb-4">
+    <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
+    <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
+      <option value="USD">USD</option>
+      <option value="ETH">ETH</option>
+    </select>
+  </div>
+  <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
+  <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+    🚀 Buy Now
+  </button>
+</section>
 
     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
