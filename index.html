@@ -238,10 +238,9 @@
 </div>
 
 <script>
-// Timer Configuration
-const PRESALE_DURATION = 15 * 60 * 1000; // 15 minutes
-const STAGE_DURATION = 1 * 60 * 1000; // 1 minute
 const TOTAL_STAGES = 15;
+const STAGE_DURATION = 60 * 1000; // 1 minute in milliseconds
+const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total for test
 
 // Get or create presale start time
 function getPresaleStartTime() {
