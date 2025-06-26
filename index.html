@@ -240,7 +240,7 @@
 <script>
 // Timer Configuration
 const PRESALE_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
-const STAGE_DURATION = 1 * 60 * 60 * 1000; // 48 hours
+const STAGE_DURATION = 48 * 60 * 60 * 1000; // 48 hours
 const TOTAL_STAGES = Math.floor(PRESALE_DURATION / STAGE_DURATION); // 15 stages
 
 // Get or create presale start time
@@ -338,18 +338,18 @@ function resetTimer() {
       <div class="progress-info">
         <span class="stage-label">Stage <span id="currentStage">1</span>/15</span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressBar" style="width: 6.67%"></div>
+      <div class="progress-bar w-full h-4 bg-gray-300 dark:bg-gray-700 rounded-lg overflow-hidden">
+        <div class="progress-fill bg-green-500 h-full transition-all duration-500" id="progressBar" style="width: 6.67%"></div>
       </div>
     </div>
     
-    <div class="fluio-price">
-      <div class="price-header">
-        <span>$FLUFFI</span>
-        <span class="live-badge">LIVE</span>
+    <div class="fluio-price mt-4">
+      <div class="price-header flex items-center justify-between">
+        <span class="font-semibold text-lg">$FLUFFI</span>
+        <span class="live-badge text-green-500 font-bold">LIVE</span>
       </div>
-      <div class="current-price" id="currentPrice">$0.000100</div>
-      <div class="price-change">+0.00%</div>
+      <div class="current-price text-xl font-mono font-bold" id="currentPrice">$0.000100</div>
+      <div class="price-change text-sm text-gray-500">+0.00%</div>
     </div>
   </div>
 
@@ -375,7 +375,7 @@ function resetTimer() {
     🚀 Buy Now
   </button>
 </section>
-
+    
     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
