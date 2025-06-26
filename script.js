@@ -179,14 +179,13 @@ function renderLeaderboard() {
     }
   `;
 }
-
-// --- Stage & Price Logic ---
 // --- Stage & Price Logic ---
 const TOTAL_STAGES = 15;
-const STAGE_DURATION = 24 * 60 * 60; // 24h in seconds
+const STAGE_DURATION = 60; // 1 minute in seconds
 
 // Load or initialize timer state
-const savedState = JSON.parse(localStorage.getItem('fluffiTimer')) || {
+localStorage.removeItem('fluffiTimer'); // <-- Optional: force reset every reload for test
+const savedState = {
   startTime: Math.floor(Date.now() / 1000),
   currentStage: 1
 };
