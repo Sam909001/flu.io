@@ -251,6 +251,20 @@ function startCountdown() {
     updateTimerDisplay();
   }, 1000);
 }
+<script>
+  // Update this dynamically from your backend or logic
+  const totalStages = 15;
+  const currentStage = 3; // Change to dynamic value if needed
+
+  const currentPrice = "$0.000115"; // example, also should be dynamic
+  const tokensSold = "67,431,509";  // update from backend if available
+
+  document.getElementById("currentStage").textContent = currentStage;
+  document.getElementById("progressBar").style.width = ((currentStage / totalStages) * 100) + "%";
+  document.getElementById("currentPrice").textContent = currentPrice;
+  document.getElementById("tokensSold").textContent = tokensSold;
+</script>
+
 
 // Initialize timer
 document.addEventListener('DOMContentLoaded', startCountdown);
