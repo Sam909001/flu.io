@@ -208,6 +208,21 @@
   .dark .price-tooltip .tooltip-text::after {
     border-color: #f9fafb transparent transparent transparent;
   }
+    /* Fix dark mode tooltip visibility */
+.dark .price-tooltip .tooltip-text {
+  background-color: #1F2937 !important; /* gray-800 */
+  color: #F9FAFB !important; /* gray-50 */
+  border: 1px solid #4B5563; /* gray-600 */
+}
+
+.dark .price-tooltip .tooltip-text::after {
+  border-color: #1F2937 transparent transparent transparent !important;
+}
+
+/* Make info icon more visible */
+.dark .price-tooltip .fa-info-circle {
+  color: #60A5FA !important; /* blue-400 */
+}
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
