@@ -226,22 +226,14 @@
     <span id="presale-seconds">00</span><span class="text-sm">s</span>
   </div>
   
-<div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-  <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Stage Progress</h4>
-  
-  <!-- Stage Progress Bar -->
-  <div class="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5 overflow-hidden mb-3">
-    <div id="stage-progress-fill" class="bg-green-500 h-full transition-all duration-700 ease-in-out w-0"></div>
-    <div class="absolute inset-0 flex items-center justify-center text-xs text-white font-bold" id="stage-progress-label">
-      Stage 1 of 15
+  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Timer:</h4>
+    <div id="stage-timer" class="text-xl font-mono text-green-600 dark:text-green-300 space-x-2">
+      <span id="stage-hours">48</span><span class="text-sm">h</span>
+      <span id="stage-minutes">00</span><span class="text-sm">m</span>
+      <span id="stage-seconds">00</span><span class="text-sm">s</span>
     </div>
-  </div>
-
-  <!-- Countdown for current stage -->
-  <div class="text-xl font-mono text-green-600 dark:text-green-300 flex justify-center gap-2">
-    <span id="stage-hours">00</span><span class="text-sm">h</span>
-    <span id="stage-minutes">00</span><span class="text-sm">m</span>
-    <span id="stage-seconds">00</span><span class="text-sm">s</span>
+    <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">Stage <span id="current-stage">1</span>/15</p>
   </div>
 </div>
 
