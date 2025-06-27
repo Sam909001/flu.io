@@ -227,13 +227,21 @@
   </div>
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Timer:</h4>
-    <div id="stage-timer" class="text-xl font-mono text-green-600 dark:text-green-300 space-x-2">
-      <span id="stage-hours">48</span><span class="text-sm">h</span>
-      <span id="stage-minutes">00</span><span class="text-sm">m</span>
-      <span id="stage-seconds">00</span><span class="text-sm">s</span>
-    </div>
-    <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">Stage <span id="current-stage">1</span>/15</p>
+  <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
+  
+  <!-- Visual progress bar -->
+  <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
+    <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+  </div>
+
+  <!-- Stage and countdown info -->
+  <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
+    <span>Stage: <span id="current-stage">1</span> / <span id="total-stages">15</span></span>
+    <span>Ends in: 
+      <span id="stage-hours">00</span>h 
+      <span id="stage-minutes">00</span>m 
+      <span id="stage-seconds">00</span>s
+    </span>
   </div>
 </div>
 
