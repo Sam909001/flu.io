@@ -1093,5 +1093,8 @@ function resetTimer() {
     updateStage();
     updateCountdown();
     updateStageTimer();
+if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  document.getElementById('walletMobileInstructions').style.display = 'block';
+}
 </script>
 </html>
