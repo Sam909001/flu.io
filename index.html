@@ -420,7 +420,17 @@ function resetTimer() {
         <span class="font-semibold text-lg">$FLUFFI</span>
         <span class="live-badge text-green-500 font-bold">LIVE</span>
       </div>
-      <div class="current-price text-xl font-mono font-bold" id="currentPrice">$0.000100</div>
+     <div class="current-price price-container" id="currentPrice">
+  $0.000100
+  <span class="price-tooltip">
+    <i class="fas fa-info-circle text-blue-500"></i>
+    <span class="tooltip-text">
+      <strong>Price Increase:</strong><br>
+      +5% per stage (every 48 hours)<br>
+      Next increase: <span id="nextIncreaseTime">23:59:59</span>
+    </span>
+  </span>
+</div>
       <div class="price-change text-sm text-gray-500">+0.00%</div>
     </div>
   </div>
