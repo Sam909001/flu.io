@@ -899,26 +899,35 @@ function resetTimer() {
     }
 
     async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
+  // Check if Ethereum provider exists
+  if (typeof window.ethereum !== 'undefined') {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      document.getElementById('walletButton').textContent = 'Connected ✓';
+    } catch (error) {
+      // Mobile-specific connection flow
+      if (error.code === 4001) {
+        alert('Connection rejected');
       } else {
-        alert('MetaMask not detected. Please install MetaMask.');
+        // Deep link to MetaMask app
+        window.location.href = 'https://metamask.app.link/dapp/' + encodeURIComponent(window.location.href);
       }
     }
-
-    async function connectReferralWallet() {
-      await connectWallet();
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
+  } else {
+    // Show mobile installation instructions
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      const useMetaMask = confirm('MetaMask not detected! Would you like to install it?');
+      if (useMetaMask) {
+        window.location.href = /iPhone|iPad|iPod/i.test(navigator.userAgent) 
+          ? 'https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202'
+          : 'https://play.google.com/store/apps/details?id=io.metamask';
       }
+    } else {
+      alert('Please install MetaMask extension');
     }
-
+  }
+}
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
