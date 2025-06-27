@@ -220,126 +220,84 @@
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
-    <span id="presale-days">00</span><span class="text-sm">d</span>
-    <span id="presale-hours">00</span><span class="text-sm">h</span>
-    <span id="presale-minutes">00</span><span class="text-sm">m</span>
-    <span id="presale-seconds">00</span><span class="text-sm">s</span>
-  </div>
-  
-  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-  <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
-  
-  <!-- Visual progress bar -->
-  <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-    <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
-  </div>
-
-  <!-- Stage and countdown info -->
-  <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
-    <span>Stage: <span id="current-stage">1</span> / <span id="total-stages">15</span></span>
-    <span>Ends in: 
-      <span id="stage-hours">00</span>h 
-      <span id="stage-minutes">00</span>m 
-      <span id="stage-seconds">00</span>s
-    </span>
-  </div>
-</div>
-
-<!-- Timer Section -->
-<div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
-  <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
     <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
   </div>
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
     <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
     
-    <!-- Progress bar -->
+    <!-- Progress Bar -->
     <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
       <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
     </div>
 
-    <!-- Stage info -->
     <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
       <span>Stage: <span id="current-stage">1</span>/15</span>
       <span>Ends in: <span id="stage-seconds">60</span>s</span>
     </div>
   </div>
-
-  <script>
-    // Timer Configuration - 1 MINUTE STAGES FOR TESTING
-    const TOTAL_STAGES = 15;
-    const STAGE_DURATION = 60 * 1000; // 1 minute per stage
-    const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
-
-    // Get or create presale start time
-    function getPresaleStartTime() {
-      let startTime = localStorage.getItem('presaleStartTime');
-      if (!startTime) {
-        startTime = Date.now();
-        localStorage.setItem('presaleStartTime', startTime);
-      }
-      return parseInt(startTime);
-    }
-
-    // Update all timers
-    function updateTimers() {
-      const now = Date.now();
-      const startTime = getPresaleStartTime();
-      const endTime = startTime + PRESALE_DURATION;
-      const timeLeft = endTime - now;
-
-      // Calculate current stage and progress
-      const currentStage = Math.min(
-        Math.floor((now - startTime) / STAGE_DURATION),
-        TOTAL_STAGES - 1
-      );
-      const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
-      const stageTimeLeft = stageEndTime - now;
-      const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
-
-      // Update displays
-      document.getElementById('current-stage').textContent = currentStage + 1;
-      
-      // Update progress bars
-      const totalProgress = ((currentStage + stageProgress) / TOTAL_STAGES) * 100;
-      document.getElementById('progressBar').style.width = `${totalProgress}%`;
-      document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
-
-      // Update price (10% increase per stage)
-      const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-      document.getElementById('currentPrice').textContent = `$${price}`;
-
-      // Update timers
-      if (timeLeft <= 0) {
-        document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-        document.getElementById('stage-seconds').textContent = "0";
-      } else {
-        // Presale timer (MM:SS)
-        const mins = Math.floor(timeLeft / (1000 * 60));
-        const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        document.getElementById('presale-minutes').textContent = mins.toString().padStart(2, '0');
-        document.getElementById('presale-seconds').textContent = secs.toString().padStart(2, '0');
-
-        // Stage timer (seconds)
-        document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
-      }
-    }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      updateTimers();
-      setInterval(updateTimers, 1000);
-    });
-
-    /* Testing function */
-    function resetTimer() {
-      localStorage.removeItem('presaleStartTime');
-      location.reload();
-    }
-  </script>
 </div>
+
+<script>
+  // Timer Configuration - 1 MINUTE STAGES
+  const TOTAL_STAGES = 15;
+  const STAGE_DURATION = 60 * 1000; // 1 minute per stage
+  const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
+
+  function getPresaleStartTime() {
+    let startTime = localStorage.getItem('presaleStartTime');
+    if (!startTime) {
+      startTime = Date.now();
+      localStorage.setItem('presaleStartTime', startTime);
+    }
+    return parseInt(startTime);
+  }
+
+  function updateTimers() {
+    const now = Date.now();
+    const startTime = getPresaleStartTime();
+    const endTime = startTime + PRESALE_DURATION;
+    const timeLeft = endTime - now;
+
+    // Calculate stage progress
+    const currentStage = Math.min(
+      Math.floor((now - startTime) / STAGE_DURATION),
+      TOTAL_STAGES - 1
+    );
+    const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
+    const stageTimeLeft = stageEndTime - now;
+    const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
+
+    // Update displays
+    document.getElementById('current-stage').textContent = currentStage + 1;
+    document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
+
+    // Update price
+    const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+    document.getElementById('currentPrice').textContent = `$${price}`;
+
+    // Update timers
+    if (timeLeft <= 0) {
+      document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+      document.getElementById('stage-seconds').textContent = "0";
+    } else {
+      document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
+      document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
+      document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
+    }
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    updateTimers();
+    setInterval(updateTimers, 1000);
+  });
+
+  function resetTimer() {
+    localStorage.removeItem('presaleStartTime');
+    location.reload();
+  }
+</script>
 
 <!-- Testing button - remove in production -->
 <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
