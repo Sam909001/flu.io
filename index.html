@@ -245,91 +245,101 @@
   </div>
 </div>
 
-<script>
-const TOTAL_STAGES = 15;
-const STAGE_DURATION = 60 * 1000; // 1 minute in milliseconds
-const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total for test
-
-// Get or create presale start time
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
+<!-- Timer Section -->
+<div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
+  <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
+    <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
+  </div>
   
-  if (!startTime) {
-    startTime = Date.now();
-    localStorage.setItem('presaleStartTime', startTime);
-    return startTime;
-  }
-  
-  return parseInt(startTime);
-}
+  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
+    
+    <!-- Progress bar -->
+    <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
+      <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+    </div>
 
-// Format time values to 2 digits
-function formatTime(value) {
-  return String(Math.floor(value)).padStart(2, '0');
-}
+    <!-- Stage info -->
+    <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
+      <span>Stage: <span id="current-stage">1</span>/15</span>
+      <span>Ends in: <span id="stage-seconds">60</span>s</span>
+    </div>
+  </div>
 
-// Update both timers
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + PRESALE_DURATION;
-  const timeLeft = endTime - now;
+  <script>
+    // Timer Configuration - 1 MINUTE STAGES FOR TESTING
+    const TOTAL_STAGES = 15;
+    const STAGE_DURATION = 60 * 1000; // 1 minute per stage
+    const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
 
-  // Update presale timer
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-timer').innerHTML = "All Stages Complete";
-    return;
-  }
+    // Get or create presale start time
+    function getPresaleStartTime() {
+      let startTime = localStorage.getItem('presaleStartTime');
+      if (!startTime) {
+        startTime = Date.now();
+        localStorage.setItem('presaleStartTime', startTime);
+      }
+      return parseInt(startTime);
+    }
 
-  // Calculate presale time
-  const presaleDays = timeLeft / (1000 * 60 * 60 * 24);
-  const presaleHours = (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-  const presaleMinutes = (timeLeft % (1000 * 60 * 60)) / (1000 * 60);
-  const presaleSeconds = (timeLeft % (1000 * 60)) / 1000;
+    // Update all timers
+    function updateTimers() {
+      const now = Date.now();
+      const startTime = getPresaleStartTime();
+      const endTime = startTime + PRESALE_DURATION;
+      const timeLeft = endTime - now;
 
-  document.getElementById('presale-days').textContent = formatTime(presaleDays);
-  document.getElementById('presale-hours').textContent = formatTime(presaleHours);
-  document.getElementById('presale-minutes').textContent = formatTime(presaleMinutes);
-  document.getElementById('presale-seconds').textContent = formatTime(presaleSeconds);
+      // Calculate current stage and progress
+      const currentStage = Math.min(
+        Math.floor((now - startTime) / STAGE_DURATION),
+        TOTAL_STAGES - 1
+      );
+      const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
+      const stageTimeLeft = stageEndTime - now;
+      const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
 
-  // Calculate stage timer
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / STAGE_DURATION),
-    TOTAL_STAGES - 1
-  );
-  
-  const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
-  const stageTimeLeft = stageEndTime - now;
+      // Update displays
+      document.getElementById('current-stage').textContent = currentStage + 1;
+      
+      // Update progress bars
+      const totalProgress = ((currentStage + stageProgress) / TOTAL_STAGES) * 100;
+      document.getElementById('progressBar').style.width = `${totalProgress}%`;
+      document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
 
-  document.getElementById('current-stage').textContent = currentStage + 1;
+      // Update price (10% increase per stage)
+      const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+      document.getElementById('currentPrice').textContent = `$${price}`;
 
-  if (stageTimeLeft <= 0) {
-    document.getElementById('stage-timer').innerHTML = 
-      currentStage >= TOTAL_STAGES - 1 ? "Final Stage Complete" : "Stage Complete!";
-  } else {
-    const stageHours = stageTimeLeft / (1000 * 60 * 60);
-    const stageMinutes = (stageTimeLeft % (1000 * 60 * 60)) / (1000 * 60);
-    const stageSeconds = (stageTimeLeft % (1000 * 60)) / 1000;
+      // Update timers
+      if (timeLeft <= 0) {
+        document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+        document.getElementById('stage-seconds').textContent = "0";
+      } else {
+        // Presale timer (MM:SS)
+        const mins = Math.floor(timeLeft / (1000 * 60));
+        const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        document.getElementById('presale-minutes').textContent = mins.toString().padStart(2, '0');
+        document.getElementById('presale-seconds').textContent = secs.toString().padStart(2, '0');
 
-    document.getElementById('stage-hours').textContent = formatTime(stageHours);
-    document.getElementById('stage-minutes').textContent = formatTime(stageMinutes);
-    document.getElementById('stage-seconds').textContent = formatTime(stageSeconds);
-  }
-}
+        // Stage timer (seconds)
+        document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
+      }
+    }
 
-// Initialize timers
-document.addEventListener('DOMContentLoaded', () => {
-  updateTimers(); // Initial update
-  setInterval(updateTimers, 1000); // Update every second
-});
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTimers();
+      setInterval(updateTimers, 1000);
+    });
 
-/* Testing function - remove in production */
-function resetTimer() {
-  localStorage.removeItem('presaleStartTime');
-  location.reload();
-}
-</script>
+    /* Testing function */
+    function resetTimer() {
+      localStorage.removeItem('presaleStartTime');
+      location.reload();
+    }
+  </script>
+</div>
 
 <!-- Testing button - remove in production -->
 <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
