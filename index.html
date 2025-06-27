@@ -1,6 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- [Previous head section remains exactly the same until the timer section] -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$FLUFFI Presale & Staking</title>
+  <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
+  <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
+  <meta name="author" content="FLUFFI Team" />
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script src="Timer.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+      color: #1a1a1a;
+    }
+    
+    .timer {
+      font-family: monospace;
+    }
+    
+    .section-title {
+      @apply text-2xl font-bold mb-4;
+    }
+    
+    /* Dark mode styles */
+    .dark {
+      background: #111827 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark .bg-white {
+      background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark .text-gray-600 {
+      color: #d1d5db !important;
+    }
+
+    .dark .text-gray-500 {
+      color: #9ca3af !important;
+    }
+
+    .dark .bg-gray-200 {
+      background-color: #374151 !important;
+    }
+
+    .dark .text-blue-600 {
+      color: #60a5fa !important;
+    }
+    
+    /* Dark mode text fixes - Force all text to be visible */
+    .dark h1,
+    .dark h2,
+    .dark h3,
+    .dark .section-title,
+    .dark p,
+    .dark span,
+    .dark div,
+    .dark li,
+    .dark summary,
+    .dark .timer,
+    .dark .stage-label,
+    .dark .font-mono,
+    .dark .font-bold,
+    .dark .font-semibold {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark .text-gray-600.dark\\:text-gray-300 {
+      color: #d1d5db !important;
+    }
+
+    /* Logo animation */
+    img[src*='fluffi.jpg'] {
+      animation: fluffi-float 3s ease-in-out infinite;
+    }
+
+    @keyframes fluffi-float {
+      0%, 100% { 
+        transform: translateY(0) scale(1) rotate(0deg); 
+      }
+      50% { 
+        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+      }
+    }
+
+    /* Progress bar styling */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #2E7D32);
+      transition: width 0.5s ease;
+    }
+
+    /* Enhanced styling for presale section */
+    .fluio-status-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .stage-progress {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .fluio-price {
+      text-align: right;
+      min-width: 150px;
+    }
+
+    .price-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-bottom: 0.25rem;
+    }
+
+    .live-badge {
+      background: #ef4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      animation: pulse 2s infinite;
+    }
+
+    .current-price {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #16a34a;
+    }
+
+    .price-change {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .fluio-status-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .fluio-price {
+        text-align: center;
+      }
+      
+      .price-header {
+        justify-content: center;
+      }
+    }
+      /* ===== PRICE TOOLTIP STYLES ===== */
+  .price-container { position: relative; display: inline-block; }
+  .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
+  .price-tooltip .tooltip-text {
+    visibility: hidden; width: 220px; background-color: #1f2937;
+    color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
+    position: absolute; z-index: 1; bottom: 125%; left: 50%;
+    transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+    font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .price-tooltip .tooltip-text::after {
+    content: ""; position: absolute; top: 100%; left: 50%;
+    margin-left: -5px; border-width: 5px; border-style: solid;
+    border-color: #1f2937 transparent transparent transparent;
+  }
+  .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+  .dark .price-tooltip .tooltip-text { background-color: #f9fafb; color: #1f2937; }
+  .dark .price-tooltip .tooltip-text::after {
+    border-color: #f9fafb transparent transparent transparent;
+  }
+  </style>
+</head>
+<body class="text-gray-800 dark:text-white">
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
+        $FLUFFI
+      </h1>
+    </div>
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
+      <a href="#presale" class="text-white hover:underline">Presale</a>
+      <a href="#staking" class="text-white hover:underline">Staking</a>
+      <a href="#faq" class="text-white hover:underline">FAQ</a>
+      <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
+      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
+      <a href="how-to-buy.html" target="_blank" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
+        How to Buy FLUFFI
+      </a>
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
+      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+    </nav>
+  </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
 
@@ -9,14 +240,6 @@
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-purple-600 dark:text-purple-300 space-x-2">
     <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
-  </div>
-  
-  <!-- Second Timer Display -->
-  <div class="mt-4">
-    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">⏳ Next Stage In:</h4>
-    <div id="stage-timer" class="text-xl font-mono text-orange-500 dark:text-orange-300 space-x-2">
-      <span id="alt-stage-minutes">01</span>:<span id="alt-stage-seconds">00</span>
-    </div>
   </div>
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -35,7 +258,7 @@
 </div>
 
 <script>
-// SHARED TIMER CONFIGURATION
+ // Timer Configuration - 1 MINUTE STAGES
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
 const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
@@ -61,7 +284,7 @@ function updateNextIncreaseTime() {
     `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function updateAllTimers() {
+function updateTimers() {
   const now = Date.now();
   const startTime = getPresaleStartTime();
   const endTime = startTime + PRESALE_DURATION;
@@ -84,7 +307,7 @@ function updateAllTimers() {
   const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
   document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:59</span></span></span>`;
 
-  // Update main presale timer
+  // Update timers
   if (timeLeft <= 0) {
     document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
     document.getElementById('stage-seconds').textContent = "0";
@@ -93,28 +316,14 @@ function updateAllTimers() {
     document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
     document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
   }
-
-  // Update secondary stage timer
-  const nextStageTime = startTime + ((currentStage + 1) * STAGE_DURATION);
-  const nextStageTimeLeft = nextStageTime - now;
-  
-  if (nextStageTimeLeft > 0) {
-    document.getElementById('alt-stage-minutes').textContent = 
-      Math.floor(nextStageTimeLeft / (1000 * 60)).toString().padStart(2, '0');
-    document.getElementById('alt-stage-seconds').textContent = 
-      Math.floor((nextStageTimeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
-  } else {
-    document.getElementById('alt-stage-minutes').textContent = "00";
-    document.getElementById('alt-stage-seconds').textContent = "00";
-  }
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  updateAllTimers();
+  updateTimers();
   updateNextIncreaseTime();
   setInterval(() => {
-    updateAllTimers();
+    updateTimers();
     updateNextIncreaseTime();
   }, 1000);
 });
