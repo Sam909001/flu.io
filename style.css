@@ -557,3 +557,16 @@ header {
 .connect-wallet-btn:hover {
   transform: translateY(-3px);
 }
+/* For the "Stage: 1/15" and countdown text */
+.stage-info-text {
+  color: #8B5CF6; /* Purple-500 */
+  /* OR */
+  color: #EC4899; /* Pink-500 */
+}
+
+/* Dark mode adaptation */
+.dark .stage-info-text {
+  color: #A78BFA; /* Purple-400 */
+  /* OR */
+  color: #F472B6; /* Pink-400 */
+}
