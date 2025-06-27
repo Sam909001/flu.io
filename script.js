@@ -174,6 +174,8 @@ function updatePresaleUI(startTime) {
   const stageLeft = stageEnd - now;
 
   elements.currentStage.textContent = current + 1;
+
+  elements.currentStage.textContent = current + 1;
   elements.progressFill.style.width = `${((current + 1) / TOTAL_STAGES * 100).toFixed(0)}%`;
   if (elements.stagePercent) elements.stagePercent.textContent = `${((current + 1) / TOTAL_STAGES * 100).toFixed(0)}%`;
 
