@@ -88,6 +88,27 @@
     .dark .text-gray-600.dark\\:text-gray-300 {
       color: #d1d5db !important;
     }
+      /* ===== PRICE TOOLTIP STYLES ===== */
+  .price-container { position: relative; display: inline-block; }
+  .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
+  .price-tooltip .tooltip-text {
+    visibility: hidden; width: 220px; background-color: #1f2937;
+    color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
+    position: absolute; z-index: 1; bottom: 125%; left: 50%;
+    transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+    font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .price-tooltip .tooltip-text::after {
+    content: ""; position: absolute; top: 100%; left: 50%;
+    margin-left: -5px; border-width: 5px; border-style: solid;
+    border-color: #1f2937 transparent transparent transparent;
+  }
+  .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+  .dark .price-tooltip .tooltip-text { background-color: #f9fafb; color: #1f2937; }
+  .dark .price-tooltip .tooltip-text::after {
+    border-color: #f9fafb transparent transparent transparent;
+  }
+</style> <!-- Add BEFORE this closing tag -->
 
     /* Logo animation */
     img[src*='fluffi.jpg'] {
@@ -227,7 +248,17 @@
     <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
     
     <!-- Progress Bar -->
-    <div class="current-price" id="currentPrice">$0.000100 
+   <div class="current-price price-container" id="currentPrice">
+  $0.000100
+  <span class="price-tooltip">
+    <i class="fas fa-info-circle text-blue-500"></i>
+    <span class="tooltip-text">
+      <strong>Price Increase:</strong><br>
+      +5% per stage (every 48 hours)<br>
+      Next increase: <span id="nextIncreaseTime">23:59:59</span>
+    </span>
+  </span>
+</div> 
   <span class="tooltip">(5% increase per stage) <i class="fas fa-info-circle"></i></span>
 </div>
     <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
