@@ -2,6 +2,8 @@
 let userWallet = null;
 const leaderboard = JSON.parse(localStorage.getItem('fluffiLeaderboard')) || {};
 const initialPrice = 0.0001;
+const TOTAL_STAGES = 15;
+const STAGE_DURATION = 60 * 1000; // 1 minute in ms for test
 
 // --- DOM Elements ---
 const elements = {
@@ -10,11 +12,20 @@ const elements = {
   stakeInput: document.getElementById('stakeInput'),
   refInput: document.getElementById('refInput'),
   currentPrice: document.getElementById('currentPrice'),
-  stageInfo: document.getElementById('stageInfo'),
   priceInfo: document.getElementById('priceInfo'),
   countdown: document.getElementById('countdown'),
   leaderboard: document.getElementById('leaderboard'),
-  referralSection: document.getElementById('referralSection')
+  referralSection: document.getElementById('referralSection'),
+  progressFill: document.getElementById('progressFill'),
+  stagePercent: document.getElementById('stage-percentage'),
+  currentStage: document.getElementById('current-stage'),
+  stageHours: document.getElementById('stage-hours'),
+  stageMinutes: document.getElementById('stage-minutes'),
+  stageSeconds: document.getElementById('stage-seconds'),
+  presaleDays: document.getElementById('presale-days'),
+  presaleHours: document.getElementById('presale-hours'),
+  presaleMinutes: document.getElementById('presale-minutes'),
+  presaleSeconds: document.getElementById('presale-seconds')
 };
 
 // --- Initialization ---
@@ -22,20 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initReferralSystem();
   startTokenCounter();
   renderLeaderboard();
-  
-  // Set up intervals
+  startCountdown();
   setInterval(simulatePriceMovement, 5000);
 });
 
-// --- Unified Wallet Connection ---
+// --- Wallet Connection ---
 async function connectWallet() {
-  if (!window.ethereum) {
-    alert('Please install MetaMask!');
-    return;
-  }
+  if (!window.ethereum) return alert('Please install MetaMask!');
 
   try {
-    // Disable all connect buttons
     document.querySelectorAll('[id*="connect"]').forEach(btn => {
       btn.disabled = true;
       btn.textContent = "Connecting...";
@@ -43,20 +49,14 @@ async function connectWallet() {
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     userWallet = accounts[0];
-    
-    // Update UI
+
     document.querySelectorAll('[id*="connect"]').forEach(btn => {
       btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
       btn.disabled = false;
     });
 
-    // Update referral section if exists
-    if (elements.referralSection) {
-      generateReferralUI();
-    }
-    
+    if (elements.referralSection) generateReferralUI();
   } catch (error) {
-    console.error("Connection failed:", error);
     alert(`Error: ${error.message}`);
     document.querySelectorAll('[id*="connect"]').forEach(btn => {
       btn.disabled = false;
@@ -65,18 +65,12 @@ async function connectWallet() {
   }
 }
 
-// --- Referral System ---
+// --- Referral ---
 function initReferralSystem() {
-  // Check URL for referral parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get('ref');
-  
+  const refCode = new URLSearchParams(window.location.search).get('ref');
   if (refCode && /^0x[a-fA-F0-9]{40}$/.test(refCode)) {
     localStorage.setItem('fluffiRef', refCode);
-    console.log(`Referral detected: ${refCode}`);
   }
-  
-  // Apply to input field if exists
   if (elements.refInput) {
     elements.refInput.value = localStorage.getItem('fluffiRef') || '';
   }
@@ -84,223 +78,140 @@ function initReferralSystem() {
 
 function generateReferralUI() {
   if (!userWallet || !elements.referralSection) return;
-  
   elements.referralSection.innerHTML = `
     <div class="space-y-4">
       <div>
         <label class="block mb-2">Your referral link:</label>
         <div class="flex">
-          <input type="text" id="userReferralLink" 
-                value="${window.location.origin}?ref=${userWallet}" 
-                class="flex-1 p-2 border rounded-l dark:bg-gray-700" readonly>
-          <button onclick="copyReferralLink()" 
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">
-            Copy
-          </button>
+          <input type="text" id="userReferralLink" value="${window.location.origin}?ref=${userWallet}" class="flex-1 p-2 border rounded-l dark:bg-gray-700" readonly>
+          <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r">Copy</button>
         </div>
       </div>
       <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
         <p>Total referrals: <span id="referralCount">${leaderboard[userWallet]?.toFixed(2) || 0}</span></p>
         <p>Earnings: <span id="referralEarnings">${(leaderboard[userWallet] * 0.1)?.toFixed(2) || 0} FLUFFI</span></p>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function copyReferralLink() {
   const input = document.getElementById('userReferralLink');
-  if (!input) return;
-  
   input.select();
   document.execCommand('copy');
-  
-  // Visual feedback
-  const button = input.nextElementSibling;
-  button.textContent = 'Copied!';
-  setTimeout(() => {
-    button.textContent = 'Copy';
-  }, 2000);
+  const btn = input.nextElementSibling;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
 }
 
-// --- Purchase Function ---
+// --- Buy ---
 async function buyFluffi() {
-  if (!userWallet) {
-    alert('Please connect wallet first');
-    return;
-  }
-
+  if (!userWallet) return alert('Please connect wallet first');
   const amount = parseFloat(elements.amountInput.value);
-  if (isNaN(amount) || amount <= 0) {
-    alert('Please enter valid amount');
-    return;
+  if (isNaN(amount) || amount <= 0) return alert('Enter valid amount');
+
+  const ref = localStorage.getItem('fluffiRef') || elements.refInput?.value;
+  if (ref && ref !== userWallet) {
+    const reward = amount * 0.1;
+    leaderboard[ref] = (leaderboard[ref] || 0) + reward;
+    localStorage.setItem('fluffiLeaderboard', JSON.stringify(leaderboard));
+    alert(`Success! Referrer earned $${reward.toFixed(2)}`);
+  } else {
+    alert('Purchase successful!');
   }
 
-  try {
-    // Get referrer from localStorage or input
-    const ref = localStorage.getItem('fluffiRef') || elements.refInput?.value;
-    
-    // Simulate purchase (replace with actual contract call)
-    if (ref && ref !== userWallet) {
-      const reward = amount * 0.1; // 10% referral reward
-      leaderboard[ref] = (leaderboard[ref] || 0) + reward;
-      localStorage.setItem('fluffiLeaderboard', JSON.stringify(leaderboard));
-      alert(`Purchase successful! Referrer earned $${reward.toFixed(2)} bonus.`);
-    } else {
-      alert('Purchase successful!');
-    }
-    
-    // Update UI
-    renderLeaderboard();
-    if (elements.referralSection) generateReferralUI();
-    
-  } catch (error) {
-    console.error("Purchase failed:", error);
-    alert(`Error: ${error.message}`);
-  }
+  renderLeaderboard();
+  if (elements.referralSection) generateReferralUI();
 }
 
 // --- Leaderboard ---
 function renderLeaderboard() {
   if (!elements.leaderboard) return;
-  
-  const sorted = Object.entries(leaderboard)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-
+  const sorted = Object.entries(leaderboard).sort((a, b) => b[1] - a[1]).slice(0, 5);
   elements.leaderboard.innerHTML = `
     <h3 class="text-lg font-bold mb-2">Top Referrers</h3>
-    ${sorted.length ? 
-      sorted.map(([addr, amt], i) => `
-        <p class="text-sm">
-          ${i+1}. ${addr.slice(0, 6)}...${addr.slice(-4)} - $${amt.toFixed(2)}
-        </p>
-      `).join('') : 
-      '<p class="text-sm text-gray-500">No referrals yet</p>'
-    }
-  `;
-}
-// --- Stage & Price Logic ---
-const TOTAL_STAGES = 15;
-const STAGE_DURATION = 60; // 1 minute in seconds
-
-// Load or initialize timer state
-localStorage.removeItem('fluffiTimer'); // <-- Optional: force reset every reload for test
-const savedState = {
-  startTime: Math.floor(Date.now() / 1000),
-  currentStage: 1
-};
-
-// Calculate current state
-const now = Math.floor(Date.now() / 1000);
-const elapsedSeconds = now - savedState.startTime;
-let currentStage = Math.min(
-  savedState.currentStage + Math.floor(elapsedSeconds / STAGE_DURATION), 
-  TOTAL_STAGES
-);
-let timeLeft = STAGE_DURATION - (elapsedSeconds % STAGE_DURATION);
-
-// Update display
-function updateTimerDisplay() {
-  const hours = Math.floor(timeLeft / 3600);
-  const minutes = Math.floor((timeLeft % 3600) / 60);
-  const seconds = timeLeft % 60;
-  
-  // Update 24h timer
-  if (document.getElementById("timer")) {
-    document.getElementById("timer").textContent = 
-      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }
-  
-  // Update progress bar
-  if (document.getElementById("progressFill")) {
-    document.getElementById("progressFill").style.width = `${(currentStage / TOTAL_STAGES) * 100}%`;
-  }
-  
-  // Update stage counter
-  if (document.getElementById("currentStage")) {
-    document.getElementById("currentStage").textContent = currentStage;
-  }
-  
-  // Update price
-  const price = (initialPrice * Math.pow(1.05, currentStage - 1)).toFixed(6);
-  if (elements.priceInfo) elements.priceInfo.textContent = `Price: $${price}`;
-  
-  // Update days counter (preserve this functionality)
-  const daysLeft = Math.floor(((TOTAL_STAGES - currentStage) * STAGE_DURATION + timeLeft) / 86400);
-  if (elements.countdown) {
-    elements.countdown.textContent = `Ends in: ${daysLeft}d`;
-  }
+    ${sorted.length ? sorted.map(([addr, amt], i) =>
+      `<p class="text-sm">${i + 1}. ${addr.slice(0, 6)}...${addr.slice(-4)} - $${amt.toFixed(2)}</p>`
+    ).join('') : '<p class="text-sm text-gray-500">No referrals yet</p>'}`;
 }
 
-// Start the countdown
+// --- Countdown & Stage Logic ---
 function startCountdown() {
-  updateTimerDisplay();
-  
-  const timer = setInterval(() => {
-    timeLeft--;
-    
-    if (timeLeft <= 0 && currentStage < TOTAL_STAGES) {
-      currentStage++;
-      timeLeft = STAGE_DURATION;
-      localStorage.setItem('fluffiTimer', JSON.stringify({
-        startTime: Math.floor(Date.now() / 1000),
-        currentStage: currentStage
-      }));
-    }
-    
-    updateTimerDisplay();
-  }, 1000);
+  const startTime = getPresaleStartTime();
+  setInterval(() => updatePresaleUI(startTime), 1000);
 }
-<script>
-  // Update this dynamically from your backend or logic
-  const totalStages = 15;
-  const currentStage = 3; // Change to dynamic value if needed
 
-  const currentPrice = "$0.000115"; // example, also should be dynamic
-  const tokensSold = "67,431,509";  // update from backend if available
+function getPresaleStartTime() {
+  let stored = localStorage.getItem('presaleStartTime');
+  if (!stored) {
+    stored = Date.now();
+    localStorage.setItem('presaleStartTime', stored);
+  }
+  return parseInt(stored);
+}
 
-  document.getElementById("currentStage").textContent = currentStage;
-  document.getElementById("progressBar").style.width = ((currentStage / totalStages) * 100) + "%";
-  document.getElementById("currentPrice").textContent = currentPrice;
-  document.getElementById("tokensSold").textContent = tokensSold;
-</script>
+function updatePresaleUI(startTime) {
+  const now = Date.now();
+  const endTime = startTime + (TOTAL_STAGES * STAGE_DURATION);
+  const timeLeft = endTime - now;
 
+  // Presale timer
+  if (timeLeft <= 0) {
+    document.getElementById('presale-timer').textContent = "🎉 Presale Ended!";
+    return;
+  }
+  const d = timeLeft / (1000 * 60 * 60 * 24);
+  const h = (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+  const m = (timeLeft % (1000 * 60 * 60)) / (1000 * 60);
+  const s = (timeLeft % (1000 * 60)) / 1000;
+  elements.presaleDays.textContent = format(d);
+  elements.presaleHours.textContent = format(h);
+  elements.presaleMinutes.textContent = format(m);
+  elements.presaleSeconds.textContent = format(s);
 
-// Initialize timer
-document.addEventListener('DOMContentLoaded', startCountdown);
+  // Stage & Progress
+  const current = Math.min(Math.floor((now - startTime) / STAGE_DURATION), TOTAL_STAGES - 1);
+  const stageEnd = startTime + (current + 1) * STAGE_DURATION;
+  const stageLeft = stageEnd - now;
+
+  elements.currentStage.textContent = current + 1;
+  elements.progressFill.style.width = `${((current + 1) / TOTAL_STAGES * 100).toFixed(0)}%`;
+  if (elements.stagePercent) elements.stagePercent.textContent = `${((current + 1) / TOTAL_STAGES * 100).toFixed(0)}%`;
+
+  const sh = stageLeft / (1000 * 60 * 60);
+  const sm = (stageLeft % (1000 * 60 * 60)) / (1000 * 60);
+  const ss = (stageLeft % (1000 * 60)) / 1000;
+  elements.stageHours.textContent = format(sh);
+  elements.stageMinutes.textContent = format(sm);
+  elements.stageSeconds.textContent = format(ss);
+
+  // Price
+  const price = (initialPrice * Math.pow(1.05, current)).toFixed(6);
+  if (elements.currentPrice) elements.currentPrice.textContent = `$${price}`;
+  if (elements.priceInfo) elements.priceInfo.textContent = `Price: $${price}`;
+}
+
+function format(num) {
+  return String(Math.floor(num)).padStart(2, '0');
+}
+
 // --- Token Counter ---
 function startTokenCounter() {
   const counter = document.getElementById('tokensSold');
   if (!counter) return;
-  
   let count = 8421509;
   setInterval(() => {
     count += Math.floor(Math.random() * 500) + 100;
     counter.textContent = count.toLocaleString();
     counter.classList.add('text-green-500', 'scale-110');
-    setTimeout(() => {
-      counter.classList.remove('text-green-500', 'scale-110');
-    }, 300);
+    setTimeout(() => counter.classList.remove('text-green-500', 'scale-110'), 300);
   }, 2000);
 }
 
-// --- Price Simulation ---
+// --- Price Movement ---
 let currentPrice = 0.0001;
 function simulatePriceMovement() {
   if (!elements.currentPrice) return;
-  
   const change = (Math.random() * 0.00002) - 0.00001;
   currentPrice = Math.max(0.00009, currentPrice + change);
   elements.currentPrice.textContent = currentPrice.toFixed(6);
-}
-// tailwind.config.js
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        'primary-green': '#10B981',
-        'dark-green': '#059669'
-      }
-    }
-  }
 }
