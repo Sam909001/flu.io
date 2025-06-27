@@ -148,6 +148,26 @@ function getPresaleStartTime() {
   }
   return parseInt(stored);
 }
+  // Inside updateTimers() function, add
+  function updateNextIncreaseTime() {
+    const now = Date.now();
+    const startTime = getPresaleStartTime();
+    const nextStageTime = startTime + (Math.floor((now - startTime) / STAGE_DURATION) + 1) * STAGE_DURATION;
+    const timeLeft = nextStageTime - now;
+    
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+    document.getElementById('nextIncreaseTime').textContent = 
+      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  // Modify your setInterval to:
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime(); // Add this line
+  }, 1000);
 
 function updatePresaleUI(startTime) {
   const now = Date.now();
