@@ -223,6 +223,28 @@
 .dark .price-tooltip .fa-info-circle {
   color: #60A5FA !important; /* blue-400 */
 }
+    /* Mobile wallet connection styles */
+@media (max-width: 640px) {
+  #walletButton {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  
+  .wallet-mobile-instructions {
+    display: none;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    border: 1px solid #e9ecef;
+  }
+  
+  .dark .wallet-mobile-instructions {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+}
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
@@ -245,6 +267,16 @@
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="connectWallet()" id="walletButton" class="...">
+  Connect Wallet
+</button>
+<div id="walletMobileInstructions" class="wallet-mobile-instructions">
+  <p>For mobile users:</p>
+  <ol class="list-decimal pl-5 mt-2 space-y-1">
+    <li>Open in MetaMask browser</li>
+    <li>Or tap "Connect" then "MetaMask"</li>
+  </ol>
+</div>
     </nav>
   </header>
 
