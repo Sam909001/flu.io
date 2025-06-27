@@ -570,3 +570,28 @@ header {
   /* OR */
   color: #F472B6; /* Pink-400 */
 }
+.progress-fill {
+  background: linear-gradient(90deg, #8A2BE2, #BA55D3);
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.7);
+}
+.stage-info-text {
+  color: #BA55D3;
+  font-weight: 600;
+}
+.dark .stage-info-text {
+  color: #DA70D6;
+}
+@keyframes progress-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+.progress-fill {
+  animation: progress-pulse 2s infinite;
+}
+.progress-fill {
+  background: linear-gradient(90deg, #FF6B6B, #FFA3A3, #FFD166);
+}
+.stage-info-text {
+  color: #FF6B6B;
+}
