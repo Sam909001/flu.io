@@ -15,6 +15,79 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
+  // Web3Modal configuration
+const providerOptions = {
+  walletconnect: {
+    package: WalletConnectProvider,
+    options: {
+      rpc: {
+        1: "https://mainnet.infura.io/v3/YOUR_INFURA_KEY",
+        56: "https://bsc-dataseed.binance.org/"
+      }
+    }
+  }
+};
+
+const web3Modal = new Web3Modal({
+  cacheProvider: true,
+  providerOptions,
+  theme: "dark"
+});
+
+// Connection functions
+function showWalletModal() {
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    redirectMobileUser();
+  } else {
+    document.getElementById('walletModal').classList.remove('hidden');
+  }
+}
+
+async function redirectMobileUser() {
+  // Try MetaMask first
+  if(typeof window.ethereum !== 'undefined') {
+    await connectInjected();
+  } 
+  // Fallback to WalletConnect
+  else {
+    await connectWalletConnect();
+  }
+}
+
+async function connectInjected() {
+  try {
+    if (typeof window.ethereum === 'undefined') {
+      window.location.href = "https://metamask.app.link/dapp/" + encodeURIComponent(window.location.href);
+      return;
+    }
+    
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    handleConnected(accounts[0]);
+  } catch (error) {
+    console.error("Connection error:", error);
+  }
+}
+
+async function connectWalletConnect() {
+  const provider = await web3Modal.connect();
+  const web3 = new Web3(provider);
+  const accounts = await web3.eth.getAccounts();
+  handleConnected(accounts[0]);
+}
+
+function handleConnected(address) {
+  userWalletAddress = address;
+  document.getElementById('walletButton').innerHTML = `
+    <span class="text-lg">Connected</span>
+    <span class="block text-xs">${address.substring(0,6)}...${address.slice(-4)}</span>
+  `;
+  document.getElementById('walletModal').classList.add('hidden');
+}
+
+// Update your existing connect button
+document.getElementById('walletButton').onclick = showWalletModal;
+  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -841,6 +914,40 @@ function resetTimer() {
       </a>
     </div>
   </footer>
+  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+    <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <button onclick="connectInjected()" class="wallet-option">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+        <span>Browser Wallet</span>
+      </button>
+      <button onclick="connectWalletConnect()" class="wallet-option">
+        <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
+        <span>WalletConnect</span>
+      </button>
+      <button onclick="connectCoinbase()" class="wallet-option">
+        <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
+        <span>Coinbase</span>
+      </button>
+      <button onclick="connectTrust()" class="wallet-option">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
+        <span>Trust Wallet</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wallet-option {
+    @apply p-4 border rounded-lg flex flex-col items-center 
+           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+  }
+  .wallet-icon {
+    @apply w-10 h-10 mb-2;
+  }
+  .hidden { display: none !important; }
+</style>
 </body>
 <script>
     let userWalletAddress = null;
