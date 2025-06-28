@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -905,6 +907,37 @@ async function connectWithWalletConnect() {
   alert("Connected via WalletConnect: " + userWallet);
 }
 </script>
+  async function connectWithWalletConnect() {
+  const provider = new WalletConnectProvider.default({
+    rpc: {
+      56: "https://bsc-dataseed.binance.org/"
+    },
+    chainId: 56
+  });
+
+  try {
+    await provider.enable();
+    const web3 = new Web3(provider);
+
+    const accounts = await web3.eth.getAccounts();
+    userWallet = accounts[0];
+
+    document.querySelectorAll('[id*="connect"]').forEach(btn => {
+      btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+      btn.disabled = false;
+    });
+
+    if (elements.referralSection) generateReferralUI();
+
+    provider.on("disconnect", (code, reason) => {
+      console.log("WalletConnect disconnected", code, reason);
+    });
+
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    alert("WalletConnect failed: " + err.message);
+  }
+}
 <script>
     let userWalletAddress = null;
     const initialPrice = 0.0001;
