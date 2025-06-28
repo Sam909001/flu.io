@@ -927,17 +927,9 @@ function resetTimer() {
 function disconnectWallet() {
   userWalletAddress = null;
 const button = document.getElementById('walletButton');
-// Update button text and styling for a larger, more prominent appearance
-button.innerHTML = `
-  <span class="text-lg md:text-xl font-bold">Connect Wallet</span>
-`;
-button.className = `
-  ${button.className.replace('bg-green-700', 'bg-green-600')} 
-  py-3 px-6 rounded-lg text-lg md:text-xl font-bold 
-  hover:bg-green-700 transition-colors duration-300 shadow-md
-  min-w-[180px] min-h-[50px] flex items-center justify-center
-`;
-document.getElementById('walletStatus').classList.add('hidden');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-700', 'bg-green-800');font semi-bold // Revert color
+  document.getElementById('walletStatus').classList.add('hidden');
   
   // Preserve dark mode classes
   if (document.documentElement.classList.contains('dark')) {
