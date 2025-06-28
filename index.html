@@ -923,12 +923,6 @@ function resetTimer() {
         showReferralUI(userWalletAddress);
       }
     }
-    // Case 1: Already in MetaMask mobile browser
-    if (isMetaMaskMobile) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleSuccessfulConnection(accounts[0]);
-      return;
-    }
   // Your existing disconnect function (with dark mode preservation)
 function disconnectWallet() {
   userWalletAddress = null;
