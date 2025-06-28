@@ -898,27 +898,137 @@ function resetTimer() {
       }
     }
 
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
+// Global wallet state
+let userWalletAddress = null;
+
+// Improved wallet connection handler
+async function connectWallet() {
+  const button = document.getElementById('walletButton');
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+  button.disabled = true;
+
+  // Check if we're on mobile
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isMetaMaskMobile = isMobile && window.ethereum?.isMetaMask;
+
+  try {
+    // Case 1: MetaMask mobile in-app browser
+    if (isMetaMaskMobile) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleSuccessfulConnection(accounts[0]);
+      return;
+    }
+
+    // Case 2: Desktop with MetaMask/extensions
+    if (window.ethereum) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleSuccessfulConnection(accounts[0]);
+      return;
+    }
+
+    // Case 3: Mobile without in-app browser - redirect to wallet
+    if (isMobile) {
+      redirectToWallet();
+      return;
+    }
+
+    // Case 4: Desktop without extensions
+    alert('Please install MetaMask or another Web3 wallet');
+  } catch (error) {
+    handleConnectionError(error, isMobile);
+  } finally {
+    button.textContent = userWalletAddress ? 'Connected ✓' : 'Connect Wallet';
+    button.disabled = false;
+  }
+}
+
+// Helper functions
+function handleSuccessfulConnection(address) {
+  userWalletAddress = address;
+  document.getElementById('walletStatus').classList.remove('hidden');
+  document.getElementById('walletAddress').textContent = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  document.getElementById('walletMobileInstructions').style.display = 'none';
+}
+
+function handleConnectionError(error, isMobile) {
+  console.error('Connection error:', error);
+  
+  if (error.code === 4001) {
+    alert('Connection rejected by user');
+  } else if (isMobile) {
+    // Retry with different wallet links if first attempt failed
+    redirectToWallet();
+  } else {
+    alert(`Connection error: ${error.message}`);
+  }
+}
+
+function redirectToWallet() {
+  // Try multiple wallet providers
+  const wallets = [
+    {
+      name: 'MetaMask',
+      url: `https://metamask.app.link/dapp/${encodeURIComponent(window.location.href)}`
+    },
+    {
+      name: 'Trust Wallet',
+      url: `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}`
+    },
+    {
+      name: 'Coinbase Wallet',
+      url: `https://go.cb-w.com/walletlink?url=${encodeURIComponent(window.location.href)}`
+    }
+  ];
+
+  // Try opening each wallet sequentially
+  let success = false;
+  wallets.forEach(wallet => {
+    if (!success) {
+      try {
+        window.location.href = wallet.url;
+        success = true;
+      } catch (e) {
+        console.log(`Failed to redirect to ${wallet.name}`);
+      }
+    }
+  });
+
+  // Fallback instructions
+  if (!success) {
+    document.getElementById('walletMobileInstructions').style.display = 'block';
+  }
+}
+
+// Connect referral wallet (unchanged)
+async function connectReferralWallet() {
+  await connectWallet();
+  if (userWalletAddress) {
+    showReferralUI(userWalletAddress);
+  }
+}
+
+// Initialize wallet connection on page load
+window.addEventListener('DOMContentLoaded', () => {
+  // Auto-connect if previously connected
+  if (window.ethereum?.selectedAddress) {
+    connectWallet();
+  }
+  
+  // Handle wallet changes
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        // Wallet disconnected
+        userWalletAddress = null;
+        document.getElementById('walletButton').textContent = 'Connect Wallet';
+        document.getElementById('walletStatus').classList.add('hidden');
       } else {
-        alert('MetaMask not detected. Please install MetaMask.');
+        // Account changed
+        handleSuccessfulConnection(accounts[0]);
       }
-    }
-
-    async function connectReferralWallet() {
-      await connectWallet();
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
-
+    });
+  }
+});
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
