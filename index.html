@@ -928,7 +928,7 @@ function disconnectWallet() {
   userWalletAddress = null;
 const button = document.getElementById('walletButton');
   button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-700', 'bg-green-800');font semi-bold // Revert color
+  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
   document.getElementById('walletStatus').classList.add('hidden');
   
   // Preserve dark mode classes
