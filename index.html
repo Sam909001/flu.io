@@ -252,7 +252,12 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      <button onclick="connectWithWalletConnect()" class="bg-purple-600 text-white px-4 py-2 rounded">WalletConnect</button>
+      <div id="walletconnect-mobile" class="hidden">
+  <button onclick="connectWithWalletConnect()" class="bg-green-600 text-white px-4 py-2 rounded">
+    WalletConnect (Mobile)
+  </button>
+</div>
+
       <button onclick="disconnectWallet()">Disconnect</button>
       </div>
       <div id="walletMobileInstructions" class="wallet-mobile-instructions">
@@ -1128,5 +1133,12 @@ const button = document.getElementById('walletButton');
     updateStage();
     updateCountdown();
     updateStageTimer();
+  document.addEventListener('DOMContentLoaded', () => {
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+  if (isMobile) {
+    const mobileBtn = document.getElementById('walletconnect-mobile');
+    if (mobileBtn) mobileBtn.classList.remove('hidden');
+  }
+});
 </script>
 </html>
