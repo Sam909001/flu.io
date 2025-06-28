@@ -903,138 +903,27 @@ function resetTimer() {
       }
     }
 
-  // Global wallet state
-let userWalletAddress = null;
-
-// Improved wallet connection handler
-async function connectWallet() {
-  const button = document.getElementById('walletButton');
-  const originalText = button.textContent;
-  const originalClasses = button.className;
-  
-  try {
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-    button.disabled = true;
-
-    // Check if we're on mobile
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isMetaMaskMobile = isMobile && window.ethereum?.isMetaMask;
-
-    // Case 1: Already in MetaMask mobile browser
-    if (isMetaMaskMobile) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleSuccessfulConnection(accounts[0]);
-      return;
-    }
-
-    // Case 2: Desktop with any injected provider
-    if (window.ethereum) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleSuccessfulConnection(accounts[0]);
-      return;
-    }
-
-    // Case 3: Mobile browser without injected provider
-    if (isMobile) {
-      redirectToWallet();
-      return;
-    }
-
-    // Case 4: Desktop without any wallet
-    alert('Please install MetaMask or another Web3 wallet');
-  } catch (error) {
-    console.error('Connection error:', error);
-    if (error.code === 4001) {
-      alert('Connection rejected by user');
-    }
-  } finally {
-    button.disabled = false;
-    button.textContent = userWalletAddress ? 'Connected ✓' : originalText;
-    button.className = originalClasses; // Preserves dark mode classes
-  }
-}
-
-// Preserve dark mode state
-function initDarkMode() {
-  const darkMode = localStorage.getItem('darkMode') === 'true';
-  if (darkMode) {
-    document.documentElement.classList.add('dark');
-  }
-}
-
-// Initialize when page loads
-window.addEventListener('DOMContentLoaded', () => {
-  initDarkMode();
-  
-  // Auto-connect if previously connected
-  if (window.ethereum?.selectedAddress) {
-    connectWallet();
-  }
-  
-  // Handle wallet changes
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts) => {
-      if (accounts.length === 0) {
-        userWalletAddress = null;
-        document.getElementById('walletButton').textContent = 'Connect Wallet';
-        document.getElementById('walletStatus').classList.add('hidden');
+  async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          document.getElementById('walletButton').textContent = 'Connected ✓';
+        } catch (error) {
+          alert('Wallet connection denied.');
+        }
       } else {
-        handleSuccessfulConnection(accounts[0]);
-      }
-    });
-  }
-});
-
-// Helper functions (same as before but with dark mode preservation)
-function handleSuccessfulConnection(address) {
-  userWalletAddress = address;
-  const walletStatus = document.getElementById('walletStatus');
-  walletStatus.classList.remove('hidden');
-  
-  // Preserve dark mode in address display
-  const addressEl = document.getElementById('walletAddress');
-  addressEl.textContent = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-  addressEl.classList.toggle('dark:text-gray-300', document.documentElement.classList.contains('dark'));
-  
-  document.getElementById('walletMobileInstructions').style.display = 'none';
-}
-
-function redirectToWallet() {
-  const wallets = [
-    { name: 'MetaMask', url: `https://metamask.app.link/dapp/${encodeURIComponent(window.location.href)}` },
-    { name: 'Trust Wallet', url: `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}` }
-  ];
-
-  let success = false;
-  wallets.forEach(wallet => {
-    if (!success) {
-      try {
-        window.location.href = wallet.url;
-        success = true;
-      } catch (e) {
-        console.error(`Redirect to ${wallet.name} failed`);
+        alert('MetaMask not detected. Please install MetaMask.');
       }
     }
-  });
 
-  if (!success) {
-    document.getElementById('walletMobileInstructions').style.display = 'block';
-  }
-}
-
-// Your existing disconnect function (with dark mode preservation)
-function disconnectWallet() {
-  userWalletAddress = null;
-  const button = document.getElementById('walletButton');
-  button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-600', 'bg-green-700'); // Revert color
-  document.getElementById('walletStatus').classList.add('hidden');
+    async function connectReferralWallet() {
+      await connectWallet();
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
+    }
   
-  // Preserve dark mode classes
-  if (document.documentElement.classList.contains('dark')) {
-    button.classList.add('dark:bg-gray-700');
-  }
-}
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
