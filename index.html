@@ -914,19 +914,45 @@ function resetTimer() {
       }
     }
 
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
+async function connectWallet() {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const button = document.getElementById('walletButton');
+  
+  try {
+    // Check if MetaMask is installed
+    if (typeof window.ethereum === 'undefined') {
+      if (isMobile) {
+        // Mobile deep linking - redirect to MetaMask app
+        window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.href)}`;
+        return;
       } else {
-        alert('MetaMask not detected. Please install MetaMask.');
+        alert('Please install MetaMask extension');
+        return;
       }
     }
+
+    // Desktop connection flow
+    const accounts = await window.ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+    
+    userWalletAddress = accounts[0];
+    button.textContent = 'Connected ✓';
+    button.classList.replace('bg-green-700', 'bg-green-600');
+    
+    // Hide mobile instructions if connected
+    document.getElementById('walletMobileInstructions').style.display = 'none';
+    
+  } catch (error) {
+    console.error('Connection error:', error);
+    button.textContent = 'Connect Wallet';
+    
+    // If on mobile and error occurred, try deep link again
+    if (isMobile && error.code !== 4001) { // 4001 = user rejected
+      window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.href)}`;
+    }
+  }
+}
 
     async function connectReferralWallet() {
       await connectWallet();
