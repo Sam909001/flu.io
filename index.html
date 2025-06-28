@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
-<script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -16,8 +15,14 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   <!-- WalletConnect + Web3Modal Scripts -->
+<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
+<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -255,10 +260,7 @@
   </button>
 </div>
 
-     <button onclick="disconnectWallet()" 
-        class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded ml-2">
-  Disconnect
-</button>
+      <button onclick="disconnectWallet()">Disconnect</button>
       </div>
       <div id="walletMobileInstructions" class="wallet-mobile-instructions">
         </div>
@@ -290,25 +292,6 @@
 </div>
 
 <script>
-  // Initialize elements object
-const elements = {
-  referralSection: document.getElementById('referralSection'),
-  walletButton: document.getElementById('walletButton'),
-  // Add other frequently used elements here
-};
-
-// Add this function
-function generateReferralUI() {
-  if (!userWalletAddress) return;
-  
-  const referralLink = `${window.location.origin}?ref=${userWalletAddress}`;
-  
-  elements.referralSection.innerHTML = `
-    <div class="referral-ui">
-      <!-- Your referral UI HTML here -->
-    </div>
-  `;
-}
  // Timer Configuration - 1 MINUTE STAGES
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
@@ -851,12 +834,14 @@ function resetTimer() {
       <h3>James Chen</h3>
       <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
       </div>
+    </div>
     <div class="team-member">
       <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
       <h3>Priya Patel</h3>
       <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
       </div>
     </div>
+  </div>
 </section>
   
   <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
