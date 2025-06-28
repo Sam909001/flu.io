@@ -96,7 +96,23 @@
     .dark .text-gray-600.dark\\:text-gray-300 {
       color: #d1d5db !important;
     }
+/* Add to your existing dark mode styles */
+.dark .wallet-option {
+  background-color: #1f2937;
+  border-color: #374151;
+}
 
+.dark input, 
+.dark select {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: white !important;
+}
+
+.dark .btn-disconnect {
+  background-color: #7f1d1d;
+  hover:bg-red-900;
+}
     /* Logo animation */
     img[src*='fluffi.jpg'] {
       animation: fluffi-float 3s ease-in-out infinite;
@@ -254,10 +270,16 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      <div id="walletconnect-mobile" class="hidden">
-  <button onclick="connectWithWalletConnect()" class="bg-green-600 text-white px-4 py-2 rounded">
-    WalletConnect (Mobile)
+      <<!-- Replace your current mobile button with this -->
+<div id="walletconnect-mobile" class="hidden">
+  <button onclick="connectWithWalletConnect()" 
+          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+    <img src="https://walletconnect.com/walletconnect-logo.png" 
+         alt="WalletConnect" 
+         class="w-5 h-5">
+    WalletConnect
   </button>
+</div>
 </div>
 
       <button onclick="disconnectWallet()">Disconnect</button>
@@ -834,7 +856,6 @@ function resetTimer() {
       <h3>James Chen</h3>
       <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
       </div>
-    </div>
     <div class="team-member">
       <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
       <h3>Priya Patel</h3>
@@ -891,20 +912,46 @@ function resetTimer() {
 </style>
 </body>
   <script>
+// Replace your existing connectWithWalletConnect() function with this:
 async function connectWithWalletConnect() {
-  const provider = new WalletConnectProvider.default({
-    rpc: {
-      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
-    },
-    chainId: 56
-  });
+  try {
+    // 1. Initialize provider
+    const provider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
+        1: "https://mainnet.infura.io/v3/YOUR_INFURA_KEY" // Ethereum
+      },
+      chainId: 56, // Default to BSC
+      bridge: "https://bridge.walletconnect.org", // Official bridge
+      qrcodeModalOptions: {
+        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent'] // Auto-deep linking
+      }
+    });
 
-  await provider.enable();
-  const web3 = new Web3(provider);
-  const accounts = await web3.eth.getAccounts();
-  const userWallet = accounts[0];
+    // 2. Enable session (triggers QR modal)
+    await provider.enable();
 
-  alert("Connected via WalletConnect: " + userWallet);
+    // 3. Create Web3 instance
+    const web3 = new Web3(provider);
+    
+    // 4. Get accounts
+    const accounts = await web3.eth.getAccounts();
+    userWalletAddress = accounts[0];
+    
+    // 5. Update UI
+    document.getElementById('walletButton').textContent = 
+      `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+    
+    // 6. Handle disconnection
+    provider.on("disconnect", (code, reason) => {
+      console.log("Disconnected:", code, reason);
+      disconnectWallet();
+    });
+
+  } catch (error) {
+    console.error("WalletConnect Error:", error);
+    alert(`Connection failed: ${error.message}`);
+  }
 }
 </script>
 <script>
