@@ -928,12 +928,12 @@ function disconnectWallet() {
   userWalletAddress = null;
   const button = document.getElementById('walletButton');
   button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-600', 'bg-green-700'); // Revert color
+  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
   document.getElementById('walletStatus').classList.add('hidden');
   
   // Preserve dark mode classes
   if (document.documentElement.classList.contains('dark')) {
-    button.classList.add('dark:bg-gray-700');
+    button.classList.add('dark:bg-gray-800');
   }
 }
   
