@@ -923,7 +923,19 @@ function resetTimer() {
         showReferralUI(userWalletAddress);
       }
     }
+  // Your existing disconnect function (with dark mode preservation)
+function disconnectWallet() {
+  userWalletAddress = null;
+  const button = document.getElementById('walletButton');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-600', 'bg-green-700'); // Revert color
+  document.getElementById('walletStatus').classList.add('hidden');
   
+  // Preserve dark mode classes
+  if (document.documentElement.classList.contains('dark')) {
+    button.classList.add('dark:bg-gray-700');
+  }
+}
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
