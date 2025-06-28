@@ -907,9 +907,12 @@ function resetTimer() {
         } catch (error) {
           alert('Wallet connection denied.');
         }
-      } else {
-        alert('MetaMask not detected. Please install MetaMask.');
-      }
+      } else if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  // On mobile device with no ethereum provider
+  alert('Please open this site inside your wallet app (e.g. MetaMask mobile) to connect.');
+} else {
+  alert('Please install MetaMask browser extension or use a web3-enabled browser.');
+}
     }
 
     async function connectReferralWallet() {
