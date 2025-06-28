@@ -250,35 +250,31 @@
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
-      <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
-        $FLUFFI
-      </h1>
-    </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
-      <a href="#presale" class="text-white hover:underline">Presale</a>
-      <a href="#staking" class="text-white hover:underline">Staking</a>
-      <a href="#faq" class="text-white hover:underline">FAQ</a>
-      <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
-        How to Buy FLUFFI
-      </a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
-      <button onclick="connectWallet()" id="walletButton" class="...">
-  Connect Wallet
-</button>
+  <div class="flex items-center gap-3">
+    <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
+    <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
+      $FLUFFI
+    </h1>
+  </div>
+  <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
+    <!-- Keep all your existing nav items -->
+    <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">
+      Connect Wallet
+    </button>
+    <div id="walletStatus" class="hidden text-xs text-gray-500 mt-1">
+  <span id="walletAddress"></span>
+  <button onclick="disconnectWallet()" class="ml-2 text-red-500">Disconnect</button>
+</div>
+  </nav>
+</header>
 <div id="walletMobileInstructions" class="wallet-mobile-instructions">
-  <p>For mobile users:</p>
-  <ol class="list-decimal pl-5 mt-2 space-y-1">
+  <p class="text-sm">For mobile users:</p>
+  <ol class="list-decimal pl-5 mt-2 space-y-1 text-xs">
     <li>Open in MetaMask browser</li>
-    <li>Or tap "Connect" then "MetaMask"</li>
+    <li>Or tap "Connect" then select "MetaMask"</li>
+    <li>Ensure you're using the latest MetaMask app</li>
   </ol>
 </div>
-    </nav>
-  </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
 
@@ -930,35 +926,57 @@ function resetTimer() {
       }
     }
 
-    async function connectWallet() {
-  // Check if Ethereum provider exists
-  if (typeof window.ethereum !== 'undefined') {
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userWalletAddress = accounts[0];
-      document.getElementById('walletButton').textContent = 'Connected ✓';
-    } catch (error) {
-      // Mobile-specific connection flow
-      if (error.code === 4001) {
-        alert('Connection rejected');
+async function connectWallet() {
+  // Mobile detection
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const button = document.getElementById('walletButton');
+  
+  try {
+    if (typeof window.ethereum === 'undefined') {
+      if (isMobile) {
+        // Mobile-specific flow
+        const shouldInstall = confirm('MetaMask not detected! Install it for the best experience.');
+        if (shouldInstall) {
+          window.location.href = /iPhone|iPad|iPod/i.test(navigator.userAgent) 
+            ? 'https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202'
+            : 'https://play.google.com/store/apps/details?id=io.metamask';
+        }
       } else {
-        // Deep link to MetaMask app
-        window.location.href = 'https://metamask.app.link/dapp/' + encodeURIComponent(window.location.href);
+        alert('Please install MetaMask extension');
       }
+      return;
     }
-  } else {
-    // Show mobile installation instructions
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      const useMetaMask = confirm('MetaMask not detected! Would you like to install it?');
-      if (useMetaMask) {
-        window.location.href = /iPhone|iPad|iPod/i.test(navigator.userAgent) 
-          ? 'https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202'
-          : 'https://play.google.com/store/apps/details?id=io.metamask';
-      }
-    } else {
-      alert('Please install MetaMask extension');
+
+    // Connection logic
+    const accounts = await window.ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+    
+    userWalletAddress = accounts[0];
+    button.textContent = 'Connected ✓';
+    button.classList.replace('bg-green-700', 'bg-green-600');
+    
+    // Hide mobile instructions if connected
+    if (isMobile) {
+      document.getElementById('walletMobileInstructions').style.display = 'none';
+    }
+    
+  } catch (error) {
+    console.error('Connection error:', error);
+    button.textContent = 'Connect Wallet';
+    
+    if (error.code === 4001) {
+      alert('Connection rejected');
+    } else if (isMobile) {
+      // Fallback for mobile deep linking
+      window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.href)}`;
     }
   }
+}
+function addWalletConnect() {
+// Initialize mobile instructions
+if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  document.getElementById('walletMobileInstructions').style.display = 'block';
 }
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
