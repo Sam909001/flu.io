@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -11,6 +12,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  <!-- WalletConnect + Web3Modal Scripts -->
+<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
+<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -248,6 +252,7 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
+      <button onclick="connectWithWalletConnect()" class="bg-purple-600 text-white px-4 py-2 rounded">WalletConnect</button>
       <button onclick="disconnectWallet()">Disconnect</button>
       </div>
       <div id="walletMobileInstructions" class="wallet-mobile-instructions">
@@ -878,6 +883,23 @@ function resetTimer() {
   .hidden { display: none !important; }
 </style>
 </body>
+  <script>
+async function connectWithWalletConnect() {
+  const provider = new WalletConnectProvider.default({
+    rpc: {
+      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
+    },
+    chainId: 56
+  });
+
+  await provider.enable();
+  const web3 = new Web3(provider);
+  const accounts = await web3.eth.getAccounts();
+  const userWallet = accounts[0];
+
+  alert("Connected via WalletConnect: " + userWallet);
+}
+</script>
 <script>
     let userWalletAddress = null;
     const initialPrice = 0.0001;
