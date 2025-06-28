@@ -923,6 +923,11 @@ function resetTimer() {
         showReferralUI(userWalletAddress);
       }
     }
+   // Case 3: Mobile browser without injected provider
+    if (isMobile) {
+      redirectToWallet();
+      return;
+    }
   // Your existing disconnect function (with dark mode preservation)
 function disconnectWallet() {
   userWalletAddress = null;
@@ -936,6 +941,7 @@ function disconnectWallet() {
     button.classList.add('dark:bg-gray-700');
   }
 }
+  
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
