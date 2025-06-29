@@ -17,14 +17,10 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   <!-- WalletConnect + Web3Modal Scripts -->
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
-<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -1204,7 +1200,7 @@ const web3Modal = new window.Web3Modal.default({
   cacheProvider: false,
   providerOptions
 });
-
+  
 let web3Provider;
 
 async function connectWalletMobile() {
