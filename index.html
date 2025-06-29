@@ -1218,5 +1218,33 @@ async function connectWalletMobile() {
     console.error("Wallet connection failed", err);
   }
 }
+  // Initialize Web3Modal
+const providerOptions = {
+  walletconnect: {
+    package: WalletConnectProvider,
+    options: {
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/", // BSC
+        1: "https://mainnet.infura.io/v3/YOUR_KEY" // Ethereum
+      }
+    }
+  }
+};
+
+const web3Modal = new Web3Modal({
+  cacheProvider: true, // optional
+  providerOptions, // required
+  disableInjectedProvider: false // enable MetaMask/etc
+});
+
+// Connection handler
+async function connectWallet() {
+  const provider = await web3Modal.connect();
+  const web3 = new Web3(provider);
+  
+  // Get accounts
+  const accounts = await web3.eth.getAccounts();
+  console.log("Connected:", accounts[0]);
+}
 </script>
 </html>
