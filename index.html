@@ -1170,27 +1170,49 @@ const button = document.getElementById('walletButton');
       document.documentElement.classList.add('dark');
     }
 
+    // Start timers
+    setInterval(() => {
+      updateStage();
+      updateCountdown();
+      updateStageTimer();
+    }, 1000);
+
+    updateStage();
+    updateCountdown();
+    updateStageTimer();
+  document.addEventListener('DOMContentLoaded', () => {
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+  if (isMobile) {
+    const mobileBtn = document.getElementById('walletconnect-mobile');
+    if (mobileBtn) mobileBtn.classList.remove('hidden');
+  }
+});
+  const providerOptions = {
+ walletconnect: {
+  package: WalletConnectProvider,
+    options: {
+      infuraId: "YOUR_INFURA_ID" // or use a BSC/RPC endpoint
+    }
+  }
+};
+
+const web3Modal = new window.Web3Modal.default({
+  cacheProvider: false,
+  providerOptions
+});
+  
+let web3Provider;
+
+async function connectWalletMobile() {
+  try {
+    const instance = await web3Modal.connect();
     web3Provider = new ethers.providers.Web3Provider(instance);
     const signer = web3Provider.getSigner();
     const address = await signer.getAddress();
     alert("Connected wallet: " + address);
-    // Set up event listeners for account changes and disconnection
-    instance.on("accountsChanged", (accounts) => {
-      if (accounts.length > 0) {
-        alert("Account changed: " + accounts[0]);
-      } else {
-        disconnectWallet();
-      }
-    });
-    instance.on("disconnect", () => {
-      disconnectWallet();
-    });
   } catch (err) {
     console.error("Wallet connection failed", err);
-    alert("Wallet connection failed: " + err.message);
   }
 }
-// Call this function when the mobile wallet button is clicked
-document.getElementById('walletconnect-mobile').onclick = connectWalletMobile;
 </script>
 </html>
