@@ -1219,32 +1219,5 @@ async function connectWalletMobile() {
     console.error("Wallet connection failed", err);
   }
 }
-  const providerOptions = {
-  walletconnect: {
-    package: window.WalletConnectProvider.default,
-    options: {
-      infuraId: "YOUR_INFURA_ID" // or use a BSC/RPC endpoint
-    }
-  }
-};
-
-const web3Modal = new window.Web3Modal.default({
-  cacheProvider: false,
-  providerOptions
-});
-
-let web3Provider;
-
-async function connectWalletMobile() {
-  try {
-    const instance = await web3Modal.connect();
-    web3Provider = new ethers.providers.Web3Provider(instance);
-    const signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
-    alert("Connected wallet: " + address);
-  } catch (err) {
-    console.error("Wallet connection failed", err);
-  }
-}
 </script>
 </html>
