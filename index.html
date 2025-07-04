@@ -910,9 +910,6 @@ function resetTimer() {
 </style>
 </body>
   <script>
-// Replace your existing connectWithWalletConnect() function with this:
-async function connectWithWalletConnect() {
-  try {
     // 1. Initialize provider
     const provider = new WalletConnectProvider.default({
       rpc: {
@@ -1013,19 +1010,47 @@ async function connectWithWalletConnect() {
       }
     }
 
-  async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
-      } else {
-        alert('MetaMask not detected. Please install MetaMask.');
+  <script>
+let web3Modal;
+let provider;
+let signer;
+let userWalletAddress = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const providerOptions = {
+    walletconnect: {
+      package: window.WalletConnectProvider.default,
+      options: {
+        rpc: {
+          56: "https://bsc-dataseed.binance.org/"
+        },
+        chainId: 56
       }
     }
+  };
+
+  web3Modal = new window.Web3Modal.default({
+    cacheProvider: false,
+    providerOptions
+  });
+});
+
+async function connectWallet() {
+  try {
+    provider = await web3Modal.connect();
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+
+    userWalletAddress = address;
+    document.getElementById('walletButton').textContent =
+      `${address.slice(0, 6)}...${address.slice(-4)}`;
+  } catch (err) {
+    console.error("Wallet connection failed", err);
+    alert("Wallet connection failed");
+  }
+}
+</script>
 
     async function connectReferralWallet() {
       await connectWallet();
