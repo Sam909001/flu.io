@@ -914,21 +914,6 @@ function resetTimer() {
 </style>
 </body>
   <script>
-    // 1. Initialize provider
-    const provider = new WalletConnectProvider.default({
-      rpc: {
-        56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
-        1: "https://mainnet.infura.io/v3/YOUR_INFURA_KEY" // Ethereum
-      },
-      chainId: 56, // Default to BSC
-      bridge: "https://bridge.walletconnect.org", // Official bridge
-      qrcodeModalOptions: {
-        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent'] // Auto-deep linking
-      }
-    });
-
-    // 2. Enable session (triggers QR modal)
-    await provider.enable();
 
     // 3. Create Web3 instance
     const web3 = new Web3(provider);
@@ -1021,22 +1006,6 @@ let signer;
 let userWalletAddress = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-  const providerOptions = {
-    walletconnect: {
-      package: window.WalletConnectProvider.default,
-      options: {
-        rpc: {
-          56: "https://bsc-dataseed.binance.org/"
-        }
-      }
-    }
-  };
-
-  web3Modal = new window.Web3Modal.default({
-    cacheProvider: false,
-    providerOptions
-  });
-});
 
 async function connectWallet() {
   try {
@@ -1237,17 +1206,5 @@ const web3Modal = new window.Web3Modal.default({
 });
   
 let web3Provider;
-
-async function connectWalletMobile() {
-  try {
-    const instance = await web3Modal.connect();
-    web3Provider = new ethers.providers.Web3Provider(instance);
-    const signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
-    alert("Connected wallet: " + address);
-  } catch (err) {
-    console.error("Wallet connection failed", err);
-  }
-}
 </script>
 </html>
