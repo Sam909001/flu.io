@@ -880,126 +880,6 @@ function resetTimer() {
         options: {
           rpc: {
             56: "https://bsc-dataseed.binance.org/" // BSC mainnet
-          },
-          chainId: 56, // Binance Smart Chain
-          qrcodeModalOptions: {
-            mobileLinks: [
-              "metamask",
-              "trust",
-              "coinbase",
-              "rainbow",
-              "argent"
-            ]
-          }
-        }
-      }
-    };
-    
-    web3Modal = new Web3Modal.default({
-      cacheProvider: true,
-      providerOptions,
-      theme: "light"
-    });
-  }
-  
-  // Main connect wallet function
-  async function connectWallet() {
-    try {
-      if (!web3Modal) initWeb3Modal();
-      
-      const walletButton = document.getElementById('walletButton');
-      walletButton.textContent = "Connecting...";
-      walletButton.disabled = true;
-      
-      provider = await web3Modal.connect();
-      const web3 = new Web3(provider);
-      
-      const accounts = await web3.eth.getAccounts();
-      userWalletAddress = accounts[0];
-      
-      updateWalletUI();
-      setupWalletEventListeners();
-      
-    } catch (error) {
-      console.error("Could not connect to wallet:", error);
-      alert("Could not connect to wallet. Please try again.");
-      resetWalletButton();
-    }
-  }
-  
-  // Update wallet UI
-  function updateWalletUI() {
-    if (userWalletAddress) {
-      document.getElementById('walletButton').textContent = 'Connected ✓';
-      document.getElementById('walletAddress').textContent = 
-        `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
-      
-      if (window.location.hash === '#referral') {
-        showReferralUI(userWalletAddress);
-      }
-    }
-    resetWalletButton();
-  }
-  
-  // Initialize when page loads
-  document.addEventListener('DOMContentLoaded', () => {
-    initWeb3Modal();
-    
-    if (web3Modal.cachedProvider) {
-      connectWallet();
-    }
-  });
-  // Keep your existing timer functions here
-    function updateCountdown() {
-      const end = startTime + 30 * 24 * 60 * 60 * 1000;
-      const left = end - Date.now();
-      const days = Math.floor(left / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((left / (1000 * 60)) % 60);
-      const seconds = Math.floor((left / 1000) % 60);
-      const countdownEl = document.getElementById('countdown');
-      if (countdownEl) {
-        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }
-    }
-
-    function updateStageTimer() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const currentStageIndex = Math.floor(elapsed / stageDuration);
-      const stageStartTime = startTime + (currentStageIndex * stageDuration);
-      const stageEndTime = stageStartTime + stageDuration;
-      const stageTimeLeft = stageEndTime - now;
-      
-      if (stageTimeLeft > 0) {
-        const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
-        const minutes = Math.floor((stageTimeLeft / (1000 * 60)) % 60);
-        const seconds = Math.floor((stageTimeLeft / 1000) % 60);
-        
-        const stageTimerEl = document.getElementById('stageTimer');
-        if (stageTimerEl) {
-          stageTimerEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
-        }
-      } else {
-        const stageTimerEl = document.getElementById('stageTimer');
-        if (stageTimerEl) {
-          stageTimerEl.textContent = "Stage Complete";
-        }
-      }
-      <script>
-  // Wallet connection state
-  let userWalletAddress = null;
-  let web3Modal;
-  let provider;
-  
-  // Initialize Web3Modal
-  function initWeb3Modal() {
-    const providerOptions = {
-      walletconnect: {
-        package: WalletConnectProvider.default,
-        options: {
-          rpc: {
-            56: "https://bsc-dataseed.binance.org/" // BSC mainnet
             // Add other chain IDs as needed
           },
           chainId: 56, // Binance Smart Chain
@@ -1233,6 +1113,21 @@ async function connectTrust() {
     updateTimers();
     updateNextIncreaseTime();
   });
+  function toggleDarkMode() {
+  document.documentElement.classList.toggle('dark');
+  localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+}
+
+// Initialize dark mode from localStorage
+if (localStorage.getItem('darkMode') === 'true') {
+  document.documentElement.classList.add('dark');
+}
+// Initialize dark mode from localStorage on page load
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.documentElement.classList.add('dark');
+  }
+});
 </script>
 </body>
 </html>
