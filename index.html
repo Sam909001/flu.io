@@ -1181,7 +1181,19 @@ async function connectTrust() {
   document.documentElement.classList.toggle('dark');
   localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
 }
-
+  // Your existing disconnect function (with dark mode preservation)
+function disconnectWallet() {
+  userWalletAddress = null;
+const button = document.getElementById('walletButton');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
+  document.getElementById('walletStatus').classList.add('hidden');
+  
+  // Preserve dark mode classes
+  if (document.documentElement.classList.contains('dark')) {
+    button.classList.add('dark:bg-gray-800');
+  }
+}
 // Initialize dark mode from localStorage
 if (localStorage.getItem('darkMode') === 'true') {
   document.documentElement.classList.add('dark');
