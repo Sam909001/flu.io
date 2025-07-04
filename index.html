@@ -999,37 +999,46 @@ function resetTimer() {
       }
     }
 
- <script>
-let web3Modal;
-let provider;
-let signer;
-let userWalletAddress = null;
+    <script>
+    let web3Modal;
+    let provider;
+    let signer;
+    let userWalletAddress = null;
 
-window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', () => {
+      const providerOptions = {
+        walletconnect: {
+          package: WalletConnectProvider.default,
+          options: {
+            rpc: {
+              56: "https://bsc-dataseed.binance.org/"
+            }
+          }
+        }
+      };
 
-async function connectWallet() {
-  try {
-    provider = await web3Modal.connect();
-    const web3Provider = new ethers.providers.Web3Provider(provider);
-    signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
-    userWalletAddress = address;
-    document.getElementById('walletButton').textContent =
-      `${address.slice(0, 6)}...${address.slice(-4)}`;
-  } catch (err) {
-    console.error("Wallet connection failed", err);
-    alert("Wallet connection failed");
-  }
-}
+      web3Modal = new window.Web3Modal.default({
+        cacheProvider: false,
+        providerOptions
+      });
+    });
 
-function disconnectWallet() {
-  userWalletAddress = null;
-  document.getElementById('walletButton').textContent = 'Connect Wallet';
-  if (web3Modal?.clearCachedProvider) {
-    web3Modal.clearCachedProvider();
-  }
-}
-</script>
+    async function connectWallet() {
+      try {
+        provider = await web3Modal.connect();
+        const web3Provider = new ethers.providers.Web3Provider(provider);
+        signer = web3Provider.getSigner();
+        const address = await signer.getAddress();
+
+        userWalletAddress = address;
+        document.getElementById('walletButton').textContent =
+          `${address.slice(0, 6)}...${address.slice(-4)}`;
+      } catch (err) {
+        console.error("Wallet connection failed", err);
+        alert("Wallet connection failed");
+      }
+    }
+  </script>
 
     async function connectReferralWallet() {
       await connectWallet();
@@ -1087,8 +1096,8 @@ const button = document.getElementById('walletButton');
         </div>
       `;
     }
-    <script>
-  function copyReferralLink() {
+</script>
+    function copyReferralLink() {
       const input = document.getElementById('referralLinkInput');
       input.select();
       document.execCommand('copy');
