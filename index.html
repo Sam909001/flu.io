@@ -4,6 +4,7 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/web3modal@1.9.7/dist/index.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -15,7 +16,6 @@
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   <!-- WalletConnect + Web3Modal Scripts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
   <script>
@@ -249,13 +249,6 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      <div id="walletconnect-mobile" class="hidden">
-  <button onclick="connectWithWalletConnect()" class="bg-green-600 text-white px-4 py-2 rounded">
-    WalletConnect (Mobile)
-  </button>
-</div>
-
-      <button onclick="disconnectWallet()">Disconnect</button>
       </div>
       <div id="walletMobileInstructions" class="wallet-mobile-instructions">
         </div>
@@ -885,29 +878,90 @@ function resetTimer() {
   .hidden { display: none !important; }
 </style>
 </body>
- <script>
-    let userWalletAddress = null;
-    const initialPrice = 0.0001;
-    const stages = 15;
-    const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
-    const startTime = Date.now();
-
-    function updateStage() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-      const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+<script>
+  // Wallet connection state
+  let userWalletAddress = null;
+  let web3Modal;
+  let provider;
+  
+  // Initialize Web3Modal
+  function initWeb3Modal() {
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider.default,
+        options: {
+          rpc: {
+            56: "https://bsc-dataseed.binance.org/" // BSC mainnet
+          },
+          chainId: 56, // Binance Smart Chain
+          qrcodeModalOptions: {
+            mobileLinks: [
+              "metamask",
+              "trust",
+              "coinbase",
+              "rainbow",
+              "argent"
+            ]
+          }
+        }
+      }
+    };
+    
+    web3Modal = new Web3Modal.default({
+      cacheProvider: true,
+      providerOptions,
+      theme: "light"
+    });
+  }
+  
+  // Main connect wallet function
+  async function connectWallet() {
+    try {
+      if (!web3Modal) initWeb3Modal();
       
-      // Update stage info
-      const currentStageEl = document.getElementById('currentStage');
-      const currentPriceEl = document.getElementById('currentPrice');
-      const progressBarEl = document.getElementById('progressBar');
+      const walletButton = document.getElementById('walletButton');
+      walletButton.textContent = "Connecting...";
+      walletButton.disabled = true;
       
-      if (currentStageEl) currentStageEl.textContent = stage + 1;
-      if (currentPriceEl) currentPriceEl.textContent = `$${price}`;
-      if (progressBarEl) progressBarEl.style.width = `${((stage + 1) / stages) * 100}%`;
+      provider = await web3Modal.connect();
+      const web3 = new Web3(provider);
+      
+      const accounts = await web3.eth.getAccounts();
+      userWalletAddress = accounts[0];
+      
+      updateWalletUI();
+      setupWalletEventListeners();
+      
+    } catch (error) {
+      console.error("Could not connect to wallet:", error);
+      alert("Could not connect to wallet. Please try again.");
+      resetWalletButton();
     }
-
+  }
+  
+  // Update wallet UI
+  function updateWalletUI() {
+    if (userWalletAddress) {
+      document.getElementById('walletButton').textContent = 'Connected ✓';
+      document.getElementById('walletAddress').textContent = 
+        `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+      
+      if (window.location.hash === '#referral') {
+        showReferralUI(userWalletAddress);
+      }
+    }
+    resetWalletButton();
+  }
+  
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    initWeb3Modal();
+    
+    if (web3Modal.cachedProvider) {
+      connectWallet();
+    }
+  });
+  // Keep your existing timer functions here
     function updateCountdown() {
       const end = startTime + 30 * 24 * 60 * 60 * 1000;
       const left = end - Date.now();
@@ -1028,17 +1082,6 @@ function resetTimer() {
       }
     } else {
       alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
-    }
-  }
-  
-  // Connect via WalletConnect
-  async function connectWalletConnect() {
-    try {
-      // This will use the Web3Modal implementation
-      await connectWallet();
-      document.getElementById('walletModal').classList.add('hidden');
-    } catch (error) {
-      console.error("WalletConnect error:", error);
     }
   }
   
