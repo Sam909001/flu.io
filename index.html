@@ -280,10 +280,13 @@
 </div>
 
 <script>
- // Timer Configuration - 1 MINUTE STAGES
+// Timer Configuration - 1 MINUTE STAGES
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
 const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
+
+let presaleInterval;
+let stageInterval;
 
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
@@ -294,23 +297,19 @@ function getPresaleStartTime() {
   return parseInt(startTime);
 }
 
-function updateNextIncreaseTime() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / STAGE_DURATION) + 1) * STAGE_DURATION;
-  const timeLeft = nextStageTime - now;
-  
-  const mins = Math.floor(timeLeft / (1000 * 60));
-  const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
-  document.getElementById('nextIncreaseTime').textContent = 
-    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
 function updateTimers() {
   const now = Date.now();
   const startTime = getPresaleStartTime();
   const endTime = startTime + PRESALE_DURATION;
   const timeLeft = endTime - now;
+
+  if (timeLeft <= 0) {
+    clearInterval(presaleInterval);
+    clearInterval(stageInterval);
+    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+    document.getElementById('stage-seconds').textContent = "0";
+    return;
+  }
 
   // Calculate stage progress
   const currentStage = Math.min(
@@ -327,27 +326,18 @@ function updateTimers() {
 
   // Update price
   const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:59</span></span></span>`;
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:${Math.floor(stageTimeLeft/1000).toString().padStart(2,'0')}</span></span></span>`;
 
   // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-seconds').textContent = "0";
-  } else {
-    document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
-    document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
-    document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
-  }
+  document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
+  document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
+  document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   updateTimers();
-  updateNextIncreaseTime();
-  setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
+  presaleInterval = setInterval(updateTimers, 1000);
 });
 
 /* Testing function - remove in production */
@@ -822,13 +812,11 @@ function resetTimer() {
       <h3>James Chen</h3>
       <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
       </div>
-    </div>
     <div class="team-member">
       <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
       <h3>Priya Patel</h3>
       <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
       </div>
-    </div>
   </div>
 </section>
   
@@ -1067,23 +1055,48 @@ function resetTimer() {
   }
   
   // Connect browser wallet directly (MetaMask, etc.)
-  async function connectBrowserWallet() {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userWalletAddress = accounts[0];
-        provider = window.ethereum;
-        updateWalletUI();
-        setupWalletEventListeners();
-        document.getElementById('walletModal').classList.add('hidden');
-      } catch (error) {
-        console.error("User denied account access", error);
-        alert('Wallet connection denied.');
-      }
-    } else {
-      alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
+async function connectInjected() {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      provider = window.ethereum;
+      updateWalletUI();
+      setupWalletEventListeners();
+      document.getElementById('walletModal').classList.add('hidden');
+    } catch (error) {
+      console.error("User denied account access", error);
+      alert('Wallet connection denied.');
     }
+  } else {
+    alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
   }
+}
+
+// Connect via WalletConnect
+async function connectWalletConnect() {
+  try {
+    provider = await web3Modal.connectTo('walletconnect');
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    userWalletAddress = accounts[0];
+    updateWalletUI();
+    setupWalletEventListeners();
+    document.getElementById('walletModal').classList.add('hidden');
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    alert("Could not connect via WalletConnect");
+  }
+}
+
+// For other wallets, you can add similar functions
+async function connectCoinbase() {
+  alert("Coinbase Wallet connection would be implemented here");
+}
+
+async function connectTrust() {
+  alert("Trust Wallet connection would be implemented here");
+}
   
   // Set up wallet event listeners
   function setupWalletEventListeners() {
