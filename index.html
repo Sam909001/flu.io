@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/web3modal@1.9.7/dist/index.js"></script>
@@ -867,245 +868,255 @@ function resetTimer() {
 </style>
 </body>
 <script>
-  // Wallet connection state
-  let userWalletAddress = null;
-  let web3Modal;
-  let provider;
-  
-  // Initialize Web3Modal
-  function initWeb3Modal() {
-    const providerOptions = {
-      walletconnect: {
-        package: WalletConnectProvider.default,
-        options: {
-          rpc: {
-            56: "https://bsc-dataseed.binance.org/" // BSC mainnet
-            // Add other chain IDs as needed
-          },
-          chainId: 56, // Binance Smart Chain
-          qrcodeModalOptions: {
-            mobileLinks: [
-              "metamask",
-              "trust",
-              "coinbase",
-              "rainbow",
-              "argent"
-            ]
+    <script>
+    // Wallet connection state
+    let userWalletAddress = null;
+    let web3Modal;
+    let provider;
+    
+    // Initialize Web3Modal
+    function initWeb3Modal() {
+      const providerOptions = {
+        walletconnect: {
+          package: WalletConnectProvider,
+          options: {
+            rpc: {
+              56: "https://bsc-dataseed.binance.org/" // BSC mainnet
+            },
+            chainId: 56, // Binance Smart Chain
+            qrcodeModalOptions: {
+              mobileLinks: ["metamask", "trust", "coinbase", "rainbow", "argent"]
+            }
+          }
+        },
+        injected: {
+          package: null,
+          display: {
+            name: "Browser Wallet",
+            description: "Connect with your browser wallet (MetaMask, etc.)"
           }
         }
-      }
-    };
+      };
+      
+      web3Modal = new Web3Modal({
+        cacheProvider: true,
+        providerOptions,
+        theme: "light"
+      });
+    }
     
-    web3Modal = new Web3Modal.default({
-      cacheProvider: true, // optional
-      providerOptions, // required
-      theme: "light" // optional
-    });
-  }
-  
-  // Main connect wallet function
-  async function connectWallet() {
-    try {
-      if (!web3Modal) initWeb3Modal();
+    // Main connect wallet function
+    async function connectWallet() {
+      try {
+        if (!web3Modal) initWeb3Modal();
+        
+        // Show loading state
+        const walletButton = document.getElementById('walletButton');
+        const originalText = walletButton.textContent;
+        walletButton.textContent = "Connecting...";
+        walletButton.disabled = true;
+        
+        provider = await web3Modal.connect();
+        
+        // Create Web3 instance
+        const web3 = new Web3(provider);
+        
+        // Get accounts
+        const accounts = await web3.eth.getAccounts();
+        userWalletAddress = accounts[0];
+        
+        // Update UI
+        updateWalletUI();
+        
+        // Subscribe to events
+        setupWalletEventListeners();
+        
+      } catch (error) {
+        console.error("Could not connect to wallet:", error);
+        alert("Could not connect to wallet. Please try again.");
+        resetWalletButton();
+      }
+    }
+    
+    // Set up wallet event listeners
+    function setupWalletEventListeners() {
+      if (!provider) return;
       
-      // Show loading state
-      const walletButton = document.getElementById('walletButton');
-      const originalText = walletButton.textContent;
-      walletButton.textContent = "Connecting...";
-      walletButton.disabled = true;
+      // Handle accounts changing
+      if (provider.on) {
+        provider.on("accountsChanged", (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            userWalletAddress = accounts[0];
+            updateWalletUI();
+          }
+        });
+        
+        // Handle chain changes
+        provider.on("chainChanged", (chainId) => {
+          console.log("Chain changed:", chainId);
+          window.location.reload();
+        });
+        
+        // Handle provider disconnect
+        provider.on("disconnect", (error) => {
+          console.log("Wallet disconnected", error);
+          disconnectWallet();
+        });
+      }
+    }
+    
+    // Disconnect wallet
+    function disconnectWallet() {
+      if (provider && provider.disconnect) {
+        provider.disconnect();
+      }
       
-      provider = await web3Modal.connect();
-      const web3 = new Web3(provider);
+      if (web3Modal) {
+        web3Modal.clearCachedProvider();
+      }
       
-      // Get accounts
-      const accounts = await web3.eth.getAccounts();
-      userWalletAddress = accounts[0];
-      
-      // Update UI
-      updateWalletUI();
-      
-      // Subscribe to events
-      setupWalletEventListeners();
-      
-    } catch (error) {
-      console.error("Could not connect to wallet:", error);
-      alert("Could not connect to wallet. Please try again.");
+      userWalletAddress = null;
+      resetWalletButton();
+      document.getElementById('walletAddress').textContent = '';
+    }
+    
+    // Update wallet UI
+    function updateWalletUI() {
+      if (userWalletAddress) {
+        document.getElementById('walletButton').textContent = 'Connected ✓';
+        const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+        document.getElementById('walletAddress').textContent = shortAddress;
+      }
       resetWalletButton();
     }
-  }
-  
-  // Connect browser wallet directly (MetaMask, etc.)
-async function connectInjected() {
-  if (window.ethereum) {
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userWalletAddress = accounts[0];
-      provider = window.ethereum;
-      updateWalletUI();
-      setupWalletEventListeners();
-      document.getElementById('walletModal').classList.add('hidden');
-    } catch (error) {
-      console.error("User denied account access", error);
-      alert('Wallet connection denied.');
-    }
-  } else {
-    alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
-  }
-}
-
-// Connect via WalletConnect
-async function connectWalletConnect() {
-  try {
-    provider = await web3Modal.connectTo('walletconnect');
-    const web3 = new Web3(provider);
-    const accounts = await web3.eth.getAccounts();
-    userWalletAddress = accounts[0];
-    updateWalletUI();
-    setupWalletEventListeners();
-    document.getElementById('walletModal').classList.add('hidden');
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    alert("Could not connect via WalletConnect");
-  }
-}
-
-// For other wallets, you can add similar functions
-async function connectCoinbase() {
-  alert("Coinbase Wallet connection would be implemented here");
-}
-
-async function connectTrust() {
-  alert("Trust Wallet connection would be implemented here");
-}
-  
-  // Set up wallet event listeners
-  function setupWalletEventListeners() {
-    // Handle accounts changing
-    provider.on("accountsChanged", (accounts) => {
-      if (accounts.length === 0) {
-        // Wallet disconnected
-        disconnectWallet();
-      } else {
-        // Account changed
-        userWalletAddress = accounts[0];
-        updateWalletUI();
-      }
-    });
     
-    // Handle chain changes
-    provider.on("chainChanged", (chainId) => {
-      console.log("Chain changed:", chainId);
-      window.location.reload();
-    });
-    
-    // Handle provider disconnect
-    provider.on("disconnect", (error) => {
-      console.log("Wallet disconnected", error);
-      disconnectWallet();
-    });
-  }
-  
-  // Disconnect wallet
-  function disconnectWallet() {
-    if (provider && provider.disconnect) {
-      provider.disconnect();
+    // Reset wallet button to original state
+    function resetWalletButton() {
+      const walletButton = document.getElementById('walletButton');
+      walletButton.textContent = userWalletAddress ? 'Connected ✓' : 'Connect Wallet';
+      walletButton.disabled = false;
     }
-    
-    if (web3Modal) {
-      web3Modal.clearCachedProvider();
-    }
-    
-    userWalletAddress = null;
-    resetWalletButton();
-    document.getElementById('walletAddress').textContent = '';
-  }
-  
-  // Update wallet UI
-  function updateWalletUI() {
-    if (userWalletAddress) {
-      document.getElementById('walletButton').textContent = 'Connected ✓';
-      document.getElementById('walletAddress').textContent = 
-        `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
-      
-      // Show referral UI if needed
-      if (window.location.hash === '#referral') {
-        showReferralUI(userWalletAddress);
-      }
-    }
-    resetWalletButton();
-  }
-  
-  // Reset wallet button to original state
-  function resetWalletButton() {
-    const walletButton = document.getElementById('walletButton');
-    walletButton.textContent = userWalletAddress ? 'Connected ✓' : 'Connect Wallet';
-    walletButton.disabled = false;
-  }
 
-   async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
+    // Buy FLUFFI function with proper error handling
+    async function buyFluffi() {
       if (!userWalletAddress) {
         alert('Please connect your wallet first.');
         return;
       }
+      
+      const amount = document.getElementById('amountInput').value;
+      const currency = document.getElementById('currencySelect').value;
+      const ref = document.getElementById('refInput').value;
+      
       if (!amount || isNaN(amount) || Number(amount) <= 0) {
         alert('Please enter a valid amount.');
         return;
       }
       
-      let ethValue;
-      if (currency === 'USD') {
-        const usdToEth = 3000; // 1 ETH = 3000 USD
-        ethValue = (Number(amount) / usdToEth).toFixed(6);
-      } else {
-        ethValue = Number(amount).toFixed(6);
-      }
-      
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+        // Convert amount to ETH value
+        let ethValue;
+        if (currency === 'USD') {
+          // In a real app, you would fetch current ETH price from an API
+          const usdToEth = 3000; // Example rate
+          ethValue = (Number(amount) / usdToEth).toFixed(6);
+        } else {
+          ethValue = Number(amount).toFixed(6);
+        }
+        
+        // Get provider and signer
+        const web3Provider = new ethers.providers.Web3Provider(provider);
+        const signer = web3Provider.getSigner();
+        
+        // Contract details - REPLACE WITH YOUR ACTUAL CONTRACT ADDRESS AND ABI
         const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        const contractAbi = [
+          // Minimal ABI for the contribute function
+          {
+            "inputs": [{"internalType": "address", "name": "referrer", "type": "address"}],
+            "name": "contribute",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+          }
+        ];
+        
+        // Create contract instance
         const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+        
+        // Validate referral address or use zero address
         const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
         
+        // Update button state
         const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
         const prevText = buyBtn.textContent;
         buyBtn.textContent = '⏳ Processing...';
         buyBtn.disabled = true;
         
-        const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
+        // Send transaction
+        const tx = await contract.contribute(refAddr, {
+          value: ethers.utils.parseEther(ethValue.toString())
+        });
+        
+        // Wait for transaction confirmation
         await tx.wait();
         
+        // Reset button
         buyBtn.textContent = prevText;
         buyBtn.disabled = false;
+        
+        // Show success message
         alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+        
+        // Update tokens sold display (mock value)
+        const tokensSoldElement = document.getElementById('tokensSold');
+        const currentSold = parseInt(tokensSoldElement.textContent.replace(/,/g, ''));
+        tokensSoldElement.textContent = (currentSold + Math.floor(amount * 1000)).toLocaleString();
+        
       } catch (err) {
+        console.error("Transaction error:", err);
+        
+        // Reset button
         const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
         if (buyBtn) {
           buyBtn.textContent = '🚀 Buy Now';
           buyBtn.disabled = false;
         }
-        if (err && err.message) {
-          alert('❌ Transaction failed: ' + err.message);
+        
+        // Show error message
+        if (err.message && err.message.includes("user rejected transaction")) {
+          alert('Transaction was cancelled by user');
+        } else if (err.message) {
+          alert('Transaction failed: ' + err.message);
         } else {
-          alert('❌ Transaction failed.');
+          alert('Transaction failed. Please try again.');
         }
       }
     }
 
-    function stakeFluffi() {
-      alert('Staking feature coming soon!');
-    }
-
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      initWeb3Modal();
+      
+      // Check if wallet is already connected (from cache)
+      if (web3Modal && web3Modal.cachedProvider) {
+        connectWallet();
+      }
+      
+      // Initialize dark mode
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+      }
+    });
+    
+    // Toggle dark mode
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
     }
-
+  </script>
   // Show referral UI
   function showReferralUI(wallet) {
     const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
