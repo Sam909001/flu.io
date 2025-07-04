@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/web3modal@1.9.7/dist/index.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -11,18 +11,13 @@
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
   <meta name="author" content="FLUFFI Team" />
 <!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   <!-- WalletConnect + Web3Modal Scripts -->
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
-<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -967,44 +962,6 @@ async function connectWithWalletConnect() {
         }
       }
     }
-
-  async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
-      } else {
-        alert('MetaMask not detected. Please install MetaMask.');
-      }
-    }
-
-    async function connectReferralWallet() {
-      await connectWallet();
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
-  // Your existing disconnect function (with dark mode preservation)
-function disconnectWallet() {
-  userWalletAddress = null;
-const button = document.getElementById('walletButton');
-  button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
-  document.getElementById('walletStatus').classList.add('hidden');
-  
-  // Preserve dark mode classes
-  if (document.documentElement.classList.contains('dark')) {
-    button.classList.add('dark:bg-gray-800');
-  }
-}
-  
-    function showReferralUI(wallet) {
-      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      
       document.getElementById('referralSection').innerHTML = `
         <div class="space-y-4">
           <div>
@@ -1039,108 +996,158 @@ const button = document.getElementById('walletButton');
       `;
     }
 
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
+  <script>
+    // Wallet connection state
+    let userWalletAddress = null;
+    let web3Modal;
+    let provider;
+    
+    // Initialize Web3Modal
+    function initWeb3Modal() {
+      const providerOptions = {
+        walletconnect: {
+          package: WalletConnectProvider.default,
+          options: {
+            rpc: {
+              56: "https://bsc-dataseed.binance.org/" // BSC mainnet
+              // Add other chain IDs as needed
+            }
+          }
+        }
+      };
+      
+      web3Modal = new Web3Modal.default({
+        cacheProvider: true, // optional
+        providerOptions, // required
+        theme: "light" // optional - change to "dark" if you prefer
+      });
     }
     
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
-    }
-    
-    function shareOnTelegram() {
-      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
-      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
-    }
-
-    async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
-      if (!userWalletAddress) {
-        alert('Please connect your wallet first.');
-        return;
-      }
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-      
-      let ethValue;
-      if (currency === 'USD') {
-        const usdToEth = 3000; // 1 ETH = 3000 USD
-        ethValue = (Number(amount) / usdToEth).toFixed(6);
-      } else {
-        ethValue = Number(amount).toFixed(6);
-      }
-      
+    // Connect wallet - shows modal with options
+    async function connectWallet() {
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-        const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-        const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
+        if (!web3Modal) initWeb3Modal();
         
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        const prevText = buyBtn.textContent;
-        buyBtn.textContent = '⏳ Processing...';
-        buyBtn.disabled = true;
+        provider = await web3Modal.connect();
+        const web3 = new Web3(provider);
         
-        const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
-        await tx.wait();
+        // Get accounts
+        const accounts = await web3.eth.getAccounts();
+        userWalletAddress = accounts[0];
         
-        buyBtn.textContent = prevText;
-        buyBtn.disabled = false;
-        alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
-      } catch (err) {
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        if (buyBtn) {
-          buyBtn.textContent = '🚀 Buy Now';
-          buyBtn.disabled = false;
+        // Update UI
+        document.getElementById('walletButton').textContent = 'Connected ✓';
+        document.getElementById('walletAddress').textContent = 
+          `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+        
+        // Subscribe to accounts change
+        provider.on("accountsChanged", (accounts) => {
+          if (accounts.length === 0) {
+            // Wallet disconnected
+            disconnectWallet();
+          } else {
+            // Account changed
+            userWalletAddress = accounts[0];
+            document.getElementById('walletAddress').textContent = 
+              `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+          }
+        });
+        
+        // Subscribe to chainId change
+        provider.on("chainChanged", (chainId) => {
+          console.log("Chain changed:", chainId);
+          // You might want to handle chain changes here
+        });
+        
+        // Subscribe to provider disconnect
+        provider.on("disconnect", (error) => {
+          console.log("Wallet disconnected", error);
+          disconnectWallet();
+        });
+        
+      } catch (error) {
+        console.error("Could not connect to wallet:", error);
+        alert("Could not connect to wallet. Please try again.");
+      }
+    }
+    
+    // Connect browser wallet directly (MetaMask, etc.)
+    async function connectBrowserWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          updateWalletUI();
+          
+          // Set up event listeners
+          window.ethereum.on('accountsChanged', (accounts) => {
+            if (accounts.length === 0) {
+              disconnectWallet();
+            } else {
+              userWalletAddress = accounts[0];
+              updateWalletUI();
+            }
+          });
+          
+          window.ethereum.on('chainChanged', () => {
+            window.location.reload();
+          });
+          
+        } catch (error) {
+          console.error("User denied account access", error);
+          alert('Wallet connection denied.');
         }
-        if (err && err.message) {
-          alert('❌ Transaction failed: ' + err.message);
-        } else {
-          alert('❌ Transaction failed.');
+      } else {
+        alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
+      }
+    }
+    
+    // Connect via WalletConnect
+    async function connectWalletConnect() {
+      // This is already handled by the web3Modal implementation in connectWallet()
+      // But we'll keep this function for the button onclick
+      await connectWallet();
+    }
+    
+    // Disconnect wallet
+    function disconnectWallet() {
+      if (provider && provider.disconnect) {
+        provider.disconnect();
+      }
+      
+      userWalletAddress = null;
+      document.getElementById('walletButton').textContent = 'Connect Wallet';
+      document.getElementById('walletAddress').textContent = '';
+      
+      // If using web3Modal cache
+      if (web3Modal) {
+        web3Modal.clearCachedProvider();
+      }
+    }
+    
+    // Update wallet UI
+    function updateWalletUI() {
+      if (userWalletAddress) {
+        document.getElementById('walletButton').textContent = 'Connected ✓';
+        document.getElementById('walletAddress').textContent = 
+          `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+        
+        // Show referral UI if on that section
+        if (window.location.hash === '#referral') {
+          showReferralUI(userWalletAddress);
         }
       }
     }
-
-    function stakeFluffi() {
-      alert('Staking feature coming soon!');
-    }
-
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    }
-
-    // Initialize dark mode from localStorage
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.documentElement.classList.add('dark');
-    }
-
-    // Start timers
-    setInterval(() => {
-      updateStage();
-      updateCountdown();
-      updateStageTimer();
-    }, 1000);
-
-    updateStage();
-    updateCountdown();
-    updateStageTimer();
-  document.addEventListener('DOMContentLoaded', () => {
-  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-  if (isMobile) {
-    const mobileBtn = document.getElementById('walletconnect-mobile');
-    if (mobileBtn) mobileBtn.classList.remove('hidden');
-  }
-});
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      initWeb3Modal();
+      
+      // Check if wallet is already connected (from cache)
+      if (web3Modal.cachedProvider) {
+        connectWallet();
+      }
+    });
 </script>
+</body>
 </html>
