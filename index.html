@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/web3modal@1.9.7/dist/index.js"></script>
@@ -12,13 +12,10 @@
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
   <meta name="author" content="FLUFFI Team" />
-<!-- Font Awesome for icons -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
-  <!-- WalletConnect + Web3Modal Scripts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script src="Timer.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -66,7 +63,7 @@
       color: #60a5fa !important;
     }
     
-    /* Dark mode text fixes - Force all text to be visible */
+    /* Dark mode text fixes */
     .dark h1,
     .dark h2,
     .dark h3,
@@ -192,41 +189,158 @@
         justify-content: center;
       }
     }
-      /* ===== PRICE TOOLTIP STYLES ===== */
-  .price-container { position: relative; display: inline-block; }
-  .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
-  .price-tooltip .tooltip-text {
-    visibility: hidden; width: 220px; background-color: #1f2937;
-    color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
-    position: absolute; z-index: 1; bottom: 125%; left: 50%;
-    transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
-    font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
-  .price-tooltip .tooltip-text::after {
-    content: ""; position: absolute; top: 100%; left: 50%;
-    margin-left: -5px; border-width: 5px; border-style: solid;
-    border-color: #1f2937 transparent transparent transparent;
-  }
-  .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
-  .dark .price-tooltip .tooltip-text { background-color: #f9fafb; color: #1f2937; }
-  .dark .price-tooltip .tooltip-text::after {
-    border-color: #f9fafb transparent transparent transparent;
-  }
-    /* Fix dark mode tooltip visibility */
-.dark .price-tooltip .tooltip-text {
-  background-color: #1F2937 !important; /* gray-800 */
-  color: #F9FAFB !important; /* gray-50 */
-  border: 1px solid #4B5563; /* gray-600 */
-}
-
-.dark .price-tooltip .tooltip-text::after {
-  border-color: #1F2937 transparent transparent transparent !important;
-}
-
-/* Make info icon more visible */
-.dark .price-tooltip .fa-info-circle {
-  color: #60A5FA !important; /* blue-400 */
-}
+    
+    /* Price tooltip styles */
+    .price-container { position: relative; display: inline-block; }
+    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
+    .price-tooltip .tooltip-text {
+      visibility: hidden; width: 220px; background-color: #1f2937;
+      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
+      position: absolute; z-index: 1; bottom: 125%; left: 50%;
+      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .price-tooltip .tooltip-text::after {
+      content: ""; position: absolute; top: 100%; left: 50%;
+      margin-left: -5px; border-width: 5px; border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+    .dark .price-tooltip .tooltip-text { 
+      background-color: #1F2937 !important;
+      color: #F9FAFB !important;
+      border: 1px solid #4B5563;
+    }
+    .dark .price-tooltip .tooltip-text::after {
+      border-color: #1F2937 transparent transparent transparent !important;
+    }
+    .dark .price-tooltip .fa-info-circle {
+      color: #60A5FA !important;
+    }
+    
+    /* Wallet modal styles */
+    .wallet-option {
+      @apply p-4 border rounded-lg flex flex-col items-center 
+             hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+    }
+    .wallet-icon {
+      @apply w-10 h-10 mb-2;
+    }
+    .hidden { display: none !important; }
+    
+    /* Team section styles */
+    .split-sections {
+      display: flex;
+      gap: 40px;
+      margin: 60px 0;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    #team, #about {
+      flex: 1;
+      min-width: 320px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      color: #333;
+      transition: all 0.3s ease-in-out;
+    }
+    .dark #team, .dark #about {
+      background: #1c1c1c;
+      color: #eeeeee;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
+    }
+    #team h2, #about h2 {
+      font-size: 2rem;
+      margin-bottom: 25px;
+      color: #28a745;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .team-grid {
+      display: grid;
+      gap: 30px;
+    }
+    .team-member {
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .team-member:hover {
+      transform: translateY(-5px);
+    }
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #28a745;
+      filter: grayscale(0%) contrast(110%);
+    }
+    .team-member h3 {
+      position: relative;
+      font-size: 1.2rem;
+      margin: 15px 0 5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .team-member h3::after {
+      content: '';
+      position: absolute;
+      width: 50%;
+      height: 2px;
+      background: linear-gradient(90deg, #FFD700, #FFA500);
+      bottom: -5px;
+      left: 25%;
+      border-radius: 2px;
+    }
+    .team-member p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .team-member a i {
+      color: #28a745;
+      font-size: 1.2rem;
+    }
+    .about-content {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+    .about-content ul {
+      margin: 25px 0;
+      padding-left: 20px;
+    }
+    .about-content li {
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 35px;
+      font-size: 1.05rem;
+    }
+    .about-content li:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 20px;
+      height: 20px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: invert(33%) sepia(98%) saturate(393%) hue-rotate(86deg) brightness(88%) contrast(96%);
+    }
+    .dark .about-content li:before {
+      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(190deg) brightness(150%) contrast(90%);
+    }
+    @media (max-width: 768px) {
+      .split-sections {
+        flex-direction: column;
+      }
+      #team, #about {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
@@ -250,172 +364,91 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      </div>
-      <div id="walletMobileInstructions" class="wallet-mobile-instructions">
-        </div>
-      </nav>
+    </nav>
   </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
-
     <!-- Timer Section -->
-<div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
-  <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300 space-x-3">
-    <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
-  </div>
-  
-  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
-    
-    <!-- Progress Bar -->
-    <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-      <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
-    </div>
-
-    <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
-      <span>Stage: <span id="current-stage">1</span>/15</span>
-      <span>Ends in: <span id="stage-seconds">60</span>s</span>
-    </div>
-  </div>
-</div>
-
-<script>
-// Timer Configuration - 1 MINUTE STAGES
-const TOTAL_STAGES = 15;
-const STAGE_DURATION = 60 * 1000; // 1 minute per stage
-const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
-
-let presaleInterval;
-let stageInterval;
-
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    startTime = Date.now();
-    localStorage.setItem('presaleStartTime', startTime);
-  }
-  return parseInt(startTime);
-}
-
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + PRESALE_DURATION;
-  const timeLeft = endTime - now;
-
-  if (timeLeft <= 0) {
-    clearInterval(presaleInterval);
-    clearInterval(stageInterval);
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-seconds').textContent = "0";
-    return;
-  }
-
-  // Calculate stage progress
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / STAGE_DURATION),
-    TOTAL_STAGES - 1
-  );
-  const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
-  const stageTimeLeft = stageEndTime - now;
-  const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
-
-  // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
-
-  // Update price
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:${Math.floor(stageTimeLeft/1000).toString().padStart(2,'0')}</span></span></span>`;
-
-  // Update timers
-  document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
-  document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
-  document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  updateTimers();
-  presaleInterval = setInterval(updateTimers, 1000);
-});
-
-/* Testing function - remove in production */
-function resetTimer() {
-  localStorage.removeItem('presaleStartTime');
-  location.reload();
-}
-</script>
-
-<!-- Testing button - remove in production -->
-<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
-  Reset Timer (For Testing)
-</button>
-    
-<!-- Presale Section -->
-<section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-  <h2 class="section-title">🚀 Presale is Live!</h2>
-
-  <div class="fluio-status-container">
-    <div class="fluio-price mt-2">
-      <div class="price-header flex items-center justify-between">
-        <span class="font-semibold text-lg">$FLUFFI</span>
-        <span class="live-badge text-green-500 font-bold">LIVE</span>
+    <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+      <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
+      <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300 space-x-3">
+        <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
       </div>
-    <div class="current-price price-container" id="currentPrice">
-  $0.000100
-  <span class="price-tooltip">
-    <i class="fas fa-info-circle text-blue-500"></i>
-    <span class="tooltip-text">
-      <strong>Price Increase:</strong><br>
-      +5% per stage (every 1 minute)<br>
-      Next increase: <span id="nextIncreaseTime">00:59</span>
-    </span>
-  </span>
-</div>
-  <span class="price-tooltip">
-    <i class="fas fa-info-circle text-blue-500"></i>
-    <span class="tooltip-text">
-      <strong>Price Increase:</strong><br>
-      +5% per stage (every 48 hours)<br>
-      Next increase: <span id="nextIncreaseTime">23:59:59</span>
-    </span>
-  </span>
-</div>
-      <div class="price-change text-sm text-gray-500">+0.00%</div>
+      
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
+          <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+        </div>
+
+        <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
+          <span>Stage: <span id="current-stage">1</span>/15</span>
+          <span>Ends in: <span id="stage-seconds">60</span>s</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="flex items-center mt-4 mb-4">
-    <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-    </svg>
-    <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-    <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
-  </div>
+    <!-- Testing button - remove in production -->
+    <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+      Reset Timer (For Testing)
+    </button>
+    
+    <!-- Presale Section -->
+    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <h2 class="section-title">🚀 Presale is Live!</h2>
 
-  <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+      <div class="fluio-status-container">
+        <div class="fluio-price mt-2">
+          <div class="price-header flex items-center justify-between">
+            <span class="font-semibold text-lg">$FLUFFI</span>
+            <span class="live-badge text-green-500 font-bold">LIVE</span>
+          </div>
+          <div class="current-price price-container" id="currentPrice">
+            $0.000100
+            <span class="price-tooltip">
+              <i class="fas fa-info-circle text-blue-500"></i>
+              <span class="tooltip-text">
+                <strong>Price Increase:</strong><br>
+                +5% per stage (every 1 minute)<br>
+                Next increase: <span id="nextIncreaseTime">00:59</span>
+              </span>
+            </span>
+          </div>
+          <div class="price-change text-sm text-gray-500">+0.00%</div>
+        </div>
+      </div>
 
-  <div class="flex gap-2 mb-4">
-    <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-    <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-      <option value="USD">USD</option>
-      <option value="ETH">ETH</option>
-    </select>
-  </div>
-  <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-  <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-    🚀 Buy Now
-  </button>
-</section>
+      <div class="flex items-center mt-4 mb-4">
+        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
+        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+      </div>
+
+      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+
+      <div class="flex gap-2 mb-4">
+        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
+          <option value="USD">USD</option>
+          <option value="ETH">ETH</option>
+        </select>
+      </div>
+      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
+      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+        🚀 Buy Now
+      </button>
+    </section>
     
     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+        <button id="referralConnectBtn" onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
           Connect Wallet for Referrals
         </button>
       </div>
@@ -436,390 +469,165 @@ function resetTimer() {
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
     </section>
     
-<!-- Tokenomics Section -->
-<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
-  <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
-    📊 Tokenomics
-  </h2>
+    <!-- Tokenomics Section -->
+    <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
+      <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
+        📊 Tokenomics
+      </h2>
 
-  <div class="grid md:grid-cols-2 gap-10 items-center">
-    <!-- Token Details -->
-    <div>
-      <ul class="space-y-4 text-lg text-gray-900 dark:text-white">
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
-          <span class="ml-2">10,000,000,000 FLUFFI</span>
-        </li>
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
-          <span class="ml-2">40%</span>
-        </li>
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
-          <span class="ml-2">30% (Locked)</span>
-        </li>
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
-          <span class="ml-2">20%</span>
-        </li>
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
-          <span class="ml-2">5%</span>
-        </li>
-        <li>
-          <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
-          <span class="ml-2">5% (Locked)</span>
-        </li>
-      </ul>
-    </div>
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <!-- Token Details -->
+        <div>
+          <ul class="space-y-4 text-lg text-gray-900 dark:text-white">
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
+              <span class="ml-2">10,000,000,000 FLUFFI</span>
+            </li>
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
+              <span class="ml-2">40%</span>
+            </li>
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
+              <span class="ml-2">30% (Locked)</span>
+            </li>
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
+              <span class="ml-2">20%</span>
+            </li>
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
+              <span class="ml-2">5%</span>
+            </li>
+            <li>
+              <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
+              <span class="ml-2">5% (Locked)</span>
+            </li>
+          </ul>
+        </div>
 
-    <!-- Chart -->
-    <div class="flex justify-center">
-      <canvas id="tokenChart" width="280" height="280"></canvas>
-    </div>
-  </div>
-</section>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const ctx = document.getElementById('tokenChart').getContext('2d');
-
-  // Detect initial dark mode
-  function getLabelColor() {
-    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
-  }
-
-  let chartConfig = {
-    type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', // Green
-          '#3B82F6', // Blue
-          '#F59E0B', // Yellow
-          '#EF4444', // Red
-          '#8B5CF6'  // Purple
-        ],
-        borderWidth: 2,
-        borderColor: '#ffffff'
-      }]
-    },
-    options: {
-      cutout: '65%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: getLabelColor(),
-            font: {
-              size: 14,
-              family: "'Inter', sans-serif"
-            },
-            padding: 20,
-          }
-        }
-      },
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  };
-
-  let tokenChart = new Chart(ctx, chartConfig);
-
-  // Optional: update legend color when theme is toggled
-  const observer = new MutationObserver(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  });
-</script>
+        <!-- Chart -->
+        <div class="flex justify-center">
+          <canvas id="tokenChart" width="280" height="280"></canvas>
+        </div>
+      </div>
+    </section>
     
-<!-- FAQ Section -->
-<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
-  <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
+    <!-- FAQ Section -->
+    <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What’s the token tax?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      <p>5% total tax on all transactions:</p>
-      <ul class="list-disc list-inside ml-2">
-        <li>3% Marketing</li>
-        <li>2% Automatic Liquidity</li>
-      </ul>
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What's the token tax?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          <p>5% total tax on all transactions:</p>
+          <ul class="list-disc list-inside ml-2">
+            <li>3% Marketing</li>
+            <li>2% Automatic Liquidity</li>
+          </ul>
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      How to claim after presale?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          How to claim after presale?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What’s the vesting schedule?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      <ul class="list-disc list-inside ml-2">
-        <li>Presale tokens: 100% unlocked at TGE</li>
-        <li>Team tokens: 24-month linear vesting</li>
-      </ul>
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What's the vesting schedule?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          <ul class="list-disc list-inside ml-2">
+            <li>Presale tokens: 100% unlocked at TGE</li>
+            <li>Team tokens: 24-month linear vesting</li>
+          </ul>
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      How do I buy $FLUFFI?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Connect your wallet, enter amount in BNB, and click "Buy Now".
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          How do I buy $FLUFFI?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Connect your wallet, enter amount in BNB, and click "Buy Now".
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      When does staking end?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Staking ends at the official listing date.
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          When does staking end?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Staking ends at the official listing date.
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What chains are supported?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Currently supporting BNB, with plans for ETH, SOL, and AVAX.
-    </div>
-  </details>
-</section>
-
-<style>
-  .split-sections {
-    display: flex;
-    gap: 40px;
-    margin: 60px 0;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  #team, #about {
-    flex: 1;
-    min-width: 320px;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    color: #333;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .dark #team, .dark #about {
-    background: #1c1c1c;
-    color: #eeeeee;
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
-  }
-
-  #team h2, #about h2 {
-    font-size: 2rem;
-    margin-bottom: 25px;
-    color: #28a745;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-
-  .team-grid {
-    display: grid;
-    gap: 30px;
-  }
-
-  .team-member {
-    text-align: center;
-  }
-
-  .team-member img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #28a745;
-    filter: grayscale(0%) contrast(110%);
-  }
-
-.team-member h3 {
-  position: relative; /* Add this */
-  font-size: 1.2rem;
-  margin: 15px 0 5px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.team-member h3::after {
-  content: '';
-  position: absolute;
-  width: 50%;
-  height: 2px;
-  background: linear-gradient(90deg, #FFD700, #FFA500);
-  bottom: -5px;
-  left: 25%;
-  border-radius: 2px;
-}
-  
-  .team-member h3 {
-    font-size: 1.2rem;
-    margin: 15px 0 5px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
- 
-  .team-member p {
-    font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 10px;
-  }
-
-  .team-member a i {
-    color: #28a745;
-    font-size: 1.2rem;
-  }
-
-  .team-member {
-  transition: transform 0.3s;
-}
-.team-member:hover {
-  transform: translateY(-5px);
-}
-
-  .about-content {
-    font-size: 1.05rem;
-    line-height: 1.7;
-  }
-
-  .about-content ul {
-    margin: 25px 0;
-    padding-left: 20px;
-  }
-
-  .about-content li {
-    margin-bottom: 15px;
-    position: relative;
-    padding-left: 35px;
-    font-size: 1.05rem;
-  }
-
-  .about-content li:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    filter: invert(33%) sepia(98%) saturate(393%) hue-rotate(86deg) brightness(88%) contrast(96%);
-  }
-
-  .dark .about-content li:before {
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(190deg) brightness(150%) contrast(90%);
-  }
-
-  .about-content li:nth-child(1):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
-  }
-
-  .about-content li:nth-child(2):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
-  }
-
-  .about-content li:nth-child(3):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
-  }
-
-  @media (max-width: 768px) {
-    .split-sections {
-      flex-direction: column;
-    }
-
-    #team, #about {
-      width: 100%;
-    }
-  }
-</style>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What chains are supported?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Currently supporting BNB, with plans for ETH, SOL, and AVAX.
+        </div>
+      </details>
+    </section>
 
     <!-- About Section -->
-  <section id="about">
-    <h2>Why Fluffi Coin?</h2>
-    <div class="about-content">
-      <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
-      <ul>
-        <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
-        <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
-        <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
-      </ul>
-      <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
-    </div>
-  </section>
-</div>
-
+    <section id="about">
+      <h2>Why Fluffi Coin?</h2>
+      <div class="about-content">
+        <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
+        <ul>
+          <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
+          <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
+          <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
+        </ul>
+        <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
+      </div>
+    </section>
     
-<div class="split-sections">
-  <!-- Team Section -->
-<section id="team">
-  <h2>Our Team</h2>
-  <div class="team-grid">
-    <div class="team-member">
-      <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO">
-      <h3>James Chen</h3>
-      <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+    <!-- Team Section -->
+    <section id="team">
+      <h2>Our Team</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO">
+          <h3>James Chen</h3>
+          <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+        </div>
+        <div class="team-member">
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
+          <h3>Priya Patel</h3>
+          <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+        </div>
       </div>
-    <div class="team-member">
-      <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
-      <h3>Priya Patel</h3>
-      <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
-      </div>
-  </div>
-</section>
+    </section>
+  </main>
   
   <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
     <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
@@ -832,43 +640,150 @@ function resetTimer() {
       </a>
     </div>
   </footer>
+
+  <!-- Wallet Modal -->
   <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-    <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
-    <div class="grid grid-cols-2 gap-4">
-      <button onclick="connectInjected()" class="wallet-option">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
-        <span>Browser Wallet</span>
-      </button>
-      <button onclick="connectWalletConnect()" class="wallet-option">
-        <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
-        <span>WalletConnect</span>
-      </button>
-      <button onclick="connectCoinbase()" class="wallet-option">
-        <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
-        <span>Coinbase</span>
-      </button>
-      <button onclick="connectTrust()" class="wallet-option">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
-        <span>Trust Wallet</span>
-      </button>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="connectInjected()" class="wallet-option">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+          <span>Browser Wallet</span>
+        </button>
+        <button onclick="connectWalletConnect()" class="wallet-option">
+          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
+          <span>WalletConnect</span>
+        </button>
+        <button onclick="connectCoinbase()" class="wallet-option">
+          <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
+          <span>Coinbase</span>
+        </button>
+        <button onclick="connectTrust()" class="wallet-option">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
+          <span>Trust Wallet</span>
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<style>
-  .wallet-option {
-    @apply p-4 border rounded-lg flex flex-col items-center 
-           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
-  }
-  .wallet-icon {
-    @apply w-10 h-10 mb-2;
-  }
-  .hidden { display: none !important; }
-</style>
-</body>
-<script>
-    <script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Initialize token chart
+    const ctx = document.getElementById('tokenChart').getContext('2d');
+
+    function getLabelColor() {
+      return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+    }
+
+    let tokenChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+        datasets: [{
+          data: [40, 30, 20, 5, 5],
+          backgroundColor: [
+            '#10B981', // Green
+            '#3B82F6', // Blue
+            '#F59E0B', // Yellow
+            '#EF4444', // Red
+            '#8B5CF6'  // Purple
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: getLabelColor(),
+              font: {
+                size: 14,
+                family: "'Inter', sans-serif"
+              },
+              padding: 20,
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // Update chart colors when theme changes
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+      tokenChart.update();
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Timer Configuration - 1 MINUTE STAGES
+    const TOTAL_STAGES = 15;
+    const STAGE_DURATION = 60 * 1000; // 1 minute per stage
+    const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
+
+    let presaleInterval;
+    let stageInterval;
+
+    function getPresaleStartTime() {
+      let startTime = localStorage.getItem('presaleStartTime');
+      if (!startTime) {
+        startTime = Date.now();
+        localStorage.setItem('presaleStartTime', startTime);
+      }
+      return parseInt(startTime);
+    }
+
+    function updateTimers() {
+      const now = Date.now();
+      const startTime = getPresaleStartTime();
+      const endTime = startTime + PRESALE_DURATION;
+      const timeLeft = endTime - now;
+
+      if (timeLeft <= 0) {
+        clearInterval(presaleInterval);
+        clearInterval(stageInterval);
+        document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+        document.getElementById('stage-seconds').textContent = "0";
+        return;
+      }
+
+      // Calculate stage progress
+      const currentStage = Math.min(
+        Math.floor((now - startTime) / STAGE_DURATION),
+        TOTAL_STAGES - 1
+      );
+      const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
+      const stageTimeLeft = stageEndTime - now;
+      const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
+
+      // Update displays
+      document.getElementById('current-stage').textContent = currentStage + 1;
+      document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
+
+      // Update price
+      const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+      document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:${Math.floor(stageTimeLeft/1000).toString().padStart(2,'0')}</span></span></span>`;
+
+      // Update timers
+      document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
+      document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
+      document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
+    }
+
+    /* Testing function - remove in production */
+    function resetTimer() {
+      localStorage.removeItem('presaleStartTime');
+      location.reload();
+    }
+
     // Wallet connection state
     let userWalletAddress = null;
     let web3Modal;
@@ -988,6 +903,11 @@ function resetTimer() {
         document.getElementById('walletButton').textContent = 'Connected ✓';
         const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
         document.getElementById('walletAddress').textContent = shortAddress;
+        
+        // Show referral UI if on referral section
+        if (window.location.hash === '#referral') {
+          showReferralUI(userWalletAddress);
+        }
       }
       resetWalletButton();
     }
@@ -1032,7 +952,7 @@ function resetTimer() {
         
         // Contract details - REPLACE WITH YOUR ACTUAL CONTRACT ADDRESS AND ABI
         const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const contractAbi = [
+        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]
           // Minimal ABI for the contribute function
           {
             "inputs": [{"internalType": "address", "name": "referrer", "type": "address"}],
@@ -1096,6 +1016,124 @@ function resetTimer() {
       }
     }
 
+    // Staking function
+    function stakeFluffi() {
+      if (!userWalletAddress) {
+        alert('Please connect your wallet first.');
+        return;
+      }
+      alert('Staking feature coming soon!');
+    }
+
+    // Show referral UI
+    function showReferralUI(wallet) {
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+      
+      document.getElementById('referralSection').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2 font-semibold">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="referralLinkInput" 
+                    value="${referralLink}" 
+                    class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          </div>
+          
+          <div class="mt-4">
+            <p class="text-sm mb-2 font-semibold">Share your link:</p>
+            <div class="flex space-x-3">
+              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                🐦 Twitter
+              </button>
+              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                📱 Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Copy referral link
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
+    }
+    
+    // Share on Twitter
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
+    }
+    
+    // Share on Telegram
+    function shareOnTelegram() {
+      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
+      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
+    }
+
+    // Toggle dark mode
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    }
+
+    // Connect injected wallet (MetaMask, etc.)
+    async function connectInjected() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          provider = window.ethereum;
+          updateWalletUI();
+          setupWalletEventListeners();
+          document.getElementById('walletModal').classList.add('hidden');
+        } catch (error) {
+          console.error("User denied account access", error);
+          alert('Wallet connection denied.');
+        }
+      } else {
+        alert('Browser wallet not detected. Please install MetaMask or try WalletConnect.');
+      }
+    }
+
+    // Connect via WalletConnect
+    async function connectWalletConnect() {
+      try {
+        provider = await web3Modal.connectTo('walletconnect');
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        userWalletAddress = accounts[0];
+        updateWalletUI();
+        setupWalletEventListeners();
+        document.getElementById('walletModal').classList.add('hidden');
+      } catch (error) {
+        console.error("WalletConnect error:", error);
+        alert("Could not connect via WalletConnect");
+      }
+    }
+
+    // Connect Coinbase Wallet
+    async function connectCoinbase() {
+      alert("Coinbase Wallet connection would be implemented here");
+    }
+
+    // Connect Trust Wallet
+    async function connectTrust() {
+      alert("Trust Wallet connection would be implemented here");
+    }
+
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', () => {
       initWeb3Modal();
@@ -1109,112 +1147,11 @@ function resetTimer() {
       if (localStorage.getItem('darkMode') === 'true') {
         document.documentElement.classList.add('dark');
       }
+      
+      // Initialize timer
+      updateTimers();
+      presaleInterval = setInterval(updateTimers, 1000);
     });
-    
-    // Toggle dark mode
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    }
   </script>
-  // Show referral UI
-  function showReferralUI(wallet) {
-    const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-    
-    document.getElementById('referralSection').innerHTML = `
-      <div class="space-y-4">
-        <div>
-          <label class="block mb-2 font-semibold">Your referral link:</label>
-          <div class="flex">
-            <input type="text" id="referralLinkInput" 
-                   value="${referralLink}" 
-                   class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-            <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-              Copy
-            </button>
-          </div>
-        </div>
-        
-        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-          <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-          <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-        </div>
-        
-        <div class="mt-4">
-          <p class="text-sm mb-2 font-semibold">Share your link:</p>
-          <div class="flex space-x-3">
-            <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-              🐦 Twitter
-            </button>
-            <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-              📱 Telegram
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-  
-  // Copy referral link
-  function copyReferralLink() {
-    const input = document.getElementById('referralLinkInput');
-    input.select();
-    document.execCommand('copy');
-    alert("Referral link copied to clipboard!");
-  }
-  
-  // Share on Twitter
-  function shareOnTwitter() {
-    const link = document.getElementById('referralLinkInput').value;
-    window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
-  }
-  
-  // Share on Telegram
-  function shareOnTelegram() {
-    const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
-    window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
-  }
-
-  // Initialize when page loads
-  document.addEventListener('DOMContentLoaded', () => {
-    initWeb3Modal();
-    
-    // Check if wallet is already connected (from cache)
-    if (web3Modal.cachedProvider) {
-      connectWallet();
-    }
-    
-    // Your other initialization code
-    updateTimers();
-    updateNextIncreaseTime();
-  });
-  function toggleDarkMode() {
-  document.documentElement.classList.toggle('dark');
-  localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-}
-  // Your existing disconnect function (with dark mode preservation)
-function disconnectWallet() {
-  userWalletAddress = null;
-const button = document.getElementById('walletButton');
-  button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
-  document.getElementById('walletStatus').classList.add('hidden');
-  
-  // Preserve dark mode classes
-  if (document.documentElement.classList.contains('dark')) {
-    button.classList.add('dark:bg-gray-800');
-  }
-}
-// Initialize dark mode from localStorage
-if (localStorage.getItem('darkMode') === 'true') {
-  document.documentElement.classList.add('dark');
-}
-// Initialize dark mode from localStorage on page load
-document.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('darkMode') === 'true') {
-    document.documentElement.classList.add('dark');
-  }
-});
-</script>
 </body>
 </html>
