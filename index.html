@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -936,15 +936,28 @@ function resetTimer() {
     }
 
     async function connectWalletConnect() {
-      if (isMobile()) {
-        // Mobile WalletConnect deep link
-        showMessage('Opening WalletConnect...', 'info');
-        const uri = `wc:${Date.now()}@1?bridge=https%3A%2F%2Fbridge.walletconnect.org&key=${Math.random().toString(36).substring(7)}`;
-        window.open(`https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`, '_blank');
-      } else {
-        showMessage('WalletConnect integration coming soon for desktop!', 'info');
-      }
-    }
+  const provider = new WalletConnectProvider.default({
+    rpc: {
+      56: "https://bsc-dataseed.binance.org/"  // Or use your preferred chain
+    },
+    chainId: 56
+  });
+
+  try {
+    await provider.enable();
+    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    const signer = ethersProvider.getSigner();
+    const address = await signer.getAddress();
+
+    userWalletAddress = address;
+    updateWalletUI();
+    closeWalletModal();
+    showMessage('Connected via WalletConnect', 'success');
+  } catch (err) {
+    console.error('WalletConnect failed:', err);
+    showMessage('WalletConnect error: ' + err.message, 'error');
+  }
+}
 
     async function connectCoinbaseWallet() {
       if (isConnecting) return;
