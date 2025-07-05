@@ -935,29 +935,29 @@ function resetTimer() {
       }
     }
 
-    async function connectWalletConnect() {
-  const provider = new WalletConnectProvider.default({
-    rpc: {
-      56: "https://bsc-dataseed.binance.org/"  // Or use your preferred chain
-    },
-    chainId: 56
-  });
+  async function connectWalletConnect() {
+    const provider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/"
+      },
+      chainId: 56
+    });
 
-  try {
-    await provider.enable();
-    const ethersProvider = new ethers.providers.Web3Provider(provider);
-    const signer = ethersProvider.getSigner();
-    const address = await signer.getAddress();
+    try {
+      await provider.enable();
+      const ethersProvider = new ethers.providers.Web3Provider(provider);
+      const signer = ethersProvider.getSigner();
+      const address = await signer.getAddress();
 
-    userWalletAddress = address;
-    updateWalletUI();
-    closeWalletModal();
-    showMessage('Connected via WalletConnect', 'success');
-  } catch (err) {
-    console.error('WalletConnect failed:', err);
-    showMessage('WalletConnect error: ' + err.message, 'error');
+      userWalletAddress = address;
+      document.getElementById('walletButton').textContent = address.slice(0, 6) + '...' + address.slice(-4);
+      closeWalletModal();
+      alert('✅ Connected to ' + address);
+    } catch (err) {
+      console.error("WalletConnect failed:", err);
+      alert('❌ WalletConnect error: ' + err.message);
+    }
   }
-}
 
     async function connectCoinbaseWallet() {
       if (isConnecting) return;
