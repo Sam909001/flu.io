@@ -1261,22 +1261,113 @@ const button = document.getElementById('walletButton');
       document.documentElement.classList.add('dark');
     }
 
-    // Start timers
-    setInterval(() => {
-      updateStage();
-      updateCountdown();
-      updateStageTimer();
-    }, 1000);
+    // =========================
+    // CHART INITIALIZATION
+    // =========================
+    function initializeChart() {
+      const ctx = document.getElementById('tokenChart');
+      if (!ctx) return;
 
-    updateStage();
-    updateCountdown();
-    updateStageTimer();
-  document.addEventListener('DOMContentLoaded', () => {
-  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-  if (isMobile) {
-    const mobileBtn = document.getElementById('walletconnect-mobile');
-    if (mobileBtn) mobileBtn.classList.remove('hidden');
-  }
-});
+      const chartData = {
+        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+        datasets: [{
+          data: [40, 30, 20, 5, 5],
+          backgroundColor: [
+            '#10B981', // Green
+            '#3B82F6', // Blue
+            '#F59E0B', // Yellow
+            '#EF4444', // Red
+            '#8B5CF6'  // Purple
+          ],
+          borderWidth: 2,
+          borderColor: isDarkMode ? '#1f2937' : '#ffffff'
+        }]
+      };
+
+      const chartOptions = {
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: isDarkMode ? '#FFFFFF' : '#111827',
+              font: {
+                size: 14,
+                family: "'Inter', sans-serif"
+              },
+              padding: 20,
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      };
+
+      tokenChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: chartData,
+        options: chartOptions
+      });
+    }
+
+    // =========================
+    // INITIALIZATION
+    // =========================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize dark mode from localStorage
+      const savedTheme = localStorage.getItem('darkMode');
+      if (savedTheme === 'true') {
+        isDarkMode = true;
+        document.body.classList.add('dark');
+        document.getElementById('themeIcon').textContent = '☀️';
+      }
+
+      // Initialize chart
+      initializeChart();
+
+      // Start timers
+      updateTimers();
+      setInterval(updateTimers, 1000);
+
+      // Check for referral in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      if (ref && isValidAddress(ref)) {
+        const refInput = document.getElementById('refInput');
+        if (refInput) {
+          refInput.value = ref;
+        }
+      }
+
+      // Close modals when clicking outside
+      document.getElementById('walletModal').addEventListener('click', (e) => {
+        if (e.target.id === 'walletModal') {
+          closeWalletModal();
+        }
+      });
+
+      document.getElementById('howToBuyModal').addEventListener('click', (e) => {
+        if (e.target.id === 'howToBuyModal') {
+          closeHowToBuyModal();
+        }
+      });
+    });
+
+    // Handle account changes
+    if (typeof window !== 'undefined' && window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else if (userWalletAddress && accounts[0] !== userWalletAddress) {
+          userWalletAddress = accounts[0];
+          updateWalletUI();
+          showMessage('Account changed', 'success');
+        }
+      });
+
+      window.ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+    }
 </script>
 </html>
