@@ -908,7 +908,7 @@ async function connectWithWalletConnect() {
 
     await mobileProvider.enable();
 
-    const web3Provider = new ethers.providers.Web3Provider(mobileProvider);
+    const web3Provider = new ethers.providers.Web3Provider(instance);
     const signer = web3Provider.getSigner();
     userWalletAddress = await signer.getAddress();
 
