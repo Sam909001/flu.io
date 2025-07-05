@@ -1370,4 +1370,13 @@ const button = document.getElementById('walletButton');
       });
     }
 </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    if (isMobile) {
+      const walletBtn = document.getElementById('walletconnect-mobile');
+      if (walletBtn) walletBtn.classList.remove('hidden');
+    }
+  });
+</script>
 </html>
