@@ -1058,7 +1058,7 @@ const button = document.getElementById('walletButton');
       `;
     }
 
-    function copyReferralLink() {
+   function copyReferralLink() {
       const input = document.getElementById('referralLinkInput');
       input.select();
       document.execCommand('copy');
@@ -1092,7 +1092,7 @@ const button = document.getElementById('walletButton');
 
   let ethValue;
   if (currency === 'USD') {
-    const usdToEth = 3000; // example rate
+    const usdToEth = 3000; // Example rate
     ethValue = (Number(amount) / usdToEth).toFixed(6);
   } else {
     ethValue = Number(amount).toFixed(6);
@@ -1100,7 +1100,7 @@ const button = document.getElementById('walletButton');
 
   try {
     const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-    const contractAbi = [/* your ABI here */]; // Use your full ABI here
+    const contractAbi = [/* paste your full ABI here */];
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
     const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
