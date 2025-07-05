@@ -4,7 +4,7 @@
 <head>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -22,8 +22,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -875,6 +873,7 @@ function resetTimer() {
         <span>Trust Wallet</span>
       </button>
     </div>
+    <button onclick="closeWalletModal()" class="mt-4 w-full py-2 text-gray-500">Cancel</button>
   </div>
 </div>
 
@@ -892,6 +891,68 @@ function resetTimer() {
 <script>
 let signer = null;
 let userWalletAddress = null;
+
+// WalletConnect configuration
+const providerOptions = {
+  walletconnect: {
+    package: WalletConnectProvider.default,
+    options: {
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain
+      }
+    }
+  }
+};
+
+let web3Modal;
+let provider;
+let signer;
+
+function initWeb3Modal() {
+  web3Modal = new Web3Modal.default({
+    cacheProvider: true, // optional
+    providerOptions, // required
+    theme: "dark" // optional
+  });
+}
+
+async function connectWalletConnect() {
+  try {
+    provider = await web3Modal.connect();
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+    userWalletAddress = address;
+    
+    // Update UI
+    document.getElementById('walletButton').textContent = 
+      address.slice(0, 6) + '...' + address.slice(-4);
+    closeWalletModal();
+    
+    // Set up event listeners
+    provider.on("accountsChanged", (accounts) => {
+      if (accounts.length === 0) disconnectWallet();
+    });
+    
+    provider.on("chainChanged", () => window.location.reload());
+    provider.on("disconnect", () => disconnectWallet());
+    
+    return address;
+  } catch (error) {
+    console.error("WalletConnect Error:", error);
+    alert("Failed to connect: " + error.message);
+  }
+}
+
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  initWeb3Modal();
+  
+  // Check if user is already connected
+  if (web3Modal.cachedProvider) {
+    connectWalletConnect();
+  }
+});
 
 async function connectWalletConnect() {
   const provider = new WalletConnectProvider.default({
@@ -1283,6 +1344,16 @@ const button = document.getElementById('walletButton');
     function stakeFluffi() {
       alert('Staking feature coming soon!');
     }
+    function openWalletModal() {
+  document.getElementById('walletModal').classList.remove('hidden');
+}
+
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.add('hidden');
+}
+
+// Update your Connect Wallet button
+document.getElementById('walletButton').addEventListener('click', openWalletModal);
 
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
@@ -1347,13 +1418,16 @@ const button = document.getElementById('walletButton');
     // INITIALIZATION
     // =========================
     document.addEventListener('DOMContentLoaded', () => {
-      // Initialize dark mode from localStorage
-      const savedTheme = localStorage.getItem('darkMode');
-      if (savedTheme === 'true') {
-        isDarkMode = true;
-        document.body.classList.add('dark');
-        document.getElementById('themeIcon').textContent = '☀️';
-      }
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+  const mobileBtn = document.getElementById('walletconnect-mobile');
+  
+  if (isMobile && mobileBtn) {
+    mobileBtn.classList.remove('hidden');
+    mobileBtn.addEventListener('click', connectWalletConnect);
+  }
+  
+  initWeb3Modal();
+});
 
       // Initialize chart
       initializeChart();
