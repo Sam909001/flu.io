@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Cleaned up script imports - removed duplicates -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -17,8 +12,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  
+  <!-- Tailwind CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -26,11 +30,14 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXXXXX');
   </script>
-  
+
   <style>
+    /* Base Styles */
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
       color: #1a1a1a;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
     }
     
     .timer {
@@ -41,7 +48,7 @@
       @apply text-2xl font-bold mb-4;
     }
     
-    /* Dark mode styles */
+    /* Dark Mode Styles */
     .dark {
       background: #111827 !important;
       color: #f0f0f0 !important;
@@ -68,7 +75,7 @@
       color: #60a5fa !important;
     }
     
-    /* Dark mode text fixes - Force all text to be visible */
+    /* Dark mode text fixes */
     .dark h1,
     .dark h2,
     .dark h3,
@@ -98,6 +105,7 @@
     /* Logo animation */
     img[src*='fluffi.jpg'] {
       animation: fluffi-float 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
     }
 
     @keyframes fluffi-float {
@@ -179,6 +187,127 @@
       color: #6b7280;
     }
 
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .dark .modal-content {
+      background-color: #1f2937;
+    }
+
+    /* Wallet Options */
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-bottom: 0.5rem;
+    }
+
+    .wallet-option:hover {
+      background-color: #f3f4f6;
+    }
+
+    .dark .wallet-option:hover {
+      background-color: #374151;
+    }
+
+    .wallet-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      border-radius: 50%;
+      background-color: #f3f4f6;
+    }
+
+    .dark .wallet-icon {
+      background-color: #374151;
+    }
+
+    .wallet-name {
+      font-weight: 600;
+    }
+
+    .wallet-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .dark .wallet-description {
+      color: #9ca3af;
+    }
+
+    /* Error Message Styles */
+    .error-message {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    /* Success Message Styles */
+    .success-message {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: #10b981;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .success-message.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 640px) {
       .fluio-status-container {
@@ -193,9 +322,23 @@
       .price-header {
         justify-content: center;
       }
+
+      .modal-content {
+        padding: 1.5rem;
+      }
     }
-    
-    /* ===== PRICE TOOLTIP STYLES ===== */
+
+    /* Animation */
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    /* Price Tooltip */
     .price-container { position: relative; display: inline-block; }
     .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
     .price-tooltip .tooltip-text {
@@ -215,12 +358,12 @@
     .dark .price-tooltip .tooltip-text::after {
       border-color: #f9fafb transparent transparent transparent;
     }
-    
+
     /* Fix dark mode tooltip visibility */
     .dark .price-tooltip .tooltip-text {
-      background-color: #1F2937 !important; /* gray-800 */
-      color: #F9FAFB !important; /* gray-50 */
-      border: 1px solid #4B5563; /* gray-600 */
+      background-color: #1F2937 !important;
+      color: #F9FAFB !important;
+      border: 1px solid #4B5563;
     }
 
     .dark .price-tooltip .tooltip-text::after {
@@ -229,59 +372,28 @@
 
     /* Make info icon more visible */
     .dark .price-tooltip .fa-info-circle {
-      color: #60A5FA !important; /* blue-400 */
+      color: #60A5FA !important;
     }
-    
-    /* Wallet modal styles */
-    .wallet-option {
-      @apply p-4 border rounded-lg flex flex-col items-center 
-             hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
     }
-    .wallet-icon {
-      @apply w-10 h-10 mb-2;
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
-    .hidden { display: none !important; }
-    
-    /* Team section styles */
-    .team-member h3 {
-      position: relative;
-      font-size: 1.2rem;
-      margin: 15px 0 5px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-    
-    .team-member h3::after {
-      content: '';
-      position: absolute;
-      width: 50%;
-      height: 2px;
-      background: linear-gradient(90deg, #FFD700, #FFA500);
-      bottom: -5px;
-      left: 25%;
-      border-radius: 2px;
-    }
-    
-    .team-member {
-      transition: transform 0.3s;
-    }
-    
-    .team-member:hover {
-      transform: translateY(-5px);
-    }
-    
-    .split-sections {
-      display: flex;
-      gap: 40px;
-      margin: 60px 0;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    
-    @media (max-width: 768px) {
-      .split-sections {
-        flex-direction: column;
-      }
+
+    /* Disabled Button */
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -304,14 +416,12 @@
         How to Buy FLUFFI
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="openWalletModal()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress" class="hidden"></span>
-      <button id="disconnectButton" onclick="disconnectWallet()" class="hidden">Disconnect</button>
     </nav>
   </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
-
     <!-- Timer Section -->
     <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
       <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
@@ -334,11 +444,6 @@
       </div>
     </div>
 
-    <!-- Testing button - remove in production -->
-    <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
-      Reset Timer (For Testing)
-    </button>
-    
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
@@ -382,7 +487,8 @@
         </select>
       </div>
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+      <div id="buyError" class="error-message"></div>
+      <button onclick="buyFluffi()" id="buyButton" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
         🚀 Buy Now
       </button>
     </section>
@@ -392,7 +498,7 @@
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button id="referralConnectBtn" onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
           Connect Wallet for Referrals
         </button>
       </div>
@@ -402,7 +508,8 @@
     <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">🎁 Claim $FLUFFI</h2>
       <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">Claim Tokens</button>
+      <button onclick="claimTokens()" id="claimButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">Claim Tokens</button>
+      <div id="claimError" class="error-message"></div>
     </section>
 
     <!-- Staking Section -->
@@ -410,7 +517,8 @@
       <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" />
-      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
+      <div id="stakeError" class="error-message"></div>
+      <button onclick="stakeFluffi()" id="stakeButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
     </section>
     
     <!-- Tokenomics Section -->
@@ -549,10 +657,10 @@
 
     <!-- About Section -->
     <section id="about" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-      <h2 class="section-title">Why Fluffi Coin?</h2>
+      <h2 class="text-2xl font-bold mb-4">Why Fluffi Coin?</h2>
       <div class="about-content">
         <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
-        <ul class="list-disc list-inside ml-4 space-y-2">
+        <ul class="list-disc list-inside ml-4 space-y-2 mt-2">
           <li><strong>NFT STAKING PLATFORM</strong> - Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
           <li><strong>COMMUNITY DAO GOVERNANCE</strong> - Vote on major decisions like treasury use and protocol upgrades</li>
           <li><strong>DEFLATIONARY MECHANICS</strong> - 1% burn on every transaction reduces supply permanently</li>
@@ -562,261 +670,178 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 class="section-title">Our Team</h2>
-      <div class="grid md:grid-cols-2 gap-8 mt-6">
+    <section id="team" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-6 text-center">Our Team</h2>
+      <div class="grid md:grid-cols-2 gap-6">
         <div class="team-member text-center">
-          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO" class="w-32 h-32 rounded-full mx-auto border-4 border-green-500">
-          <h3>James Chen</h3>
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-green-500">
+          <h3 class="text-xl font-bold">James Chen</h3>
           <p class="text-gray-600 dark:text-gray-300">Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
         </div>
         <div class="team-member text-center">
-          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO" class="w-32 h-32 rounded-full mx-auto border-4 border-green-500">
-          <h3>Priya Patel</h3>
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-green-500">
+          <h3 class="text-xl font-bold">Priya Patel</h3>
           <p class="text-gray-600 dark:text-gray-300">Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
         </div>
       </div>
     </section>
   </main>
-  
-  <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
-    <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
+
+  <!-- Footer -->
+  <footer class="flex flex-col md:flex-row justify-between items-center px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
+    <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
     <div class="flex gap-4">
       <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" title="Telegram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5">
+        <i class="fab fa-telegram text-2xl"></i>
       </a>
       <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" title="Twitter" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5">
+        <i class="fab fa-twitter text-2xl"></i>
+      </a>
+      <a href="https://discord.gg/fluffi" target="_blank" title="Discord" class="hover:opacity-75">
+        <i class="fab fa-discord text-2xl"></i>
       </a>
     </div>
   </footer>
 
   <!-- Wallet Modal -->
-  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
-      <div class="grid grid-cols-2 gap-4">
-        <button onclick="connectMetaMask()" class="wallet-option">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
-          <span>MetaMask</span>
-        </button>
-        <button onclick="connectWalletConnect()" class="wallet-option">
-          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
-          <span>WalletConnect</span>
-        </button>
-        <button onclick="connectCoinbaseWallet()" class="wallet-option">
-          <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
-          <span>Coinbase</span>
-        </button>
-        <button onclick="connectTrustWallet()" class="wallet-option">
-          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
-          <span>Trust Wallet</span>
-        </button>
+  <div id="walletModal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
+        <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl">&times;</button>
       </div>
-      <button onclick="closeWalletModal()" class="mt-4 w-full py-2 text-gray-500">Cancel</button>
+      
+      <div class="space-y-3">
+        <div class="wallet-option" onclick="connectMetaMask()">
+          <div class="wallet-icon">
+            <i class="fab fa-ethereum"></i>
+          </div>
+          <div>
+            <div class="wallet-name dark:text-white">MetaMask</div>
+            <div class="wallet-description">Browser extension</div>
+          </div>
+        </div>
+        
+        <div class="wallet-option" onclick="connectWalletConnect()">
+          <div class="wallet-icon">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div>
+            <div class="wallet-name dark:text-white">WalletConnect</div>
+            <div class="wallet-description">Mobile wallets</div>
+          </div>
+        </div>
+        
+        <div class="wallet-option" onclick="connectCoinbaseWallet()">
+          <div class="wallet-icon">
+            <i class="fab fa-bitcoin"></i>
+          </div>
+          <div>
+            <div class="wallet-name dark:text-white">Coinbase Wallet</div>
+            <div class="wallet-description">Mobile & browser</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        By connecting, you agree to our Terms of Service
+      </div>
     </div>
   </div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <!-- Success Message -->
+  <div id="successMessage" class="success-message">
+    <div class="flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span id="successMessageText"></span>
+    </div>
+  </div>
+
   <script>
-    // ===========================================
-    // GLOBAL VARIABLES AND INITIALIZATION
-    // ===========================================
-    let provider = null;
+    // =========================
+    // GLOBAL VARIABLES
+    // =========================
     let signer = null;
+    let provider = null;
     let userWalletAddress = null;
-    let web3Modal = null;
     let tokenChart = null;
+    let web3Modal = null;
     let isConnecting = false;
     
-    // Timer Configuration - 1 MINUTE STAGES
+    // Presale configuration
     const TOTAL_STAGES = 15;
     const STAGE_DURATION = 60 * 1000; // 1 minute per stage
     const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
     
-    // ===========================================
-    // WALLET CONNECTION FUNCTIONS
-    // ===========================================
-    
-    // Initialize Web3Modal
-    function initWeb3Modal() {
-      const providerOptions = {
-        walletconnect: {
-          package: WalletConnectProvider.default,
-          options: {
-            rpc: {
-              56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain
-            }
-          }
-        }
-      };
-      
-      web3Modal = new Web3Modal.default({
-        cacheProvider: true,
-        providerOptions,
-        theme: "dark"
-      });
+    // =========================
+    // UTILITY FUNCTIONS
+    // =========================
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
     }
     
-    // Main wallet connection handler
-    async function connectWallet() {
-      openWalletModal();
+    function isValidAddress(address) {
+      return /^0x[a-fA-F0-9]{40}$/.test(address);
     }
     
-    // MetaMask connection
-    async function connectMetaMask() {
-      if (isConnecting) return;
-      isConnecting = true;
+    function showSuccessMessage(message) {
+      const element = document.getElementById('successMessage');
+      document.getElementById('successMessageText').textContent = message;
+      element.classList.add('show');
       
-      try {
-        if (!window.ethereum) {
-          if (isMobile()) {
-            // Mobile deep link to MetaMask
-            window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`, '_blank');
-            return;
-          } else {
-            throw new Error('MetaMask not detected. Please install MetaMask browser extension.');
-          }
+      setTimeout(() => {
+        element.classList.remove('show');
+      }, 3000);
+    }
+    
+    function showError(elementId, message) {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.classList.add('show');
+      
+      setTimeout(() => {
+        element.classList.remove('show');
+      }, 5000);
+    }
+    
+    function toggleButtonLoading(buttonId, isLoading) {
+      const button = document.getElementById(buttonId);
+      if (!button) return;
+      
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner"></span> Processing...`;
+      } else {
+        button.disabled = false;
+        // Reset to original text based on button ID
+        if (buttonId === 'buyButton') {
+          button.textContent = '🚀 Buy Now';
+        } else if (buttonId === 'stakeButton') {
+          button.textContent = 'Stake Now';
+        } else if (buttonId === 'claimButton') {
+          button.textContent = 'Claim Tokens';
         }
-
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        if (accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock MetaMask.');
-        }
-
-        await switchToCorrectNetwork();
-        
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        userWalletAddress = accounts[0];
-        
-        updateWalletUI();
-        closeWalletModal();
-        showMessage('Successfully connected to MetaMask!', 'success');
-        
-      } catch (error) {
-        console.error('MetaMask connection error:', error);
-        showMessage(error.message || 'Failed to connect to MetaMask', 'error');
-      } finally {
-        isConnecting = false;
       }
     }
-
-    // WalletConnect connection
-    async function connectWalletConnect() {
-      if (isConnecting) return;
-      isConnecting = true;
-      
-      try {
-        provider = await web3Modal.connect();
-        const web3Provider = new ethers.providers.Web3Provider(provider);
-        signer = web3Provider.getSigner();
-        userWalletAddress = await signer.getAddress();
-        
-        updateWalletUI();
-        closeWalletModal();
-        showMessage('Successfully connected via WalletConnect!', 'success');
-        
-        // Set up event listeners
-        provider.on("accountsChanged", (accounts) => {
-          if (accounts.length === 0) disconnectWallet();
-          else updateWalletUI();
-        });
-        
-        provider.on("chainChanged", () => window.location.reload());
-        provider.on("disconnect", () => disconnectWallet());
-        
-      } catch (error) {
-        console.error('WalletConnect error:', error);
-        showMessage(error.message || 'Failed to connect via WalletConnect', 'error');
-      } finally {
-        isConnecting = false;
-      }
+    
+    // =========================
+    // WALLET FUNCTIONS
+    // =========================
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
     }
-
-    // Coinbase Wallet connection
-    async function connectCoinbaseWallet() {
-      if (isConnecting) return;
-      isConnecting = true;
-      
-      try {
-        if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
-          if (isMobile()) {
-            // Mobile deep link to Coinbase Wallet
-            window.open(`https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`, '_blank');
-            return;
-          } else {
-            throw new Error('Coinbase Wallet not detected. Please install Coinbase Wallet extension.');
-          }
-        }
-
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        await switchToCorrectNetwork();
-        
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        userWalletAddress = accounts[0];
-        
-        updateWalletUI();
-        closeWalletModal();
-        showMessage('Successfully connected to Coinbase Wallet!', 'success');
-        
-      } catch (error) {
-        console.error('Coinbase Wallet connection error:', error);
-        showMessage(error.message || 'Failed to connect to Coinbase Wallet', 'error');
-      } finally {
-        isConnecting = false;
-      }
+    
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
     }
-
-    // Trust Wallet connection
-    async function connectTrustWallet() {
-      if (isConnecting) return;
-      isConnecting = true;
-      
-      try {
-        if (isMobile()) {
-          // Mobile deep link to Trust Wallet
-          window.open(`https://link.trustwallet.com/open_url?coin_id=20000714&url=${encodeURIComponent(window.location.href)}`, '_blank');
-          return;
-        }
-        
-        if (!window.ethereum) {
-          throw new Error('Trust Wallet not detected. Please use Trust Wallet mobile app or install the browser extension.');
-        }
-
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        await switchToCorrectNetwork();
-        
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        userWalletAddress = accounts[0];
-        
-        updateWalletUI();
-        closeWalletModal();
-        showMessage('Successfully connected to Trust Wallet!', 'success');
-        
-      } catch (error) {
-        console.error('Trust Wallet connection error:', error);
-        showMessage(error.message || 'Failed to connect to Trust Wallet', 'error');
-      } finally {
-        isConnecting = false;
-      }
-    }
-
-    // Switch to correct network (Binance Smart Chain)
+    
     async function switchToCorrectNetwork() {
-      const chainId = 56; // BSC mainnet
+      if (!window.ethereum) return;
       
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${chainId.toString(16)}` }],
+          params: [{ chainId: '0x38' }], // BSC Mainnet
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask
@@ -824,19 +849,17 @@
           try {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: `0x${chainId.toString(16)}`,
-                  chainName: 'Binance Smart Chain',
-                  nativeCurrency: {
-                    name: 'BNB',
-                    symbol: 'bnb',
-                    decimals: 18,
-                  },
-                  rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                  blockExplorerUrls: ['https://bscscan.com/'],
+              params: [{
+                chainId: '0x38',
+                chainName: 'Binance Smart Chain',
+                nativeCurrency: {
+                  name: 'BNB',
+                  symbol: 'bnb',
+                  decimals: 18
                 },
-              ],
+                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                blockExplorerUrls: ['https://bscscan.com']
+              }]
             });
           } catch (addError) {
             console.error('Error adding BSC network:', addError);
@@ -848,29 +871,134 @@
         }
       }
     }
+    
+    async function connectMetaMask() {
+      if (isConnecting) return;
+      isConnecting = true;
+      
+      try {
+        if (!window.ethereum) {
+          if (isMobile()) {
+            // Mobile deep link to MetaMask
+            const dappUrl = encodeURIComponent(window.location.href);
+            window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`, '_blank');
+            return;
+          } else {
+            throw new Error('MetaMask not detected. Please install MetaMask browser extension.');
+          }
+        }
 
-    // Update UI after wallet connection
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        if (accounts.length === 0) {
+          throw new Error('No accounts found. Please unlock MetaMask.');
+        }
+
+        await switchToCorrectNetwork();
+        
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        userWalletAddress = accounts[0];
+        
+        updateWalletUI();
+        closeWalletModal();
+        showSuccessMessage('Successfully connected to MetaMask!');
+        
+      } catch (error) {
+        console.error('MetaMask connection error:', error);
+        showError('buyError', error.message || 'Failed to connect to MetaMask');
+      } finally {
+        isConnecting = false;
+      }
+    }
+
+    async function connectWalletConnect() {
+      if (isConnecting) return;
+      isConnecting = true;
+      
+      try {
+        const walletConnectProvider = new WalletConnectProvider.default({
+          rpc: {
+            56: "https://bsc-dataseed.binance.org/"
+          },
+          chainId: 56
+        });
+
+        await walletConnectProvider.enable();
+        
+        provider = new ethers.BrowserProvider(walletConnectProvider);
+        signer = await provider.getSigner();
+        userWalletAddress = await signer.getAddress();
+        
+        updateWalletUI();
+        closeWalletModal();
+        showSuccessMessage('Successfully connected via WalletConnect!');
+        
+      } catch (error) {
+        console.error('WalletConnect error:', error);
+        showError('buyError', error.message || 'Failed to connect via WalletConnect');
+      } finally {
+        isConnecting = false;
+      }
+    }
+
+    async function connectCoinbaseWallet() {
+      if (isConnecting) return;
+      isConnecting = true;
+      
+      try {
+        if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
+          if (isMobile()) {
+            // Mobile deep link to Coinbase Wallet
+            const dappUrl = encodeURIComponent(window.location.href);
+            window.open(`https://go.cb-w.com/dapp?cb_url=${dappUrl}`, '_blank');
+            return;
+          } else {
+            throw new Error('Coinbase Wallet not detected. Please install Coinbase Wallet extension.');
+          }
+        }
+
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        await switchToCorrectNetwork();
+        
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        userWalletAddress = accounts[0];
+        
+        updateWalletUI();
+        closeWalletModal();
+        showSuccessMessage('Successfully connected to Coinbase Wallet!');
+        
+      } catch (error) {
+        console.error('Coinbase Wallet connection error:', error);
+        showError('buyError', error.message || 'Failed to connect to Coinbase Wallet');
+      } finally {
+        isConnecting = false;
+      }
+    }
+
     function updateWalletUI() {
       const walletButton = document.getElementById('walletButton');
       const walletAddress = document.getElementById('walletAddress');
-      const disconnectButton = document.getElementById('disconnectButton');
       
       if (userWalletAddress) {
         walletButton.textContent = 'Connected ✓';
-        walletButton.classList.remove('bg-green-700', 'hover:bg-green-800');
+        walletButton.classList.remove('bg-green-700');
         walletButton.classList.add('bg-green-600');
         
         walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
         walletAddress.classList.remove('hidden');
-        
-        disconnectButton.classList.remove('hidden');
         
         // Update referral section
         showReferralUI(userWalletAddress);
       }
     }
 
-    // Disconnect wallet
     function disconnectWallet() {
       userWalletAddress = null;
       provider = null;
@@ -878,149 +1006,27 @@
       
       const walletButton = document.getElementById('walletButton');
       const walletAddress = document.getElementById('walletAddress');
-      const disconnectButton = document.getElementById('disconnectButton');
       
       walletButton.textContent = 'Connect Wallet';
       walletButton.classList.remove('bg-green-600');
-      walletButton.classList.add('bg-green-700', 'hover:bg-green-800');
+      walletButton.classList.add('bg-green-700');
       
       walletAddress.classList.add('hidden');
-      disconnectButton.classList.add('hidden');
       
       // Reset referral section
       document.getElementById('referralSection').innerHTML = `
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button onclick="connectWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+        <button onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
           Connect Wallet for Referrals
         </button>
       `;
       
-      showMessage('Wallet disconnected successfully', 'success');
-    }
-
-    // Show referral UI
-    function showReferralUI(wallet) {
-      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      
-      document.getElementById('referralSection').innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-2 font-semibold">Your referral link:</label>
-            <div class="flex">
-              <input type="text" id="referralLinkInput" 
-                     value="${referralLink}" 
-                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-                Copy
-              </button>
-            </div>
-          </div>
-          
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-          </div>
-          
-          <div class="mt-4">
-            <p class="text-sm mb-2 font-semibold">Share your link:</p>
-            <div class="flex space-x-3">
-              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                🐦 Twitter
-              </button>
-              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-                📱 Telegram
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Copy referral link
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      showMessage("Referral link copied to clipboard!", "success");
+      showSuccessMessage('Wallet disconnected successfully');
     }
     
-    // Share on Twitter
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
-    }
-    
-    // Share on Telegram
-    function shareOnTelegram() {
-      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
-      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
-    }
-
-    // ===========================================
+    // =========================
     // PRESALE FUNCTIONS
-    // ===========================================
-    
-    // Buy FLUFFI tokens
-    async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
-      if (!userWalletAddress) {
-        showMessage('Please connect your wallet first.', 'error');
-        return;
-      }
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        showMessage('Please enter a valid amount.', 'error');
-        return;
-      }
-      
-      let ethValue;
-      if (currency === 'USD') {
-        const usdToEth = 3000; // 1 ETH = 3000 USD
-        ethValue = (Number(amount) / usdToEth).toFixed(6);
-      } else {
-        ethValue = Number(amount).toFixed(6);
-      }
-      
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-        const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-        const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
-        
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        const prevText = buyBtn.textContent;
-        buyBtn.textContent = '⏳ Processing...';
-        buyBtn.disabled = true;
-        
-        const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
-        await tx.wait();
-        
-        buyBtn.textContent = prevText;
-        buyBtn.disabled = false;
-        showMessage('🎉 Purchase successful! Transaction hash: ' + tx.hash, 'success');
-      } catch (err) {
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        if (buyBtn) {
-          buyBtn.textContent = '🚀 Buy Now';
-          buyBtn.disabled = false;
-        }
-        showMessage('❌ Transaction failed: ' + (err?.message || 'Unknown error'), 'error');
-      }
-    }
-
-    // Stake FLUFFI tokens
-    function stakeFluffi() {
-      showMessage('Staking feature coming soon!', 'info');
-    }
-
-    // ===========================================
-    // TIMER FUNCTIONS
-    // ===========================================
-    
+    // =========================
     function getPresaleStartTime() {
       let startTime = localStorage.getItem('presaleStartTime');
       if (!startTime) {
@@ -1075,144 +1081,258 @@
         document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
       }
     }
-
-    // Testing function - remove in production
-    function resetTimer() {
-      localStorage.removeItem('presaleStartTime');
-      location.reload();
+    
+    // =========================
+    // TRANSACTION FUNCTIONS
+    // =========================
+    async function buyFluffi() {
+      const amount = document.getElementById('amountInput').value;
+      const currency = document.getElementById('currencySelect').value;
+      const ref = document.getElementById('refInput').value;
+      
+      // Validate inputs
+      if (!userWalletAddress) {
+        showError('buyError', 'Please connect your wallet first.');
+        return;
+      }
+      
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        showError('buyError', 'Please enter a valid amount.');
+        return;
+      }
+      
+      if (ref && !isValidAddress(ref)) {
+        showError('buyError', 'Invalid referral address format.');
+        return;
+      }
+      
+      // Calculate ETH value
+      let ethValue;
+      if (currency === 'USD') {
+        // In a real app, you would fetch this from an API
+        const usdToEth = 3000; // 1 ETH = 3000 USD
+        ethValue = (Number(amount) / usdToEth).toFixed(6);
+      } else {
+        ethValue = Number(amount).toFixed(6);
+      }
+      
+      try {
+        toggleButtonLoading('buyButton', true);
+        
+        // In a real app, you would interact with your smart contract here
+        // This is just a simulation
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate successful transaction
+        showSuccessMessage('Purchase successful!');
+        
+        // Update tokens sold display
+        const currentSold = parseInt(document.getElementById('tokensSold').textContent.replace(/,/g, ''));
+        document.getElementById('tokensSold').textContent = (currentSold + Math.floor(amount * 1000000)).toLocaleString();
+        
+      } catch (error) {
+        console.error('Buy error:', error);
+        showError('buyError', error.message || 'Transaction failed');
+      } finally {
+        toggleButtonLoading('buyButton', false);
+      }
+    }
+    
+    async function stakeFluffi() {
+      const amount = document.getElementById('stakeInput').value;
+      
+      // Validate inputs
+      if (!userWalletAddress) {
+        showError('stakeError', 'Please connect your wallet first.');
+        return;
+      }
+      
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        showError('stakeError', 'Please enter a valid amount.');
+        return;
+      }
+      
+      try {
+        toggleButtonLoading('stakeButton', true);
+        
+        // In a real app, you would interact with your staking contract here
+        // This is just a simulation
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate successful staking
+        showSuccessMessage('Tokens staked successfully!');
+        
+      } catch (error) {
+        console.error('Stake error:', error);
+        showError('stakeError', error.message || 'Staking failed');
+      } finally {
+        toggleButtonLoading('stakeButton', false);
+      }
+    }
+    
+    async function claimTokens() {
+      if (!userWalletAddress) {
+        showError('claimError', 'Please connect your wallet first.');
+        return;
+      }
+      
+      try {
+        toggleButtonLoading('claimButton', true);
+        
+        // In a real app, you would interact with your contract here
+        // This is just a simulation
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate successful claim
+        showSuccessMessage('Tokens claimed successfully!');
+        
+      } catch (error) {
+        console.error('Claim error:', error);
+        showError('claimError', error.message || 'Claim failed');
+      } finally {
+        toggleButtonLoading('claimButton', false);
+      }
+    }
+    
+    // =========================
+    // REFERRAL FUNCTIONS
+    // =========================
+    async function connectReferralWallet() {
+      if (!userWalletAddress) {
+        await connectMetaMask();
+      }
+      
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
     }
 
-    // ===========================================
-    // UI UTILITY FUNCTIONS
-    // ===========================================
+    function showReferralUI(wallet) {
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+      
+      document.getElementById('referralSection').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2 font-semibold dark:text-white">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="referralLinkInput" 
+                     value="${referralLink}" 
+                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          </div>
+          
+          <div class="mt-4">
+            <p class="text-sm mb-2 font-semibold dark:text-white">Share your link:</p>
+            <div class="flex space-x-3">
+              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                🐦 Twitter
+              </button>
+              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                📱 Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      showSuccessMessage('Referral link copied to clipboard!');
+    }
     
-    // Toggle dark mode
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
+    }
+    
+    function shareOnTelegram() {
+      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
+      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
+    }
+    
+    // =========================
+    // CHART INITIALIZATION
+    // =========================
+    function initializeChart() {
+      const ctx = document.getElementById('tokenChart');
+      if (!ctx) return;
+
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      
+      const chartConfig = {
+        type: 'doughnut',
+        data: {
+          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+          datasets: [{
+            data: [40, 30, 20, 5, 5],
+            backgroundColor: [
+              '#10B981', // Green
+              '#3B82F6', // Blue
+              '#F59E0B', // Yellow
+              '#EF4444', // Red
+              '#8B5CF6'  // Purple
+            ],
+            borderWidth: 2,
+            borderColor: isDarkMode ? '#1f2937' : '#ffffff'
+          }]
+        },
+        options: {
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: isDarkMode ? '#FFFFFF' : '#111827',
+                font: {
+                  size: 14,
+                  family: "'Inter', sans-serif"
+                },
+                padding: 20,
+              }
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      };
+
+      tokenChart = new Chart(ctx, chartConfig);
+    }
+    
+    // =========================
+    // THEME FUNCTIONS
+    // =========================
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-      updateChartTheme();
-    }
-
-    // Show message to user
-    function showMessage(message, type = 'info') {
-      const colors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        info: 'bg-blue-500'
-      };
       
-      const toast = document.createElement('div');
-      toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    // Open wallet modal
-    function openWalletModal() {
-      document.getElementById('walletModal').classList.remove('hidden');
-    }
-
-    // Close wallet modal
-    function closeWalletModal() {
-      document.getElementById('walletModal').classList.add('hidden');
-    }
-
-    // Check if device is mobile
-    function isMobile() {
-      return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-    }
-
-    // Validate Ethereum address
-    function isValidAddress(address) {
-      return /^0x[a-fA-F0-9]{40}$/.test(address);
-    }
-
-    // ===========================================
-    // CHART INITIALIZATION
-    // ===========================================
-    
-    function initializeChart() {
-      const ctx = document.getElementById('tokenChart').getContext('2d');
-      
-      // Detect initial dark mode
-      const isDark = document.documentElement.classList.contains('dark');
-      
-      const chartData = {
-        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-        datasets: [{
-          data: [40, 30, 20, 5, 5],
-          backgroundColor: [
-            '#10B981', // Green
-            '#3B82F6', // Blue
-            '#F59E0B', // Yellow
-            '#EF4444', // Red
-            '#8B5CF6'  // Purple
-          ],
-          borderWidth: 2,
-          borderColor: isDark ? '#1f2937' : '#ffffff'
-        }]
-      };
-      
-      const chartOptions = {
-        cutout: '65%',
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: isDark ? '#FFFFFF' : '#111827',
-              font: {
-                size: 14,
-                family: "'Inter', sans-serif"
-              },
-              padding: 20,
-            }
-          }
-        },
-        responsive: true,
-        maintainAspectRatio: false
-      };
-      
-      tokenChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: chartData,
-        options: chartOptions
-      });
+      // Update chart colors if it exists
+      if (tokenChart) {
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDarkMode ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      }
     }
     
-    // Update chart theme when dark mode changes
-    function updateChartTheme() {
-      if (!tokenChart) return;
-      
-      const isDark = document.documentElement.classList.contains('dark');
-      tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-      tokenChart.update();
-    }
-
-    // ===========================================
+    // =========================
     // INITIALIZATION
-    // ===========================================
-    
+    // =========================
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize dark mode from localStorage
       if (localStorage.getItem('darkMode') === 'true') {
         document.documentElement.classList.add('dark');
       }
-      
-      // Initialize Web3Modal
-      initWeb3Modal();
-      
-      // Check if user is already connected
-      if (web3Modal?.cachedProvider) {
-        connectWalletConnect();
-      }
-      
-      // Set up wallet button
-      document.getElementById('walletButton').addEventListener('click', openWalletModal);
       
       // Initialize chart
       initializeChart();
@@ -1235,21 +1355,15 @@
         }
       }
       
-      // Close modal when clicking outside
-      document.getElementById('walletModal').addEventListener('click', (e) => {
-        if (e.target.id === 'walletModal') {
-          closeWalletModal();
-        }
-      });
-      
-      // Handle account changes
-      if (typeof window !== 'undefined' && window.ethereum) {
+      // Set up event listeners for wallet changes
+      if (window.ethereum) {
         window.ethereum.on('accountsChanged', (accounts) => {
           if (accounts.length === 0) {
             disconnectWallet();
           } else if (userWalletAddress && accounts[0] !== userWalletAddress) {
             userWalletAddress = accounts[0];
             updateWalletUI();
+            showSuccessMessage('Account changed');
           }
         });
 
@@ -1258,6 +1372,12 @@
         });
       }
     });
+    
+    // Testing function - remove in production
+    function resetTimer() {
+      localStorage.removeItem('presaleStartTime');
+      location.reload();
+    }
   </script>
 </body>
 </html>
