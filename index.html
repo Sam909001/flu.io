@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -15,13 +20,7 @@
   
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  
+    
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
@@ -703,13 +702,19 @@
     </div>
   </footer>
 
-  <!-- Wallet Modal -->
-  <div id="walletModal" class="modal">
-    <div class="modal-content">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
-        <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl">&times;</button>
-      </div>
+    <!-- Wallet Modal -->
+  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="connectMetaMask()" class="wallet-option">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+          <span>MetaMask</span>
+        </button>
+        <button onclick="connectWalletConnect()" class="wallet-option">
+          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
+          <span>WalletConnect</span>
+        </button>
       
       <div class="space-y-3">
         <div class="wallet-option" onclick="connectMetaMask()">
@@ -746,6 +751,7 @@
       <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
         By connecting, you agree to our Terms of Service
       </div>
+       let provider = null;
     </div>
   </div>
 
