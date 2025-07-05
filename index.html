@@ -888,21 +888,35 @@ function resetTimer() {
   .hidden { display: none !important; }
 </style>
 </body>
-  <script>
+<script>
+let mobileProvider;
+
 async function connectWithWalletConnect() {
-  const provider = new WalletConnectProvider.default({
-    rpc: {
-      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
-    },
-    chainId: 56
-  });
+  try {
+    mobileProvider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/"
+      },
+      chainId: 56
+    });
 
-  await provider.enable();
-  const web3 = new Web3(provider);
-  const accounts = await web3.eth.getAccounts();
-  const userWallet = accounts[0];
+    await mobileProvider.enable();
 
-  alert("Connected via WalletConnect: " + userWallet);
+    const web3Provider = new ethers.providers.Web3Provider(mobileProvider);
+    const signer = web3Provider.getSigner();
+    userWalletAddress = await signer.getAddress();
+
+    // Update wallet button
+    const btn = document.getElementById('walletButton');
+    if (btn) {
+      btn.textContent = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
+    }
+
+    alert("✅ Wallet connected: " + userWalletAddress);
+  } catch (err) {
+    console.error("WalletConnect failed", err);
+    alert("❌ WalletConnect failed");
+  }
 }
 </script>
 <script>
