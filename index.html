@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,11 +9,8 @@
   <meta name="author" content="FLUFFI Team" />
   
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://
-
-cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" type="image/svg+xml">
   
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -22,91 +18,81 @@ cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Ethers.js v6 -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
   
-  <!-- WalletConnect v2 -->
-  <script src="https://unpkg.com/@walletconnect/web3modal@2.7.1/dist/index.umd.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  
-  <!-- Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
-  
   <style>
+    :root {
+      --primary-green: #10b981;
+      --primary-red: #ef4444;
+      --dark-bg: #0f172a;
+      --dark-card: #1e293b;
+    }
+
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
       color: #1a1a1a;
+      transition: all 0.3s ease;
     }
-    
 
-    .timer {
-      font-family: monospace;
-    }
-    
-    .section-title {
-      @apply text-2xl font-bold mb-4;
-    }
-    
     /* Dark mode styles */
     .dark {
-      background: #111827 !important;
+      background: linear-gradient(to bottom, var(--dark-bg), var(--dark-card)) !important;
       color: #f0f0f0 !important;
     }
 
     .dark .bg-white {
-      background-color: #1f2937 !important;
+      background-color: var(--dark-card) !important;
       color: #f0f0f0 !important;
     }
 
-    .dark .text-gray-600 {
+    .dark .text-gray-600,
+    .dark .text-gray-500,
+    .dark .text-gray-700 {
       color: #d1d5db !important;
-
     }
 
-    .dark .text-gray-500 {
-      color: #9ca3af !important;
-    }
-
-    .dark .bg-gray-200 {
-      background-color: #374151 !important;
-    }
-
-    .dark .text-blue-600 {
-      color: #60a5fa !important;
-    }
-    
-    /* Dark mode text fixes */
-    .dark h1,
-    .dark h2,
-    .dark h3,
-    .dark .section-title,
-    .dark p,
-    .dark span,
-
-    .dark div,
-    .dark li,
-    .dark summary,
-    .dark .timer,
-    .dark .stage-label,
-    .dark .font-mono,
-    .dark .font-bold,
-    .dark .font-semibold {
-      color: #f0f0f0 !important;
-    }
-    
+    .dark .bg-gray-200,
     .dark .bg-gray-100 {
       background-color: #374151 !important;
       color: #f0f0f0 !important;
     }
 
-    /* Logo animation */
-    img[src*='fluffi.jpg'] {
-      animation: fluffi-float 3s ease-in-out infinite;
+    .dark .border-gray-200,
+    .dark .border-gray-300 {
+      border-color: #4b5563 !important;
     }
 
+    .dark .text-blue-600 {
+      color: #60a5fa !important;
+    }
+
+    .dark h1, .dark h2, .dark h3, .dark h4,
+    .dark p, .dark span, .dark div, .dark li,
+    .dark summary, .dark label, .dark .timer,
+    .dark .stage-label, .dark .font-mono,
+    .dark .font-bold, .dark .font-semibold {
+      color: #f0f0f9 !important;
+    }
+
+    /* Timer animation */
+    @keyframes pulse-glow {
+      0%, 100% { 
+        text-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+      }
+      50% { 
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 30px rgba(239, 68, 68, 0.6);
+      }
+    }
+
+    .timer-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* Logo animation */
+    .logo-animate {
+      animation: fluffi-float 3s ease-in-out infinite;
+    }
 
     @keyframes fluffi-float {
       0%, 100% { 
@@ -120,131 +106,229 @@ cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     /* Progress bar styling */
     .progress-bar {
       width: 100%;
-      height: 8px;
+      height: 12px;
       background: #f0f0f0;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
-    
+
+    .dark .progress-bar {
+      background: #374151;
+    }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #4CAF50, #2E7D32);
+      background: linear-gradient(90deg, var(--primary-green), #059669);
       transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
     }
 
-    /* Enhanced styling for presale section */
-    .fluio-status-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .stage-progress {
-      flex: 1;
-      min-width: 200px;
-
-    }
-
-    .progress-info {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .fluio-price {
-      text-align: right;
-      min-width: 150px;
-    }
-
-    .price-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: flex-end;
-      margin-bottom: 0.25rem;
-    }
-
-
-    .live-badge {
-      background: #ef4444;
+    /* Button styles */
+    .btn-primary {
+      background: var(--primary-green);
       color: white;
-      padding: 2px 6px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .btn-danger {
+      background: var(--primary-red);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    /* Card styles */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .dark .card {
+      background: var(--dark-card);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Input styles */
+    .input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: white;
+      color: #1a1a1a;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .dark .input {
+      background: #374151;
+      border-color: #4b5563;
+      color: #f0f0f0;
+    }
+
+    .dark .input:focus {
+      border-color: var(--primary-green);
+    }
+
+    /* Select styles */
+    .select {
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dark .select {
+      background: #374151;
+      border-color: #4b5563;
+      color: #f0f0f0;
+    }
+
+    /* Tab styles */
+    .tab-list {
+      display: flex;
+      background: #f3f4f6;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .dark .tab-list {
+      background: #374151;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .tab.active {
+      background: white;
+      color: var(--primary-green);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .tab.active {
+      background: var(--dark-card);
+      color: var(--primary-green);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Alert styles */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--primary-green);
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .dark .alert {
+      background: #14532d;
+      color: #86efac;
+    }
+
+    /* Badge styles */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
       border-radius: 4px;
-      font-size: 0.7rem;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-live {
+      background: var(--primary-red);
+      color: white;
       animation: pulse 2s infinite;
     }
 
-    .current-price {
-      font-size: 1.5rem;
-      font-weight: bold;
+    .badge-connected {
+      background: #dcfce7;
       color: #16a34a;
     }
 
-    .price-change {
-      font-size: 0.8rem;
-      color: #6b7280;
+    .dark .badge-connected {
+      background: #14532d;
+      color: #86efac;
     }
 
-    /* Mobile responsiveness */
-    @media (max-width: 640px) {
-      .fluio-status-container {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .fluio-price {
-        text-align: center;
-      }
-      
-      .price-header {
-        justify-content: center;
-      }
-    }
-    
-    /* Price tooltip styles */
-    .price-container { position: relative; display: inline-block; }
-    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
-
-    .price-tooltip .tooltip-text {
-      visibility: hidden; width: 220px; background-color: #1f2937;
-      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
-      position: absolute; z-index: 1; bottom: 125%; left: 50%;
-      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
-      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .price-tooltip .tooltip-text::after {
-      content: ""; position: absolute; top: 100%; left: 50%;
-      margin-left: -5px; border-width: 5px; border-style: solid;
-      border-color: #1f2937 transparent transparent transparent;
-    }
-    .price-tooltip:hover .tooltip-text { 
-
-visibility: visible; opacity: 1; }
-    .dark .price-tooltip .tooltip-text { 
-      background-color: #1F2937 !important; 
-      color: #F9FAFB !important; 
-      border: 1px solid #4B5563; 
-    }
-    .dark .price-tooltip .tooltip-text::after {
-      border-color: #1F2937 transparent transparent transparent !important;
-    }
-    .dark .price-tooltip .fa-info-circle {
-      color: #60A5FA !important;
-    }
-
-    /* Wallet modal styles */
-    .wallet-modal {
+    /* Modal styles */
+    .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-
       background: rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
@@ -252,7 +336,7 @@ visibility: visible; opacity: 1; }
       z-index: 1000;
     }
 
-    .wallet-modal-content {
+    .modal-content {
       background: white;
       border-radius: 12px;
       padding: 24px;
@@ -262,11 +346,10 @@ visibility: visible; opacity: 1; }
       overflow-y: auto;
     }
 
-    .dark .wallet-modal-content {
-      background: #1f2937;
+    .dark .modal-content {
+      background: var(--dark-card);
       color: white;
     }
-
 
     .wallet-option {
       display: flex;
@@ -281,7 +364,7 @@ visibility: visible; opacity: 1; }
 
     .wallet-option:hover {
       background: #f3f4f6;
-      border-color: #10b981;
+      border-color: var(--primary-green);
     }
 
     .dark .wallet-option {
@@ -289,537 +372,450 @@ visibility: visible; opacity: 1; }
       background: #374151;
     }
 
-
     .dark .wallet-option:hover {
       background: #4b5563;
-      border-color: #10b981;
+      border-color: var(--primary-green);
     }
 
     .wallet-icon {
       width: 32px;
       height: 32px;
       margin-right: 12px;
-    }
-
-    .hidden { 
-      display: none !important; 
-    }
-
-    /* Loading states */
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #10b981;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 8px;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Error states */
-    .error-message {
-      background: #fee2e2;
-      color: #dc2626;
-
-      padding: 12px;
+    /* FAQ styles */
+    .faq-item {
+      border: 1px solid #e5e7eb;
       border-radius: 8px;
-      margin: 12px 0;
-      border: 1px solid #fecaca;
+      margin-bottom: 8px;
+      overflow: hidden;
     }
 
-    .dark .error-message {
-      background: #7f1d1d;
-      color: #fca5a5;
-      border-color: #991b1b;
+    .dark .faq-item {
+      border-color: #4b5563;
     }
 
-    .success-message {
-      background: #dcfce7;
-      color: #16a34a;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 12px 0;
-      border: 1px solid #bbf7d0;
-    }
-
-    .dark .success-message {
-      background: #14532d;
-      color: #86efac;
-      border-color: #166534;
-    }
-
-    /* Team section styles */
-    .split-sections {
+    .faq-header {
+      padding: 16px;
+      cursor: pointer;
       display: flex;
-      gap: 40px;
-      margin: 60px 0;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    #team, #about {
-      flex: 1;
-      min-width: 320px;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      color: #333;
-      transition: all 0.3s ease-in-out;
-    }
-
-    .dark #team, .dark #about {
-      background: #1c1c1c;
-      color: #eeeeee;
-      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
-    }
-
-    #team h2, #about h2 {
-      font-size: 2rem;
-      margin-bottom: 25px;
-      color: #28a745;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-
-    }
-
-    .team-grid {
-      display: grid;
-      gap: 30px;
-    }
-
-    .team-member {
-      text-align: center;
-      transition: transform 0.3s;
-    }
-
-    .team-member:hover {
-      transform: translateY(-5px);
-    }
-
-    .team-member img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-
-      border: 3px solid #28a745;
-      filter: grayscale(0%) contrast(110%);
-    }
-
-    .team-member h3 {
-      position: relative;
-      font-size: 1.2rem;
-      margin: 15px 0 5px;
-      text-transform: uppercase;
+      justify-content: space-between;
+      align-items: center;
       font-weight: 600;
+      background: #f9fafb;
+      transition: all 0.3s ease;
     }
 
-    .team-member h3::after {
-      content: '';
-      position: absolute;
-      width: 50%;
-      height: 2px;
-      background: linear-gradient(90deg, #FFD700, #FFA500);
-      bottom: -5px;
-      left: 25%;
-
-      border-radius: 2px;
+    .dark .faq-header {
+      background: #374151;
     }
 
-    .team-member p {
-      font-size: 1rem;
-      line-height: 1.5;
-      margin-bottom: 10px;
+    .faq-header:hover {
+      background: #f3f4f6;
     }
 
-    .about-content {
-      font-size: 1.05rem;
-      line-height: 1.7;
+    .dark .faq-header:hover {
+      background: #4b5563;
     }
 
-    .about-content ul {
-      margin: 25px 0;
-      padding-left: 20px;
+    .faq-content {
+      padding: 0 16px;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
 
-    .about-content li {
-      margin-bottom: 15px;
-
-      position: relative;
-      padding-left: 35px;
-      font-size: 1.05rem;
+    .faq-content.active {
+      padding: 16px;
+      max-height: 200px;
     }
 
+    .faq-arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .faq-arrow.active {
+      transform: rotate(180deg);
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-      .split-sections {
-        flex-direction: column;
+      .container {
+        padding: 0 16px;
       }
 
-      #team, #about {
-        width: 100%;
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .flex-responsive {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card {
+        padding: 16px;
       }
     }
+
+    /* Utility classes */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .grid { display: grid; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .gap-4 { gap: 16px; }
+    .gap-8 { gap: 32px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .text-sm { font-size: 14px; }
+    .text-lg { font-size: 18px; }
+    .text-xl { font-size: 20px; }
+    .text-2xl { font-size: 24px; }
+    .text-3xl { font-size: 30px; }
+    .text-4xl { font-size: 36px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mb-6 { margin-bottom: 24px; }
+    .mb-8 { margin-bottom: 32px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-6 { margin-top: 24px; }
+    .p-4 { padding: 16px; }
+    .p-6 { padding: 24px; }
+    .sticky { position: sticky; }
+    .top-0 { top: 0; }
+    .z-50 { z-index: 50; }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .rounded-lg { border-radius: 8px; }
+    .rounded-full { border-radius: 50%; }
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .max-w-md { max-width: 448px; }
+    .max-w-lg { max-width: 512px; }
+    .max-w-2xl { max-width: 672px; }
+    .max-w-4xl { max-width: 896px; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .space-y-4 > * + * { margin-top: 16px; }
+    .space-y-6 > * + * { margin-top: 24px; }
+    .fixed { position: fixed; }
+    .bottom-4 { bottom: 16px; }
+    .right-4 { right: 16px; }
   </style>
 </head>
-<body class="text-gray-800 dark:text-white">
+
+<body>
   <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-
-
-green-600 shadow sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
-      <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
-        $FLUFFI
-      </h1>
+  <header class="sticky top-0 z-50 shadow-lg" style="background: #10b981;">
+    <div class="container">
+      <div class="flex items-center justify-between p-4 flex-responsive">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl logo-animate">🐾</div>
+          <h1 class="text-4xl font-bold text-white">$FLUFFI</h1>
+        </div>
+        
+        <nav class="flex items-center gap-4 flex-wrap">
+          <a href="#presale" class="text-white hover:underline">Presale</a>
+          <a href="#staking" class="text-white hover:underline">Staking</a>
+          <a href="#faq" class="text-white hover:underline">FAQ</a>
+          <a href="#tokenomics" class="text-white hover:underline">Tokenomics</a>
+          
+          <button onclick="toggleDarkMode()" class="btn-secondary">
+            <span id="themeIcon">🌙</span>
+          </button>
+          
+          <button onclick="openWalletModal()" id="walletButton" class="btn-primary">
+            Connect Wallet
+          </button>
+          
+          <span id="walletAddress" class="badge badge-connected hidden"></span>
+          
+          <button onclick="disconnectWallet()" id="disconnectButton" class="btn-danger hidden">
+            Disconnect
+          </button>
+        </nav>
+      </div>
     </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
-      <a href="#presale" class="text-white hover:underline">Presale</a>
-      <a href="#staking" class="text-white hover:underline">Staking</a>
-      <a href="#faq" class="text-white hover:underline">FAQ</a>
-      <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
-
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
-        How to Buy FLUFFI
-      </a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="openWalletModal()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">
-        Connect Wallet
-      </button>
-      <span id="walletAddress" class="text-white text-sm"></span>
-
-      <button onclick="disconnectWallet()" id="disconnectButton" class="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded hidden">
-        Disconnect
-      </button>
-    </nav>
   </header>
 
-  <main class="p-6 mx-auto w-full max-w-6xl">
+  <main class="container space-y-8 p-6">
     <!-- Error/Success Messages -->
     <div id="messageContainer"></div>
 
     <!-- Timer Section -->
-    <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-      <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE 
-
-ENDS IN:</h3>
-      <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300 space-x-3">
+    <div class="card max-w-2xl mx-auto text-center">
+      <h3 class="text-2xl font-bold mb-6">🚀 PRESALE ENDS IN:</h3>
+      <div id="presale-timer" class="text-4xl font-mono timer-glow mb-6" style="color: #ef4444;">
         <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
       </div>
       
-      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
+      <div class="mb-6">
+        <h4 class="text-lg font-semibold mb-4">Current Stage Progress</h4>
         
-        <!-- Progress Bar -->
-        <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-          <div id="stageProgressBar" class="h-full bg-green-500 transition-all 
-
-duration-1000 ease-in-out" style="width: 0%"></div>
+        <div class="progress-bar mb-4">
+          <div id="stageProgressBar" class="progress-fill" style="width: 0%"></div>
         </div>
 
-        <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
+        <div class="flex justify-between text-sm">
           <span>Stage: <span id="current-stage">1</span>/15</span>
-          <span>Ends in: <span id="stage-seconds">60</span>s</span>
+          <span>Progress: <span id="stage-progress-text">0.0</span>%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4 text-center">
+        <div>
+          <div class="text-sm text-gray-600">Current Price</div>
+          <div id="currentPrice" class="text-2xl font-bold" style="color: #10b981;">$0.000100</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-600">Tokens Sold</div>
+          <div id="tokensSold" class="text-2xl font-bold">67,431,509</div>
         </div>
       </div>
     </div>
 
-    <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 class="section-title">🚀 Presale is Live!</h2>
+    <!-- Main Content Tabs -->
+    <div class="max-w-2xl mx-auto">
+      <div class="tab-list">
+        <button class="tab active" onclick="switchTab('presale')">Presale</button>
+        <button class="tab" onclick="switchTab('staking')">Staking</button>
+        <button class="tab" onclick="switchTab('referral')">Referral</button>
+        <button class="tab" onclick="switchTab('claim')">Claim</button>
+      </div>
 
-
-      <div class="fluio-status-container">
-        <div class="fluio-price mt-2">
-          <div class="price-header flex items-center justify-between">
-            <span class="font-semibold text-lg">$FLUFFI</span>
-            <span class="live-badge text-green-500 font-bold">LIVE</span>
+      <!-- Presale Tab -->
+      <div id="presale-tab" class="tab-content active">
+        <div class="card max-w-md mx-auto">
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            🚀 Buy FLUFFI
+            <span class="badge badge-live">LIVE</span>
+          </h2>
+          
+          <div class="alert">
+            🎯 Referral Bonus: <strong>10%</strong>
           </div>
-          <div class="current-price price-container" id="currentPrice">
-            $0.000100
-            <span class="price-tooltip">
-              <i class="fas fa-info-circle text-blue-500"></i>
-              <span class="tooltip-text">
-                <strong>Price Increase:</strong><br>
-                +5% per stage (every 1 minute)<br>
-
-                Next increase: <span id="nextIncreaseTime">00:59</span>
-              </span>
-            </span>
+          
+          <div class="space-y-4">
+            <div class="flex gap-2">
+              <input type="number" placeholder="Amount" id="amountInput" class="input flex-1" />
+              <select id="currencySelect" class="select" style="min-width: 80px;">
+                <option value="BNB">BNB</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            
+            <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="input" />
+            
+            <button onclick="buyFluffi()" id="buyButton" class="btn-primary w-full">
+              🚀 Buy Now
+            </button>
           </div>
-          <div class="price-change text-sm text-gray-500">+0.00%</div>
         </div>
       </div>
 
-      <div class="flex items-center mt-4 mb-4">
-        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-        </svg>
-        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-
-        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+      <!-- Staking Tab -->
+      <div id="staking-tab" class="tab-content">
+        <div class="card max-w-md mx-auto">
+          <h2 class="text-xl font-bold mb-4">📈 Stake Your FLUFFI</h2>
+          
+          <div class="alert">
+            APY: <strong>90%</strong> | Ends at Listing Date
+          </div>
+          
+          <div class="space-y-4">
+            <input type="number" placeholder="Amount to stake" id="stakeInput" class="input" />
+            
+            <button onclick="stakeFluffi()" class="btn-primary w-full" style="background: #eab308;">
+              Stake Now
+            </button>
+          </div>
+        </div>
       </div>
 
-      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
-
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="USD">USD</option>
-          <option value="ETH">ETH</option>
-        </select>
-
+      <!-- Referral Tab -->
+      <div id="referral-tab" class="tab-content">
+        <div class="card max-w-lg mx-auto">
+          <h2 class="text-xl font-bold mb-4">💰 Earn with Referrals</h2>
+          
+          <div id="referralSection">
+            <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+            <button onclick="connectReferralWallet()" class="btn-primary">
+              Connect Wallet for Referrals
+            </button>
+          </div>
+        </div>
       </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-      <button onclick="buyFluffi()" id="buyButton" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-        🚀 Buy Now
-      </button>
-    </section>
-    
-    <!-- Referral Section -->
-    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-      <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
 
-      <div id="referralSection">
-        <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
-          Connect Wallet for Referrals
-        </button>
+      <!-- Claim Tab -->
+      <div id="claim-tab" class="tab-content">
+        <div class="card max-w-md mx-auto">
+          <h2 class="text-xl font-bold mb-4">🎁 Claim FLUFFI</h2>
+          
+          <p class="mb-4 text-gray-600">
+            Once the presale ends, you can claim your purchased tokens here.
+          </p>
+          
+          <button class="btn-primary w-full" disabled style="opacity: 0.5;">
+            Claim Tokens (Coming Soon)
+          </button>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Claim Section -->
-    <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">🎁 Claim $FLUFFI</h2>
-      <p class="mb-4">Once the presale ends, you can claim your purchased 
-
-tokens here.</p>
-      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">Claim Tokens</button>
-    </section>
-
-    <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
-      <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
-      <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" />
-
-      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
-    </section>
-    
     <!-- Tokenomics Section -->
-    <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
-      <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
-        📊 Tokenomics
-      </h2>
+    <section id="tokenomics" class="card max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-8">📊 Tokenomics</h2>
 
-      <div class="grid md:grid-cols-2 gap-10 items-center">
-        <!-- Token Details -->
-        <div>
-          <ul class="space-y-4 text-lg text-
-
-gray-900 dark:text-white">
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
-              <span class="ml-2">10,000,000,000 FLUFFI</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
-              <span class="ml-2">40%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
-              <span class="ml-2">30% (Locked)</span>
-
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
-              <span class="ml-2">20%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
-              <span class="ml-2">5%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
-              <span class="ml-2">5% (Locked)</span>
-            </li>
-          </ul>
-
+      <div class="grid grid-2 gap-8 items-center">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <span class="font-semibold">Total Supply:</span>
+            <span>10,000,000,000 FLUFFI</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Presale:</span>
+            <span>40%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Liquidity:</span>
+            <span>30% (Locked)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Staking:</span>
+            <span>20%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Marketing:</span>
+            <span>5%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Team:</span>
+            <span>5% (Locked)</span>
+          </div>
         </div>
-
-        <!-- Chart -->
+        
         <div class="flex justify-center">
-          <canvas id="tokenChart" width="280" height="280"></canvas>
+          <div style="width: 300px; height: 300px;">
+            <canvas id="tokenChart"></canvas>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- FAQ Section -->
-    <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
+    <section id="faq" class="card max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-8">❓ FAQ</h2>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          What's the token tax?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          <p>5% total tax on all transactions:</p>
-          <ul class="list-disc list-inside ml-2">
-            <li>3% Marketing</li>
-            <li>2% Automatic Liquidity</li>
-          </ul>
-
+      <div class="space-y-4">
+        <div class="faq-item">
+          <div class="faq-header" onclick="toggleFAQ(0)">
+            <span class="font-semibold">What's the token tax?</span>
+            <span class="faq-arrow">↓</span>
+          </div>
+          <div class="faq-content">
+            <p>5% total tax on all transactions:</p>
+            <ul style="list-style: disc; margin-left: 20px;">
+              <li>3% Marketing</li>
+              <li>2% Automatic Liquidity</li>
+            </ul>
+          </div>
         </div>
-      </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          How to claim after presale?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-
-          Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
+        <div class="faq-item">
+          <div class="faq-header" onclick="toggleFAQ(1)">
+            <span class="font-semibold">How to claim after presale?</span>
+            <span class="faq-arrow">↓</span>
+          </div>
+          <div class="faq-content">
+            <p>Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.</p>
+          </div>
         </div>
-      </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          What's the vesting schedule?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          <ul class="list-disc list-inside ml-2">
-            <li>Presale tokens: 100% unlocked at TGE</li>
-            <li>Team tokens: 24-month linear vesting</li>
-          </ul>
+        <div class="faq-item">
+          <div class="faq-header" onclick="toggleFAQ(2)">
+            <span class="font-semibold">What's the vesting schedule?</span>
+            <span class="faq-arrow">↓</span>
+          </div>
+          <div class="faq-content">
+            <ul style="list-style: disc; margin-left: 20px;">
+              <li>Presale tokens: 100% unlocked at TGE</li>
+              <li>Team tokens: 24-month linear vesting</li>
+            </ul>
+          </div>
         </div>
-      </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          How do I buy $FLUFFI?
-          <svg class="w-5 h-5 text-gray-500 
-
-group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Connect your wallet, enter amount in BNB, and click "Buy Now".
+        <div class="faq-item">
+          <div class="faq-header" onclick="toggleFAQ(3)">
+            <span class="font-semibold">How do I buy $FLUFFI?</span>
+            <span class="faq-arrow">↓</span>
+          </div>
+          <div class="faq-content">
+            <p>Connect your wallet, enter amount in BNB, and click "Buy Now".</p>
+          </div>
         </div>
-      </details>
-
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-
-          When does staking end?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Staking ends at the official listing date.
-        </div>
-      </details>
-
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-
-
-gray-100 flex justify-between items-center">
-          What chains are supported?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Currently supporting BNB, with plans for ETH, SOL, and AVAX.
-        </div>
-      </details>
+      </div>
     </section>
 
-    <!-- About Section -->
-    <div class="split-sections">
-
-      <section id="about">
-        <h2>Why Fluffi Coin?</h2>
-        <div class="about-content">
-          <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
-          <ul>
-            <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
-            <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
-            <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
-          </ul>
-          <p>Fluffi bridges meme culture with 
-
-sustainable financial infrastructure for the future.</p>
-        </div>
-      </section>
-      
-      <!-- Team Section -->
-      <section id="team">
-        <h2>Our Team</h2>
-        <div class="team-grid">
-          <div class="team-member">
-            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO">
-            <h3>James Chen</h3>
-            <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development 
-
-and protocol design.</p>
+    <!-- About & Team Section -->
+    <div class="grid grid-2 gap-8">
+      <div class="card">
+        <h2 class="text-2xl font-bold mb-4">Why FLUFFI Coin?</h2>
+        <div class="space-y-4">
+          <p>FLUFFI Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
+          <div class="space-y-2">
+            <div><strong>NFT STAKING PLATFORM</strong><br />Launching Q3 2025 – Stake FLUFFI NFTs to earn exclusive rewards</div>
+            <div><strong>COMMUNITY DAO GOVERNANCE</strong><br />Vote on major decisions like treasury use and protocol upgrades</div>
+            <div><strong>DEFLATIONARY MECHANICS</strong><br />1% burn on every transaction reduces supply permanently</div>
           </div>
-          <div class="team-member">
-            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
-            <h3>Priya Patel</h3>
-            <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+          <p>FLUFFI bridges meme culture with sustainable financial infrastructure for the future.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="text-2xl font-bold mb-4">Our Team</h2>
+        <div class="space-y-6">
+          <div class="text-center">
+            <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white font-bold text-xl mb-2" style="background: linear-gradient(45deg, #3b82f6, #8b5cf6);">
+              JC
+            </div>
+            <h3 class="font-semibold">James Chen</h3>
+            <p class="text-sm text-gray-600">Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development.</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white font-bold text-xl mb-2" style="background: linear-gradient(45deg, #ec4899, #ef4444);">
+              PP
+            </div>
+            <h3 class="font-semibold">Priya Patel</h3>
+            <p class="text-sm text-gray-600">Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   </main>
   
-  <footer class="flex justify-between px-6 
-
-py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
-    <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
-    <div class="flex gap-4">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" title="Telegram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5">
-      </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" title="Twitter" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5">
-      </a>
+  <footer class="mt-16 p-6" style="background: #f9fafb; border-top: 1px solid #e5e7eb;">
+    <div class="container flex justify-between items-center flex-responsive">
+      <div class="text-sm text-gray-600">© 2025 $FLUFFI Token - All Rights Reserved</div>
+      <div class="flex gap-4">
+        <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" class="text-gray-600 hover:text-gray-900">
+          📱 Telegram
+        </a>
+        <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" class="text-gray-600 hover:text-gray-900">
+          🐦 Twitter
+        </a>
+      </div>
     </div>
-
   </footer>
 
   <!-- Wallet Modal -->
-  <div id="walletModal" class="wallet-modal hidden">
-    <div class="wallet-modal-content">
+  <div id="walletModal" class="modal hidden">
+    <div class="modal-content">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-xl font-bold">Connect Wallet</h3>
         <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
@@ -827,9 +823,7 @@ py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
       
       <div class="space-y-3">
         <div class="wallet-option" onclick="connectMetaMask()">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" 
-
-class="wallet-icon" alt="MetaMask">
+          <div class="wallet-icon bg-orange-500 flex items-center justify-center text-white font-bold">M</div>
           <div>
             <div class="font-semibold">MetaMask</div>
             <div class="text-sm text-gray-500">Browser extension</div>
@@ -837,16 +831,15 @@ class="wallet-icon" alt="MetaMask">
         </div>
         
         <div class="wallet-option" onclick="connectWalletConnect()">
-          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon" alt="WalletConnect">
+          <div class="wallet-icon bg-blue-500 flex items-center justify-center text-white font-bold">W</div>
           <div>
             <div class="font-semibold">WalletConnect</div>
             <div class="text-sm text-gray-500">Mobile wallets</div>
           </div>
-
         </div>
         
         <div class="wallet-option" onclick="connectCoinbaseWallet()">
-          <img src="https://images.ctfassets.net/q5ulk4bp65r7/3VgCpJvlCKKcLhGkfcOvka/c89c0cc26e74d93b7d92b6d0c6e1bf8d/coinbase_wallet_logo.svg" class="wallet-icon" alt="Coinbase Wallet">
+          <div class="wallet-icon bg-blue-600 flex items-center justify-center text-white font-bold">C</div>
           <div>
             <div class="font-semibold">Coinbase Wallet</div>
             <div class="text-sm text-gray-500">Mobile & browser</div>
@@ -854,9 +847,7 @@ class="wallet-icon" alt="MetaMask">
         </div>
         
         <div class="wallet-option" onclick="connectTrustWallet()">
-          <img src="https://trustwallet.com/
-
-assets/images/media/assets/TWT.png" class="wallet-icon" alt="Trust Wallet">
+          <div class="wallet-icon bg-blue-400 flex items-center justify-center text-white font-bold">T</div>
           <div>
             <div class="font-semibold">Trust Wallet</div>
             <div class="text-sm text-gray-500">Mobile wallet</div>
@@ -870,14 +861,9 @@ assets/images/media/assets/TWT.png" class="wallet-icon" alt="Trust Wallet">
     </div>
   </div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/
-
-chart.js"></script>
-
-  <!-- Testing button - remove in production -->
-  <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
-    Reset Timer (For Testing)
+  <!-- Reset Timer Button (for testing) -->
+  <button onclick="resetTimer()" class="btn-danger fixed bottom-4 right-4">
+    Reset Timer
   </button>
 
   <script>
@@ -887,49 +873,43 @@ chart.js"></script>
     let userWalletAddress = null;
     let provider = null;
     let signer = null;
-    let web3Modal = null;
+    let tokenChart = null;
+    let isDarkMode = false;
     
     // Timer Configuration
     const TOTAL_STAGES = 15;
-
     const STAGE_DURATION = 60 * 1000; // 1 minute per stage
     const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
     
     // Contract Configuration
     const CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-    const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]
+    const CONTRACT_ABI = [
+      {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},
+      {"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},
+      {"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+    ];
+
+    let startTime = Date.now();
+
     // =========================
     // UTILITY FUNCTIONS
     // =========================
     function showMessage(message, type = 'info') {
       const container = document.getElementById('messageContainer');
       const messageDiv = document.createElement('div');
-      messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+      messageDiv.className = type === 'error' ? 'alert' : 'alert';
+      messageDiv.style.background = type === 'error' ? '#fee2e2' : '#dcfce7';
+      messageDiv.style.color = type === 'error' ? '#dc2626' : '#16a34a';
+      messageDiv.style.borderLeftColor = type === 'error' ? '#dc2626' : '#16a34a';
       messageDiv.textContent = message;
       
       container.innerHTML = '';
-
       container.appendChild(messageDiv);
       
       setTimeout(() => {
         messageDiv.remove();
       }, 5000);
-    }
-
-    function setLoading(elementId, isLoading) {
-      const element = document.getElementById(elementId);
-      if (!element) return;
-      
-      if (isLoading) {
-        element.classList.add('loading');
-        element.innerHTML = '<span class="spinner"></span>' + element.textContent;
-        element.disabled = true;
-      } else {
-        element.classList.remove('loading');
-
-        element.innerHTML = element.textContent.replace(/⏳.*/, '');
-        element.disabled = false;
-      }
     }
 
     function isValidAddress(address) {
@@ -938,31 +918,23 @@ chart.js"></script>
 
     async function switchToCorrectNetwork() {
       try {
-        // Switch to BSC Mainnet (Chain ID: 56)
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: '0x38' }]
         });
-
         return true;
       } catch (switchError) {
         if (switchError.code === 4902) {
           try {
-            // Add BSC network if not present
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [{
                 chainId: '0x38',
                 chainName: 'BNB Smart Chain',
-                nativeCurrency: {
-                  name: 'BNB',
-                  symbol: 'BNB',
-                  decimals: 18
-                },
+                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
                 rpcUrls: ['https://bsc-dataseed.binance.org/'],
                 blockExplorerUrls: ['https://bscscan.com/']
               }]
-
             });
             return true;
           } catch (addError) {
@@ -977,96 +949,128 @@ chart.js"></script>
     // TIMER FUNCTIONS
     // =========================
     function getPresaleStartTime() {
-      let startTime = localStorage.getItem('presaleStartTime');
-      if (!startTime) {
-        startTime = Date.now();
-        localStorage.setItem('presaleStartTime', 
-
-startTime);
+      let savedStartTime = localStorage.getItem('presaleStartTime');
+      if (!savedStartTime) {
+        savedStartTime = startTime;
+        localStorage.setItem('presaleStartTime', savedStartTime);
       }
-      return parseInt(startTime);
-    }
-
-    function updateNextIncreaseTime() {
-      const now = Date.now();
-      const startTime = getPresaleStartTime();
-      const nextStageTime = startTime + (Math.floor((now - startTime) / STAGE_DURATION) + 1) * STAGE_DURATION;
-      const timeLeft = nextStageTime - now;
-      
-      const mins = Math.floor(timeLeft / (1000 * 60));
-      const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
-      const nextIncreaseElement = document.getElementById('nextIncreaseTi
-
-me');
-      if (nextIncreaseElement) {
-        nextIncreaseElement.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      }
+      return parseInt(savedStartTime);
     }
 
     function updateTimers() {
       const now = Date.now();
       const startTime = getPresaleStartTime();
       const endTime = startTime + PRESALE_DURATION;
-      const timeLeft = endTime - now;
+      const timeLeft = Math.max(0, endTime - now);
 
       // Calculate stage progress
       const currentStage = Math.min(
         Math.floor((now - startTime) / STAGE_DURATION),
         TOTAL_STAGES - 1
-
       );
       const stageEndTime = startTime + ((currentStage + 1) * STAGE_DURATION);
-      const stageTimeLeft = stageEndTime - now;
-      const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
+      const stageTimeLeft = Math.max(0, stageEndTime - now);
+      const stageProgress = Math.max(0, Math.min(100, ((STAGE_DURATION - stageTimeLeft) / STAGE_DURATION) * 100));
 
       // Update displays
-      const currentStageElement = document.getElementById('current-stage');
-      const stageProgressBar = document.getElementById('stageProgressBar');
-      const currentPriceElement = document.getElementById('currentPrice');
-      
-      if (currentStageElement) currentStageElement.textContent = currentStage + 1;
-      if (stageProgressBar) {
-
-        stageProgressBar.style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
-      }
+      document.getElementById('current-stage').textContent = currentStage + 1;
+      document.getElementById('stage-progress-text').textContent = stageProgress.toFixed(1);
+      document.getElementById('stageProgressBar').style.width = `${stageProgress}%`;
 
       // Update price
       const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-      if (currentPriceElement) {
-        currentPriceElement.innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:59</span></span></span>`;
-      }
+      document.getElementById('currentPrice').textContent = `$${price}`;
 
       // Update timers
-      const presaleTimerElement = 
-
-document.getElementById('presale-timer');
-      const stageSecondsElement = document.getElementById('stage-seconds');
-      
       if (timeLeft <= 0) {
-        if (presaleTimerElement) presaleTimerElement.innerHTML = "🎉 Presale Ended!";
-        if (stageSecondsElement) stageSecondsElement.textContent = "0";
+        document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
       } else {
-        const minutes = document.getElementById('presale-minutes');
-        const seconds = document.getElementById('presale-seconds');
-        
-        if (minutes) minutes.textContent = Math.floor(timeLeft / (1000 * 
-
-60)).toString().padStart(2, '0');
-        if (seconds) seconds.textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
-        if (stageSecondsElement) stageSecondsElement.textContent = Math.floor(stageTimeLeft / 1000);
+        const minutes = Math.floor(timeLeft / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        document.getElementById('presale-minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('presale-seconds').textContent = seconds.toString().padStart(2, '0');
       }
     }
 
     function resetTimer() {
-      localStorage.removeItem('presaleStartTime');
-      location.reload();
+      startTime = Date.now();
+      localStorage.setItem('presaleStartTime', startTime.toString());
+      showMessage('Timer reset successfully!', 'success');
+    }
+
+    // =========================
+    // THEME FUNCTIONS
+    // =========================
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (isDarkMode) {
+        body.classList.add('dark');
+        themeIcon.textContent = '☀️';
+      } else {
+        body.classList.remove('dark');
+        themeIcon.textContent = '🌙';
+      }
+      
+      localStorage.setItem('darkMode', isDarkMode.toString());
+      
+      // Update chart if it exists
+      if (tokenChart) {
+        tokenChart.options.plugins.legend.labels.color = isDarkMode ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      }
+    }
+
+    // =========================
+    // TAB FUNCTIONS
+    // =========================
+    function switchTab(tabName) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Show selected tab content
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      // Add active class to selected tab
+      event.target.classList.add('active');
+    }
+
+    // =========================
+    // FAQ FUNCTIONS
+    // =========================
+    function toggleFAQ(index) {
+      const faqItems = document.querySelectorAll('.faq-item');
+      const faqContent = faqItems[index].querySelector('.faq-content');
+      const faqArrow = faqItems[index].querySelector('.faq-arrow');
+      
+      const isActive = faqContent.classList.contains('active');
+      
+      // Close all FAQ items
+      faqItems.forEach((item, i) => {
+        const content = item.querySelector('.faq-content');
+        const arrow = item.querySelector('.faq-arrow');
+        content.classList.remove('active');
+        arrow.classList.remove('active');
+      });
+      
+      // Open clicked item if it wasn't active
+      if (!isActive) {
+        faqContent.classList.add('active');
+        faqArrow.classList.add('active');
+      }
     }
 
     // =========================
     // WALLET CONNECTION FUNCTIONS
     // =========================
     function openWalletModal() {
-
       document.getElementById('walletModal').classList.remove('hidden');
     }
 
@@ -1080,10 +1084,6 @@ document.getElementById('presale-timer');
           throw new Error('MetaMask not detected. Please install MetaMask browser extension.');
         }
 
-        setLoading('walletButton', true);
-        
-
-        // Request account access
         const accounts = await window.ethereum.request({ 
           method: 'eth_requestAccounts' 
         });
@@ -1092,67 +1092,30 @@ document.getElementById('presale-timer');
           throw new Error('No accounts found. Please unlock MetaMask.');
         }
 
-        // Switch to correct network
         await switchToCorrectNetwork();
         
-        // Set up provider and signer
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
         userWalletAddress = accounts[0];
         
         updateWalletUI();
-
         closeWalletModal();
         showMessage('Successfully connected to MetaMask!', 'success');
         
       } catch (error) {
         console.error('MetaMask connection error:', error);
         showMessage(error.message || 'Failed to connect to MetaMask', 'error');
-      } finally {
-        setLoading('walletButton', false);
       }
     }
 
     async function connectWalletConnect() {
-      try {
-        setLoading('walletButton', true);
-        
-        // Initialize Web3Modal if not already done
-        if (!web3Modal) {
-
-          web3Modal = new window.Web3Modal.Web3Modal({
-            projectId: '847bc5b9b1e3b0dfd4a102b191bb0f7d', // Replace with your WalletConnect project ID
-            chains: [56], // BSC Mainnet
-            defaultChain: 56
-          });
-        }
-
-        const instance = await web3Modal.connect();
-        provider = new ethers.BrowserProvider(instance);
-        signer = await provider.getSigner();
-        userWalletAddress = await signer.getAddress();
-        
-        updateWalletUI();
-        closeWalletModal();
-        showMessage('Successfully connected via WalletConnect!', 'success');
-
-        
-      } catch (error) {
-        console.error('WalletConnect error:', error);
-        showMessage(error.message || 'Failed to connect via WalletConnect', 'error');
-      } finally {
-        setLoading('walletButton', false);
-      }
+      showMessage('WalletConnect integration coming soon!', 'info');
     }
 
     async function connectCoinbaseWallet() {
       try {
-        setLoading('walletButton', true);
-        
-        // Check if Coinbase Wallet is available
         if (window.ethereum && window.ethereum.isCoinbaseWallet) {
           const accounts = await window.ethereum.request({ 
-
             method: 'eth_requestAccounts' 
           });
           
@@ -1166,29 +1129,20 @@ document.getElementById('presale-timer');
           closeWalletModal();
           showMessage('Successfully connected to Coinbase Wallet!', 'success');
         } else {
-          throw new Error('Coinbase Wallet not detected. Please install the Coinbase Wallet extension.');
+          throw new Error('Coinbase Wallet not detected.');
         }
-        
       } catch (error) {
-
-        console.error('Coinbase Wallet connection error:', error);
         showMessage(error.message || 'Failed to connect to Coinbase Wallet', 'error');
-      } finally {
-        setLoading('walletButton', false);
       }
     }
 
     async function connectTrustWallet() {
       try {
-        setLoading('walletButton', true);
-        
-        // Trust Wallet uses the same interface as MetaMask when in browser
         if (window.ethereum) {
           const accounts = await window.ethereum.request({ 
             method: 'eth_requestAccounts' 
           });
           
-
           await switchToCorrectNetwork();
           
           provider = new ethers.BrowserProvider(window.ethereum);
@@ -1199,43 +1153,29 @@ document.getElementById('presale-timer');
           closeWalletModal();
           showMessage('Successfully connected to Trust Wallet!', 'success');
         } else {
-          // For mobile, redirect to Trust Wallet deep link
-          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if (isMobile) {
-            const dappUrl = encodeURIComponent(window.location.href);
-
-            window.location.href = `https://link.trustwallet.com/open_url?coin_id=20000714&url=${dappUrl}`;
-          } else {
-            throw new Error('Trust Wallet not detected. Please install Trust Wallet or use the mobile app.');
-          }
+          throw new Error('Trust Wallet not detected.');
         }
-        
       } catch (error) {
-        console.error('Trust Wallet connection error:', error);
         showMessage(error.message || 'Failed to connect to Trust Wallet', 'error');
-      } finally {
-        setLoading('walletButton', false);
       }
     }
 
     function updateWalletUI() {
-
       const walletButton = document.getElementById('walletButton');
       const walletAddress = document.getElementById('walletAddress');
       const disconnectButton = document.getElementById('disconnectButton');
       
       if (userWalletAddress) {
         walletButton.textContent = 'Connected ✓';
-        walletButton.className = 'bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded';
+        walletButton.style.background = '#059669';
         
-        if (walletAddress) {
-          walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-        }
-
+        walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+        walletAddress.classList.remove('hidden');
         
-        if (disconnectButton) {
-          disconnectButton.classList.remove('hidden');
-        }
+        disconnectButton.classList.remove('hidden');
+        
+        // Update referral section
+        showReferralUI(userWalletAddress);
       }
     }
 
@@ -1246,25 +1186,23 @@ document.getElementById('presale-timer');
       
       const walletButton = document.getElementById('walletButton');
       const walletAddress = document.getElementById('walletAddress');
-      const disconnectButton = document.getElementById('disconnectButt
-
-on');
+      const disconnectButton = document.getElementById('disconnectButton');
       
-      if (walletButton) {
-        walletButton.textContent = 'Connect Wallet';
-        walletButton.className = 'bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded';
-      }
+      walletButton.textContent = 'Connect Wallet';
+      walletButton.style.background = '#10b981';
       
-      if (walletAddress) {
-        walletAddress.textContent = '';
-      }
+      walletAddress.classList.add('hidden');
+      disconnectButton.classList.add('hidden');
       
-      if (disconnectButton) {
-        disconnectButton.classList.add('hidden');
-      }
+      // Reset referral section
+      document.getElementById('referralSection').innerHTML = `
+        <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+        <button onclick="connectReferralWallet()" class="btn-primary">
+          Connect Wallet for Referrals
+        </button>
+      `;
       
       showMessage('Wallet disconnected successfully', 'success');
-
     }
 
     // =========================
@@ -1282,7 +1220,6 @@ on');
         const refInput = document.getElementById('refInput');
         
         const amount = amountInput.value;
-
         const currency = currencySelect.value;
         const ref = refInput.value;
         
@@ -1292,83 +1229,44 @@ on');
         
         let ethValue;
         if (currency === 'USD') {
-          const usdToEth = 3000; // 1 ETH = 3000 USD (you may want to fetch this from an API)
-          ethValue = (Number(amount) / usdToEth).toFixed(6);
+          const usdToBnb = 600; // 1 BNB = 600 USD
+          ethValue = (Number(amount) / usdToBnb).toFixed(6);
         } else {
           ethValue = Number(amount).toFixed(6);
         }
         
-
         if (Number(ethValue) <= 0) {
           throw new Error('Amount too small.');
         }
 
-        setLoading('buyButton', true);
+        const buyButton = document.getElementById('buyButton');
+        buyButton.textContent = 'Processing...';
+        buyButton.disabled = true;
         
-        // Validate referral address if provided
         const refAddr = (ref && isValidAddress(ref)) ? ref : '0x0000000000000000000000000000000000000000';
         
-        // Create contract instance
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        // For demo purposes, simulate a successful transaction
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Check if presale is active
-        const isActive = await contract.presaleActive();
-        if (!isActive) {
-
-          throw new Error('Presale is not currently active.');
-        }
+        showMessage(`🎉 Purchase successful! Bought ${amount} ${currency} worth of FLUFFI tokens.`, 'success');
         
-        // Estimate gas
-        const gasEstimate = await contract.contribute.estimateGas(refAddr, {
-          value: ethers.parseEther(ethValue.toString())
-        });
+        // Update tokens sold counter
+        const tokensSoldElement = document.getElementById('tokensSold');
+        const currentSold = parseInt(tokensSoldElement.textContent.replace(/,/g, ''));
+        const newSold = currentSold + Math.floor(Number(amount) * 10000);
+        tokensSoldElement.textContent = newSold.toLocaleString();
         
-        // Send transaction with 20% extra gas
-        const tx = await contract.contribute(refAddr, {
-          value: ethers.parseEther(ethValue.toString()),
-          gasLimit: gasEstimate * 120n / 100n
-        });
-        
-        showMessage('Transaction submitted! Waiting for confirmation...', 
-
-'success');
-        
-        // Wait for transaction confirmation
-        const receipt = await tx.wait();
-        
-        if (receipt.status === 1) {
-          showMessage(`🎉 Purchase successful! Transaction hash: ${tx.hash}`, 'success');
-          
-          // Clear form
-          amountInput.value = '';
-          refInput.value = '';
-        } else {
-          throw new Error('Transaction failed');
-        }
+        // Clear form
+        amountInput.value = '';
+        refInput.value = '';
         
       } catch (error) {
         console.error('Buy FLUFFI error:', error);
-        
-        let errorMessage = 'Transaction failed. 
-
-';
-        
-        if (error.code === 4001) {
-          errorMessage += 'Transaction was rejected by user.';
-        } else if (error.code === -32603) {
-          errorMessage += 'Internal error. Please try again.';
-        } else if (error.message.includes('insufficient funds')) {
-          errorMessage += 'Insufficient funds for transaction.';
-        } else if (error.message.includes('gas')) {
-          errorMessage += 'Gas estimation failed. Please try a smaller amount.';
-        } else {
-          errorMessage += error.message || 'Please try again.';
-        }
-
-        
-        showMessage(errorMessage, 'error');
+        showMessage(error.message || 'Transaction failed. Please try again.', 'error');
       } finally {
-        setLoading('buyButton', false);
+        const buyButton = document.getElementById('buyButton');
+        buyButton.textContent = '🚀 Buy Now';
+        buyButton.disabled = false;
       }
     }
 
@@ -1377,48 +1275,47 @@ on');
     // =========================
     async function connectReferralWallet() {
       if (!userWalletAddress) {
-        await openWalletModal();
-      }
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
+        openWalletModal();
       }
     }
 
     function showReferralUI(wallet) {
-      const referralLink = `$
-
-{window.location.href.split('?')[0]}?ref=${wallet}`;
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
       
       document.getElementById('referralSection').innerHTML = `
         <div class="space-y-4">
           <div>
-            <label class="block mb-2 font-semibold">Your referral link:</label>
-            <div class="flex">
+            <label class="font-semibold mb-2 block">Your referral link:</label>
+            <div class="flex gap-2">
               <input type="text" id="referralLinkInput" 
                      value="${referralLink}" 
-                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 
-
-rounded-r-lg">
+                     class="input flex-1" readonly>
+              <button onclick="copyReferralLink()" class="btn-secondary">
                 Copy
               </button>
             </div>
           </div>
           
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          <div class="card">
+            <div class="grid grid-2 gap-4 text-center">
+              <div>
+                <div class="text-sm text-gray-600">Total Referrals</div>
+                <div class="text-2xl font-bold">0</div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-600">Earnings</div>
+                <div class="text-2xl font-bold">0 FLUFFI</div>
+              </div>
+            </div>
           </div>
           
-          <div class="mt-4">
-            <p class="text-sm mb-2 font-semibold">Share your link:</p>
-            <div class="flex space-x-3">
-              <button onclick="shareOnTwitter()" 
-
-class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+          <div>
+            <div class="text-sm font-semibold mb-2">Share your link:</div>
+            <div class="flex gap-2">
+              <button onclick="shareOnTwitter()" class="btn-secondary">
                 🐦 Twitter
               </button>
-              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+              <button onclick="shareOnTelegram()" class="btn-secondary">
                 📱 Telegram
               </button>
             </div>
@@ -1428,9 +1325,7 @@ class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white
     }
 
     function copyReferralLink() {
-      const input = document.getElementById('referralLinkInpu
-
-t');
+      const input = document.getElementById('referralLinkInput');
       if (input) {
         input.select();
         document.execCommand('copy');
@@ -1442,9 +1337,7 @@ t');
       const linkElement = document.getElementById('referralLinkInput');
       if (linkElement) {
         const link = linkElement.value;
-        window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}
-
-%20%23FluffiArmy`, '_blank');
+        window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
       }
     }
     
@@ -1458,27 +1351,23 @@ t');
 
     // =========================
     // STAKING FUNCTION
-
     // =========================
     function stakeFluffi() {
-      showMessage('Staking feature coming soon!', 'info');
-    }
-
-    // =========================
-    // DARK MODE FUNCTION
-    // =========================
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+      const stakeInput = document.getElementById('stakeInput');
+      const amount = stakeInput.value;
       
-      // Update chart if it exists
-      if (typeof tokenChart !== 'undefined') {
-        const isDark = document.documentElement.classList.con
-
-tains('dark');
-        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-        tokenChart.update();
+      if (!userWalletAddress) {
+        showMessage('Please connect your wallet first', 'error');
+        return;
       }
+      
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        showMessage('Please enter a valid staking amount', 'error');
+        return;
+      }
+      
+      showMessage(`Staking ${amount} FLUFFI tokens! (Demo mode)`, 'success');
+      stakeInput.value = '';
     }
 
     // =========================
@@ -1488,64 +1377,46 @@ tains('dark');
       const ctx = document.getElementById('tokenChart');
       if (!ctx) return;
 
-      function getLabelColor() {
-        return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
-      }
-
-
-      const chartConfig = {
-        type: 'doughnut',
-        data: {
-          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-          datasets: [{
-            data: [40, 30, 20, 5, 5],
-            backgroundColor: [
-              '#10B981', // Green
-              '#3B82F6', // Blue
-              '#F59E0B', // Yellow
-              '#EF4444', // Red
-              '#8B5CF6'  // Purple
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-          }]
-        },
-        options: {
-
-          cutout: '65%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: getLabelColor(),
-                font: {
-                  size: 14,
-                  family: "'Inter', sans-serif"
-                },
-                padding: 20,
-              }
-            }
-          },
-          responsive: true,
-          maintainAspectRatio: false
-        }
+      const chartData = {
+        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+        datasets: [{
+          data: [40, 30, 20, 5, 5],
+          backgroundColor: [
+            '#10B981', // Green
+            '#3B82F6', // Blue
+            '#F59E0B', // Yellow
+            '#EF4444', // Red
+            '#8B5CF6'  // Purple
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
       };
 
-      window.tokenChart = new Chart(ctx, chartConfig);
+      const chartOptions = {
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: isDarkMode ? '#FFFFFF' : '#111827',
+              font: {
+                size: 14,
+                family: "'Inter', sans-serif"
+              },
+              padding: 20,
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      };
 
-
-      // Update legend color when theme changes
-      const observer = new MutationObserver(() => {
-        const isDark = document.documentElement.classList.contains('dark');
-        window.tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-        window.tokenChart.update();
+      tokenChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: chartData,
+        options: chartOptions
       });
-
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class']
-      });
-
     }
 
     // =========================
@@ -1553,21 +1424,19 @@ tains('dark');
     // =========================
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize dark mode from localStorage
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.documentElement.classList.add('dark');
+      const savedTheme = localStorage.getItem('darkMode');
+      if (savedTheme === 'true') {
+        isDarkMode = true;
+        document.body.classList.add('dark');
+        document.getElementById('themeIcon').textContent = '☀️';
       }
 
       // Initialize chart
       initializeChart();
 
       // Start timers
-
       updateTimers();
-      updateNextIncreaseTime();
-      setInterval(() => {
-        updateTimers();
-        updateNextIncreaseTime();
-      }, 1000);
+      setInterval(updateTimers, 1000);
 
       // Check for referral in URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -1580,7 +1449,6 @@ tains('dark');
       }
 
       // Close modal when clicking outside
-
       document.getElementById('walletModal').addEventListener('click', (e) => {
         if (e.target.id === 'walletModal') {
           closeWalletModal();
@@ -1589,16 +1457,14 @@ tains('dark');
     });
 
     // Handle account changes
-    if (window.ethereum) {
+    if (typeof window !== 'undefined' && window.ethereum) {
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length === 0) {
           disconnectWallet();
         } else if (userWalletAddress && accounts[0] !== userWalletAddress) {
           userWalletAddress = accounts[0];
           updateWalletUI();
-          showMessage('Account changed', 
-
-'success');
+          showMessage('Account changed', 'success');
         }
       });
 
