@@ -1308,48 +1308,6 @@
 
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      
-      document.getElementById('referralSection').innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="font-semibold mb-2 block">Your referral link:</label>
-            <div class="flex gap-2">
-              <input type="text" id="referralLinkInput" 
-                     value="${referralLink}" 
-                     class="input flex-1" readonly>
-              <button onclick="copyReferralLink()" class="btn-secondary">
-                Copy
-              </button>
-            </div>
-          </div>
-          
-          <div class="card">
-            <div class="grid grid-2 gap-4 text-center">
-              <div>
-                <div class="text-sm text-gray-600">Total Referrals</div>
-                <div class="text-2xl font-bold">0</div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-600">Earnings</div>
-                <div class="text-2xl font-bold">0 FLUFFI</div>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <div class="text-sm font-semibold mb-2">Share your link:</div>
-            <div class="flex gap-2">
-              <button onclick="shareOnTwitter()" class="btn-secondary">
-                🐦 Twitter
-              </button>
-              <button onclick="shareOnTelegram()" class="btn-secondary">
-                📱 Telegram
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
 
     function copyReferralLink() {
       const input = document.getElementById('referralLinkInput');
