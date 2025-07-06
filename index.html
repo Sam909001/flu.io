@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
   <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -36,7 +34,10 @@
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
       color: #1a1a1a;
       font-family: 'Inter', sans-serif;
-      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    body, .wallet-option, button, input, select {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .timer {
@@ -50,12 +51,12 @@
     /* Dark Mode Styles */
     .dark {
       background: #111827 !important;
-      color: #f0f0f0 !important;
+      color: #f8fafc !important;
     }
 
     .dark .bg-white {
       background-color: #1f2937 !important;
-      color: #f0f0f0 !important;
+      color: #f8fafc !important;
     }
 
     .dark .text-gray-600 {
@@ -89,16 +90,39 @@
     .dark .font-mono,
     .dark .font-bold,
     .dark .font-semibold {
-      color: #f0f0f0 !important;
-    }
-    
-    .dark .bg-gray-100 {
-      background-color: #374151 !important;
-      color: #f0f0f0 !important;
+      color: #f8fafc !important;
     }
 
-    .dark .text-gray-600.dark\\:text-gray-300 {
+    .dark .text-gray-600.dark\:text-gray-300 {
       color: #d1d5db !important;
+    }
+
+    /* Progress bar styling */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .dark .progress-bar {
+      background: #374151;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #2E7D32);
+      transition: width 0.5s ease;
+    }
+
+    /* Input fields */
+    input, select {
+      @apply text-black focus:outline-none focus:ring-2 focus:ring-green-500;
+    }
+    
+    .dark input, .dark select {
+      @apply text-white bg-gray-700 border-gray-600;
     }
 
     /* Logo animation */
@@ -114,21 +138,6 @@
       50% { 
         transform: translateY(-15px) scale(1.05) rotate(2deg); 
       }
-    }
-
-    /* Progress bar styling */
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: #f0f0f0;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #4CAF50, #2E7D32);
-      transition: width 0.5s ease;
     }
 
     /* Enhanced styling for presale section */
@@ -228,22 +237,11 @@
     }
 
     /* Wallet Options */
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      margin-bottom: 0.5rem;
-    }
-
-    .wallet-option:hover {
-      background-color: #f3f4f6;
-    }
-
-    .dark .wallet-option:hover {
-      background-color: #374151;
+    .btn-wallet {
+      @apply flex items-center w-full p-4 rounded-lg transition-colors
+             bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600
+             text-gray-800 dark:text-white border border-transparent
+             hover:border-gray-300 dark:hover:border-gray-500;
     }
 
     .wallet-icon {
@@ -276,14 +274,19 @@
 
     /* Error Message Styles */
     .error-message {
-      color: #ef4444;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      display: none;
+      @apply text-red-500 dark:text-red-400 text-sm mt-2 p-3 rounded-lg 
+             bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800;
+      animation: shake 0.5s ease-in-out;
     }
 
     .error-message.show {
       display: block;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-3px); }
+      40%, 80% { transform: translateX(3px); }
     }
 
     /* Success Message Styles */
@@ -305,6 +308,77 @@
     .success-message.show {
       transform: translateY(0);
       opacity: 1;
+    }
+
+    /* Unified button base */
+    .btn {
+      @apply font-semibold rounded-lg transition-all duration-200 
+             focus:outline-none focus:ring-2 focus:ring-opacity-50 
+             disabled:opacity-70 disabled:cursor-not-allowed;
+    }
+
+    /* Primary (Green) */
+    .btn-primary {
+      @apply bg-green-600 hover:bg-green-700 text-white 
+             focus:ring-green-500 py-3 px-6 text-lg;
+    }
+
+    /* Secondary (Blue) */
+    .btn-secondary {
+      @apply bg-blue-500 hover:bg-blue-600 text-white 
+             focus:ring-blue-400 py-2 px-4 text-base;
+    }
+
+    /* Special stake button variant */
+    .btn-stake {
+      @apply bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-400 
+             text-white py-3 px-6 text-lg;
+    }
+
+    /* Price Tooltip */
+    .price-container { position: relative; display: inline-block; }
+    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
+    .price-tooltip .tooltip-text {
+      visibility: hidden; width: 220px; background-color: #1f2937;
+      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
+      position: absolute; z-index: 1; bottom: 125%; left: 50%;
+      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .price-tooltip .tooltip-text::after {
+      content: ""; position: absolute; top: 100%; left: 50%;
+      margin-left: -5px; border-width: 5px; border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+    
+    .dark .price-tooltip .tooltip-text {
+      background-color: #1F2937 !important;
+      color: #F9FAFB !important;
+      border: 1px solid #4B5563;
+    }
+
+    .dark .price-tooltip .tooltip-text::after {
+      border-color: #1F2937 transparent transparent transparent !important;
+    }
+
+    .dark .price-tooltip .fa-info-circle {
+      color: #60A5FA !important;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* Mobile responsiveness */
@@ -336,64 +410,6 @@
         opacity: 0.7;
       }
     }
-
-    /* Price Tooltip */
-    .price-container { position: relative; display: inline-block; }
-    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
-    .price-tooltip .tooltip-text {
-      visibility: hidden; width: 220px; background-color: #1f2937;
-      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
-      position: absolute; z-index: 1; bottom: 125%; left: 50%;
-      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
-      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .price-tooltip .tooltip-text::after {
-      content: ""; position: absolute; top: 100%; left: 50%;
-      margin-left: -5px; border-width: 5px; border-style: solid;
-      border-color: #1f2937 transparent transparent transparent;
-    }
-    .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
-    .dark .price-tooltip .tooltip-text { background-color: #f9fafb; color: #1f2937; }
-    .dark .price-tooltip .tooltip-text::after {
-      border-color: #f9fafb transparent transparent transparent;
-    }
-
-    /* Fix dark mode tooltip visibility */
-    .dark .price-tooltip .tooltip-text {
-      background-color: #1F2937 !important;
-      color: #F9FAFB !important;
-      border: 1px solid #4B5563;
-    }
-
-    .dark .price-tooltip .tooltip-text::after {
-      border-color: #1F2937 transparent transparent transparent !important;
-    }
-
-    /* Make info icon more visible */
-    .dark .price-tooltip .fa-info-circle {
-      color: #60A5FA !important;
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Disabled Button */
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
@@ -411,11 +427,11 @@
       <a href="#faq" class="text-white hover:underline">FAQ</a>
       <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
       <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
+      <a href="how-to-buy.html" target="_blank" class="btn btn-secondary">
         How to Buy FLUFFI
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="openWalletModal()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="openWalletModal()" id="walletButton" class="btn btn-secondary">Connect Wallet</button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
   </header>
@@ -487,7 +503,7 @@
       </div>
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
       <div id="buyError" class="error-message"></div>
-      <button onclick="buyFluffi()" id="buyButton" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+      <button onclick="buyFluffi()" id="buyButton" class="btn btn-primary w-full">
         🚀 Buy Now
       </button>
     </section>
@@ -497,7 +513,7 @@
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="btn btn-primary">
           Connect Wallet for Referrals
         </button>
       </div>
@@ -507,7 +523,7 @@
     <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">🎁 Claim $FLUFFI</h2>
       <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button onclick="claimTokens()" id="claimButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">Claim Tokens</button>
+      <button onclick="claimTokens()" id="claimButton" class="btn btn-primary w-full">Claim Tokens</button>
       <div id="claimError" class="error-message"></div>
     </section>
 
@@ -517,7 +533,9 @@
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" />
       <div id="stakeError" class="error-message"></div>
-      <button onclick="stakeFluffi()" id="stakeButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
+      <button onclick="stakeFluffi()" id="stakeButton" class="btn btn-stake w-full">
+        Stake Now
+      </button>
     </section>
     
     <!-- Tokenomics Section -->
@@ -525,7 +543,6 @@
       <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
         📊 Tokenomics
       </h2>
-
       <div class="grid md:grid-cols-2 gap-10 items-center">
         <!-- Token Details -->
         <div>
@@ -702,22 +719,14 @@
     </div>
   </footer>
 
-    <!-- Wallet Modal -->
+  <!-- Wallet Modal -->
   <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
       <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
-      <div class="grid grid-cols-2 gap-4">
-        <button onclick="connectMetaMask()" class="wallet-option">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
-          <span>MetaMask</span>
-        </button>
-        <button onclick="connectWalletConnect()" class="wallet-option">
-          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
-          <span>WalletConnect</span>
-        </button>
       
       <div class="space-y-3">
-        <div class="wallet-option" onclick="connectMetaMask()">
+        <!-- MetaMask Option -->
+        <button class="btn-wallet" onclick="connectMetaMask()">
           <div class="wallet-icon">
             <i class="fab fa-ethereum"></i>
           </div>
@@ -725,9 +734,10 @@
             <div class="wallet-name dark:text-white">MetaMask</div>
             <div class="wallet-description">Browser extension</div>
           </div>
-        </div>
+        </button>
         
-        <div class="wallet-option" onclick="connectWalletConnect()">
+        <!-- WalletConnect Option -->
+        <button class="btn-wallet" onclick="connectWalletConnect()">
           <div class="wallet-icon">
             <i class="fas fa-wallet"></i>
           </div>
@@ -735,9 +745,10 @@
             <div class="wallet-name dark:text-white">WalletConnect</div>
             <div class="wallet-description">Mobile wallets</div>
           </div>
-        </div>
+        </button>
         
-        <div class="wallet-option" onclick="connectCoinbaseWallet()">
+        <!-- Coinbase Wallet Option -->
+        <button class="btn-wallet" onclick="connectCoinbaseWallet()">
           <div class="wallet-icon">
             <i class="fab fa-bitcoin"></i>
           </div>
@@ -745,13 +756,12 @@
             <div class="wallet-name dark:text-white">Coinbase Wallet</div>
             <div class="wallet-description">Mobile & browser</div>
           </div>
-        </div>
+        </button>
       </div>
       
       <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
         By connecting, you agree to our Terms of Service
       </div>
-       let provider = null;
     </div>
   </div>
 
@@ -771,7 +781,6 @@
     let provider = null;
     let userWalletAddress = null;
     let tokenChart = null;
-    let web3Modal = null;
     let isConnecting = false;
     
     // Presale configuration
@@ -850,7 +859,6 @@
           params: [{ chainId: '0x38' }], // BSC Mainnet
         });
       } catch (switchError) {
-        // This error code indicates that the chain has not been added to MetaMask
         if (switchError.code === 4902) {
           try {
             await window.ethereum.request({
@@ -885,8 +893,6 @@
       try {
         if (!window.ethereum) {
           if (isMobile()) {
-            // Mobile deep link to MetaMask
-            const dappUrl = encodeURIComponent(window.location.href);
             window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`, '_blank');
             return;
           } else {
@@ -896,11 +902,12 @@
 
         const accounts = await window.ethereum.request({ 
           method: 'eth_requestAccounts' 
+        }).catch(err => {
+          if (err.code === 4001) throw new Error("Connection rejected");
+          throw err;
         });
-        
-        if (accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock MetaMask.');
-        }
+
+        if (!accounts.length) throw new Error("No accounts found");
 
         await switchToCorrectNetwork();
         
@@ -914,7 +921,7 @@
         
       } catch (error) {
         console.error('MetaMask connection error:', error);
-        showError('buyError', error.message || 'Failed to connect to MetaMask');
+        showError('walletError', error.message || 'Failed to connect to MetaMask');
       } finally {
         isConnecting = false;
       }
@@ -925,26 +932,12 @@
       isConnecting = true;
       
       try {
-        const walletConnectProvider = new WalletConnectProvider.default({
-          rpc: {
-            56: "https://bsc-dataseed.binance.org/"
-          },
-          chainId: 56
-        });
-
-        await walletConnectProvider.enable();
-        
-        provider = new ethers.BrowserProvider(walletConnectProvider);
-        signer = await provider.getSigner();
-        userWalletAddress = await signer.getAddress();
-        
-        updateWalletUI();
-        closeWalletModal();
-        showSuccessMessage('Successfully connected via WalletConnect!');
+        // In a real implementation, you would initialize WalletConnect here
+        throw new Error('WalletConnect implementation required');
         
       } catch (error) {
         console.error('WalletConnect error:', error);
-        showError('buyError', error.message || 'Failed to connect via WalletConnect');
+        showError('walletError', 'WalletConnect not configured in this demo');
       } finally {
         isConnecting = false;
       }
@@ -955,9 +948,8 @@
       isConnecting = true;
       
       try {
-        if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
+        if (!window.ethereum?.isCoinbaseWallet) {
           if (isMobile()) {
-            // Mobile deep link to Coinbase Wallet
             const dappUrl = encodeURIComponent(window.location.href);
             window.open(`https://go.cb-w.com/dapp?cb_url=${dappUrl}`, '_blank');
             return;
@@ -982,7 +974,7 @@
         
       } catch (error) {
         console.error('Coinbase Wallet connection error:', error);
-        showError('buyError', error.message || 'Failed to connect to Coinbase Wallet');
+        showError('walletError', error.message || 'Failed to connect to Coinbase Wallet');
       } finally {
         isConnecting = false;
       }
@@ -994,13 +986,12 @@
       
       if (userWalletAddress) {
         walletButton.textContent = 'Connected ✓';
-        walletButton.classList.remove('bg-green-700');
+        walletButton.classList.remove('bg-blue-500');
         walletButton.classList.add('bg-green-600');
         
         walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
         walletAddress.classList.remove('hidden');
         
-        // Update referral section
         showReferralUI(userWalletAddress);
       }
     }
@@ -1015,19 +1006,16 @@
       
       walletButton.textContent = 'Connect Wallet';
       walletButton.classList.remove('bg-green-600');
-      walletButton.classList.add('bg-green-700');
+      walletButton.classList.add('bg-blue-500');
       
       walletAddress.classList.add('hidden');
       
-      // Reset referral section
       document.getElementById('referralSection').innerHTML = `
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+        <button onclick="connectReferralWallet()" class="btn btn-primary">
           Connect Wallet for Referrals
         </button>
       `;
-      
-      showSuccessMessage('Wallet disconnected successfully');
     }
     
     // =========================
@@ -1091,63 +1079,94 @@
     // =========================
     // TRANSACTION FUNCTIONS
     // =========================
-    async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
-      // Validate inputs
-      if (!userWalletAddress) {
-        showError('buyError', 'Please connect your wallet first.');
-        return;
-      }
-      
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        showError('buyError', 'Please enter a valid amount.');
-        return;
-      }
-      
-      if (ref && !isValidAddress(ref)) {
-        showError('buyError', 'Invalid referral address format.');
-        return;
-      }
-      
-      // Calculate ETH value
-      let ethValue;
-      if (currency === 'USD') {
-        // In a real app, you would fetch this from an API
-        const usdToEth = 3000; // 1 ETH = 3000 USD
-        ethValue = (Number(amount) / usdToEth).toFixed(6);
-      } else {
-        ethValue = Number(amount).toFixed(6);
-      }
-      
+    async function safeTransaction(operation, params) {
       try {
-        toggleButtonLoading('buyButton', true);
-        
-        // In a real app, you would interact with your smart contract here
-        // This is just a simulation
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Simulate successful transaction
-        showSuccessMessage('Purchase successful!');
-        
-        // Update tokens sold display
-        const currentSold = parseInt(document.getElementById('tokensSold').textContent.replace(/,/g, ''));
-        document.getElementById('tokensSold').textContent = (currentSold + Math.floor(amount * 1000000)).toLocaleString();
-        
+        toggleButtonLoading(params.buttonId, true);
+        const result = await operation();
+        return result;
       } catch (error) {
-        console.error('Buy error:', error);
-        showError('buyError', error.message || 'Transaction failed');
+        console.error(`${params.context} Error:`, error);
+        
+        let userMessage = error.message;
+        if (error.code === 4001) userMessage = "Transaction rejected";
+        if (error.code === -32603) userMessage = "Network error occurred";
+        
+        showError(params.errorElementId, `
+          ${params.friendlyMessage || "Operation failed"}: 
+          ${userMessage}
+          ${params.retryHint ? "\n\n" + params.retryHint : ''}
+        `);
+        
+        return null;
       } finally {
-        toggleButtonLoading('buyButton', false);
+        toggleButtonLoading(params.buttonId, false);
+      }
+    }
+
+    function validatePurchase(params) {
+      if (!userWalletAddress) {
+        return { valid: false, message: 'Please connect your wallet first.' };
+      }
+      
+      if (!params.amount || isNaN(params.amount) || Number(params.amount) <= 0) {
+        return { valid: false, message: 'Please enter a valid amount.' };
+      }
+      
+      if (params.ref && !isValidAddress(params.ref)) {
+        return { valid: false, message: 'Invalid referral address format.' };
+      }
+      
+      return { valid: true };
+    }
+
+    async function mockPurchase(params) {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return {
+        success: true,
+        amount: params.amount,
+        tokens: params.amount * 1000000
+      };
+    }
+
+    function updateUIAfterPurchase(result) {
+      showSuccessMessage('Purchase successful!');
+      const currentSold = parseInt(document.getElementById('tokensSold').textContent.replace(/,/g, ''));
+      document.getElementById('tokensSold').textContent = (currentSold + result.tokens).toLocaleString();
+    }
+
+    async function buyFluffi() {
+      const params = {
+        amount: document.getElementById('amountInput').value,
+        currency: document.getElementById('currencySelect').value,
+        ref: document.getElementById('refInput').value
+      };
+
+      const validation = validatePurchase(params);
+      if (!validation.valid) {
+        showError('buyError', validation.message);
+        return;
+      }
+
+      const result = await safeTransaction(
+        async () => await mockPurchase(params),
+        {
+          context: "Token Purchase",
+          buttonId: 'buyButton',
+          errorElementId: 'buyError',
+          friendlyMessage: "Purchase failed",
+          retryHint: "Check your balance and try again"
+        }
+      );
+
+      if (result) {
+        updateUIAfterPurchase(result);
       }
     }
     
     async function stakeFluffi() {
       const amount = document.getElementById('stakeInput').value;
       
-      // Validate inputs
       if (!userWalletAddress) {
         showError('stakeError', 'Please connect your wallet first.');
         return;
@@ -1158,22 +1177,19 @@
         return;
       }
       
-      try {
-        toggleButtonLoading('stakeButton', true);
-        
-        // In a real app, you would interact with your staking contract here
-        // This is just a simulation
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Simulate successful staking
-        showSuccessMessage('Tokens staked successfully!');
-        
-      } catch (error) {
-        console.error('Stake error:', error);
-        showError('stakeError', error.message || 'Staking failed');
-      } finally {
-        toggleButtonLoading('stakeButton', false);
-      }
+      await safeTransaction(
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return { success: true };
+        },
+        {
+          context: "Staking",
+          buttonId: 'stakeButton',
+          errorElementId: 'stakeError',
+          friendlyMessage: "Staking failed",
+          retryHint: "Check your token balance and approval"
+        }
+      );
     }
     
     async function claimTokens() {
@@ -1182,22 +1198,19 @@
         return;
       }
       
-      try {
-        toggleButtonLoading('claimButton', true);
-        
-        // In a real app, you would interact with your contract here
-        // This is just a simulation
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Simulate successful claim
-        showSuccessMessage('Tokens claimed successfully!');
-        
-      } catch (error) {
-        console.error('Claim error:', error);
-        showError('claimError', error.message || 'Claim failed');
-      } finally {
-        toggleButtonLoading('claimButton', false);
-      }
+      await safeTransaction(
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return { success: true };
+        },
+        {
+          context: "Claim",
+          buttonId: 'claimButton',
+          errorElementId: 'claimError',
+          friendlyMessage: "Claim failed",
+          retryHint: "Try again later"
+        }
+      );
     }
     
     // =========================
@@ -1223,8 +1236,8 @@
             <div class="flex">
               <input type="text" id="referralLinkInput" 
                      value="${referralLink}" 
-                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600" readonly>
+              <button onclick="copyReferralLink()" class="btn btn-secondary rounded-l-none">
                 Copy
               </button>
             </div>
@@ -1238,10 +1251,10 @@
           <div class="mt-4">
             <p class="text-sm mb-2 font-semibold dark:text-white">Share your link:</p>
             <div class="flex space-x-3">
-              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+              <button onclick="shareOnTwitter()" class="btn btn-secondary text-sm">
                 🐦 Twitter
               </button>
-              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+              <button onclick="shareOnTelegram()" class="btn btn-secondary text-sm">
                 📱 Telegram
               </button>
             </div>
@@ -1323,7 +1336,6 @@
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
       
-      // Update chart colors if it exists
       if (tokenChart) {
         const isDarkMode = document.documentElement.classList.contains('dark');
         tokenChart.options.plugins.legend.labels.color = isDarkMode ? '#FFFFFF' : '#111827';
@@ -1369,7 +1381,6 @@
           } else if (userWalletAddress && accounts[0] !== userWalletAddress) {
             userWalletAddress = accounts[0];
             updateWalletUI();
-            showSuccessMessage('Account changed');
           }
         });
 
@@ -1378,12 +1389,6 @@
         });
       }
     });
-    
-    // Testing function - remove in production
-    function resetTimer() {
-      localStorage.removeItem('presaleStartTime');
-      location.reload();
-    }
   </script>
 </body>
 </html>
