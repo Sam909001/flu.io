@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -406,13 +407,6 @@
 </head>
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
-   <!-- Mobile Connect Button -->
-<div class="md:hidden text-center my-4">
-  <button onclick="openWalletModal()" class="btn btn-primary text-sm px-4 py-2">
-    🔗 Connect Wallet (Mobile)
-  </button>
-</div>
-
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
       <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
@@ -430,12 +424,17 @@
         How to Buy FLUFFI
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="openWalletModal()" id="walletButton" class="btn btn-secondary hidden md:inline-block">
-  Connect Wallet
-</button>
+      <button onclick="openWalletModal()" id="walletButton" class="btn btn-secondary">Connect Wallet</button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
   </header>
+<!-- Mobile Connect Button -->
+<div class="md:hidden text-center my-4">
+  <button onclick="openWalletModal()" class="bg-green-600 text-white px-4 py-2 rounded shadow">
+    🔗 Connect Wallet (Mobile)
+  </button>
+</div>
+
 
   <main class="p-6 mx-auto w-full max-w-6xl">
     <!-- Timer Section -->
@@ -1402,13 +1401,7 @@
       if (localStorage.getItem('darkMode') === 'true') {
         document.documentElement.classList.add('dark');
       }
-        // Show wallet modal automatically for mobile if wallet not connected
-  if (isMobile() && !userWalletAddress) {
-    setTimeout(() => {
-      openWalletModal();
-    }, 1500); // small delay for better UX
-  }
-});
+      
       // Show reset button in development
       if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
         document.getElementById('devResetButton').classList.remove('hidden');
@@ -1459,5 +1452,21 @@
       }
     });
   </script>
+
+<script>
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isMobile() && !window.userWalletAddress) {
+      setTimeout(() => {
+        const btn = document.getElementById('walletconnect-mobile');
+        if (btn) btn.classList.remove('hidden');
+      }, 1000);
+    }
+  });
+</script>
+
 </body>
 </html>
