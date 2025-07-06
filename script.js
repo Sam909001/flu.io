@@ -1,5 +1,7 @@
 // --- Global State ---
 let userWallet = null;
+let walletConnectProvider = null;
+let isConnecting = false;
 const leaderboard = JSON.parse(localStorage.getItem('fluffiLeaderboard')) || {};
 const initialPrice = 0.0001;
 const TOTAL_STAGES = 15;
@@ -35,37 +37,126 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLeaderboard();
   startCountdown();
   setInterval(simulatePriceMovement, 5000);
+  
+  // Initialize wallet listeners
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    window.ethereum.on('chainChanged', () => window.location.reload());
+  }
 });
 
 // --- Wallet Connection ---
 async function connectWallet() {
-  if (!window.ethereum) return alert('Please install MetaMask!');
-
+  if (isConnecting) return;
+  isConnecting = true;
+  
   try {
     document.querySelectorAll('[id*="connect"]').forEach(btn => {
       btn.disabled = true;
       btn.textContent = "Connecting...";
     });
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    userWallet = accounts[0];
-
-    document.querySelectorAll('[id*="connect"]').forEach(btn => {
-      btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
-      btn.disabled = false;
-    });
-
-    if (elements.referralSection) generateReferralUI();
+    // Try MetaMask first
+    if (window.ethereum) {
+      await connectMetaMask();
+    } else {
+      // Fallback to WalletConnect
+      await connectWalletConnect();
+    }
   } catch (error) {
+    console.error('Connection error:', error);
     alert(`Error: ${error.message}`);
-    document.querySelectorAll('[id*="connect"]').forEach(btn => {
-      btn.disabled = false;
-      btn.textContent = "Connect Wallet";
-    });
+    resetWalletButtons();
+  } finally {
+    isConnecting = false;
   }
 }
 
-// --- Referral ---
+async function connectMetaMask() {
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+  userWallet = accounts[0];
+  updateWalletUI();
+}
+
+async function connectWalletConnect() {
+  // Initialize WalletConnect Provider
+  walletConnectProvider = new WalletConnectProvider.default({
+    rpc: {
+      1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+      56: "https://bsc-dataseed.binance.org/",
+      137: "https://polygon-rpc.com/"
+    },
+    chainId: 56, // Default to BSC
+    qrcodeModalOptions: {
+      mobileLinks: ["metamask", "trust", "rainbow", "argent", "coinbase"],
+      desktopLinks: ["metamask", "coinbase"]
+    }
+  });
+
+  // Handle mobile deep linking
+  if (isMobile()) {
+    walletConnectProvider.connector.on("display_uri", (err, payload) => {
+      const uri = payload.params[0];
+      // Try to open directly in mobile wallet
+      if (navigator.userAgent.match(/Trust/i)) {
+        window.open(`https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`);
+      } else if (navigator.userAgent.match(/MetaMaskMobile/i)) {
+        window.open(`https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`);
+      }
+    });
+  }
+
+  await walletConnectProvider.enable();
+  
+  // Create Ethers provider
+  const provider = new ethers.BrowserProvider(walletConnectProvider);
+  const signer = await provider.getSigner();
+  userWallet = await signer.getAddress();
+
+  // Set up event listeners
+  walletConnectProvider.on("accountsChanged", handleAccountsChanged);
+  walletConnectProvider.on("disconnect", disconnectWallet);
+
+  updateWalletUI();
+}
+
+function handleAccountsChanged(accounts) {
+  if (accounts.length === 0) {
+    disconnectWallet();
+  } else {
+    userWallet = accounts[0];
+    updateWalletUI();
+  }
+}
+
+function disconnectWallet() {
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
+    walletConnectProvider = null;
+  }
+  userWallet = null;
+  resetWalletButtons();
+}
+
+function updateWalletUI() {
+  if (!userWallet) return;
+  
+  document.querySelectorAll('[id*="connect"]').forEach(btn => {
+    btn.textContent = `${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+    btn.disabled = false;
+  });
+
+  if (elements.referralSection) generateReferralUI();
+}
+
+function resetWalletButtons() {
+  document.querySelectorAll('[id*="connect"]').forEach(btn => {
+    btn.disabled = false;
+    btn.textContent = "Connect Wallet";
+  });
+}
+
+// --- Referral System (keep existing implementation) ---
 function initReferralSystem() {
   const refCode = new URLSearchParams(window.location.search).get('ref');
   if (refCode && /^0x[a-fA-F0-9]{40}$/.test(refCode)) {
@@ -236,4 +327,7 @@ function simulatePriceMovement() {
   const change = (Math.random() * 0.00002) - 0.00001;
   currentPrice = Math.max(0.00009, currentPrice + change);
   elements.currentPrice.textContent = currentPrice.toFixed(6);
+}
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 }
