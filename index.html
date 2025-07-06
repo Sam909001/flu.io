@@ -4,6 +4,7 @@
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -782,6 +783,7 @@
     let userWalletAddress = null;
     let tokenChart = null;
     let isConnecting = false;
+    let walletConnectProvider = null;
     
     // Presale configuration
     const TOTAL_STAGES = 15;
@@ -789,131 +791,148 @@
     const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
     
     // =========================
-    // UTILITY FUNCTIONS
+    // WALLET FUNCTIONS - UPDATED
     // =========================
-    function isMobile() {
-      return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-    }
-    
-    function isValidAddress(address) {
-      return /^0x[a-fA-F0-9]{40}$/.test(address);
-    }
-    
-    function showSuccessMessage(message) {
-      const element = document.getElementById('successMessage');
-      document.getElementById('successMessageText').textContent = message;
-      element.classList.add('show');
-      
-      setTimeout(() => {
-        element.classList.remove('show');
-      }, 3000);
-    }
-    
-    function showError(elementId, message) {
-      const element = document.getElementById(elementId);
-      element.textContent = message;
-      element.classList.add('show');
-      
-      setTimeout(() => {
-        element.classList.remove('show');
-      }, 5000);
-    }
-    
-    function toggleButtonLoading(buttonId, isLoading) {
-      const button = document.getElementById(buttonId);
-      if (!button) return;
-      
-      if (isLoading) {
-        button.disabled = true;
-        button.innerHTML = `<span class="spinner"></span> Processing...`;
-      } else {
-        button.disabled = false;
-        // Reset to original text based on button ID
-        if (buttonId === 'buyButton') {
-          button.textContent = '🚀 Buy Now';
-        } else if (buttonId === 'stakeButton') {
-          button.textContent = 'Stake Now';
-        } else if (buttonId === 'claimButton') {
-          button.textContent = 'Claim Tokens';
-        }
-      }
-    }
-    
-    // =========================
-    // WALLET FUNCTIONS
-    // =========================
-    function openWalletModal() {
-      document.getElementById('walletModal').classList.add('active');
-    }
-    
-    function closeWalletModal() {
-      document.getElementById('walletModal').classList.remove('active');
-    }
-    
-    async function switchToCorrectNetwork() {
-      if (!window.ethereum) return;
+    async function connectWalletConnect() {
+      if (isConnecting) return;
+      isConnecting = true;
       
       try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x38' }], // BSC Mainnet
+        // Initialize WalletConnect Provider
+        walletConnectProvider = new WalletConnectProvider.default({
+          rpc: {
+            56: "https://bsc-dataseed.binance.org/" // BSC Mainnet
+          },
+          chainId: 56
         });
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: '0x38',
-                chainName: 'Binance Smart Chain',
-                nativeCurrency: {
-                  name: 'BNB',
-                  symbol: 'bnb',
-                  decimals: 18
-                },
-                rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                blockExplorerUrls: ['https://bscscan.com']
-              }]
-            });
-          } catch (addError) {
-            console.error('Error adding BSC network:', addError);
-            throw new Error('Failed to add Binance Smart Chain network to your wallet');
-          }
-        } else {
-          console.error('Error switching to BSC network:', switchError);
-          throw new Error('Failed to switch to Binance Smart Chain network');
-        }
+
+        // Enable session (triggers QR code modal)
+        await walletConnectProvider.enable();
+        
+        // Create Ethers provider
+        provider = new ethers.BrowserProvider(walletConnectProvider);
+        signer = await provider.getSigner();
+        userWalletAddress = await signer.getAddress();
+        
+        // Subscribe to events
+        walletConnectProvider.on("accountsChanged", (accounts) => {
+          if (accounts.length === 0) disconnectWallet();
+          else updateWalletUI();
+        });
+
+        walletConnectProvider.on("chainChanged", () => {
+          window.location.reload();
+        });
+
+        walletConnectProvider.on("disconnect", () => {
+          disconnectWallet();
+        });
+
+        updateWalletUI();
+        closeWalletModal();
+        showSuccessMessage('Successfully connected via WalletConnect!');
+        
+      } catch (error) {
+        console.error('WalletConnect error:', error);
+        showError('walletError', error.message || 'Failed to connect via WalletConnect');
+      } finally {
+        isConnecting = false;
       }
     }
-    
+
+    // Add to disconnect function
+    function disconnectWallet() {
+      if (walletConnectProvider) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+      userWalletAddress = null;
+      provider = null;
+      signer = null;
+      
+      const walletButton = document.getElementById('walletButton');
+      const walletAddress = document.getElementById('walletAddress');
+      
+      walletButton.textContent = 'Connect Wallet';
+      walletButton.classList.remove('bg-green-600');
+      walletButton.classList.add('bg-blue-500');
+      
+      walletAddress.classList.add('hidden');
+      
+      document.getElementById('referralSection').innerHTML = `
+        <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+        <button onclick="connectReferralWallet()" class="btn btn-primary">
+          Connect Wallet for Referrals
+        </button>
+      `;
+    }
+
+    // =========================
+    // TIMER FUNCTIONS - ADD RESET FOR DEV
+    // =========================
+    function resetPresaleTimer() {
+      if (confirm("Reset presale timer for development?")) {
+        localStorage.removeItem('presaleStartTime');
+        location.reload();
+      }
+    }
+
+    // Add to DOMContentLoaded:
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add dev tools if localhost
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        window._devTools = {
+          resetTimer: resetPresaleTimer
+        };
+        console.log("Dev tools available: _devTools.resetTimer()");
+      }
+      
+      // ... rest of your init code ...
+    });
+
+    // =========================
+    // METAMASK CONNECTION IMPROVEMENTS
+    // =========================
     async function connectMetaMask() {
       if (isConnecting) return;
       isConnecting = true;
       
       try {
         if (!window.ethereum) {
+          // Mobile deep link
           if (isMobile()) {
-            window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`, '_blank');
-            return;
+            window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`);
+            throw new Error("Please open in MetaMask browser");
           } else {
             throw new Error('MetaMask not detected. Please install MetaMask browser extension.');
           }
         }
 
-        const accounts = await window.ethereum.request({ 
+        // Check if already connected
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          userWalletAddress = accounts[0];
+          provider = new ethers.BrowserProvider(window.ethereum);
+          signer = await provider.getSigner();
+          updateWalletUI();
+          return;
+        }
+
+        // Request connection
+        const newAccounts = await window.ethereum.request({ 
           method: 'eth_requestAccounts' 
         }).catch(err => {
           if (err.code === 4001) throw new Error("Connection rejected");
           throw err;
         });
 
-        if (!accounts.length) throw new Error("No accounts found");
+        if (!newAccounts.length) throw new Error("No accounts found");
 
         await switchToCorrectNetwork();
         
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
-        userWalletAddress = accounts[0];
+        userWalletAddress = newAccounts[0];
         
         updateWalletUI();
         closeWalletModal();
