@@ -1,5 +1,9 @@
+/* =============================
+   FLUFFI Token - Unified Style Sheet
+   Combined core, layout, theme, and extras
+   ============================= */
 
-/* ====== CORE RESET & VARIABLES ====== */
+/* ====== VARIABLES ====== */
 :root {
   --primary: #10B981;
   --primary-dark: #059669;
@@ -19,176 +23,25 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
+  background: linear-gradient(to bottom, #fff0f5, #fff9e6);
   color: var(--text-dark);
-  background-color: var(--bg-light);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   transition: all 0.3s ease;
+  max-width: 100%;
 }
 
 .dark body {
-  background-color: var(--bg-dark);
+  background: #111827;
   color: var(--text-light);
 }
 
-/* ====== LAYOUT STRUCTURE ====== */
-.site-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-header {
-  width: 100%;
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #10B981, #059669) !important;
-  color: var(--text-light);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.main-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem; /* Reduced from 2rem */
-  padding: 1.5rem; /* Reduced from 2rem */
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* Tight layout for right column sections */
-.main-content > div:last-child {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 0.75rem; /* Tight gap between sections */
-}
-
-/* For modern browsers supporting subgrid */
-@supports (grid-template-columns: subgrid) {
-  .main-content {
-    grid-template-columns: subgrid;
-  }
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .main-content {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
-  }
-}
-
-.content-section {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 0; /* Remove default bottom margin */
-}
-
-.dark .content-section {
-  background: #1e293b;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-/* Specific section adjustments */
-#referral,
-#claim, 
-#tokenomics {
-  padding: 1.25rem; /* Slightly reduced padding */
-  margin-bottom: 0;
-}
-
-/* ====== NAVIGATION ====== */
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.site-nav a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.site-nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* ====== TYPOGRAPHY ====== */
-/* Base text colors */
-body {
-  color: var(--text-dark); /* Black in light mode */
-}
-
-.dark body {
-  color: var(--text-light); /* White in dark mode */
-}
-
-/* Headings */
 h1, h2, h3, h4 {
   font-weight: 700;
   line-height: 1.3;
   margin-bottom: 1rem;
-  color: var(--text-dark);
-}
-
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4 {
-  color: var(--text-light);
-}
-
-/* Section titles */
-.section-title {
-  color: var(--text-dark);
-  font-weight: 700;
-}
-
-.dark .section-title {
-  color: var(--text-light);
-}
-
-/* Specific element adjustments */
-#presale,
-#referral,
-.price-ticker,
-.tokenomics-section {
-  color: var(--text-dark);
-}
-
-.dark #presale,
-.dark #referral,
-.dark .price-ticker,
-.dark .tokenomics-section {
-  color: var(--text-light);
-}
-
-/* Forced white text elements (e.g., buttons) */
-.always-light-text {
-  color: white !important;
-}
-
-/* Forced dark text elements */
-.always-dark-text {
-  color: var(--text-dark) !important;
-}
-body, h1, h2, h3, h4, .section-title,
-#presale, #referral, .price-ticker, .tokenomics-section {
-  transition: color 0.3s ease;
 }
 
 h1 {
@@ -197,7 +50,6 @@ h1 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  display: inline-block;
 }
 
 h2 {
@@ -209,6 +61,43 @@ h2 {
   color: var(--secondary);
 }
 
+/* Section Titles */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.dark .section-title,
+.dark h1, .dark h2, .dark h3, .dark h4 {
+  color: var(--text-light);
+}
+
+/* ====== HEADER ====== */
+header {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: var(--text-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  animation: fluffi-float 3s ease-in-out infinite;
+}
+
+@keyframes fluffi-float {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0); }
+  50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+}
+
 /* ====== BUTTONS ====== */
 .btn {
   display: inline-flex;
@@ -217,10 +106,10 @@ h2 {
   padding: 0.75rem 1.75rem;
   font-weight: 600;
   border-radius: 8px;
-  text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
   border: none;
+  text-decoration: none;
 }
 
 .btn-primary {
@@ -239,163 +128,16 @@ h2 {
   color: white;
 }
 
-/* ====== SPECIAL EFFECTS ====== */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+.connect-wallet-btn {
+  background: linear-gradient(90deg, #FF00FF 0%, #8A2BE2 100%);
+  box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+  transition: transform 0.3s;
+}
+.connect-wallet-btn:hover {
+  transform: translateY(-3px);
 }
 
-.floating {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.pulse:hover {
-  animation: pulse 1.5s infinite;
-}
-
-.price-update {
-  animation: pulseUpdate 0.5s ease;
-}
-
-@keyframes pulseUpdate {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-
-/* ====== RESPONSIVE DESIGN ====== */
-@media (max-width: 768px) {
-  .main-header {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .content-section {
-    padding: 1.25rem;
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-}
-
-/* Header fixes */
-header {
-  position: static !important;
-  width: 100vw !important;
-  left: 0 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1rem 2rem !important;
-  background-image: 
-    linear-gradient(135deg, #10B981, #059669),
-    radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%) !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-@media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-    width: 100%;
-  }
-}
-
-/* Section hover effects */
-section {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(0,0,0,0.1);
-}
-h1, h2, h3 {
-  color: white !important;
-  font-weight: 700 !important; /* Extra bold */
-  font-size: 2.2rem !important; /* Increase size */
-}
-body {
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100%;
-}
-.container, .row {
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
-.stage-progress-container {
-  max-width: 600px;
-  margin: 20px auto;
-  font-family: sans-serif;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 20px;
-  background: #f0f0f0;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 6.66%; /* 1/15th (100/15) */
-  background: #4CAF50;
-  transition: width 0.3s;
-}
-
-.stage-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.2em;
-}
-
-#timer {
-  font-family: monospace;
-}
-/* ===== BASE STYLES ===== */
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.6;
-  background: linear-gradient(to bottom, #fff0f5, #fff9e6);
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-.dark body {
-  background: #111827;
-  color: white;
-}
-
-/* ===== PROGRESS BAR STYLES ===== */
-.stage-progress-container {
-  max-width: 400px;
-  margin: 0 auto 20px;
-  font-family: sans-serif;
-}
-
-.stage-progress {
-  margin-bottom: 15px;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #555;
-}
-
+/* ====== PROGRESS BAR ====== */
 .progress-bar {
   width: 100%;
   height: 8px;
@@ -406,139 +148,58 @@ body {
 
 .progress-fill {
   height: 100%;
-  width: 6.66%; /* 1/15th */
-  background: linear-gradient(90deg, #4CAF50, #2E7D32);
-  transition: width 0.5s ease;
+  background: linear-gradient(90deg, #FF6B6B, #FFA3A3, #FFD166);
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.7);
+  animation: progress-pulse 2s infinite;
 }
 
-/* ===== PRICE DISPLAY STYLES ===== */
-.fluio-price {
-  text-align: center;
-  padding: 12px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  margin-top: 15px;
+@keyframes progress-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
 }
 
-.price-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
+/* ====== LIVE BADGE & PRICE TOOLTIP ====== */
 .live-badge {
-  background: #f44336;
+  background: #ef4444;
   color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  animation: pulse 2s infinite;
 }
 
-.current-price {
-  font-size: 22px;
-  font-weight: bold;
-  color: #333;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
-.price-change {
-  color: #4CAF50;
-  font-size: 14px;
+.price-tooltip .tooltip-text {
+  transition: all 0.2s ease;
 }
 
-/* ===== HEADER STYLES ===== */
-header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: linear-gradient(to right, #4CAF50, #ffffff);
+.dark .price-tooltip:hover .tooltip-text {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
 }
 
-.logo {
-  width: 40px;
-  height: 40px;
-  animation: fluffi-float 2s ease-in-out infinite;
-}
-
-@keyframes fluffi-float {
-  0%, 100% { transform: translateY(0) scale(1) rotate(0); }
-  50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
-}
-
-/* ===== RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .stage-progress-container {
-    padding: 0 15px;
-  }
-}
-
-/* ===== UTILITY CLASSES ===== */
-.hidden {
-  display: none !important;
-}
-.network-badge {
-  padding: 6px 12px;
-  background: #f0f0f0;
-  border-radius: 20px;
-  font-size: 14px;
-  margin-left: 10px;
-}
-.dark .network-badge {
-  background: #333;
-}
-@media (max-width: 768px) {
-  body {
-    padding: 10px;
-    font-size: 14px;
-  }
-  .trust-badges {
-    flex-direction: column;
-    align-items: center;
-  }
-}
+/* ====== REFERRAL, STAKING, ABOUT, TEAM ====== */
 #about {
   background: #1a1a1a;
   padding: 2rem;
   border-radius: 10px;
   margin: 2rem 0;
 }
-.about-content ul {
-  margin: 1rem 0;
-  list-style-type: none;
-}
-.about-content li {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
-  position: relative;
-}
+
 .about-content li:before {
   content: "•";
   color: #FF00FF;
   position: absolute;
   left: 0;
 }
-/* Team Section Styles */
-.team-grid {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.team-member {
-  text-align: center;
-  max-width: 150px;
-}
+
 .team-member img {
   border-radius: 50%;
+  border: 4px solid #10B981;
 }
 
 .chart-container {
@@ -546,70 +207,35 @@ header {
   margin: 0 auto;
 }
 
-#tokenChart {
-  max-height: 400px;
-}
-.connect-wallet-btn {
-  background: linear-gradient(90deg, #FF00FF 0%, #8A2BE2 100%);
-  box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
-  transition: transform 0.3s;
-}
-.connect-wallet-btn:hover {
-  transform: translateY(-3px);
-}
-/* For the "Stage: 1/15" and countdown text */
-.stage-info-text {
-  color: #8B5CF6; /* Purple-500 */
-  /* OR */
-  color: #EC4899; /* Pink-500 */
+/* ====== UTILITIES & RESPONSIVE ====== */
+.hidden {
+  display: none !important;
 }
 
-/* Dark mode adaptation */
-.dark .stage-info-text {
-  color: #A78BFA; /* Purple-400 */
-  /* OR */
-  color: #F472B6; /* Pink-400 */
-}
-.progress-fill {
-  background: linear-gradient(90deg, #8A2BE2, #BA55D3);
-  box-shadow: 0 0 15px rgba(138, 43, 226, 0.7);
-}
-.stage-info-text {
-  color: #BA55D3;
-  font-weight: 600;
-}
-.dark .stage-info-text {
-  color: #DA70D6;
-}
-@keyframes progress-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.8; }
-  100% { opacity: 1; }
-}
-.progress-fill {
-  animation: progress-pulse 2s infinite;
-}
-.progress-fill {
-  background: linear-gradient(90deg, #FF6B6B, #FFA3A3, #FFD166);
-}
-.stage-info-text {
-  color: #FF6B6B;
-}
-/* Add to your CSS */
-.price-tooltip .tooltip-text {
-  transition: all 0.2s ease;
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  body {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .content-section {
+    padding: 1.25rem;
+  }
+
+  .main-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .stage-progress-container {
+    padding: 0 15px;
+  }
 }
 
-.dark .price-tooltip:hover .tooltip-text {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); /* blue glow */
-}
-
-/* Pulse animation for live indicator */
-.live-badge {
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
+/* End of merged stylesheet */
