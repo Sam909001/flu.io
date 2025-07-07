@@ -1,369 +1,373 @@
-/* ====== CORE RESET & VARIABLES ====== */
-:root {
-  --primary: #6e8efb;
-  --primary-dark: #5b7ce8;
-  --secondary: #a777e3;
-  --accent: #10b981;
-  --text-light: #f8fafc;
-  --text-dark: #1e293b;
-  --bg-light: #f8fafc;
-  --bg-dark: #0f172a;
-  --card-light: #ffffff;
-  --card-dark: #1e293b;
-  --border-light: #e2e8f0;
-  --border-dark: #334155;
-}
-
-/* ====== BASE STYLES ====== */
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.6;
-  color: var(--text-dark);
-  background-color: var(--bg-light);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-}
-
-.dark body {
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-}
-
-/* ====== LAYOUT STRUCTURE ====== */
-.site-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-header {
-  width: 100%;
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #10B981, #059669) !important;
-  color: var(--text-light);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.main-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* For modern browsers supporting subgrid */
-@supports (grid-template-columns: subgrid) {
-  .main-content {
-    grid-template-columns: subgrid;
-  }
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .main-content {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
-  }
-}
-.content-section {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.dark .content-section {
-  background: #1e293b;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.content-section {
-  flex: 1;
-  padding: 2rem;
-  background-color: var(--card-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.dark .content-section {
-  background-color: var(--card-dark);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* ====== NAVIGATION ====== */
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.site-nav a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.site-nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* ====== TYPOGRAPHY ====== */
-h1, h2, h3, h4 {
-  font-weight: 700;
-  line-height: 1.3;
-  margin-bottom: 1rem;
-}
-
-h1 {
-  font-size: 2.5rem;
-background: linear-gradient(90deg, #10B981, #059669);
-/* OR for solid color: */
-color: #10B981;
-background: none;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
-}
-
-h2 {
-  font-size: 1.8rem;
-  color: var(--primary);
-}
-
-.dark h2 {
-  color: var(--secondary);
-}
-
-/* ====== BUTTONS ====== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.75rem;
-  font-weight: 600;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #10B981, #059669);
-  color: white;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-}
-
-.btn-secondary {
-  background-color: var(--accent);
-  color: white;
-}
-
-/* ====== SPECIAL EFFECTS ====== */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.floating {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.pulse:hover {
-  animation: pulse 1.5s infinite;
-}
-
-/* ====== RESPONSIVE DESIGN ====== */
-@media (max-width: 768px) {
-  .main-header {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$FLUFFI Presale & Staking</title>
+  <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
+  <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
+  <meta name="author" content="FLUFFI Team" />
   
-  .main-content {
-    flex-direction: column;
-    padding: 1rem;
-  }
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   
-  .content-section {
-    padding: 1.5rem;
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-}
-header {
-  position: static !important;
-  width: 100% !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1rem 2rem !important;
-}
-/* ===== GRID LAYOUT ENHANCEMENTS ===== */
-/* Main container grid */
-main.p-6 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  align-items: start;
-}
+  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <!-- Mobile Connect Button -->
+  <div class="md:hidden text-center my-4">
+    <button onclick="openWalletModal()" class="btn btn-primary text-sm px-4 py-2">
+      🔗 Connect Wallet (Mobile)
+    </button>
+  </div>
 
-/* Section styling */
-section {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
+  <header>
+    <div>
+      <img src="fluffi.jpg" alt="$FLUFFI Logo">
+      <h1>$FLUFFI</h1>
+    </div>
+    <nav>
+      <a href="#presale">Presale</a>
+      <a href="#staking">Staking</a>
+      <a href="#faq">FAQ</a>
+      <a href="referral.html" target="_blank">Referral</a>
+      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank">Whitepaper</a>
+      <a href="how-to-buy.html" target="_blank">How to Buy FLUFFI</a>
+      <button onclick="toggleDarkMode()">🌙</button>
+      <button onclick="openWalletModal()" id="walletButton">Connect Wallet</button>
+      <span id="walletAddress"></span>
+    </nav>
+  </header>
 
-/* Dark mode sections */
-.dark section {
-  background: #1f2937;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
+  <main>
+    <!-- Timer Section -->
+    <div id="countdown-container">
+      <h3>🚀 PRESALE ENDS IN:</h3>
+      <div id="presale-timer">
+        <span id="presale-minutes">15</span>:<span id="presale-seconds">00</span>
+      </div>
+      
+      <div>
+        <h4>Current Stage Progress</h4>
+        <div>
+          <div id="stageProgressBar"></div>
+        </div>
+        <div>
+          <span>Stage: <span id="current-stage">1</span>/15</span>
+          <span>Ends in: <span id="stage-seconds">60</span>s</span>
+        </div>
+      </div>
+      
+      <!-- Reset Button (Visible only in development) -->
+      <div id="devResetButton">
+        <button onclick="resetPresaleTimer()">Reset Timer (Dev)</button>
+      </div>
+    </div>
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  main.p-6 {
-    grid-template-columns: 1fr;
-    padding: 1rem !important;
-  }
-  
-  section {
-    padding: 1.25rem;
-  }
-}
-section {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-/* Ensure full height for right column sections */
-.grid > div {
-  display: flex;
-  flex-direction: column;
-}
+    <!-- Presale Section -->
+    <section id="presale">
+      <h2>🚀 Presale is Live!</h2>
 
-.grid > div > section {
-  flex: 1;
-}
+      <div>
+        <div>
+          <div>
+            <span>$FLUFFI</span>
+            <span>LIVE</span>
+          </div>
+          <div id="currentPrice">
+            $0.000100
+            <span>
+              <i class="fas fa-info-circle"></i>
+              <span>
+                <strong>Price Increase:</strong><br>
+                +5% per stage (every 1 minute)<br>
+                Next increase: <span id="nextIncreaseTime">00:59</span>
+              </span>
+            </span>
+          </div>
+          <div>+0.00%</div>
+        </div>
+      </div>
 
-/* Smooth shadow transitions */
-section {
-  transition: box-shadow 0.3s ease;
-}
+      <div>
+        <svg viewBox="0 0 24 24">
+          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+        <span id="tokensSold">67,431,509</span>
+        <span>FLUFFI sold</span>
+      </div>
 
-section:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
+      <p>🎯 Referral Bonus: <strong>10%</strong></p>
 
-/* Dark mode enhancements */
-.dark section:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-}
-header {
-  position: static !important;
-  width: 100vw !important;
-  left: 0 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1rem 2rem !important;
-  background-image: 
-  linear-gradient(135deg, #10B981, #059669),
-  radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%);
-}
-@media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden;
-    width: 100%;
-  }
-}
-section {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 
-    0 4px 6px rgba(0,0,0,0.05),
-    0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
+      <div>
+        <input type="number" placeholder="Amount" id="amountInput" />
+        <select id="currencySelect">
+          <option value="USD">USD</option>
+          <option value="ETH">ETH</option>
+        </select>
+      </div>
+      <input type="text" placeholder="Referral wallet (optional)" id="refInput" />
+      <div id="buyError"></div>
+      <button onclick="buyFluffi()" id="buyButton">🚀 Buy Now</button>
+    </section>
+    
+    <!-- Referral Section -->
+    <section id="referral">
+      <h2>💰 Earn with Referrals</h2>
+      <div id="referralSection">
+        <p>Connect your wallet to access your referral link and start earning!</p>
+        <button id="referralConnectBtn" onclick="connectReferralWallet()">Connect Wallet for Referrals</button>
+      </div>
+    </section>
 
-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 7px 14px rgba(0,0,0,0.1),
-    0 3px 6px rgba(0,0,0,0.08);
-}
-.price-update {
-  animation: pulseUpdate 0.5s ease;
-}
+    <!-- Claim Section -->
+    <section>
+      <h2>🎁 Claim $FLUFFI</h2>
+      <p>Once the presale ends, you can claim your purchased tokens here.</p>
+      <button onclick="claimTokens()" id="claimButton">Claim Tokens</button>
+      <div id="claimError"></div>
+    </section>
 
-@keyframes pulseUpdate {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
-}
+    <!-- Staking Section -->
+    <section id="staking">
+      <h2>📈 Stake Your $FLUFFI</h2>
+      <p>APY: <strong>90%</strong> | Ends at Listing Date</p>
+      <input type="number" placeholder="Amount to stake" id="stakeInput" />
+      <div id="stakeError"></div>
+      <button onclick="stakeFluffi()" id="stakeButton">Stake Now</button>
+    </section>
+    
+    <!-- Tokenomics Section -->
+    <section id="tokenomics">
+      <h2>📊 Tokenomics</h2>
+      <div>
+        <!-- Token Details -->
+        <div>
+          <ul>
+            <li>
+              <span>Total Supply:</span>
+              <span>10,000,000,000 FLUFFI</span>
+            </li>
+            <li>
+              <span>Presale:</span>
+              <span>40%</span>
+            </li>
+            <li>
+              <span>Liquidity:</span>
+              <span>30% (Locked)</span>
+            </li>
+            <li>
+              <span>Staking:</span>
+              <span>20%</span>
+            </li>
+            <li>
+              <span>Marketing:</span>
+              <span>5%</span>
+            </li>
+            <li>
+              <span>Team:</span>
+              <span>5% (Locked)</span>
+            </li>
+          </ul>
+        </div>
 
-h1, h2, h3 {
-  font-family: 'Inter Tight', sans-serif;
-  font-weight: 700;
-}
-.btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
+        <!-- Chart -->
+        <div>
+          <canvas id="tokenChart" width="280" height="280"></canvas>
+        </div>
+      </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section id="faq">
+      <h2>❓ FAQ</h2>
 
-.btn-primary {
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
-  color: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+      <details>
+        <summary>
+          What's the token tax?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          <p>5% total tax on all transactions:</p>
+          <ul>
+            <li>3% Marketing</li>
+            <li>2% Automatic Liquidity</li>
+          </ul>
+        </div>
+      </details>
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(0,0,0,0.15);
-}
-header {
-  /* Add subtle texture */
-  background-image: 
-    linear-gradient(135deg, #10B981, #059669),
-    radial-gradient(circle at top left, rgba(255,255,255,0.1) 0%, transparent 20%);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
+      <details>
+        <summary>
+          How to claim after presale?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          What's the vesting schedule?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          <ul>
+            <li>Presale tokens: 100% unlocked at TGE</li>
+            <li>Team tokens: 24-month linear vesting</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          How do I buy $FLUFFI?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          Connect your wallet, enter amount in BNB, and click "Buy Now".
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          When does staking end?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          Staking ends at the official listing date.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          What chains are supported?
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div>
+          Currently supporting BNB, with plans for ETH, SOL, and AVAX.
+        </div>
+      </details>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+      <h2>Why Fluffi Coin?</h2>
+      <div>
+        <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
+        <ul>
+          <li><strong>NFT STAKING PLATFORM</strong> - Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards</li>
+          <li><strong>COMMUNITY DAO GOVERNANCE</strong> - Vote on major decisions like treasury use and protocol upgrades</li>
+          <li><strong>DEFLATIONARY MECHANICS</strong> - 1% burn on every transaction reduces supply permanently</li>
+        </ul>
+        <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team">
+      <h2>Our Team</h2>
+      <div>
+        <div>
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CEO">
+          <h3>James Chen</h3>
+          <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+        </div>
+        <div>
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=280&h=280&crop=faces&facepad=3" alt="CTO">
+          <h3>Priya Patel</h3>
+          <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
+    <div>
+      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" title="Telegram">
+        <i class="fab fa-telegram"></i>
+      </a>
+      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" title="Twitter">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Wallet Modal -->
+  <div id="walletModal">
+    <div>
+      <h3>Connect Wallet</h3>
+      
+      <div>
+        <!-- MetaMask Option -->
+        <button onclick="connectMetaMask()">
+          <div>
+            <i class="fab fa-ethereum"></i>
+          </div>
+          <div>
+            <div>MetaMask</div>
+            <div>Browser extension</div>
+          </div>
+        </button>
+        
+        <!-- WalletConnect Option -->
+        <button onclick="connectWalletConnect()">
+          <div>
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div>
+            <div>WalletConnect</div>
+            <div>Mobile wallets</div>
+          </div>
+        </button>
+        
+        <!-- Coinbase Wallet Option -->
+        <button onclick="connectCoinbaseWallet()">
+          <div>
+            <i class="fab fa-bitcoin"></i>
+          </div>
+          <div>
+            <div>Coinbase Wallet</div>
+            <div>Mobile & browser</div>
+          </div>
+        </button>
+      </div>
+      
+      <div>
+        By connecting, you agree to our Terms of Service
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div id="successMessage">
+    <div>
+      <i class="fas fa-check-circle"></i>
+      <span id="successMessageText"></span>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
