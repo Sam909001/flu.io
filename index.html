@@ -853,25 +853,20 @@ function resetTimer() {
       </a>
     </div>
   </footer>
-  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+<div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
   <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
     <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
-    <div class="grid grid-cols-2 gap-4">
-      <button onclick="connectInjected()" class="wallet-option">
+    <div class="grid grid-cols-1 gap-4">
+      <!-- Browser Wallet -->
+      <button onclick="connectWallet()" class="wallet-option">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
         <span>Browser Wallet</span>
       </button>
-      <button onclick="connectWalletConnect()" class="wallet-option">
+      
+      <!-- WalletConnect -->
+      <button onclick="connectWithWalletConnect()" class="wallet-option">
         <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
         <span>WalletConnect</span>
-      </button>
-      <button onclick="connectCoinbase()" class="wallet-option">
-        <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
-        <span>Coinbase</span>
-      </button>
-      <button onclick="connectTrust()" class="wallet-option">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
-        <span>Trust Wallet</span>
       </button>
     </div>
   </div>
