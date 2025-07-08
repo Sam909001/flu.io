@@ -68,11 +68,13 @@ function showSuccessMessage(message) {
 }
 
 function openWalletModal() {
-  document.getElementById('walletModal').classList.remove('hidden');
+  const modal = document.getElementById('walletModal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeWalletModal() {
-  document.getElementById('walletModal').classList.add('hidden');
+  const modal = document.getElementById('walletModal');
+  if (modal) modal.classList.add('hidden');
 }
 
 // =========================
@@ -134,8 +136,13 @@ async function connectWalletConnect() {
   isConnecting = true;
   
   try {
+    // Check if WalletConnect is available
+    if (typeof WalletConnectProvider === 'undefined') {
+      throw new Error('WalletConnect not available. Please ensure the library is loaded.');
+    }
+
     // Initialize WalletConnect Provider
-    walletConnectProvider = new WalletConnectProvider.default({
+    walletConnectProvider = new WalletConnectProvider({
       rpc: {
         56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
         1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161" // Ethereum Mainnet
@@ -233,7 +240,7 @@ function updateWalletUI() {
   const walletButton = document.getElementById('walletButton');
   const walletAddress = document.getElementById('walletAddress');
   
-  if (userWalletAddress) {
+  if (userWalletAddress && walletButton && walletAddress) {
     walletButton.textContent = 'Connected ✓';
     walletButton.classList.remove('bg-blue-500');
     walletButton.classList.add('bg-green-600');
@@ -261,19 +268,24 @@ function disconnectWallet() {
   const walletButton = document.getElementById('walletButton');
   const walletAddress = document.getElementById('walletAddress');
   
-  walletButton.textContent = 'Connect Wallet';
-  walletButton.classList.remove('bg-green-600');
-  walletButton.classList.add('bg-blue-500');
-  
-  walletAddress.classList.add('hidden');
+  if (walletButton && walletAddress) {
+    walletButton.textContent = 'Connect Wallet';
+    walletButton.classList.remove('bg-green-600');
+    walletButton.classList.add('bg-blue-500');
+    
+    walletAddress.classList.add('hidden');
+  }
   
   // Reset referral section
-  document.getElementById('referralSection').innerHTML = `
-    <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-    <button onclick="connectReferralWallet()" class="btn btn-primary">
-      Connect Wallet for Referrals
-    </button>
-  `;
+  const referralSection = document.getElementById('referralSection');
+  if (referralSection) {
+    referralSection.innerHTML = `
+      <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+      <button onclick="connectReferralWallet()" class="btn btn-primary">
+        Connect Wallet for Referrals
+      </button>
+    `;
+  }
   
   showSuccessMessage('Wallet disconnected');
 }
@@ -305,8 +317,11 @@ function updateNextIncreaseTime() {
   
   const mins = Math.floor(timeLeft / (1000 * 60));
   const secs = Math.floor((timeLeft % (1000 * 60)) / 1000);
-  document.getElementById('nextIncreaseTime').textContent = 
-    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const nextIncreaseElement = document.getElementById('nextIncreaseTime');
+  if (nextIncreaseElement) {
+    nextIncreaseElement.textContent = 
+      `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
 }
 
 function updateTimers() {
@@ -325,21 +340,37 @@ function updateTimers() {
   const stageProgress = 1 - (stageTimeLeft / STAGE_DURATION);
 
   // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
+  const currentStageElement = document.getElementById('current-stage');
+  if (currentStageElement) currentStageElement.textContent = currentStage + 1;
+  
+  const stageProgressBar = document.getElementById('stageProgressBar');
+  if (stageProgressBar) {
+    stageProgressBar.style.width = `${((currentStage + stageProgress) / TOTAL_STAGES) * 100}%`;
+  }
 
   // Update price
   const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:59</span></span></span>`;
+  const currentPriceElement = document.getElementById('currentPrice');
+  if (currentPriceElement) {
+    currentPriceElement.innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 1 minute)<br>Next increase: <span id="nextIncreaseTime">00:59</span></span></span>`;
+  }
 
   // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-seconds').textContent = "0";
-  } else {
-    document.getElementById('presale-minutes').textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
-    document.getElementById('presale-seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
-    document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
+  const presaleTimerElement = document.getElementById('presale-timer');
+  if (presaleTimerElement) {
+    if (timeLeft <= 0) {
+      presaleTimerElement.innerHTML = "🎉 Presale Ended!";
+      const stageSecondsElement = document.getElementById('stage-seconds');
+      if (stageSecondsElement) stageSecondsElement.textContent = "0";
+    } else {
+      const presaleMinutesElement = document.getElementById('presale-minutes');
+      const presaleSecondsElement = document.getElementById('presale-seconds');
+      const stageSecondsElement = document.getElementById('stage-seconds');
+      
+      if (presaleMinutesElement) presaleMinutesElement.textContent = Math.floor(timeLeft / (1000 * 60)).toString().padStart(2, '0');
+      if (presaleSecondsElement) presaleSecondsElement.textContent = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
+      if (stageSecondsElement) stageSecondsElement.textContent = Math.floor(stageTimeLeft / 1000);
+    }
   }
 }
 
@@ -398,15 +429,18 @@ async function mockPurchase(params) {
 
 function updateUIAfterPurchase(result) {
   showSuccessMessage('Purchase successful!');
-  const currentSold = parseInt(document.getElementById('tokensSold').textContent.replace(/,/g, ''));
-  document.getElementById('tokensSold').textContent = (currentSold + result.tokens).toLocaleString();
+  const tokensSoldElement = document.getElementById('tokensSold');
+  if (tokensSoldElement) {
+    const currentSold = parseInt(tokensSoldElement.textContent.replace(/,/g, ''));
+    tokensSoldElement.textContent = (currentSold + result.tokens).toLocaleString();
+  }
 }
 
 async function buyFluffi() {
   const params = {
-    amount: document.getElementById('amountInput').value,
-    currency: document.getElementById('currencySelect').value,
-    ref: document.getElementById('refInput').value
+    amount: document.getElementById('amountInput')?.value,
+    currency: document.getElementById('currencySelect')?.value,
+    ref: document.getElementById('refInput')?.value
   };
 
   const validation = validatePurchase(params);
@@ -432,7 +466,7 @@ async function buyFluffi() {
 }
 
 async function stakeFluffi() {
-  const amount = document.getElementById('stakeInput').value;
+  const amount = document.getElementById('stakeInput')?.value;
   
   if (!userWalletAddress) {
     showError('stakeError', 'Please connect your wallet first.');
@@ -483,20 +517,13 @@ async function claimTokens() {
 // =========================
 // REFERRAL FUNCTIONS
 // =========================
-async function connectReferralWallet() {
-  if (!userWalletAddress) {
-    await connectMetaMask();
-  }
-  
-  if (userWalletAddress) {
-    showReferralUI(userWalletAddress);
-  }
-}
-
 function showReferralUI(wallet) {
+  const referralSection = document.getElementById('referralSection');
+  if (!referralSection) return;
+  
   const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
   
-  document.getElementById('referralSection').innerHTML = `
+  referralSection.innerHTML = `
     <div class="space-y-4">
       <div>
         <label class="block mb-2 font-semibold dark:text-white">Your referral link:</label>
@@ -530,20 +557,38 @@ function showReferralUI(wallet) {
   `;
 }
 
+async function connectReferralWallet() {
+  if (!userWalletAddress) {
+    await connectMetaMask();
+  }
+  
+  if (userWalletAddress) {
+    showReferralUI(userWalletAddress);
+  }
+}
+
 function copyReferralLink() {
   const input = document.getElementById('referralLinkInput');
+  if (!input) return;
+  
   input.select();
   document.execCommand('copy');
   showSuccessMessage('Referral link copied to clipboard!');
 }
 
 function shareOnTwitter() {
-  const link = document.getElementById('referralLinkInput').value;
+  const input = document.getElementById('referralLinkInput');
+  if (!input) return;
+  
+  const link = input.value;
   window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
 }
 
 function shareOnTelegram() {
-  const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
+  const input = document.getElementById('referralLinkInput');
+  if (!input) return;
+  
+  const link = encodeURIComponent(input.value);
   window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
 }
 
@@ -628,7 +673,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Show reset button in development
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    document.getElementById('devResetButton').classList.remove('hidden');
+    const devResetButton = document.getElementById('devResetButton');
+    if (devResetButton) devResetButton.classList.remove('hidden');
     window._devTools = {
       resetTimer: resetPresaleTimer,
       disconnectWallet: disconnectWallet
