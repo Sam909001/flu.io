@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
  <!-- Libraries -->
- <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -133,72 +132,286 @@
       }
     }
 
-    /* Enhanced Button Styles */
+    /* Enhanced styling for presale section */
+    .fluio-status-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .stage-progress {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .fluio-price {
+      text-align: right;
+      min-width: 150px;
+    }
+
+    .price-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-bottom: 0.25rem;
+    }
+
+    .live-badge {
+      background: #ef4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      animation: pulse 2s infinite;
+    }
+
+    .current-price {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #16a34a;
+    }
+
+    .price-change {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .dark .modal-content {
+      background-color: #1f2937;
+    }
+
+    /* Wallet Options */
+    .btn-wallet {
+      @apply flex items-center w-full p-4 rounded-lg transition-colors
+             bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600
+             text-gray-800 dark:text-white border border-transparent
+             hover:border-gray-300 dark:hover:border-gray-500;
+    }
+
+    .wallet-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      border-radius: 50%;
+      background-color: #f3f4f6;
+    }
+
+    .dark .wallet-icon {
+      background-color: #374151;
+    }
+
+    .wallet-name {
+      font-weight: 600;
+    }
+
+    .wallet-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .dark .wallet-description {
+      color: #9ca3af;
+    }
+
+    /* Error Message Styles */
+    .error-message {
+      @apply text-red-500 dark:text-red-400 text-sm mt-2 p-3 rounded-lg 
+             bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-3px); }
+      40%, 80% { transform: translateX(3px); }
+    }
+
+    /* Success Message Styles */
+    .success-message {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: #10b981;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .success-message.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Unified button base */
     .btn {
       @apply font-semibold rounded-lg transition-all duration-200 
              focus:outline-none focus:ring-2 focus:ring-opacity-50 
-             disabled:opacity-70 disabled:cursor-not-allowed
-             transform hover:scale-[1.02] active:scale-[0.98]
-             shadow-md hover:shadow-lg;
+             disabled:opacity-70 disabled:cursor-not-allowed;
     }
 
     /* Primary (Green) */
     .btn-primary {
-      @apply bg-gradient-to-r from-green-500 to-green-600 text-white 
-             border border-green-600 hover:border-green-700
+      @apply bg-green-600 hover:bg-green-700 text-white 
              focus:ring-green-500 py-3 px-6 text-lg;
     }
 
     /* Secondary (Blue) */
     .btn-secondary {
-      @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white 
-             border border-blue-600 hover:border-blue-700
+      @apply bg-blue-500 hover:bg-blue-600 text-white 
              focus:ring-blue-400 py-2 px-4 text-base;
     }
 
     /* Special stake button variant */
     .btn-stake {
-      @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-white 
-             border border-yellow-600 hover:border-yellow-700
-             focus:ring-yellow-400 py-3 px-6 text-lg;
+      @apply bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-400 
+             text-white py-3 px-6 text-lg;
     }
 
-    /* Connect Wallet Button */
-    .btn-connect {
-      @apply bg-gradient-to-r from-purple-500 to-purple-600 text-white 
-             border border-purple-600 hover:border-purple-700
-             focus:ring-purple-400 py-2 px-4 text-base;
+    /* Price Tooltip */
+    .price-container { position: relative; display: inline-block; }
+    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
+    .price-tooltip .tooltip-text {
+      visibility: hidden; width: 220px; background-color: #1f2937;
+      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
+      position: absolute; z-index: 1; bottom: 125%; left: 50%;
+      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .price-tooltip .tooltip-text::after {
+      content: ""; position: absolute; top: 100%; left: 50%;
+      margin-left: -5px; border-width: 5px; border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+    
+    .dark .price-tooltip .tooltip-text {
+      background-color: #1F2937 !important;
+      color: #F9FAFB !important;
+      border: 1px solid #4B5563;
     }
 
-    /* Wallet Options - Enhanced */
-    .btn-wallet {
-      @apply flex items-center w-full p-4 rounded-lg transition-all
-             bg-white hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600
-             text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600
-             hover:shadow-md hover:-translate-y-0.5 active:translate-y-0;
+    .dark .price-tooltip .tooltip-text::after {
+      border-color: #1F2937 transparent transparent transparent !important;
     }
 
-    .wallet-icon {
-      @apply w-10 h-10 flex items-center justify-center mr-3 rounded-lg
-             bg-gray-100 dark:bg-gray-600;
+    .dark .price-tooltip .fa-info-circle {
+      color: #60A5FA !important;
     }
 
-    /* Wallet Icons */
-    .wallet-icon.metamask { background-color: #f6851b; color: white; }
-    .wallet-icon.walletconnect { background-color: #3b99fc; color: white; }
-    .wallet-icon.coinbase { background-color: #1652f0; color: white; }
-    .wallet-icon.phantom { background-color: #4e44ce; color: white; }
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
 
-    /* Rest of your existing styles... */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      .fluio-status-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .fluio-price {
+        text-align: center;
+      }
+      
+      .price-header {
+        justify-content: center;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Animation */
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
-  <div class="md:hidden text-center my-4">
-    <button onclick="openWalletModal()" class="btn btn-connect text-sm px-4 py-2">
-      <i class="fas fa-wallet mr-2"></i> Connect Wallet
-    </button>
-  </div>
+   <!-- Mobile Connect Button -->
+<div class="md:hidden text-center my-4">
+  <button onclick="openWalletModal()" class="btn btn-primary text-sm px-4 py-2">
+    🔗 Connect Wallet (Mobile)
+  </button>
+</div>
 
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
@@ -214,12 +427,12 @@
       <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
       <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
       <a href="how-to-buy.html" target="_blank" class="btn btn-secondary">
-        <i class="fas fa-shopping-cart mr-2"></i> How to Buy
+        How to Buy FLUFFI
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="openWalletModal()" id="walletButton" class="btn btn-connect hidden md:inline-flex items-center">
-        <i class="fas fa-wallet mr-2"></i> Connect Wallet
-      </button>
+      <button onclick="openWalletModal()" id="walletButton" class="btn btn-secondary hidden md:inline-block">
+  Connect Wallet
+</button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
   </header>
@@ -237,7 +450,7 @@
         
         <!-- Progress Bar -->
         <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-          <div id="stageProgressBar" class="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+          <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
         </div>
 
         <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
@@ -246,16 +459,16 @@
         </div>
       </div>
       
-      <!-- Reset Button -->
-      <div id="devResetButton" class="mt-4">
+      <!-- Reset Button (Visible only in development) -->
+      <div id="devResetButton" class="mt-4 hidden">
         <button onclick="resetPresaleTimer()" class="btn btn-secondary text-sm">
-          <i class="fas fa-sync-alt mr-2"></i> Reset Timer (Dev)
+          Reset Timer (Dev)
         </button>
       </div>
     </div>
 
     <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
 
       <div class="fluio-status-container">
@@ -299,39 +512,37 @@
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
       <div id="buyError" class="error-message"></div>
       <button onclick="buyFluffi()" id="buyButton" class="btn btn-primary w-full">
-        <i class="fas fa-rocket mr-2"></i> Buy Now
+        🚀 Buy Now
       </button>
     </section>
     
     <!-- Referral Section -->
-    <section id="referral" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
         <button id="referralConnectBtn" onclick="connectReferralWallet()" class="btn btn-primary">
-          <i class="fas fa-link mr-2"></i> Connect Wallet for Referrals
+          Connect Wallet for Referrals
         </button>
       </div>
     </section>
 
     <!-- Claim Section -->
-    <section class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6">
+    <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">🎁 Claim $FLUFFI</h2>
       <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button onclick="claimTokens()" id="claimButton" class="btn btn-primary w-full">
-        <i class="fas fa-gift mr-2"></i> Claim Tokens
-      </button>
+      <button onclick="claimTokens()" id="claimButton" class="btn btn-primary w-full">Claim Tokens</button>
       <div id="claimError" class="error-message"></div>
     </section>
 
     <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6">
+    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" />
       <div id="stakeError" class="error-message"></div>
       <button onclick="stakeFluffi()" id="stakeButton" class="btn btn-stake w-full">
-        <i class="fas fa-lock mr-2"></i> Stake Now
+        Stake Now
       </button>
     </section>
     
@@ -469,7 +680,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+    <section id="about" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">Why Fluffi Coin?</h2>
       <div class="about-content">
         <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
@@ -483,7 +694,7 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+    <section id="team" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-6 text-center">Our Team</h2>
       <div class="grid md:grid-cols-2 gap-6">
         <div class="team-member text-center">
@@ -515,48 +726,40 @@
   <!-- Wallet Modal -->
   <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
-        <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+      <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
       
       <div class="space-y-3">
         <!-- MetaMask Option -->
         <button class="btn-wallet" onclick="connectMetaMask()">
-          <div class="wallet-icon metamask">
+          <div class="wallet-icon">
             <i class="fab fa-ethereum"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">MetaMask</div>
             <div class="wallet-description">Browser extension</div>
           </div>
-          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
         
         <!-- WalletConnect Option -->
         <button class="btn-wallet" onclick="connectWalletConnect()">
-          <div class="wallet-icon walletconnect">
+          <div class="wallet-icon">
             <i class="fas fa-wallet"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">WalletConnect</div>
             <div class="wallet-description">Mobile wallets</div>
           </div>
-          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
         
         <!-- Coinbase Wallet Option -->
         <button class="btn-wallet" onclick="connectCoinbaseWallet()">
-          <div class="wallet-icon coinbase">
+          <div class="wallet-icon">
             <i class="fab fa-bitcoin"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">Coinbase Wallet</div>
             <div class="wallet-description">Mobile & browser</div>
           </div>
-          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
       </div>
       
