@@ -4,86 +4,10 @@
 let signer = null;
 let provider = null;
 let userWalletAddress = null;
+let walletConnectProvider = null;
+let web3Modal = null;
 let tokenChart = null;
 let isConnecting = false;
-let walletConnectProvider = null;
-
-async function connectWalletConnect() {
-  try {
-    console.log("Initializing WalletConnect...");
-    
-    // 1. Initialize Provider
-    walletConnectProvider = new WalletConnectProvider.default({
-      rpc: {
-        56: "https://bsc-dataseed1.defibit.io/", // BSC Mainnet
-        1: "https://cloudflare-eth.com" // Ethereum fallback
-      },
-      chainId: 56, // Default to BSC
-      bridge: "https://bridge.walletconnect.org", // Official bridge
-      qrcodeModalOptions: {
-        mobileLinks: [
-          "metamask",
-          "trust",
-          "rainbow",
-          "argent",
-          "imtoken"
-        ],
-        desktopLinks: ["metamask"],
-        themeMode: 'dark'
-      }
-    });
-
-    // 2. Enable Session (Triggers QR Modal)
-    console.log("Enabling session...");
-    await walletConnectProvider.enable();
-    
-    // 3. Setup Ethers
-    const provider = new ethers.providers.Web3Provider(walletConnectProvider);
-    const signer = provider.getSigner();
-    userWalletAddress = await signer.getAddress();
-    
-    // 4. Event Listeners
-    walletConnectProvider.on("accountsChanged", (accounts) => {
-      console.log("Accounts changed:", accounts);
-      if (accounts.length === 0) disconnectWallet();
-      else updateWalletUI();
-    });
-
-    walletConnectProvider.on("chainChanged", (chainId) => {
-      console.log("Chain changed:", parseInt(chainId, 16));
-    });
-
-    walletConnectProvider.on("disconnect", (code, reason) => {
-      console.log("Disconnected:", code, reason);
-      disconnectWallet();
-    });
-
-    // 5. UI Updates
-    updateWalletUI();
-    closeWalletModal();
-    showSuccessMessage("Connected via WalletConnect!");
-    
-  } catch (error) {
-    console.error("WalletConnect Error:", error);
-    
-    // Special handling for mobile
-    if (isMobile() && error.message.includes("User closed modal")) {
-      showError('walletError', 'Please open the link in your wallet app');
-    } else {
-      showError('walletError', error.message || 'Connection failed');
-    }
-    
-    // Cleanup if error occurs
-    if (walletConnectProvider) {
-      try {
-        await walletConnectProvider.disconnect();
-      } catch (e) {
-        console.error("Disconnect error:", e);
-      }
-      walletConnectProvider = null;
-    }
-  }
-}
 
 // Presale configuration
 const TOTAL_STAGES = 15;
@@ -91,31 +15,159 @@ const STAGE_DURATION = 60 * 1000; // 1 minute per stage
 const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
 
 // =========================
+// WALLET CONNECT INITIALIZATION
+// =========================
+function initWalletConnect() {
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider.default,
+      options: {
+        rpc: {
+          56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
+          1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161" // Ethereum
+        },
+        qrcodeModalOptions: {
+          mobileLinks: ["metamask", "trust", "rainbow", "argent", "imtoken"],
+          desktopLinks: ["metamask"],
+          themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+        }
+      }
+    }
+  };
+
+  web3Modal = new Web3Modal.default({
+    cacheProvider: false, // optional
+    providerOptions, // required
+    disableInjectedProvider: false, // optional
+    theme: "dark"
+  });
+}
+
+// =========================
+// WALLET CONNECTION
+// =========================
+async function connectWallet() {
+  if (isConnecting) return;
+  isConnecting = true;
+  
+  try {
+    // Initialize if not already done
+    if (!web3Modal) {
+      initWalletConnect();
+    }
+
+    console.log("Connecting wallet...");
+    const instance = await web3Modal.connect();
+    provider = new ethers.providers.Web3Provider(instance);
+    signer = provider.getSigner();
+    userWalletAddress = await signer.getAddress();
+    
+    // Set up event listeners
+    instance.on("accountsChanged", (accounts) => {
+      console.log("Accounts changed:", accounts);
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else {
+        userWalletAddress = accounts[0];
+        updateWalletUI();
+      }
+    });
+
+    instance.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", chainId);
+      window.location.reload();
+    });
+
+    instance.on("disconnect", (code, reason) => {
+      console.log("Disconnected:", code, reason);
+      disconnectWallet();
+    });
+
+    updateWalletUI();
+    closeWalletModal();
+    showSuccessMessage("Wallet connected successfully!");
+    
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+    showError('walletError', error.message || "Failed to connect wallet");
+    
+    // Special handling for mobile
+    if (isMobile() && error.message.includes("User closed modal")) {
+      showError('walletError', 'Please open the link in your wallet app');
+    }
+  } finally {
+    isConnecting = false;
+  }
+}
+
+// =========================
+// WALLET DISCONNECTION
+// =========================
+function disconnectWallet() {
+  if (walletConnectProvider) {
+    try {
+      walletConnectProvider.disconnect();
+    } catch (e) {
+      console.error("Error disconnecting WalletConnect:", e);
+    }
+    walletConnectProvider = null;
+  }
+  
+  if (web3Modal && web3Modal.cachedProvider) {
+    web3Modal.clearCachedProvider();
+  }
+  
+  // Reset state
+  userWalletAddress = null;
+  provider = null;
+  signer = null;
+  
+  // Update UI
+  updateWalletUI();
+  showSuccessMessage("Wallet disconnected");
+}
+
+// =========================
+// UI UPDATES
+// =========================
+function updateWalletUI() {
+  const walletButton = document.getElementById('walletButton');
+  const walletAddress = document.getElementById('walletAddress');
+  
+  if (userWalletAddress) {
+    // Connected state
+    walletButton.textContent = 'Connected ✓';
+    walletButton.classList.remove('bg-blue-500');
+    walletButton.classList.add('bg-green-600');
+    
+    walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+    walletAddress.classList.remove('hidden');
+    
+    // Update referral section
+    showReferralUI(userWalletAddress);
+  } else {
+    // Disconnected state
+    walletButton.textContent = 'Connect Wallet';
+    walletButton.classList.remove('bg-green-600');
+    walletButton.classList.add('bg-blue-500');
+    
+    walletAddress.classList.add('hidden');
+    
+    // Reset referral section
+    document.getElementById('referralSection').innerHTML = `
+      <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+      <button onclick="connectWallet()" class="btn btn-primary">
+        Connect Wallet for Referrals
+      </button>
+    `;
+  }
+}
+
+// =========================
 // UTILITY FUNCTIONS
 // =========================
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-function isValidAddress(address) {
-  return /^(0x)?[0-9a-f]{40}$/i.test(address);
-}
-
-function toggleButtonLoading(buttonId, isLoading) {
-  const button = document.getElementById(buttonId);
-  if (!button) return;
-  
-  if (isLoading) {
-    button.innerHTML = `<span class="spinner"></span> Processing...`;
-    button.disabled = true;
-  } else {
-    const originalText = buttonId === 'buyButton' ? '🚀 Buy Now' : 
-                       buttonId === 'stakeButton' ? 'Stake Now' : 
-                       buttonId === 'claimButton' ? 'Claim Tokens' : 
-                       'Connect Wallet';
-    button.innerHTML = originalText;
-    button.disabled = false;
-  }
 }
 
 function showError(elementId, message) {
@@ -145,170 +197,47 @@ function showSuccessMessage(message) {
 }
 
 function openWalletModal() {
-  const modal = document.getElementById('walletModal');
-  if (modal) modal.classList.remove('hidden');
+  document.getElementById('walletModal').classList.remove('hidden');
 }
 
 function closeWalletModal() {
-  const modal = document.getElementById('walletModal');
-  if (modal) modal.classList.add('hidden');
+  document.getElementById('walletModal').classList.add('hidden');
 }
 
 // =========================
-// WALLET FUNCTIONS
+// EVENT LISTENERS
 // =========================
-async function connectMetaMask() {
-  if (isConnecting) return;
-  isConnecting = true;
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Web3Modal
+  initWalletConnect();
   
-  try {
-    if (!window.ethereum) {
-      // Mobile deep link
-      if (isMobile()) {
-        window.open(`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`);
-        throw new Error("Please open in MetaMask browser");
-      } else {
-        throw new Error('MetaMask not detected. Please install MetaMask browser extension.');
-      }
-    }
-
-    // Check if already connected
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-    if (accounts.length > 0) {
-      userWalletAddress = accounts[0];
-      provider = new ethers.BrowserProvider(window.ethereum);
-      signer = await provider.getSigner();
-      updateWalletUI();
-      return;
-    }
-
-    // Request connection
-    const newAccounts = await window.ethereum.request({ 
-      method: 'eth_requestAccounts' 
-    }).catch(err => {
-      if (err.code === 4001) throw new Error("Connection rejected");
-      throw err;
-    });
-
-    if (!newAccounts.length) throw new Error("No accounts found");
-    
-    provider = new ethers.BrowserProvider(window.ethereum);
-    signer = await provider.getSigner();
-    userWalletAddress = newAccounts[0];
-    
-    updateWalletUI();
-    closeWalletModal();
-    showSuccessMessage('Successfully connected to MetaMask!');
-    
-  } catch (error) {
-    console.error('MetaMask connection error:', error);
-    showError('walletError', error.message || 'Failed to connect to MetaMask');
-  } finally {
-    isConnecting = false;
+  // Bind wallet connection button
+  const walletButton = document.getElementById('walletButton');
+  if (walletButton) {
+    walletButton.addEventListener('click', connectWallet);
   }
-}
-
-walletConnectProvider.on("accountsChanged", (accounts) => {
-  if (accounts.length === 0) disconnectWallet();
-  else {
-    userWalletAddress = accounts[0];
-    updateWalletUI();
-  }
+  
+  // Bind modal wallet options
+  const walletOptions = document.querySelectorAll('.wallet-option');
+  walletOptions.forEach(option => {
+    option.addEventListener('click', connectWallet);
+  });
+  
+  // Initialize other components
+  initializeChart();
+  startTimers();
 });
 
-async function connectCoinbaseWallet() {
-  if (isConnecting) return;
-  isConnecting = true;
-  
-  try {
-    if (!window.ethereum?.isCoinbaseWallet) {
-      if (isMobile()) {
-        const dappUrl = encodeURIComponent(window.location.href);
-        window.open(`https://go.cb-w.com/dapp?cb_url=${dappUrl}`, '_blank');
-        return;
-      } else {
-        throw new Error('Coinbase Wallet not detected. Please install Coinbase Wallet extension.');
-      }
-    }
-
-    const accounts = await window.ethereum.request({ 
-      method: 'eth_requestAccounts' 
-    });
-    
-    provider = new ethers.BrowserProvider(window.ethereum);
-    signer = await provider.getSigner();
-    userWalletAddress = accounts[0];
-    
-    updateWalletUI();
-    closeWalletModal();
-    showSuccessMessage('Successfully connected to Coinbase Wallet!');
-    
-  } catch (error) {
-    console.error('Coinbase Wallet connection error:', error);
-    showError('walletError', error.message || 'Failed to connect to Coinbase Wallet');
-  } finally {
-    isConnecting = false;
-  }
-}
-
-function updateWalletUI() {
-  const walletButton = document.getElementById('walletButton');
-  const walletAddress = document.getElementById('walletAddress');
-  
-  if (userWalletAddress && walletButton && walletAddress) {
-    walletButton.textContent = 'Connected ✓';
-    walletButton.classList.remove('bg-blue-500');
-    walletButton.classList.add('bg-green-600');
-    
-    walletAddress.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-    walletAddress.classList.remove('hidden');
-    
-    showReferralUI(userWalletAddress);
-  }
-}
-
-function disconnectWallet() {
-  // Disconnect WalletConnect if active
-  if (walletConnectProvider) {
-    try {
-      walletConnectProvider.disconnect();
-    } catch (e) {
-      console.error("Error disconnecting WalletConnect:", e);
-    }
-    walletConnectProvider = null;
-  }
-  
-  // Reset all wallet state
-  userWalletAddress = null;
-  provider = null;
-  signer = null;
-  
-  // Update UI
-  const walletButton = document.getElementById('walletButton');
-  const walletAddress = document.getElementById('walletAddress');
-  
-  if (walletButton) {
-    walletButton.textContent = 'Connect Wallet';
-    walletButton.classList.remove('bg-green-600');
-    walletButton.classList.add('bg-blue-500');
-  }
-  
-  if (walletAddress) {
-    walletAddress.classList.add('hidden');
-  }
-  
-  // Reset referral section
-  const referralSection = document.getElementById('referralSection');
-  if (referralSection) {
-    referralSection.innerHTML = `
-      <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-      <button onclick="connectReferralWallet()" class="btn btn-primary">
-        Connect Wallet for Referrals
-      </button>
-    `;
-  }
-  
-  showSuccessMessage('Wallet disconnected');
+// =========================
+// PRESALE FUNCTIONS (example)
+// =========================
+function startTimers() {
+  updateTimers();
+  updateNextIncreaseTime();
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime();
+  }, 1000);
 }
 
 // =========================
