@@ -8,6 +8,83 @@ let tokenChart = null;
 let isConnecting = false;
 let walletConnectProvider = null;
 
+async function connectWalletConnect() {
+  try {
+    console.log("Initializing WalletConnect...");
+    
+    // 1. Initialize Provider
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed1.defibit.io/", // BSC Mainnet
+        1: "https://cloudflare-eth.com" // Ethereum fallback
+      },
+      chainId: 56, // Default to BSC
+      bridge: "https://bridge.walletconnect.org", // Official bridge
+      qrcodeModalOptions: {
+        mobileLinks: [
+          "metamask",
+          "trust",
+          "rainbow",
+          "argent",
+          "imtoken"
+        ],
+        desktopLinks: ["metamask"],
+        themeMode: 'dark'
+      }
+    });
+
+    // 2. Enable Session (Triggers QR Modal)
+    console.log("Enabling session...");
+    await walletConnectProvider.enable();
+    
+    // 3. Setup Ethers
+    const provider = new ethers.providers.Web3Provider(walletConnectProvider);
+    const signer = provider.getSigner();
+    userWalletAddress = await signer.getAddress();
+    
+    // 4. Event Listeners
+    walletConnectProvider.on("accountsChanged", (accounts) => {
+      console.log("Accounts changed:", accounts);
+      if (accounts.length === 0) disconnectWallet();
+      else updateWalletUI();
+    });
+
+    walletConnectProvider.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", parseInt(chainId, 16));
+    });
+
+    walletConnectProvider.on("disconnect", (code, reason) => {
+      console.log("Disconnected:", code, reason);
+      disconnectWallet();
+    });
+
+    // 5. UI Updates
+    updateWalletUI();
+    closeWalletModal();
+    showSuccessMessage("Connected via WalletConnect!");
+    
+  } catch (error) {
+    console.error("WalletConnect Error:", error);
+    
+    // Special handling for mobile
+    if (isMobile() && error.message.includes("User closed modal")) {
+      showError('walletError', 'Please open the link in your wallet app');
+    } else {
+      showError('walletError', error.message || 'Connection failed');
+    }
+    
+    // Cleanup if error occurs
+    if (walletConnectProvider) {
+      try {
+        await walletConnectProvider.disconnect();
+      } catch (e) {
+        console.error("Disconnect error:", e);
+      }
+      walletConnectProvider = null;
+    }
+  }
+}
+
 // Presale configuration
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
