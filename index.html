@@ -1140,5 +1140,138 @@ const button = document.getElementById('walletButton');
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
+<script>
+// =============================================
+// MOBILE WALLETCONNECT INTEGRATION
+// =============================================
+
+// 1. Detect mobile devices
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// 2. Initialize WalletConnect provider
+let walletConnectProvider = null;
+
+async function initializeWalletConnect() {
+  // Only load if not already initialized
+  if (!walletConnectProvider) {
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
+        1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161" // Ethereum
+      },
+      chainId: 56, // Default to BSC
+      qrcodeModalOptions: {
+        mobileLinks: ["metamask", "trust", "rainbow", "argent"],
+        desktopLinks: ["metamask"],
+        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      }
+    });
+  }
+  return walletConnectProvider;
+}
+
+// 3. Mobile-specific connection function
+async function connectWithWalletConnect() {
+  try {
+    // Initialize provider
+    const provider = await initializeWalletConnect();
+    
+    // Enable session (triggers QR code modal)
+    await provider.enable();
+    
+    // Create Web3 provider
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+    
+    // Update UI
+    userWalletAddress = address;
+    updateWalletUI();
+    closeWalletModal();
+    showSuccessMessage('Connected via WalletConnect!');
+    
+    // Set up event listeners
+    provider.on("accountsChanged", (accounts) => {
+      if (accounts.length === 0) disconnectWallet();
+      else {
+        userWalletAddress = accounts[0];
+        updateWalletUI();
+      }
+    });
+
+    provider.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", chainId);
+      window.location.reload();
+    });
+
+    provider.on("disconnect", (code, reason) => {
+      console.log("Disconnected:", code, reason);
+      disconnectWallet();
+    });
+    
+  } catch (error) {
+    console.error('WalletConnect error:', error);
+    showError('walletError', error.message || 'Failed to connect via WalletConnect');
+    
+    // Special handling for mobile
+    if (isMobileDevice() && error.message.includes("User closed modal")) {
+      showError('walletError', 'Please open the link in your wallet app');
+    }
+  }
+}
+
+// 4. Update your existing connectWallet function
+async function connectWallet() {
+  // If mobile, use WalletConnect by default
+  if (isMobileDevice()) {
+    return connectWithWalletConnect();
+  }
+  
+  // Original browser wallet connection logic
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      document.getElementById('walletButton').textContent = 'Connected ✓';
+      // ... rest of your existing connection logic
+    } catch (error) {
+      alert('Wallet connection denied.');
+    }
+  } else {
+    alert('MetaMask not detected. Please install MetaMask.');
+  }
+}
+
+// 5. Update your disconnect function
+function disconnectWallet() {
+  // Disconnect WalletConnect if active
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
+    walletConnectProvider = null;
+  }
+  
+  // Original disconnect logic
+  userWalletAddress = null;
+  const button = document.getElementById('walletButton');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-700', 'bg-green-800');
+  document.getElementById('walletStatus').classList.add('hidden');
+  
+  if (document.documentElement.classList.contains('dark')) {
+    button.classList.add('dark:bg-gray-800');
+  }
+}
+
+// 6. Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Show mobile-specific UI if needed
+  if (isMobileDevice()) {
+    const mobileBtn = document.getElementById('walletconnect-mobile');
+    if (mobileBtn) mobileBtn.classList.remove('hidden');
+  }
+  
+});
 </script>
 </html>
