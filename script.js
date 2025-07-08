@@ -190,28 +190,106 @@ function updateTimers() {
 // =========================
 // BUY FUNCTION
 // =========================
+const PRESALE_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+const PRESALE_ABI = [
+  {
+    "inputs": [{"internalType":"address","name":"referrer","type":"address"}],
+    "name":"contribute",
+    "outputs":[],
+    "stateMutability":"payable",
+    "type":"function"
+  }
+];
+
 async function buyFluffi() {
-  const amount = parseFloat(document.getElementById('amountInput').value);
+  const amount = document.getElementById('amountInput').value;
   const currency = document.getElementById('currencySelect').value;
   const ref = document.getElementById('refInput').value;
+  const errorElement = document.getElementById('buyError');
 
-  if (!userWalletAddress) return showError('buyError', 'Connect your wallet.');
-  if (!amount || amount <= 0) return showError('buyError', 'Enter valid amount.');
-  if (ref && !isValidAddress(ref)) return showError('buyError', 'Invalid referral.');
+  if (!signer || !provider || !userWalletAddress) {
+    return showError('buyError', 'Please connect your wallet first.');
+  }
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    return showError('buyError', 'Please enter a valid amount.');
+  }
+
+  if (ref && !isValidAddress(ref)) {
+    return showError('buyError', 'Invalid referral wallet address.');
+  }
 
   try {
     toggleButtonLoading('buyButton', true);
-    // mock TX delay
-    await new Promise(res => setTimeout(res, 2000));
-    showSuccessMessage('Purchase successful!');
-    const sold = parseInt(document.getElementById('tokensSold').textContent.replace(/,/g, ''));
-    document.getElementById('tokensSold').textContent = (sold + amount * 1000000).toLocaleString();
-  } catch (e) {
-    showError('buyError', e.message);
+
+    const contract = new ethers.Contract(PRESALE_ADDRESS, PRESALE_ABI, signer);
+    const value = ethers.parseEther(amount.toString());
+
+    const tx = await contract.contribute(ref || ethers.ZeroAddress, { value });
+    await tx.wait();
+
+    showSuccessMessage('✅ Purchase successful!');
+    updateTokensSoldDisplay(Number(amount)); // Optional update
+  } catch (error) {
+    console.error("Buy Error:", error);
+    let message = error?.reason || error?.data?.message || error.message;
+    if (message.includes('insufficient funds')) message = "Insufficient BNB in your wallet.";
+    showError('buyError', message);
   } finally {
     toggleButtonLoading('buyButton', false);
   }
 }
+
+const PRESALE_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+const PRESALE_ABI = [
+  {
+    "inputs": [{"internalType":"address","name":"referrer","type":"address"}],
+    "name":"contribute",
+    "outputs":[],
+    "stateMutability":"payable",
+    "type":"function"
+  }
+];
+
+async function buyFluffi() {
+  const amount = document.getElementById('amountInput').value;
+  const currency = document.getElementById('currencySelect').value;
+  const ref = document.getElementById('refInput').value;
+  const errorElement = document.getElementById('buyError');
+
+  if (!signer || !provider || !userWalletAddress) {
+    return showError('buyError', 'Please connect your wallet first.');
+  }
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    return showError('buyError', 'Please enter a valid amount.');
+  }
+
+  if (ref && !isValidAddress(ref)) {
+    return showError('buyError', 'Invalid referral wallet address.');
+  }
+
+  try {
+    toggleButtonLoading('buyButton', true);
+
+    const contract = new ethers.Contract(PRESALE_ADDRESS, PRESALE_ABI, signer);
+    const value = ethers.parseEther(amount.toString());
+
+    const tx = await contract.contribute(ref || ethers.ZeroAddress, { value });
+    await tx.wait();
+
+    showSuccessMessage('✅ Purchase successful!');
+    updateTokensSoldDisplay(Number(amount)); // Optional update
+  } catch (error) {
+    console.error("Buy Error:", error);
+    let message = error?.reason || error?.data?.message || error.message;
+    if (message.includes('insufficient funds')) message = "Insufficient BNB in your wallet.";
+    showError('buyError', message);
+  } finally {
+    toggleButtonLoading('buyButton', false);
+  }
+}
+
 
 // =========================
 // STAKE / CLAIM / REFERRAL
