@@ -229,12 +229,12 @@
       background-color: #1f2937;
     }
 
-    /* Wallet Options */
+    /* Wallet Options - Modernized */
     .btn-wallet {
-      @apply flex items-center w-full p-4 rounded-lg transition-colors
-             bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600
-             text-gray-800 dark:text-white border border-transparent
-             hover:border-gray-300 dark:hover:border-gray-500;
+      @apply flex items-center w-full p-4 rounded-xl transition-all duration-300
+             bg-white hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600
+             text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600
+             hover:shadow-md hover:-translate-y-0.5 active:translate-y-0;
     }
 
     .wallet-icon {
@@ -244,7 +244,7 @@
       align-items: center;
       justify-content: center;
       margin-right: 1rem;
-      border-radius: 50%;
+      border-radius: 12px;
       background-color: #f3f4f6;
     }
 
@@ -254,6 +254,7 @@
 
     .wallet-name {
       font-weight: 600;
+      font-size: 1.1rem;
     }
 
     .wallet-description {
@@ -303,29 +304,48 @@
       opacity: 1;
     }
 
-    /* Unified button base */
+    /* Modern Button Styles */
     .btn {
-      @apply font-semibold rounded-lg transition-all duration-200 
+      @apply font-semibold rounded-xl transition-all duration-300 
              focus:outline-none focus:ring-2 focus:ring-opacity-50 
-             disabled:opacity-70 disabled:cursor-not-allowed;
+             disabled:opacity-70 disabled:cursor-not-allowed
+             hover:shadow-md hover:-translate-y-0.5 active:translate-y-0
+             transform-gpu;
     }
 
     /* Primary (Green) */
     .btn-primary {
-      @apply bg-green-600 hover:bg-green-700 text-white 
-             focus:ring-green-500 py-3 px-6 text-lg;
+      @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+             text-white focus:ring-green-500 py-3 px-6 text-lg shadow-lg
+             border border-green-600 hover:border-green-700;
     }
 
     /* Secondary (Blue) */
     .btn-secondary {
-      @apply bg-blue-500 hover:bg-blue-600 text-white 
-             focus:ring-blue-400 py-2 px-4 text-base;
+      @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 
+             text-white focus:ring-blue-400 py-2 px-4 text-base shadow-md
+             border border-blue-600 hover:border-blue-700;
     }
 
     /* Special stake button variant */
     .btn-stake {
-      @apply bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-400 
-             text-white py-3 px-6 text-lg;
+      @apply bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 
+             focus:ring-yellow-400 text-white py-3 px-6 text-lg shadow-lg
+             border border-yellow-600 hover:border-yellow-700;
+    }
+
+    /* Connect Wallet Button */
+    .btn-connect {
+      @apply bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 
+             text-white focus:ring-purple-400 py-2 px-4 text-base shadow-md
+             border border-purple-600 hover:border-purple-700;
+    }
+
+    /* Dark Mode Toggle Button */
+    .btn-darkmode {
+      @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600
+             text-gray-800 dark:text-white p-2 rounded-lg shadow
+             flex items-center justify-center w-10 h-10;
     }
 
     /* Price Tooltip */
@@ -409,31 +429,31 @@
   <!-- Header -->
    <!-- Mobile Connect Button -->
 <div class="md:hidden text-center my-4">
-  <button onclick="openWalletModal()" class="btn btn-primary text-sm px-4 py-2">
-    🔗 Connect Wallet (Mobile)
+  <button onclick="openWalletModal()" class="btn btn-connect text-sm px-4 py-2">
+    🔗 Connect Wallet
   </button>
 </div>
 
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 shadow-lg sticky top-0 z-10">
     <div class="flex items-center gap-3">
       <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
       </h1>
     </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
       <a href="#presale" class="text-white hover:underline">Presale</a>
       <a href="#staking" class="text-white hover:underline">Staking</a>
       <a href="#faq" class="text-white hover:underline">FAQ</a>
       <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
       <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
       <a href="how-to-buy.html" target="_blank" class="btn btn-secondary">
-        How to Buy FLUFFI
+        How to Buy
       </a>
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="openWalletModal()" id="walletButton" class="btn btn-secondary hidden md:inline-block">
-  Connect Wallet
-</button>
+      <button onclick="toggleDarkMode()" class="btn-darkmode">🌙</button>
+      <button onclick="openWalletModal()" id="walletButton" class="btn btn-connect hidden md:inline-flex items-center">
+        <i class="fas fa-wallet mr-2"></i> Connect Wallet
+      </button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
   </header>
@@ -451,7 +471,7 @@
         
         <!-- Progress Bar -->
         <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-          <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+          <div id="stageProgressBar" class="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
         </div>
 
         <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
@@ -460,16 +480,15 @@
         </div>
       </div>
       
-      <!-- Reset Button (Visible only in development) -->
-      <div id="devResetButton" class="mt-4 hidden">
-        <button onclick="resetPresaleTimer()" class="btn btn-secondary text-sm">
-          Reset Timer (Dev)
-        </button>
-      </div>
-    </div>
+  <!-- Reset Button (Visible only in development) -->
+<div id="devResetButton" class="mt-4">
+  <button onclick="resetPresaleTimer()" class="btn btn-secondary text-sm">
+    <i class="fas fa-sync-alt mr-2"></i> Reset Timer (Dev)
+  </button>
+</div>
 
     <!-- Presale Section -->
-    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
 
       <div class="fluio-status-container">
@@ -513,37 +532,39 @@
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
       <div id="buyError" class="error-message"></div>
       <button onclick="buyFluffi()" id="buyButton" class="btn btn-primary w-full">
-        🚀 Buy Now
+        <i class="fas fa-rocket mr-2"></i> Buy Now
       </button>
     </section>
     
     <!-- Referral Section -->
-    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <section id="referral" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
         <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
         <button id="referralConnectBtn" onclick="connectReferralWallet()" class="btn btn-primary">
-          Connect Wallet for Referrals
+          <i class="fas fa-link mr-2"></i> Connect Wallet for Referrals
         </button>
       </div>
     </section>
 
     <!-- Claim Section -->
-    <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+    <section class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6">
       <h2 class="section-title">🎁 Claim $FLUFFI</h2>
       <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button onclick="claimTokens()" id="claimButton" class="btn btn-primary w-full">Claim Tokens</button>
+      <button onclick="claimTokens()" id="claimButton" class="btn btn-primary w-full">
+        <i class="fas fa-gift mr-2"></i> Claim Tokens
+      </button>
       <div id="claimError" class="error-message"></div>
     </section>
 
     <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6">
       <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" />
       <div id="stakeError" class="error-message"></div>
       <button onclick="stakeFluffi()" id="stakeButton" class="btn btn-stake w-full">
-        Stake Now
+        <i class="fas fa-lock mr-2"></i> Stake Now
       </button>
     </section>
     
@@ -681,7 +702,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <section id="about" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">Why Fluffi Coin?</h2>
       <div class="about-content">
         <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
@@ -695,7 +716,7 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <section id="team" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-6 text-center">Our Team</h2>
       <div class="grid md:grid-cols-2 gap-6">
         <div class="team-member text-center">
@@ -727,40 +748,60 @@
   <!-- Wallet Modal -->
   <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-4 dark:text-white">Connect Wallet</h3>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
+        <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
       
       <div class="space-y-3">
         <!-- MetaMask Option -->
         <button class="btn-wallet" onclick="connectMetaMask()">
           <div class="wallet-icon">
-            <i class="fab fa-ethereum"></i>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-6 h-6">
           </div>
           <div>
             <div class="wallet-name dark:text-white">MetaMask</div>
             <div class="wallet-description">Browser extension</div>
           </div>
+          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
         
         <!-- WalletConnect Option -->
         <button class="btn-wallet" onclick="connectWalletConnect()">
           <div class="wallet-icon">
-            <i class="fas fa-wallet"></i>
+            <img src="https://avatars.githubusercontent.com/u/37784886?s=200&v=4" alt="WalletConnect" class="w-6 h-6">
           </div>
           <div>
             <div class="wallet-name dark:text-white">WalletConnect</div>
             <div class="wallet-description">Mobile wallets</div>
           </div>
+          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
         
         <!-- Coinbase Wallet Option -->
         <button class="btn-wallet" onclick="connectCoinbaseWallet()">
           <div class="wallet-icon">
-            <i class="fab fa-bitcoin"></i>
+            <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/coinbase-wallet-logo.png" alt="Coinbase Wallet" class="w-6 h-6">
           </div>
           <div>
             <div class="wallet-name dark:text-white">Coinbase Wallet</div>
             <div class="wallet-description">Mobile & browser</div>
           </div>
+          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+        </button>
+        
+        <!-- Phantom Wallet Option -->
+        <button class="btn-wallet" onclick="connectPhantom()">
+          <div class="wallet-icon">
+            <img src="https://phantom.app/favicon.ico" alt="Phantom" class="w-6 h-6">
+          </div>
+          <div>
+            <div class="wallet-name dark:text-white">Phantom</div>
+            <div class="wallet-description">Solana wallet</div>
+          </div>
+          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
       </div>
       
