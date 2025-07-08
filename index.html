@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
  <!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
+ <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
  <script src="script.js"></script>
   <meta charset="UTF-8" />
@@ -133,324 +133,90 @@
       }
     }
 
-    /* Enhanced styling for presale section */
-    .fluio-status-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
+    /* Enhanced Button Styles */
+    .btn {
+      @apply font-semibold rounded-lg transition-all duration-200 
+             focus:outline-none focus:ring-2 focus:ring-opacity-50 
+             disabled:opacity-70 disabled:cursor-not-allowed
+             transform hover:scale-[1.02] active:scale-[0.98]
+             shadow-md hover:shadow-lg;
     }
 
-    .stage-progress {
-      flex: 1;
-      min-width: 200px;
+    /* Primary (Green) */
+    .btn-primary {
+      @apply bg-gradient-to-r from-green-500 to-green-600 text-white 
+             border border-green-600 hover:border-green-700
+             focus:ring-green-500 py-3 px-6 text-lg;
     }
 
-    .progress-info {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+    /* Secondary (Blue) */
+    .btn-secondary {
+      @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white 
+             border border-blue-600 hover:border-blue-700
+             focus:ring-blue-400 py-2 px-4 text-base;
     }
 
-    .fluio-price {
-      text-align: right;
-      min-width: 150px;
+    /* Special stake button variant */
+    .btn-stake {
+      @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-white 
+             border border-yellow-600 hover:border-yellow-700
+             focus:ring-yellow-400 py-3 px-6 text-lg;
     }
 
-    .price-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: flex-end;
-      margin-bottom: 0.25rem;
+    /* Connect Wallet Button */
+    .btn-connect {
+      @apply bg-gradient-to-r from-purple-500 to-purple-600 text-white 
+             border border-purple-600 hover:border-purple-700
+             focus:ring-purple-400 py-2 px-4 text-base;
     }
 
-    .live-badge {
-      background: #ef4444;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      animation: pulse 2s infinite;
-    }
-
-    .current-price {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #16a34a;
-    }
-
-    .price-change {
-      font-size: 0.8rem;
-      color: #6b7280;
-    }
-
-    /* Modal Styles */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .modal.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-content {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 0.5rem;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      transform: translateY(-20px);
-      transition: transform 0.3s ease;
-    }
-
-    .modal.active .modal-content {
-      transform: translateY(0);
-    }
-
-    .dark .modal-content {
-      background-color: #1f2937;
-    }
-
-    /* Wallet Options - Modernized */
+    /* Wallet Options - Enhanced */
     .btn-wallet {
-      @apply flex items-center w-full p-4 rounded-xl transition-all duration-300
+      @apply flex items-center w-full p-4 rounded-lg transition-all
              bg-white hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600
              text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600
              hover:shadow-md hover:-translate-y-0.5 active:translate-y-0;
     }
 
     .wallet-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 1rem;
-      border-radius: 12px;
-      background-color: #f3f4f6;
+      @apply w-10 h-10 flex items-center justify-center mr-3 rounded-lg
+             bg-gray-100 dark:bg-gray-600;
     }
 
-    .dark .wallet-icon {
-      background-color: #374151;
-    }
+    /* Wallet Icons */
+    .wallet-icon.metamask { background-color: #f6851b; color: white; }
+    .wallet-icon.walletconnect { background-color: #3b99fc; color: white; }
+    .wallet-icon.coinbase { background-color: #1652f0; color: white; }
+    .wallet-icon.phantom { background-color: #4e44ce; color: white; }
 
-    .wallet-name {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .wallet-description {
-      font-size: 0.875rem;
-      color: #6b7280;
-    }
-
-    .dark .wallet-description {
-      color: #9ca3af;
-    }
-
-    /* Error Message Styles */
-    .error-message {
-      @apply text-red-500 dark:text-red-400 text-sm mt-2 p-3 rounded-lg 
-             bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800;
-      animation: shake 0.5s ease-in-out;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-3px); }
-      40%, 80% { transform: translateX(3px); }
-    }
-
-    /* Success Message Styles */
-    .success-message {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      background-color: #10b981;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    .success-message.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    /* Modern Button Styles */
-    .btn {
-      @apply font-semibold rounded-xl transition-all duration-300 
-             focus:outline-none focus:ring-2 focus:ring-opacity-50 
-             disabled:opacity-70 disabled:cursor-not-allowed
-             hover:shadow-md hover:-translate-y-0.5 active:translate-y-0
-             transform-gpu;
-    }
-
-    /* Primary (Green) */
-    .btn-primary {
-      @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
-             text-white focus:ring-green-500 py-3 px-6 text-lg shadow-lg
-             border border-green-600 hover:border-green-700;
-    }
-
-    /* Secondary (Blue) */
-    .btn-secondary {
-      @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 
-             text-white focus:ring-blue-400 py-2 px-4 text-base shadow-md
-             border border-blue-600 hover:border-blue-700;
-    }
-
-    /* Special stake button variant */
-    .btn-stake {
-      @apply bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 
-             focus:ring-yellow-400 text-white py-3 px-6 text-lg shadow-lg
-             border border-yellow-600 hover:border-yellow-700;
-    }
-
-    /* Connect Wallet Button */
-    .btn-connect {
-      @apply bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 
-             text-white focus:ring-purple-400 py-2 px-4 text-base shadow-md
-             border border-purple-600 hover:border-purple-700;
-    }
-
-    /* Dark Mode Toggle Button */
-    .btn-darkmode {
-      @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600
-             text-gray-800 dark:text-white p-2 rounded-lg shadow
-             flex items-center justify-center w-10 h-10;
-    }
-
-    /* Price Tooltip */
-    .price-container { position: relative; display: inline-block; }
-    .price-tooltip { position: relative; display: inline-block; margin-left: 4px; }
-    .price-tooltip .tooltip-text {
-      visibility: hidden; width: 220px; background-color: #1f2937;
-      color: #f9fafb; text-align: center; border-radius: 6px; padding: 8px;
-      position: absolute; z-index: 1; bottom: 125%; left: 50%;
-      transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
-      font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .price-tooltip .tooltip-text::after {
-      content: ""; position: absolute; top: 100%; left: 50%;
-      margin-left: -5px; border-width: 5px; border-style: solid;
-      border-color: #1f2937 transparent transparent transparent;
-    }
-    .price-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
-    
-    .dark .price-tooltip .tooltip-text {
-      background-color: #1F2937 !important;
-      color: #F9FAFB !important;
-      border: 1px solid #4B5563;
-    }
-
-    .dark .price-tooltip .tooltip-text::after {
-      border-color: #1F2937 transparent transparent transparent !important;
-    }
-
-    .dark .price-tooltip .fa-info-circle {
-      color: #60A5FA !important;
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 640px) {
-      .fluio-status-container {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .fluio-price {
-        text-align: center;
-      }
-      
-      .price-header {
-        justify-content: center;
-      }
-
-      .modal-content {
-        padding: 1.5rem;
-      }
-    }
-
-    /* Animation */
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.7;
-      }
-    }
+    /* Rest of your existing styles... */
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
-   <!-- Mobile Connect Button -->
-<div class="md:hidden text-center my-4">
-  <button onclick="openWalletModal()" class="btn btn-connect text-sm px-4 py-2">
-    🔗 Connect Wallet
-  </button>
-</div>
+  <div class="md:hidden text-center my-4">
+    <button onclick="openWalletModal()" class="btn btn-connect text-sm px-4 py-2">
+      <i class="fas fa-wallet mr-2"></i> Connect Wallet
+    </button>
+  </div>
 
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 shadow-lg sticky top-0 z-10">
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
       <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10">
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
       </h1>
     </div>
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
       <a href="#presale" class="text-white hover:underline">Presale</a>
       <a href="#staking" class="text-white hover:underline">Staking</a>
       <a href="#faq" class="text-white hover:underline">FAQ</a>
       <a href="referral.html" target="_blank" class="text-white hover:underline">Referral</a>
       <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" class="text-white hover:underline">Whitepaper</a>
       <a href="how-to-buy.html" target="_blank" class="btn btn-secondary">
-        How to Buy
+        <i class="fas fa-shopping-cart mr-2"></i> How to Buy
       </a>
-      <button onclick="toggleDarkMode()" class="btn-darkmode">🌙</button>
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="openWalletModal()" id="walletButton" class="btn btn-connect hidden md:inline-flex items-center">
         <i class="fas fa-wallet mr-2"></i> Connect Wallet
       </button>
@@ -480,12 +246,13 @@
         </div>
       </div>
       
-  <!-- Reset Button (Visible only in development) -->
-<div id="devResetButton" class="mt-4">
-  <button onclick="resetPresaleTimer()" class="btn btn-secondary text-sm">
-    <i class="fas fa-sync-alt mr-2"></i> Reset Timer (Dev)
-  </button>
-</div>
+      <!-- Reset Button -->
+      <div id="devResetButton" class="mt-4">
+        <button onclick="resetPresaleTimer()" class="btn btn-secondary text-sm">
+          <i class="fas fa-sync-alt mr-2"></i> Reset Timer (Dev)
+        </button>
+      </div>
+    </div>
 
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
@@ -758,8 +525,8 @@
       <div class="space-y-3">
         <!-- MetaMask Option -->
         <button class="btn-wallet" onclick="connectMetaMask()">
-          <div class="wallet-icon">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-6 h-6">
+          <div class="wallet-icon metamask">
+            <i class="fab fa-ethereum"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">MetaMask</div>
@@ -770,8 +537,8 @@
         
         <!-- WalletConnect Option -->
         <button class="btn-wallet" onclick="connectWalletConnect()">
-          <div class="wallet-icon">
-            <img src="https://avatars.githubusercontent.com/u/37784886?s=200&v=4" alt="WalletConnect" class="w-6 h-6">
+          <div class="wallet-icon walletconnect">
+            <i class="fas fa-wallet"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">WalletConnect</div>
@@ -782,24 +549,12 @@
         
         <!-- Coinbase Wallet Option -->
         <button class="btn-wallet" onclick="connectCoinbaseWallet()">
-          <div class="wallet-icon">
-            <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/coinbase-wallet-logo.png" alt="Coinbase Wallet" class="w-6 h-6">
+          <div class="wallet-icon coinbase">
+            <i class="fab fa-bitcoin"></i>
           </div>
           <div>
             <div class="wallet-name dark:text-white">Coinbase Wallet</div>
             <div class="wallet-description">Mobile & browser</div>
-          </div>
-          <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-        </button>
-        
-        <!-- Phantom Wallet Option -->
-        <button class="btn-wallet" onclick="connectPhantom()">
-          <div class="wallet-icon">
-            <img src="https://phantom.app/favicon.ico" alt="Phantom" class="w-6 h-6">
-          </div>
-          <div>
-            <div class="wallet-name dark:text-white">Phantom</div>
-            <div class="wallet-description">Solana wallet</div>
           </div>
           <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
         </button>
