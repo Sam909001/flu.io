@@ -819,6 +819,52 @@ function resetTimer() {
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
+  /* Mobile wallet connect styles */
+@media (max-width: 640px) {
+  #walletconnect-mobile button {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .wallet-option {
+    padding: 1rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .wallet-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Connection status indicators */
+.connection-status {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.connected {
+  background-color: #10B981; /* green-500 */
+}
+
+.disconnected {
+  background-color: #EF4444; /* red-500 */
+}
+
+.connecting {
+  background-color: #F59E0B; /* yellow-500 */
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 </style>
 
     <!-- About Section -->
@@ -1150,11 +1196,18 @@ const button = document.getElementById('walletButton');
 // MOBILE WALLETCONNECT INTEGRATION
 // =============================================
 
-// Mobile WalletConnect with proper redirects
+// Global WalletConnect provider instance
+let walletConnectProvider = null;
+
 async function connectWithWalletConnect() {
   try {
-    // Initialize WalletConnect provider
-    const provider = new WalletConnectProvider.default({
+    // Close any existing connection
+    if (walletConnectProvider) {
+      await walletConnectProvider.disconnect();
+    }
+
+    // Initialize with proper configuration
+    walletConnectProvider = new WalletConnectProvider.default({
       rpc: {
         56: "https://bsc-dataseed.binance.org/",
         1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
@@ -1163,89 +1216,131 @@ async function connectWithWalletConnect() {
       bridge: "https://bridge.walletconnect.org",
       qrcodeModalOptions: {
         mobileLinks: ["metamask", "trust", "rainbow", "argent"],
-        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+        desktopLinks: ["metamask"]
       }
     });
 
-    // Show loading state
-    const connectBtn = document.querySelector('[onclick="connectWithWalletConnect()"]');
-    if (connectBtn) {
-      connectBtn.disabled = true;
-      connectBtn.innerHTML = '<span class="spinner"></span> Connecting...';
-    }
+    // Set loading state
+    toggleButtonLoading('walletButton', true);
+    document.getElementById('walletButton').textContent = 'Connecting...';
 
-    // Enable session (triggers QR modal)
-    await provider.enable();
+    // Enable session
+    await walletConnectProvider.enable();
 
     // Handle mobile redirects
     if (isMobile()) {
-      const { uri } = provider.connector;
-      
-      // MetaMask mobile deep link
-      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-        window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-      } 
-      // Trust Wallet deep link
-      else if (navigator.userAgent.match(/Android/i)) {
-        window.location.href = `trust://wc?uri=${encodeURIComponent(uri)}`;
-      }
-      
-      // Fallback for other wallets
-      setTimeout(() => {
-        window.location.href = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
-      }, 1000);
+      const { uri } = walletConnectProvider.connector;
+      await handleMobileRedirect(uri);
     }
 
-    // Setup provider and signer
-    const web3Provider = new ethers.providers.Web3Provider(provider);
+    // Setup provider
+    const web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
     const signer = web3Provider.getSigner();
     userWalletAddress = await signer.getAddress();
 
-    // Update UI
     updateWalletUI();
-    showSuccessMessage('Wallet connected!');
+    showSuccessMessage('Connected via WalletConnect!');
 
-    // Event listeners
-    provider.on("accountsChanged", (accounts) => {
-      if (accounts.length === 0) disconnectWallet();
-      else {
-        userWalletAddress = accounts[0];
-        updateWalletUI();
-      }
-    });
-
-    provider.on("chainChanged", (chainId) => {
-      window.location.reload();
-    });
-
-    provider.on("disconnect", () => {
-      disconnectWallet();
-    });
+    // Setup event listeners
+    setupWalletConnectEvents();
 
   } catch (error) {
     console.error('WalletConnect error:', error);
-    
-    // Reset button state
-    const connectBtn = document.querySelector('[onclick="connectWithWalletConnect()"]');
-    if (connectBtn) {
-      connectBtn.disabled = false;
-      connectBtn.textContent = 'WalletConnect (Mobile)';
-    }
-
-    // Special error handling
-    if (error.message.includes("User closed modal")) {
-      showError('walletError', 'Connection cancelled by user');
-    } else if (error.message.includes("Session disconnected")) {
-      showError('walletError', 'Session expired. Please try again.');
-    } else {
-      showError('walletError', error.message || 'Failed to connect');
-    }
+    handleWalletConnectError(error);
+  } finally {
+    toggleButtonLoading('walletButton', false);
   }
 }
-
-// Mobile detection helper
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Mobile redirect handler
+async function handleMobileRedirect(uri) {
+  return new Promise((resolve) => {
+    // Try MetaMask first
+    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+      window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
+    } 
+    // Then Trust Wallet
+    else if (navigator.userAgent.match(/Android/i)) {
+      window.location.href = `trust://wc?uri=${encodeURIComponent(uri)}`;
+    }
+    
+    // Fallback after 1 second
+    setTimeout(() => {
+      window.location.href = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
+      resolve();
+    }, 1000);
+  });
 }
-</script>
+
+// Event listeners setup
+function setupWalletConnectEvents() {
+  walletConnectProvider.on("accountsChanged", (accounts) => {
+    if (accounts.length === 0) disconnectWallet();
+    else {
+      userWalletAddress = accounts[0];
+      updateWalletUI();
+    }
+  });
+
+  walletConnectProvider.on("chainChanged", () => {
+    window.location.reload();
+  });
+
+  walletConnectProvider.on("disconnect", () => {
+    disconnectWallet();
+  });
+}
+
+// Error handling
+function handleWalletConnectError(error) {
+  let errorMessage = 'Connection failed';
+  
+  if (error.message.includes("User closed modal")) {
+    errorMessage = 'Connection cancelled';
+  } else if (error.message.includes("Session disconnected")) {
+    errorMessage = 'Session expired. Please try again.';
+  } else if (error.message.includes("QR Code Modal closed")) {
+    errorMessage = 'Please scan the QR code with your wallet app';
+  }
+
+  showError('walletError', errorMessage);
+  
+  // Add retry button
+  const errorElement = document.getElementById('walletError');
+  if (errorElement) {
+    errorElement.innerHTML += `
+      <button onclick="connectWithWalletConnect()" 
+              class="ml-2 px-3 py-1 bg-blue-500 text-white rounded">
+        Retry
+      </button>
+    `;
+  }
+}
+    // Enhanced mobile detection
+function isMobile() {
+  const userAgent = navigator.userAgent;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  const isTablet = /(iPad|Tablet|PlayBook|Kindle)|(Android(?!.*Mobile))/i.test(userAgent);
+  return isMobile && !isTablet;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Show mobile-specific UI if needed
+  if (isMobile()) {
+    const mobileSection = document.getElementById('walletconnect-mobile');
+    if (mobileSection) {
+      mobileSection.innerHTML = `
+        <button onclick="connectWithWalletConnect()" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+          <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+        </button>
+        <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
+          Works with MetaMask, Trust Wallet, and others
+        </p>
+      `;
+      mobileSection.classList.remove('hidden');
+    }
+  }
+});
+  </script>
 </html>
