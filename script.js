@@ -131,75 +131,13 @@ async function connectMetaMask() {
   }
 }
 
-async function connectWalletConnect() {
-  if (isConnecting) return;
-  isConnecting = true;
-  
-  try {
-    // Check if WalletConnect is available
-    if (typeof WalletConnectProvider === 'undefined') {
-      throw new Error('WalletConnect not available. Please ensure the library is loaded.');
-    }
-
-    // Initialize WalletConnect Provider
-    walletConnectProvider = new WalletConnectProvider({
-      rpc: {
-        56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
-        1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161" // Ethereum Mainnet
-      },
-      chainId: 56, // Default to BSC
-      qrcodeModalOptions: {
-        mobileLinks: [
-          "metamask",
-          "trust",
-          "rainbow",
-          "argent",
-          "imtoken",
-          "pillar"
-        ]
-      }
-    });
-
-    // Enable session (triggers QR code modal)
-    await walletConnectProvider.enable();
-    
-    // Create Ethers provider
-    provider = new ethers.BrowserProvider(walletConnectProvider);
-    signer = await provider.getSigner();
-    userWalletAddress = await signer.getAddress();
-    
-    // Subscribe to events
-    walletConnectProvider.on("accountsChanged", (accounts) => {
-      if (accounts.length === 0) disconnectWallet();
-      else {
-        userWalletAddress = accounts[0];
-        updateWalletUI();
-      }
-    });
-
-    walletConnectProvider.on("chainChanged", (chainId) => {
-      console.log("Chain changed:", chainId);
-      if (chainId !== "0x38") { // 0x38 is BSC mainnet in hex
-        alert("Please switch to Binance Smart Chain (Chain ID: 56)");
-      }
-    });
-
-    walletConnectProvider.on("disconnect", (code, reason) => {
-      console.log("WalletConnect disconnected:", code, reason);
-      disconnectWallet();
-    });
-
+walletConnectProvider.on("accountsChanged", (accounts) => {
+  if (accounts.length === 0) disconnectWallet();
+  else {
+    userWalletAddress = accounts[0];
     updateWalletUI();
-    closeWalletModal();
-    showSuccessMessage('Successfully connected via WalletConnect!');
-    
-  } catch (error) {
-    console.error('WalletConnect error:', error);
-    showError('walletError', error.message || 'Failed to connect via WalletConnect');
-  } finally {
-    isConnecting = false;
   }
-}
+});
 
 async function connectCoinbaseWallet() {
   if (isConnecting) return;
@@ -255,7 +193,11 @@ function updateWalletUI() {
 function disconnectWallet() {
   // Disconnect WalletConnect if active
   if (walletConnectProvider) {
-    walletConnectProvider.disconnect();
+    try {
+      walletConnectProvider.disconnect();
+    } catch (e) {
+      console.error("Error disconnecting WalletConnect:", e);
+    }
     walletConnectProvider = null;
   }
   
@@ -268,11 +210,13 @@ function disconnectWallet() {
   const walletButton = document.getElementById('walletButton');
   const walletAddress = document.getElementById('walletAddress');
   
-  if (walletButton && walletAddress) {
+  if (walletButton) {
     walletButton.textContent = 'Connect Wallet';
     walletButton.classList.remove('bg-green-600');
     walletButton.classList.add('bg-blue-500');
-    
+  }
+  
+  if (walletAddress) {
     walletAddress.classList.add('hidden');
   }
   
