@@ -1601,50 +1601,5 @@ const button = document.getElementById('walletButton');
     
     showError(message);
   }
-  // UI helper functions with proper DOM implementation
-function showSuccess(message) {
-  const notification = createNotification('success', message);
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), 5000);
-}
-
-function showError(message) {
-  const notification = createNotification('error', message);
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), 5000);
-}
-
-function showMessage(message) {
-  const notification = createNotification('info', message);
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), 5000);
-}
-
-// Helper function to create notification elements
-function createNotification(type, message) {
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  
-  // Close button
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'notification-close';
-  closeBtn.innerHTML = '&times;';
-  closeBtn.addEventListener('click', () => notification.remove());
-  
-  // Message content
-  const content = document.createElement('div');
-  content.className = 'notification-content';
-  content.textContent = message;
-  
-  notification.appendChild(content);
-  notification.appendChild(closeBtn);
-  
-  // Add slide-in animation
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  return notification;
-}
   </script>
 </html>
