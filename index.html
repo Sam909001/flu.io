@@ -1349,45 +1349,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileBtn = document.getElementById('walletconnect-mobile');
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
-// Initialize mobile UI
-function initMobileWalletUI() {
-  if (isMobile()) {
-    const mobileSection = document.getElementById('walletconnect-mobile');
-    if (mobileSection) {
-      mobileSection.innerHTML = `
-        <button onclick="connectWithWalletConnect()" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-          <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
-        </button>
-        <p class="text-sm mt-2 text-center text-gray-600 dark:text-gray-300">
-          Works with MetaMask, Trust Wallet, and others
-        </p>
-      `;
-      mobileSection.classList.remove('hidden');
-    }
-  }
-}
-// Call this on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', initMobileWalletUI);
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  // Show mobile-specific UI if needed
-  if (isMobile()) {
-    const mobileSection = document.getElementById('walletconnect-mobile');
-    if (mobileSection) {
-      mobileSection.innerHTML = `
-        <button onclick="connectWithWalletConnect()" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-          <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
-        </button>
-        <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
-          Works with MetaMask, Trust Wallet, and others
-        </p>
-      `;
-      mobileSection.classList.remove('hidden');
-    }
-  }
 });
-  </script>
+</script>
+
 </html>
