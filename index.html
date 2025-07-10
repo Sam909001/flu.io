@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
@@ -1220,6 +1221,7 @@ const button = document.getElementById('walletButton');
   }
 });
   </script>
+   </script>
     // =============================================
 // MOBILE WALLETCONNECT IMPLEMENTATION
 // (Works alongside existing browser wallet connection)
@@ -1242,7 +1244,6 @@ function isMobileDevice() {
 // Initialize WalletConnect provider
 async function initWalletConnect() {
   if (!walletConnectProvider) {
-    walletConnectProvider = new WalletConnectProvider.default({
       rpc: {
         56: "https://bsc-dataseed.binance.org/",
         1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
@@ -1312,8 +1313,8 @@ async function connectMobileWallet() {
     }
 
     // Setup provider
-    const web3Provider = new ethers.providers.Web3Provider(provider);
-    walletConnectSigner = web3Provider.getSigner();
+   provider = new ethers.BrowserProvider(walletConnectProvider);
+walletConnectSigner = await provider.getSigner();
     walletConnectAddress = await walletConnectSigner.getAddress();
     
     // Update UI
@@ -1438,4 +1439,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+</script>
+</body>
 </html>
