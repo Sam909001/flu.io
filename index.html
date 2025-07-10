@@ -1218,208 +1218,137 @@ const button = document.getElementById('walletButton');
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
-    // =============================================
-  // COMPLETE MOBILE WALLETCONNECT IMPLEMENTATION
-  // =============================================
-  
-    // Global WalletConnect provider instance
+    <script>
+// =============================================
+// MOBILE WALLETCONNECT INTEGRATION
+// =============================================
+
+// 1. Detect mobile devices
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// 2. Initialize WalletConnect provider
 let walletConnectProvider = null;
 
-async function connectWithWalletConnect() {
-  try {
-    // Show loading state
-    const connectBtn = document.querySelector('#walletconnect-mobile button');
-    if (connectBtn) {
-      connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Preparing connection...';
-      connectBtn.disabled = true;
-    }
-
-    // Initialize WalletConnect
+async function initializeWalletConnect() {
+  // Only load if not already initialized
+  if (!walletConnectProvider) {
     walletConnectProvider = new WalletConnectProvider.default({
       rpc: {
-        56: "https://bsc-dataseed.binance.org/",
-        1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+        56: "https://bsc-dataseed.binance.org/", // BSC Mainnet
+        1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161" // Ethereum
       },
-      chainId: 56,
-      bridge: "https://bridge.walletconnect.org",
+      chainId: 56, // Default to BSC
       qrcodeModalOptions: {
         mobileLinks: ["metamask", "trust", "rainbow", "argent"],
-        desktopLinks: ["metamask"]
+        desktopLinks: ["metamask"],
+        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      }
+    });
+  }
+  return walletConnectProvider;
+}
+
+// 3. Mobile-specific connection function
+async function connectWithWalletConnect() {
+  try {
+    // Initialize provider
+    const provider = await initializeWalletConnect();
+    
+    // Enable session (triggers QR code modal)
+    await provider.enable();
+    
+    // Create Web3 provider
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+    
+    // Update UI
+    userWalletAddress = address;
+    updateWalletUI();
+    closeWalletModal();
+    showSuccessMessage('Connected via WalletConnect!');
+    
+    // Set up event listeners
+    provider.on("accountsChanged", (accounts) => {
+      if (accounts.length === 0) disconnectWallet();
+      else {
+        userWalletAddress = accounts[0];
+        updateWalletUI();
       }
     });
 
-    // Enable session (triggers QR modal)
-    await walletConnectProvider.enable();
+    provider.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", chainId);
+      window.location.reload();
+    });
 
-    // Handle mobile redirect
-    if (isMobile()) {
-      await handleMobileRedirect(walletConnectProvider.connector.uri);
-    }
-
-    // Setup provider
-    const web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
-    const signer = web3Provider.getSigner();
-    userWalletAddress = await signer.getAddress();
-
-    // Update UI
-    updateWalletUI();
-    showSuccessMessage('Wallet connected!');
-
-    // Setup event listeners
-    setupWalletConnectEvents();
-
+    provider.on("disconnect", (code, reason) => {
+      console.log("Disconnected:", code, reason);
+      disconnectWallet();
+    });
+    
   } catch (error) {
     console.error('WalletConnect error:', error);
-    handleWalletConnectError(error);
-  } finally {
-    resetConnectButton();
+    showError('walletError', error.message || 'Failed to connect via WalletConnect');
+    
+    // Special handling for mobile
+    if (isMobileDevice() && error.message.includes("User closed modal")) {
+      showError('walletError', 'Please open the link in your wallet app');
+    }
   }
 }
- // Mobile redirect handler that actually works
-async function handleMobileRedirect(uri) {
-  return new Promise((resolve) => {
-    // Encode the URI properly
-    const encodedUri = encodeURIComponent(uri);
-    
-    // Platform-specific deep links
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    const isAndroid = /Android/i.test(ua);
-    
-    // Try MetaMask first
-    if (isIOS) {
-      window.location.href = `https://metamask.app.link/wc?uri=${encodedUri}`;
-    } 
-    // Then Trust Wallet
-    else if (isAndroid) {
-      window.location.href = `https://link.trustwallet.com/wc?uri=${encodedUri}`;
-    }
-    // Fallback to WalletConnect universal link
-    else {
-      window.location.href = `https://walletconnect.com/wc?uri=${encodedUri}`;
-    }
 
-    // Timeout in case redirect fails
-    setTimeout(() => {
-      // Check if we're still on the same page
-      if (window.location.href.indexOf('wc?uri') === -1) {
-        showError('walletError', 'Redirect failed. Please open your wallet app manually and scan the QR code.');
-      }
-      resolve();
-    }, 2000);
-  });
-}
-
-// Proper event listener setup
-function setupWalletConnectEvents() {
-  if (!walletConnectProvider) return;
-
-  walletConnectProvider.on("accountsChanged", (accounts) => {
-    if (accounts.length === 0) {
-      disconnectWallet();
-    } else {
-      userWalletAddress = accounts[0];
-      updateWalletUI();
-    }
-  });
-
-  walletConnectProvider.on("chainChanged", (chainId) => {
-    console.log("Chain changed to:", chainId);
-    window.location.reload();
-  });
-
-  walletConnectProvider.on("disconnect", (code, reason) => {
-    console.log("Disconnected:", code, reason);
-    disconnectWallet();
-  });
-}
-
-// Error handling with specific messages
-function handleWalletConnectError(error) {
-  let message = 'Connection failed';
+// 4. Update your existing connectWallet function
+async function connectWallet() {
+  // If mobile, use WalletConnect by default
+  if (isMobileDevice()) {
+    return connectWithWalletConnect();
+  }
   
-  if (error.message.includes("User closed modal")) {
-    message = 'You cancelled the connection';
-  } else if (error.message.includes("Session disconnected")) {
-    message = 'Session expired. Please try again.';
-  } else if (error.message.includes("QR Code Modal closed")) {
-    message = 'Please scan the QR code with your wallet app';
+  // Original browser wallet connection logic
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      document.getElementById('walletButton').textContent = 'Connected ✓';
+      // ... rest of your existing connection logic
+    } catch (error) {
+      alert('Wallet connection denied.');
+    }
   } else {
-    message = error.message || 'Failed to connect';
-  }
-
-  showError('walletError', message);
-}
-
-// Reset connect button state
-function resetConnectButton() {
-  const connectBtn = document.querySelector('#walletconnect-mobile button');
-  if (connectBtn) {
-    connectBtn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
-    connectBtn.disabled = false;
+    alert('MetaMask not detected. Please install MetaMask.');
   }
 }
-    
-    // Fallback after 1 second
-    setTimeout(() => {
-      window.location.href = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
-      resolve();
-    }, 1000);
-  });
-}
 
-// Event listeners setup
-function setupWalletConnectEvents() {
-  walletConnectProvider.on("accountsChanged", (accounts) => {
-    if (accounts.length === 0) disconnectWallet();
-    else {
-      userWalletAddress = accounts[0];
-      updateWalletUI();
-    }
-  });
-
-  walletConnectProvider.on("chainChanged", () => {
-    window.location.reload();
-  });
-
-  walletConnectProvider.on("disconnect", () => {
-    disconnectWallet();
-  });
-}
-
-// Error handling
-function handleWalletConnectError(error) {
-  let errorMessage = 'Connection failed';
+// 5. Update your disconnect function
+function disconnectWallet() {
+  // Disconnect WalletConnect if active
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
+    walletConnectProvider = null;
+  }
   
-  if (error.message.includes("User closed modal")) {
-    errorMessage = 'Connection cancelled';
-  } else if (error.message.includes("Session disconnected")) {
-    errorMessage = 'Session expired. Please try again.';
-  } else if (error.message.includes("QR Code Modal closed")) {
-    errorMessage = 'Please scan the QR code with your wallet app';
-  }
-
-  showError('walletError', errorMessage);
+  // Original disconnect logic
+  userWalletAddress = null;
+  const button = document.getElementById('walletButton');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-700', 'bg-green-800');
+  document.getElementById('walletStatus').classList.add('hidden');
   
-  // Add retry button
-  const errorElement = document.getElementById('walletError');
-  if (errorElement) {
-    errorElement.innerHTML += `
-      <button onclick="connectWithWalletConnect()" 
-              class="ml-2 px-3 py-1 bg-blue-500 text-white rounded">
-        Retry
-      </button>
-    `;
+  if (document.documentElement.classList.contains('dark')) {
+    button.classList.add('dark:bg-gray-800');
   }
 }
-    // Reliable mobile detection
-function isMobile() {
-  const ua = navigator.userAgent;
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const isTablet = /(iPad|Tablet|PlayBook|Kindle)|(Android(?!.*Mobile))/i.test(ua);
-  return isMobile && !isTablet;
-}
 
+// 6. Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Show mobile-specific UI if needed
+  if (isMobileDevice()) {
+    const mobileBtn = document.getElementById('walletconnect-mobile');
+    if (mobileBtn) mobileBtn.classList.remove('hidden');
+  }
 // Initialize mobile UI
 function initMobileWalletUI() {
   if (isMobile()) {
