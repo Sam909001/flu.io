@@ -1341,6 +1341,10 @@ function setupWalletConnectEvents(provider) {
   provider.on("disconnect", disconnectMobileWallet);
   provider.on("chainChanged", () => window.location.reload());
 }
+     
+     function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 function disconnectMobileWallet() {
   if (walletConnectProvider) {
