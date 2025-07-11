@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
   
   <meta charset="UTF-8" />
 
@@ -1362,12 +1362,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!container) return;
   container.innerHTML = `
 
-
-    <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-      <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
-    </button>
-    <div id="walletconnect-address" class="hidden mt-2 text-sm text-center text-gray-300"></div>
+<button onclick="connectWallet()" id="walletconnect-mobile-btn"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+  <i class="fas fa-mobile-alt mr-2"></i> Connect Wallet
+</button>
+<span id="walletAddress" class="hidden text-sm ml-2 font-medium text-gray-800 dark:text-white"></span>
     <p class="text-sm mt-2 text-gray-600 dark:text-gray-300 text-center">
       Works with MetaMask, Trust Wallet and others
     </p>
@@ -1389,5 +1388,38 @@ function showError(id, msg) {
     alert(msg);
   }
 }
+</script>
+  <script>
+  const { EthereumProvider, Web3Modal } = window['web3modal'];
+
+  const projectId = 'YOUR_WALLETCONNECT_PROJECT_ID'; // ← Required! Free from https://cloud.walletconnect.com
+
+  const providerOptions = {
+    walletconnect: {
+      projectId: projectId,
+      chains: [56], // BSC chain
+      methods: ['eth_sendTransaction', 'personal_sign'],
+      showQrModal: true
+    }
+  };
+
+  const modal = new Web3Modal({
+    themeMode: 'dark',
+    walletConnectVersion: 2,
+    providerOptions
+  });
+
+  async function connectWallet() {
+    const instance = await modal.connect();
+    const ethersProvider = new ethers.BrowserProvider(instance);
+    const signer = await ethersProvider.getSigner();
+    const address = await signer.getAddress();
+
+    // Show UI
+    document.getElementById("walletAddress").innerText =
+      address.slice(0, 6) + "..." + address.slice(-4);
+    document.getElementById("walletAddress").classList.remove("hidden");
+    console.log("✅ Connected:", address);
+  }
 </script>
 </html>
