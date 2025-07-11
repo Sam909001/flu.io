@@ -1247,11 +1247,11 @@ const button = document.getElementById('walletButton');
   }
 });
     </script>
+  
+  <script>
 // =============================================
 // IMPROVED MOBILE WALLETCONNECT IMPLEMENTATION
 // =============================================
-
-<script>
 let walletConnectProvider = null;
 let web3Provider = null;
 let signer = null;
@@ -1373,8 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div id="walletError" class="text-red-500 text-sm text-center mt-2 hidden"></div>
   `;
 });
-</script>
-<script>
+
 function showSuccessMessage(msg) {
   alert(msg); // replace with your toast/snackbar system
 }
@@ -1388,8 +1387,6 @@ function showError(id, msg) {
     alert(msg);
   }
 }
-</script>
-  <script>
   const { EthereumProvider, Web3Modal } = window['web3modal'];
 
   const projectId = 'YOUR_WALLETCONNECT_PROJECT_ID'; // ← Required! Free from https://cloud.walletconnect.com
