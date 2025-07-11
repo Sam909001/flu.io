@@ -1362,10 +1362,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!container) return;
   container.innerHTML = `
 
-  if (walletAddress) {
-  document.getElementById('walletAddress').innerText = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
-  document.getElementById('walletAddress').classList.remove('hidden');
-}
 
     <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
       class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
