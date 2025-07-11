@@ -248,7 +248,7 @@
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
-      <span id="walletAddress"></span>
+     <span id="walletAddress" class="hidden text-sm ml-2 font-medium text-gray-800 dark:text-white"></span>
       <div id="walletconnect-mobile" class="hidden">
   <button onclick="connectWithWalletConnect()" class="bg-green-600 text-white px-4 py-2 rounded">
     WalletConnect (Mobile)
@@ -1265,39 +1265,41 @@ function isMobileDevice() {
 // Connect Wallet via WalletConnect
 async function connectMobileWallet() {
   try {
-    // Show loading state
     const btn = document.getElementById('walletconnect-mobile-btn');
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span class="animate-spin mr-2">🔄</span> Connecting...';
     }
 
-    // Init provider
-    walletConnectProvider = new WalletConnectProvider.default({
+    // ✅ FIX: Remove `.default`
+    walletConnectProvider = new WalletConnectProvider({
       rpc: {
         56: "https://bsc-dataseed.binance.org/"
       },
       chainId: 56,
-      qrcode: !isMobileDevice(),
+      qrcode: !isMobileDevice(), // Show QR for desktop
       qrcodeModalOptions: {
-        mobileLinks: ["metamask", "trust", "rainbow", "argent"],
+        mobileLinks: ["metamask", "trust"],
         themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light"
       }
     });
 
-    // Connect session
     await walletConnectProvider.enable();
 
-    // Wrap with Ethers v5
-    web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
-    signer = web3Provider.getSigner();
-    walletAddress = await signer.getAddress();
+    // ethers v5 support
+    const provider = new ethers.providers.Web3Provider(walletConnectProvider);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
 
-    // Update UI
+    walletAddress = address;
+
+    document.getElementById('walletAddress').innerText = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+document.getElementById('walletAddress').classList.remove('hidden');
+
     updateMobileWalletUI();
     showSuccessMessage("✅ Connected to: " + walletAddress);
 
-    // Events
+    // Set listeners
     walletConnectProvider.on("accountsChanged", (accounts) => {
       walletAddress = accounts[0] || null;
       updateMobileWalletUI();
@@ -1313,7 +1315,6 @@ async function connectMobileWallet() {
     resetMobileButton();
   }
 }
-
 // Update UI
 function updateMobileWalletUI() {
   const btn = document.getElementById('walletconnect-mobile-btn');
@@ -1360,6 +1361,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('walletconnect-mobile');
   if (!container) return;
   container.innerHTML = `
+
+  if (walletAddress) {
+  document.getElementById('walletAddress').innerText = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+  document.getElementById('walletAddress').classList.remove('hidden');
+}
+
     <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
       class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
       <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
