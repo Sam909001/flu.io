@@ -1350,9 +1350,12 @@ async function connectMobileWallet() {
       qrcode: false // disable modal for mobile
     });
 
-    await walletConnectProvider.connector.createSession();
 
-    const uri = walletConnectProvider.connector.uri;
+   const uri = walletConnectProvider.connector.uri;
+if (isMobileDevice() && uri) {
+  window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
+  return;
+}
 
     if (isMobileDevice()) {
       window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
