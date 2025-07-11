@@ -1362,11 +1362,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!container) return;
   container.innerHTML = `
 
-<button onclick="connectWallet()" id="walletconnect-mobile-btn"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-  <i class="fas fa-mobile-alt mr-2"></i> Connect Wallet
-</button>
-<span id="walletAddress" class="hidden text-sm ml-2 font-medium text-gray-800 dark:text-white"></span>
+ <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+      <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+    </button>
+    <div id="walletconnect-address" class="hidden mt-2 text-sm text-center text-gray-300"></div>
     <p class="text-sm mt-2 text-gray-600 dark:text-gray-300 text-center">
       Works with MetaMask, Trust Wallet and others
     </p>
