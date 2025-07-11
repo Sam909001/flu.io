@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   
   <meta charset="UTF-8" />
@@ -1247,211 +1247,144 @@ const button = document.getElementById('walletButton');
   }
 });
     </script>
-  
-  <script>
 // =============================================
 // IMPROVED MOBILE WALLETCONNECT IMPLEMENTATION
 // =============================================
 
-// Global variables
+<script>
 let walletConnectProvider = null;
-let walletConnectSigner = null;
-let walletConnectAddress = null;
-let connectionTimeout = null;
+let web3Provider = null;
+let signer = null;
+let walletAddress = null;
 
-// Enhanced mobile detection with touch screen check
+// Mobile detection
 function isMobileDevice() {
-  try {
-    const userAgent = navigator.userAgent;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    const isTablet = /(iPad|Tablet|PlayBook|Kindle)|(Android(?!.*Mobile))/i.test(userAgent);
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    return (isMobile || hasTouch) && !isTablet;
-  } catch (e) {
-    console.error('Mobile detection error:', e);
-    return false;
-  }
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Initialize WalletConnect provider with error handling
-async function initWalletConnect() {
-  try {
-    if (!window.WalletConnectProvider || !window.ethers) {
-      throw new Error('Required libraries not loaded');
-    }
-
-    if (!walletConnectProvider) {
-      walletConnectProvider = new WalletConnectProvider({
-        rpc: {
-          56: "https://bsc-dataseed.binance.org/",
-          1: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-        },
-        chainId: 56,
-        bridge: "https://bridge.walletconnect.org",
-        qrcodeModalOptions: {
-          mobileLinks: ["metamask", "trust", "rainbow", "argent"],
-          themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-          desktopLinks: []
-        }
-      });
-    }
-    return walletConnectProvider;
-  } catch (error) {
-    console.error('WalletConnect initialization error:', error);
-    throw error;
-  }
-}
-
-// Improved mobile redirect handling
-async function redirectMobileWallet(uri) {
-  return new Promise((resolve) => {
-    try {
-      // Enhanced URI encoding
-      const encodedUri = encodeURIComponent(encodeURIComponent(uri));
-      
-      // Try deep links with fallbacks
-      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = `metamask://wc?uri=${encodedUri}`;
-        setTimeout(() => {
-          window.location.href = `https://metamask.app.link/wc?uri=${encodedUri}`;
-        }, 500);
-      } else if (/Android/i.test(navigator.userAgent)) {
-        window.location.href = `trust://wc?uri=${encodedUri}`;
-        setTimeout(() => {
-          window.location.href = `https://link.trustwallet.com/wc?uri=${encodedUri}`;
-        }, 500);
-      }
-      
-      // Final fallback
-      setTimeout(() => {
-        window.location.href = `https://walletconnect.com/wc?uri=${encodedUri}`;
-      }, 1000);
-    } catch (e) {
-      console.error('Redirect error:', e);
-    }
-  });
-}
-
-// Main connection function with enhanced error handling
+// Connect Wallet via WalletConnect
 async function connectMobileWallet() {
   try {
-    const mobileBtn = document.getElementById('walletconnect-mobile-btn');
-    if (mobileBtn) {
-      mobileBtn.disabled = true;
-      mobileBtn.innerHTML = '<span class="wc-spinner"></span> Connecting...';
+    // Show loading state
+    const btn = document.getElementById('walletconnect-mobile-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin mr-2">🔄</span> Connecting...';
     }
 
-    walletConnectProvider = new WalletConnectProvider({
+    // Init provider
+    walletConnectProvider = new WalletConnectProvider.default({
       rpc: {
         56: "https://bsc-dataseed.binance.org/"
       },
       chainId: 56,
-      bridge: "https://bridge.walletconnect.org",
-      qrcode: false // disable modal for mobile
+      qrcode: !isMobileDevice(),
+      qrcodeModalOptions: {
+        mobileLinks: ["metamask", "trust", "rainbow", "argent"],
+        themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light"
+      }
     });
 
-
-   const uri = walletConnectProvider.connector.uri;
-if (isMobileDevice() && uri) {
-  window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-  return;
-}
-
-    if (isMobileDevice()) {
-      window.location.href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-      return; // Redirected to wallet app
-    }
-
+    // Connect session
     await walletConnectProvider.enable();
 
-    const provider = new ethers.BrowserProvider(walletConnectProvider);
-    walletConnectSigner = await provider.getSigner();
-    walletConnectAddress = await walletConnectSigner.getAddress();
+    // Wrap with Ethers v5
+    web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
+    signer = web3Provider.getSigner();
+    walletAddress = await signer.getAddress();
 
+    // Update UI
     updateMobileWalletUI();
-    showSuccessMessage("✅ Mobile wallet connected!");
-    setupWalletConnectEvents(walletConnectProvider);
-  } catch (e) {
-    console.error("WalletConnect error:", e);
-    showError("walletError", e.message || "Wallet connection failed.");
+    showSuccessMessage("✅ Connected to: " + walletAddress);
+
+    // Events
+    walletConnectProvider.on("accountsChanged", (accounts) => {
+      walletAddress = accounts[0] || null;
+      updateMobileWalletUI();
+    });
+
+    walletConnectProvider.on("disconnect", () => {
+      disconnectMobileWallet();
+    });
+
+  } catch (error) {
+    console.error("WalletConnect Error:", error);
+    showError("walletError", error.message || "Wallet connection failed.");
     resetMobileButton();
   }
 }
-    
+
+// Update UI
+function updateMobileWalletUI() {
+  const btn = document.getElementById('walletconnect-mobile-btn');
+  const addr = document.getElementById('walletconnect-address');
+  if (walletAddress) {
+    if (btn) {
+      btn.innerHTML = `<i class="fas fa-check-circle mr-2"></i> Connected`;
+      btn.classList.replace("bg-blue-600", "bg-green-600");
+    }
+    if (addr) {
+      addr.textContent = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+      addr.classList.remove("hidden");
+    }
+  } else {
+    resetMobileButton();
+  }
+}
+
 function resetMobileButton() {
   const btn = document.getElementById('walletconnect-mobile-btn');
+  const addr = document.getElementById('walletconnect-address');
   if (btn) {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
-    btn.classList.replace('bg-green-600', 'bg-blue-600');
+    btn.classList.replace("bg-green-600", "bg-blue-600");
   }
-  const addr = document.getElementById('walletconnect-address');
-  if (addr) addr.classList.add('hidden');
+  if (addr) addr.classList.add("hidden");
 }
 
-function setupWalletConnectEvents(provider) {
-  provider.on("accountsChanged", (accounts) => {
-    if (accounts.length === 0) disconnectMobileWallet();
-    else {
-      walletConnectAddress = accounts[0];
-      updateMobileWalletUI();
-    }
-  });
-
-  provider.on("disconnect", disconnectMobileWallet);
-  provider.on("chainChanged", () => window.location.reload());
-}
-     
-     function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-    function detectInstalledWallets() {
-  const wallets = [];
-  if (window.ethereum?.isMetaMask) wallets.push('metamask');
-  if (window.trustwallet) wallets.push('trust');
-  // Add other wallet checks
-  return wallets;
-}
-    
 function disconnectMobileWallet() {
   if (walletConnectProvider) {
     walletConnectProvider.disconnect();
     walletConnectProvider = null;
   }
-  walletConnectSigner = null;
-  walletConnectAddress = null;
+  walletAddress = null;
+  signer = null;
+  web3Provider = null;
   updateMobileWalletUI();
-  showSuccessMessage('Mobile wallet disconnected');
+  showSuccessMessage("❎ Disconnected");
 }
-    
-// Initialize with dependency check
-document.addEventListener('DOMContentLoaded', function() {
-  // Only initialize for mobile devices
-  if (isMobileDevice()) {
-    // Check if required libraries are loaded
-    if (!window.WalletConnectProvider || !window.ethers) {
-      console.error('Required libraries not loaded');
-      showError('walletError', 'WalletConnect dependencies missing. Please reload the page.');
-      return;
-    }
 
-    const mobileSection = document.getElementById('walletconnect-mobile');
-    if (mobileSection) {
-      mobileSection.innerHTML = `
-        <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-          <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
-        </button>
-        <div id="walletconnect-address" class="hidden mt-2 text-sm text-center"></div>
-        <p class="text-sm mt-2 text-gray-600 dark:text-gray-300 text-center">
-          Works with MetaMask, Trust Wallet, and others
-        </p>
-        <div id="walletError" class="error-message hidden mt-2 text-red-500 text-sm"></div>
-      `;
-      mobileSection.classList.remove('hidden');
-    }
-  }
+// On Load — inject button
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('walletconnect-mobile');
+  if (!container) return;
+  container.innerHTML = `
+    <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+      <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+    </button>
+    <div id="walletconnect-address" class="hidden mt-2 text-sm text-center text-gray-300"></div>
+    <p class="text-sm mt-2 text-gray-600 dark:text-gray-300 text-center">
+      Works with MetaMask, Trust Wallet and others
+    </p>
+    <div id="walletError" class="text-red-500 text-sm text-center mt-2 hidden"></div>
+  `;
 });
+</script>
+<script>
+function showSuccessMessage(msg) {
+  alert(msg); // replace with your toast/snackbar system
+}
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.classList.remove("hidden");
+    setTimeout(() => el.classList.add("hidden"), 5000);
+  } else {
+    alert(msg);
+  }
+}
 </script>
 </html>
