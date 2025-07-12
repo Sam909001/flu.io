@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
-  
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
   <meta charset="UTF-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
@@ -1599,7 +1597,27 @@ async function connectMobileWallet() {
     clearTimeout(connectionTimeout);
   }
 }
-
+async function connectMobileWallet() {
+  console.log("1. Starting connection"); // Debug
+  try {
+    console.log("2. Initializing provider"); // Debug
+    const provider = await initWalletConnect();
+    console.log("3. Provider initialized", provider); // Debug
+    
+    await provider.enable();
+    console.log("4. Provider enabled"); // Debug
+    
+    if (isMobileDevice() && provider.connector?.uri) {
+      console.log("5. Redirecting mobile", provider.connector.uri); // Debug
+      await redirectMobileWallet(provider.connector.uri);
+      return;
+    }
+    // ... rest of your code
+  } catch (error) {
+    console.error("Connection failed:", error); // Debug
+    handleWalletConnectError(error);
+  }
+}
 // Update UI for mobile wallet connection
 function updateMobileWalletUI() {
   const mobileBtn = document.getElementById('walletconnect-mobile-btn');
