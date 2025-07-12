@@ -1,4 +1,0 @@
-touch .nojekyll
-git add .well-known/walletconnect.txt .nojekyll
-git commit -m "Add WalletConnect verification file"
-git push
