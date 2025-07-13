@@ -1,30 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://unpkg.com/@walletconnect/modal@2.6.6/dist/umd/index.min.js"></script>
 
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards." />
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token" />
   <meta name="author" content="FLUFFI Team" />
-<!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
-  <!-- WalletConnect + Web3Modal Scripts -->
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
-<script src="https://unpkg.com/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" defer></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script src="Timer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.7/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -1203,103 +1194,53 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
-  <script>
-// WalletConnect Configuration
-const WC_PROJECT_ID = "b74a733c47def7b6672eb9ad072c4e8a"; // Replace with your Project ID
-const WC_CHAIN_ID = 56; // BSC (Change if needed)
-const WC_RPC_URL = "https://bsc-dataseed.binance.org/";
+<script>
+const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // From WalletConnect Cloud
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  initWalletConnect();
+const web3Modal = new window.WalletConnectModal.default({
+  projectId,
+  themeMode: "dark",
+  walletConnectVersion: 2,
+  chains: [56], // BSC Chain ID
+  standaloneChains: ["eip155:56"],
+  metadata: {
+    name: "Fluffi Token",
+    description: "Buy & Stake $FLUFFI",
+    url: "https://fluffi.site",
+    icons: ["https://fluffi.site/logo.png"]
+  }
 });
 
-// 1. Initialize WalletConnect
-function initWalletConnect() {
-  if (!isMobile()) return;
-  
-  const mobileSection = document.getElementById('walletconnect-mobile');
-  if (mobileSection) {
-    mobileSection.classList.remove('hidden');
-    document.getElementById('wc-mobile-btn').addEventListener('click', connectWallet);
-  }
-}
+let walletConnectSigner = null;
+let walletConnectAddress = null;
 
-// 2. Check if Mobile
-function isMobile() {
-  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// 3. Connect Wallet (Handles MetaMask, Trust, Coinbase)
-async function connectWallet() {
-  const btn = document.getElementById('wc-mobile-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Connecting...';
-
+async function connectMobileWallet() {
   try {
-    // Try MetaMask/Coinbase first if installed
-    if (window.ethereum?.isMetaMask || window.ethereum?.isCoinbaseWallet) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleSuccess(accounts[0]);
-      return;
+    const { provider } = await web3Modal.connect();
+
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    walletConnectSigner = await ethersProvider.getSigner();
+    walletConnectAddress = await walletConnectSigner.getAddress();
+
+    // Update UI
+    const btn = document.getElementById('walletconnect-mobile-btn');
+    const addr = document.getElementById('walletconnect-address');
+    if (btn) {
+      btn.innerHTML = '✅ Connected';
+      btn.classList.replace('bg-blue-600', 'bg-green-600');
+    }
+    if (addr) {
+      addr.textContent = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
+      addr.classList.remove('hidden');
     }
 
-    // Fallback to WalletConnect
-    const provider = new WalletConnectProvider.default({
-      projectId: WC_PROJECT_ID,
-      chainId: WC_CHAIN_ID,
-      rpc: { [WC_CHAIN_ID]: WC_RPC_URL },
-      metadata: {
-        name: "My DApp",
-        description: "Connect your wallet",
-        url: window.location.href,
-        icons: ["https://example.com/icon.png"]
-      },
-      qrcodeModalOptions: {
-        mobileLinks: ['metamask', 'trust', 'coinbase']
-      }
-    });
-
-    await provider.enable();
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    const signer = await ethersProvider.getSigner();
-    handleSuccess(await signer.getAddress());
-
-  } catch (error) {
-    handleError(error);
+    // Handle disconnect or account switch
+    provider.on("accountsChanged", () => window.location.reload());
+    provider.on("disconnect", () => window.location.reload());
+  } catch (err) {
+    console.error("WalletConnect failed:", err);
+    alert("Wallet connection failed: " + (err.message || "Unknown error"));
   }
 }
-
-// 4. Handle Successful Connection
-function handleSuccess(address) {
-  const btn = document.getElementById('wc-mobile-btn');
-  btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Connected';
-  btn.classList.add('connected');
-  document.getElementById('walletAddress').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-// 5. Handle Errors
-function handleError(error) {
-  console.error(error);
-  const errorEl = document.getElementById('walletError');
-  errorEl.textContent = getErrorMessage(error);
-  errorEl.classList.add('show');
-  setTimeout(() => errorEl.classList.remove('show'), 5000);
-  resetButton();
-}
-
-function getErrorMessage(error) {
-  if (error.code === 4001) return "Connection rejected";
-  if (error.message.includes("User closed")) return "Connection cancelled";
-  return "Connection failed";
-}
-
-// 6. Reset Button
-function resetButton() {
-  const btn = document.getElementById('wc-mobile-btn');
-  btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet';
-  btn.classList.remove('connected');
-  btn.disabled = false;
-}
-  </script>
+</script>
 </html>
