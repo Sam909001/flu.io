@@ -1196,31 +1196,30 @@ const button = document.getElementById('walletButton');
 </script>
 
   <script>
-// WalletConnect configuration
-const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Replace with your actual project ID
-const WC_CHAIN_ID = 56; // BSC chain
+// Configuration
+const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Your WalletConnect Project ID
+const WC_CHAIN_ID = 56; // BSC chain ID
 const WC_RPC_URL = "https://bsc-dataseed.binance.org/";
-
-// Global variables
-let walletConnectProvider = null;
-let walletConnectSigner = null;
+const WC_METADATA = {
+  name: "FLUFFI Presale",
+  description: "Connect to FLUFFI Presale",
+  url: window.location.href,
+  icons: ["https://fluffi.site/favicon.ico"]
+};
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  initMobileWalletConnect();
+  initMobileWalletSection();
 });
 
-// Initialize mobile wallet connection
-function initMobileWalletConnect() {
-  // Only show on mobile devices
+// Initialize mobile wallet section
+function initMobileWalletSection() {
   if (!isMobileDevice()) return;
   
   const mobileSection = document.getElementById('walletconnect-mobile');
   if (mobileSection) {
     mobileSection.classList.remove('hidden');
-    
-    const connectBtn = document.getElementById('wc-mobile-btn');
-    connectBtn.addEventListener('click', connectMobileWallet);
+    document.getElementById('wc-mobile-btn').addEventListener('click', handleMobileWalletConnect);
   }
 }
 
@@ -1229,60 +1228,70 @@ function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Connect with mobile wallet
-async function connectMobileWallet() {
+// Handle mobile wallet connection
+async function handleMobileWalletConnect() {
   try {
     const btn = document.getElementById('wc-mobile-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="wc-spinner"></span> Connecting...';
     
-    // Initialize WalletConnect provider
-    walletConnectProvider = new WalletConnectProvider.default({
-      projectId: WC_PROJECT_ID,
-      chainId: WC_CHAIN_ID,
-      rpc: {
-        [WC_CHAIN_ID]: WC_RPC_URL
-      },
-      metadata: {
-        name: "FLUFFI Presale",
-        description: "Connect to FLUFFI Presale",
-        url: window.location.href,
-        icons: ["https://fluffi.site/favicon.ico"]
-      },
-      qrcodeModalOptions: {
-        mobileLinks: [
-          'metamask',
-          'trust',
-          'coinbase',
-          'rainbow',
-          'argent'
-        ]
-      }
-    });
+    // First try direct connection to MetaMask/Coinbase if installed
+    if (window.ethereum?.isMetaMask || window.ethereum?.isCoinbaseWallet) {
+      await connectInjectedWallet();
+      return;
+    }
     
-    // Enable session (triggers QR code modal)
-    await walletConnectProvider.enable();
-    
-    // Create ethers provider
-    const provider = new ethers.BrowserProvider(walletConnectProvider);
-    walletConnectSigner = await provider.getSigner();
-    const address = await walletConnectSigner.getAddress();
-    
-    // Update UI
-    updateWalletUI(address);
-    
-    // Set up event listeners
-    walletConnectProvider.on("accountsChanged", (accounts) => {
-      if (accounts.length === 0) disconnectWallet();
-      else updateWalletUI(accounts[0]);
-    });
-    
-    walletConnectProvider.on("chainChanged", () => window.location.reload());
-    walletConnectProvider.on("disconnect", disconnectWallet);
-    
+    // Fall back to WalletConnect
+    await connectWithWalletConnect();
   } catch (error) {
     handleWalletError(error);
   }
+}
+
+// Connect with injected provider (MetaMask/Coinbase)
+async function connectInjectedWallet() {
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    updateWalletUI(accounts[0]);
+  } catch (error) {
+    // If user rejects, fall back to WalletConnect
+    if (error.code === 4001) {
+      await connectWithWalletConnect();
+    } else {
+      throw error;
+    }
+  }
+}
+
+// Connect with WalletConnect
+async function connectWithWalletConnect() {
+  const provider = new WalletConnectProvider.default({
+    projectId: WC_PROJECT_ID,
+    chainId: WC_CHAIN_ID,
+    rpc: { [WC_CHAIN_ID]: WC_RPC_URL },
+    metadata: WC_METADATA,
+    qrcodeModalOptions: {
+      mobileLinks: ['metamask', 'trust', 'coinbase', 'rainbow'],
+      desktopLinks: ['metamask', 'trust', 'coinbase']
+    }
+  });
+
+  await provider.enable();
+  
+  // Create ethers provider
+  const ethersProvider = new ethers.BrowserProvider(provider);
+  const signer = await ethersProvider.getSigner();
+  const address = await signer.getAddress();
+  
+  updateWalletUI(address);
+  
+  // Set up event listeners
+  provider.on("accountsChanged", (accounts) => {
+    if (accounts.length === 0) disconnectWallet();
+    else updateWalletUI(accounts[0]);
+  });
+  provider.on("chainChanged", () => window.location.reload());
+  provider.on("disconnect", disconnectWallet);
 }
 
 // Update UI after successful connection
@@ -1298,6 +1307,7 @@ function updateWalletUI(address) {
   if (mobileBtn) {
     mobileBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Connected';
     mobileBtn.classList.replace('bg-blue-600', 'bg-green-600');
+    mobileBtn.disabled = false;
   }
   
   document.getElementById('walletAddress').textContent = 
@@ -1310,12 +1320,10 @@ function handleWalletError(error) {
   console.error('Wallet connection error:', error);
   
   let errorMessage = 'Connection failed';
-  if (error.message.includes("User closed modal")) {
+  if (error.code === 4001) {
+    errorMessage = 'Connection rejected by user';
+  } else if (error.message.includes("User closed modal")) {
     errorMessage = 'Connection cancelled';
-  } else if (error.message.includes("Session disconnected")) {
-    errorMessage = 'Session expired';
-  } else if (error.message.includes("QR Code Modal closed")) {
-    errorMessage = 'Please scan the QR code';
   }
   
   const errorEl = document.getElementById('walletError');
@@ -1330,11 +1338,6 @@ function handleWalletError(error) {
 
 // Disconnect wallet
 function disconnectWallet() {
-  if (walletConnectProvider) {
-    walletConnectProvider.disconnect();
-    walletConnectProvider = null;
-  }
-  walletConnectSigner = null;
   resetWalletButtons();
 }
 
@@ -1357,5 +1360,5 @@ function resetWalletButtons() {
   document.getElementById('walletAddress').textContent = '';
   document.getElementById('walletAddress').classList.add('hidden');
 }
-</script>
+  </script>
 </html>
