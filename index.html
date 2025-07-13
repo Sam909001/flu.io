@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
-<script src="https://unpkg.com/@walletconnect/modal@2.6.6/dist/umd/index.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/web3modal@2.5.2/dist/web3modal.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -262,11 +262,10 @@
 
 <div id="walletconnect-mobile">
   <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()"
-  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-  📱 Connect Mobile Wallet
-</button>
-<span id="walletconnect-address" class="hidden text-sm ml-2 font-medium text-gray-800 dark:text-white"></span>
-  <div id="walletError" class="text-red-500 text-sm text-center hidden mt-2"></div>
+    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+  </button>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-center text-white"></div>
 </div>
 
 
@@ -1235,5 +1234,55 @@ const button = document.getElementById('walletButton');
       alert("Connection failed: " + (err.message ?? "unknown error"));
     }
   };
+</script>
+  <script>
+const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // ✅ Replace with your real one
+
+const metadata = {
+  name: "FLUFFI Presale",
+  description: "Buy & Stake $FLUFFI Token",
+  url: "https://fluffi.site",
+  icons: ["https://fluffi.site/logo.png"] // Use your actual logo
+};
+
+const web3Modal = new window.Web3Modal({
+  projectId,
+  walletConnectVersion: 2,
+  themeMode: "dark",
+  chains: [56], // BSC
+  metadata
+});
+
+let signer, address;
+
+async function connectMobileWallet() {
+  try {
+    const session = await web3Modal.connect();
+    const provider = new ethers.BrowserProvider(session);
+    signer = await provider.getSigner();
+    address = await signer.getAddress();
+
+    // ✅ Update UI
+    document.getElementById("walletconnect-mobile-btn").innerHTML = "✅ Connected";
+    document.getElementById("walletconnect-address").textContent =
+      address.slice(0, 6) + "..." + address.slice(-4);
+    document.getElementById("walletconnect-address").classList.remove("hidden");
+
+    // Optional: Handle events
+    session.on("disconnect", () => {
+      console.log("Disconnected");
+      resetWalletUI();
+    });
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
+  }
+}
+
+function resetWalletUI() {
+  const btn = document.getElementById("walletconnect-mobile-btn");
+  if (btn) btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
+  document.getElementById("walletconnect-address").classList.add("hidden");
+}
 </script>
 </html>
