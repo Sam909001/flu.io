@@ -1189,6 +1189,8 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
+  <script>
+    
 <!-- WalletConnect v2 + Ethers.js v6 (Mobile Friendly) -->
 <script type="module">
   import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
@@ -1242,22 +1244,5 @@ const button = document.getElementById('walletButton');
       alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
     }
   };
-</script>
-  <script>
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Replace this with your real ID
-
-  const web3Modal = new WalletConnectModal.default({
-    projectId,
-    themeMode: "dark",
-    walletConnectVersion: 2,
-    chains: [56],
-    standaloneChains: ["eip155:56"],
-    metadata: {
-      name: "Fluffi Token",
-      description: "Buy & Stake $FLUFFI",
-      url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"]
-    }
-  });
 </script>
 </html>
