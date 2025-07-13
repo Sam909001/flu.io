@@ -1190,59 +1190,71 @@ const button = document.getElementById('walletButton');
 </script>
 
   <script>
-    
-<!-- WalletConnect v2 + Ethers.js v6 (Mobile Friendly) -->
-<script type="module">
   import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
 
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // ✅ your WalletConnect project ID
+const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Verify this is correct
 
-  const modal = new WalletConnectModal({
-    projectId,
-    walletConnectVersion: 2,
-    themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light",
-    chains: [56], // BSC
-    standaloneChains: ["eip155:56"],
-    metadata: {
-      name: "Fluffi Presale",
-      description: "Buy & Stake $FLUFFI",
-      url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"] // ✅ optional logo
+// 1. First ensure the modal is properly initialized
+const modal = new WalletConnectModal({
+  projectId,
+  walletConnectVersion: 2,
+  themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light",
+  chains: [56], // BSC
+  standaloneChains: ["eip155:56"],
+  // 2. Add required provider metadata
+  providerMetadata: {
+    name: "Fluffi Presale",
+    description: "Buy & Stake $FLUFFI",
+    url: "https://fluffi.site",
+    icons: ["https://fluffi.site/logo.png"]
+  }
+});
+
+// 3. Add error handling for modal initialization
+modal.init().catch(err => {
+  console.error("Modal initialization failed:", err);
+});
+
+window.connectMobileWallet = async function () {
+  try {
+    // 4. Check if modal is initialized
+    if (!modal.initialized) {
+      await modal.init();
     }
-  });
-
-  window.connectMobileWallet = async function () {
-    try {
-      const { provider } = await modal.connect();
-
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const address = await signer.getAddress();
-
-      // Update UI
-      const btn = document.getElementById("walletconnect-mobile-btn");
-      const addrBox = document.getElementById("walletconnect-address");
-
-      if (btn) btn.innerHTML = `✅ ${address.slice(0, 6)}...${address.slice(-4)}`;
-      if (addrBox) {
-        addrBox.textContent = address;
-        addrBox.classList.remove("hidden");
-      }
-
-      // Events
-      provider.on("accountsChanged", () => window.location.reload());
-      provider.on("disconnect", () => window.location.reload());
-
-      // Make signer/address global (optional)
-      window.walletConnectProvider = provider;
-      window.walletConnectSigner = signer;
-      window.walletConnectAddress = address;
-
-    } catch (err) {
-      console.error("WalletConnect error:", err);
-      alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
+    
+    const { provider } = await modal.connect();
+    
+    // 5. Add error handling for provider
+    if (!provider) {
+      throw new Error("Provider not returned from WalletConnect");
     }
-  };
+
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    const signer = await ethersProvider.getSigner();
+    const address = await signer.getAddress();
+
+    // 6. More robust UI updates
+    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    document.querySelectorAll('.wallet-address').forEach(el => {
+      el.textContent = shortAddress;
+      el.classList.remove('hidden');
+    });
+
+    // Store references
+    window.walletConnect = { provider, signer, address };
+
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    // 7. More user-friendly error display
+    const errorEl = document.getElementById('wallet-error');
+    if (errorEl) {
+      errorEl.textContent = `Connection failed: ${err.message}`;
+      errorEl.classList.remove('hidden');
+    } else {
+      alert(`Wallet connection failed: ${err.message}`);
+    }
+  }
+};
 </script>
 </html>
