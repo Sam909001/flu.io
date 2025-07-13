@@ -260,12 +260,15 @@
       </nav>
   </header>
 
-<div id="walletconnect-mobile" class="hidden">
-  <button id="wc-mobile-btn" class="wallet-connect-btn">
-    <i class="fas fa-mobile-alt mr-2"></i> Connect Wallet
+<div id="walletconnect-mobile">
+  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
   </button>
-  <div id="walletError" class="error-message"></div>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-center text-white"></div>
+  <div id="walletError" class="text-red-500 text-sm text-center hidden mt-2"></div>
 </div>
+
 
   <main class="p-6 mx-auto w-full max-w-6xl">
 
@@ -1195,52 +1198,45 @@ const button = document.getElementById('walletButton');
 </script>
 
 <script>
-const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // From WalletConnect Cloud
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; 
 
-const web3Modal = new window.WalletConnectModal.default({
-  projectId,
-  themeMode: "dark",
-  walletConnectVersion: 2,
-  chains: [56], // BSC Chain ID
-  standaloneChains: ["eip155:56"],
-  metadata: {
-    name: "Fluffi Token",
-    description: "Buy & Stake $FLUFFI",
-    url: "https://fluffi.site",
-    icons: ["https://fluffi.site/logo.png"]
-  }
-});
-
-let walletConnectSigner = null;
-let walletConnectAddress = null;
-
-async function connectMobileWallet() {
-  try {
-    const { provider } = await web3Modal.connect();
-
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    walletConnectSigner = await ethersProvider.getSigner();
-    walletConnectAddress = await walletConnectSigner.getAddress();
-
-    // Update UI
-    const btn = document.getElementById('walletconnect-mobile-btn');
-    const addr = document.getElementById('walletconnect-address');
-    if (btn) {
-      btn.innerHTML = '✅ Connected';
-      btn.classList.replace('bg-blue-600', 'bg-green-600');
+  const web3Modal = new window.WalletConnectModal.default({
+    projectId,
+    walletConnectVersion: 2,
+    themeMode: "dark",
+    chains: [56], // BSC
+    standaloneChains: ["eip155:56"],
+    metadata: {
+      name: "Fluffi Token",
+      description: "Buy & Stake $FLUFFI",
+      url: "https://fluffi.site",
+      icons: ["https://fluffi.site/logo.png"] // Optional
     }
-    if (addr) {
-      addr.textContent = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
-      addr.classList.remove('hidden');
-    }
+  });
 
-    // Handle disconnect or account switch
-    provider.on("accountsChanged", () => window.location.reload());
-    provider.on("disconnect", () => window.location.reload());
-  } catch (err) {
-    console.error("WalletConnect failed:", err);
-    alert("Wallet connection failed: " + (err.message || "Unknown error"));
+  let walletConnectSigner = null;
+  let walletConnectAddress = null;
+
+  async function connectMobileWallet() {
+    try {
+      const { provider } = await web3Modal.connect();
+      const ethersProvider = new ethers.BrowserProvider(provider);
+      walletConnectSigner = await ethersProvider.getSigner();
+      walletConnectAddress = await walletConnectSigner.getAddress();
+
+      // UI update
+      document.getElementById('walletconnect-mobile-btn').innerText = '✅ Connected';
+      document.getElementById('walletconnect-address').textContent =
+        `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
+      document.getElementById('walletconnect-address').classList.remove('hidden');
+
+      provider.on("accountsChanged", () => window.location.reload());
+      provider.on("disconnect", () => window.location.reload());
+    } catch (err) {
+      console.error("WalletConnect failed:", err);
+      document.getElementById('walletError').classList.remove('hidden');
+      document.getElementById('walletError').innerText = err.message || 'Connection failed';
+    }
   }
-}
 </script>
 </html>
