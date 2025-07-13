@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -246,10 +244,12 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      <div id="walletconnect-mobile" class="hidden">
-  <button onclick="connectWithWalletConnect()" class="bg-green-600 text-white px-4 py-2 rounded">
-    WalletConnect (Mobile)
+      <div id="walletconnect-mobile" class="text-center my-4">
+  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+    class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
   </button>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
 </div>
 
       <button onclick="disconnectWallet()">Disconnect</button>
@@ -1186,60 +1186,24 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
+<!-- WalletConnect v2 + Ethers.js v6 (Mobile Friendly) -->
 <script type="module">
   import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
 
-  const modal = new WalletConnectModal({
-    projectId,
-    walletConnectVersion: 2,
-    themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-    chains: [56],
-    standaloneChains: ["eip155:56"],
-    metadata: {
-      name: "Fluffi Presale",
-      description: "Buy & stake $FLUFFI",
-      url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"]
-    }
-  });
-
-  window.connectMobileWallet = async function() {
-    try {
-      const { provider } = await modal.connect();
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const address = await signer.getAddress();
-
-      document.getElementById("walletconnect-mobile-btn").innerText = `✅ ${address.slice(0,6)}…${address.slice(-4)}`;
-      document.getElementById("walletconnect-address").innerText = address;
-      document.getElementById("walletconnect-address").classList.remove("hidden");
-
-      provider.on("accountsChanged", () => window.location.reload());
-      provider.on("disconnect", () => window.location.reload());
-    } catch (err) {
-      console.error("WalletConnect Error:", err);
-      alert("Connection failed: " + (err.message ?? "unknown error"));
-    }
-  };
-</script>
-<script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
-
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // ✅ Your real WalletConnect projectId
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // ✅ your WalletConnect project ID
 
   const modal = new WalletConnectModal({
     projectId,
     walletConnectVersion: 2,
     themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light",
-    chains: [56],
+    chains: [56], // BSC
     standaloneChains: ["eip155:56"],
     metadata: {
       name: "Fluffi Presale",
-      description: "Buy & stake $FLUFFI",
+      description: "Buy & Stake $FLUFFI",
       url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"]
+      icons: ["https://fluffi.site/logo.png"] // ✅ optional logo
     }
   });
 
@@ -1251,16 +1215,30 @@ const button = document.getElementById('walletButton');
       const signer = await ethersProvider.getSigner();
       const address = await signer.getAddress();
 
-      document.getElementById("walletconnect-mobile-btn").innerHTML = "✅ " + address.slice(0, 6) + "..." + address.slice(-4);
-      document.getElementById("walletconnect-address").textContent = address;
-      document.getElementById("walletconnect-address").classList.remove("hidden");
+      // Update UI
+      const btn = document.getElementById("walletconnect-mobile-btn");
+      const addrBox = document.getElementById("walletconnect-address");
 
+      if (btn) btn.innerHTML = `✅ ${address.slice(0, 6)}...${address.slice(-4)}`;
+      if (addrBox) {
+        addrBox.textContent = address;
+        addrBox.classList.remove("hidden");
+      }
+
+      // Events
       provider.on("accountsChanged", () => window.location.reload());
       provider.on("disconnect", () => window.location.reload());
+
+      // Make signer/address global (optional)
+      window.walletConnectProvider = provider;
+      window.walletConnectSigner = signer;
+      window.walletConnectAddress = address;
+
     } catch (err) {
-      console.error("WalletConnect Error:", err);
-      alert("Connection failed: " + (err.message ?? "unknown error"));
+      console.error("WalletConnect error:", err);
+      alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
     }
   };
 </script>
+<body>
 </html>
