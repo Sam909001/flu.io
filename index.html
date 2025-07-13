@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
+<!-- Ethers.js v6 (only once) -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+<!-- WalletConnect v2 Modal -->
+<script src="https://unpkg.com/@walletconnect/modal@2.6.6/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>$FLUFFI Presale & Staking</title>
@@ -1476,6 +1478,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
           <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
         </button>
+        
         <div id="walletconnect-address" class="hidden mt-2 text-sm text-center"></div>
         <p class="text-sm mt-2 text-gray-600 dark:text-gray-300 text-center">
           Works with MetaMask, Trust Wallet, and others
@@ -1487,8 +1490,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-<script>
-const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // From cloud.walletconnect.com
+
+  <script>
+const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // from cloud.walletconnect.com
 
 const web3Modal = new window.WalletConnectModal.default({
   projectId,
@@ -1500,7 +1504,7 @@ const web3Modal = new window.WalletConnectModal.default({
     name: "Fluffi Token",
     description: "Buy & Stake $FLUFFI",
     url: "https://fluffi.site",
-    icons: ["https://fluffi.site/logo.png"] // Replace with your logo if available
+    icons: ["https://fluffi.site/logo.png"]
   }
 });
 
@@ -1528,4 +1532,5 @@ async function connectMobileWallet() {
   }
 }
 </script>
+</body>
 </html>
