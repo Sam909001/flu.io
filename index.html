@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- WalletConnect V2 Meta Tags -->
+  <meta name="walletconnect:projectId" content="847bc5b9b1e3b0dfd4a102b191bb0f7d">
   <meta name="walletconnect:version" content="2.0">
   <meta name="walletconnect:mode" content="modal">
   <meta name="walletconnect:deeplink" content="true">
@@ -1152,5 +1153,113 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
- 
+  <script>
+    import SignClient from '@walletconnect/sign-client'
+import { Web3Modal } from '@web3modal/modal'
+
+class MobileWalletConnect {
+  constructor() {
+    this.projectId = '847bc5b9b1e3b0dfd4a102b191bb0f7d' // Replace with your actual WalletConnect Project ID
+    this.signClient = null
+    this.web3modal = null
+  }
+
+  async initialize() {
+    if (!this.isMobileDevice()) return
+
+    try {
+      // Initialize Sign Client
+      this.signClient = await SignClient.init({
+        projectId: this.projectId,
+        metadata: {
+          name: 'Your Dapp Name',
+          description: 'Mobile Wallet Connection',
+          url: window.location.origin,
+          icons: ['https://your-icon-url.com']
+        }
+      })
+
+      // Initialize Web3Modal
+      this.web3modal = new Web3Modal({
+        projectId: this.projectId,
+        chains: [1], // Ethereum mainnet, adjust as needed
+        walletConnectVersion: 2
+      })
+
+      this.setupEventListeners()
+      this.createMobileConnectButton()
+    } catch (error) {
+      console.error('Initialization Error:', error)
+    }
+  }
+
+  setupEventListeners() {
+    this.signClient.on('session_proposal', this.handleSessionProposal.bind(this))
+    this.signClient.on('session_connect', this.handleSessionConnect.bind(this))
+    this.signClient.on('session_disconnect', this.handleSessionDisconnect.bind(this))
+  }
+
+  createMobileConnectButton() {
+    const container = document.getElementById('mobile-connect-container')
+    const button = document.createElement('button')
+    button.id = 'mobile-wallet-connect'
+    button.textContent = 'Connect Mobile Wallet'
+    button.style.display = this.isMobileDevice() ? 'block' : 'none'
+    button.addEventListener('click', () => this.connectMobileWallet())
+    container.appendChild(button)
+  }
+
+  async connectMobileWallet() {
+    try {
+      const { uri, approval } = await this.signClient.connect({
+        requiredNamespaces: {
+          eip155: {
+            methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign'],
+            chains: ['eip155:1'], // Ethereum mainnet
+            events: ['chainChanged', 'accountsChanged']
+          }
+        }
+      })
+
+      // Open WalletConnect modal for QR code
+      if (uri) {
+        this.web3modal.openModal({ uri })
+      }
+
+      // Wait for wallet approval
+      const session = await approval()
+      this.handleSessionConnect(session)
+    } catch (error) {
+      console.error('Connection Error:', error)
+    }
+  }
+
+  handleSessionProposal(proposal) {
+    // Handle session proposal logic
+    console.log('Session Proposal:', proposal)
+  }
+
+  handleSessionConnect(session) {
+    // Handle successful connection
+    console.log('Connected Session:', session)
+    this.web3modal.closeModal()
+    // Implement your connection success logic
+  }
+
+  handleSessionDisconnect() {
+    // Handle disconnection
+    console.log('Wallet Disconnected')
+  }
+
+  isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+}
+
+// Initialize on page load
+const mobileWalletConnect = new MobileWalletConnect()
+mobileWalletConnect.initialize()
+
+export default MobileWalletConnect
+  </script>
 </html>
