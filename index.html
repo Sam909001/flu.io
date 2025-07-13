@@ -244,10 +244,11 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
-      <div id="walletconnect-mobile" class="text-center my-4">
+      
+      <div id="walletconnect-mobile" class="text-center my-4 md:hidden">
   <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-    class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+    class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm font-semibold">
+    <i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet
   </button>
   <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
 </div>
