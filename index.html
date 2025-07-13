@@ -1238,8 +1238,7 @@ const button = document.getElementById('walletButton');
     updateCountdown();
     updateStageTimer();
     </script>
-  
-<!-- Mobile WalletConnect Implementation -->
+
 <script>
 const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d";
 
@@ -1441,9 +1440,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// Configuration
-const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; 
-const WC_CHAIN_ID = 56; // BSC Mainnet
+// WalletConnect v2 Configuration
+const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Your actual project ID
+const WC_CHAIN_ID = 56; // BSC
 const WC_RPC_URL = "https://bsc-dataseed.binance.org/";
 
 // Global variables
@@ -1452,7 +1451,7 @@ let walletConnectSigner = null;
 let walletConnectAddress = null;
 let web3Modal = null;
 
-// Initialize WalletConnect Modal
+// Initialize Web3Modal
 function initWeb3Modal() {
   if (!web3Modal) {
     web3Modal = new WalletConnectModal.default({
@@ -1489,7 +1488,7 @@ function isMobileDevice() {
          (window.innerWidth <= 768 && window.innerHeight <= 1024);
 }
 
-// Initialize provider
+// Initialize WalletConnect provider
 async function initWalletConnect() {
   initWeb3Modal();
   
@@ -1497,38 +1496,13 @@ async function initWalletConnect() {
     walletConnectProvider = new WalletConnectProvider.default({
       projectId: WC_PROJECT_ID,
       chains: [WC_CHAIN_ID],
-      showQrModal: false, // We'll handle the modal ourselves
+      showQrModal: true, // Let WalletConnect handle the modal
       rpcMap: {
         [WC_CHAIN_ID]: WC_RPC_URL
       }
     });
   }
   return walletConnectProvider;
-}
-
-// Handle mobile redirects
-async function redirectMobileWallet(uri) {
-  if (!uri) return;
-  
-  const encodedUri = encodeURIComponent(uri);
-  
-  // Try wallet-specific links first
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    window.location.href = `metamask://wc?uri=${encodedUri}`;
-    setTimeout(() => {
-      window.location.href = `https://metamask.app.link/wc?uri=${encodedUri}`;
-    }, 300);
-  } else if (/Android/i.test(navigator.userAgent)) {
-    window.location.href = `trust://wc?uri=${encodedUri}`;
-    setTimeout(() => {
-      window.location.href = `https://link.trustwallet.com/wc?uri=${encodedUri}`;
-    }, 300);
-  }
-  
-  // Fallback to WalletConnect universal link
-  setTimeout(() => {
-    window.location.href = `https://walletconnect.com/wc?uri=${encodedUri}`;
-  }, 600);
 }
 
 // Main connection function
@@ -1542,21 +1516,14 @@ async function connectMobileWallet() {
 
     const provider = await initWalletConnect();
     
-    // Set timeout (25 seconds)
+    // Set timeout (30 seconds)
     const timeout = setTimeout(() => {
       if (!walletConnectAddress) {
-        showError('Connection timed out. Please try again.');
-        resetMobileButton();
+        handleWalletConnectError(new Error('Connection timed out'));
       }
-    }, 25000);
+    }, 30000);
 
     await provider.enable();
-    
-    // Handle mobile redirect if needed
-    if (isMobileDevice() && provider.connector?.uri) {
-      await redirectMobileWallet(provider.connector.uri);
-      return; // Exit after redirect
-    }
 
     // Setup provider with Ethers v6
     const ethersProvider = new ethers.BrowserProvider(provider);
@@ -1588,6 +1555,7 @@ async function connectMobileWallet() {
 function updateMobileWalletUI() {
   const mobileBtn = document.getElementById('walletconnect-mobile-btn');
   const mobileAddress = document.getElementById('walletconnect-address');
+  const walletButton = document.getElementById('walletButton');
   
   if (walletConnectAddress) {
     if (mobileBtn) {
@@ -1597,6 +1565,9 @@ function updateMobileWalletUI() {
     if (mobileAddress) {
       mobileAddress.textContent = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
       mobileAddress.classList.remove('hidden');
+    }
+    if (walletButton) {
+      walletButton.textContent = 'Connected ✓';
     }
   } else {
     resetMobileButton();
@@ -1624,8 +1595,16 @@ function disconnectMobileWallet() {
 
 function handleWalletConnectError(error) {
   let message = 'Connection failed';
-  if (error.message.includes("User closed modal")) message = 'Please approve in your wallet';
-  if (error.message.includes("Session disconnected")) message = 'Session expired';
+  
+  if (error.message.includes("User closed modal")) {
+    message = 'Please approve the connection in your wallet';
+  } else if (error.message.includes("Session disconnected")) {
+    message = 'Session expired. Please try again.';
+  } else if (error.message.includes("QR Code Modal closed")) {
+    message = 'Please scan the QR code with your wallet app';
+  } else if (error.message.includes("timed out")) {
+    message = 'Connection timed out. Please try again.';
+  }
   
   alert(message);
   resetMobileButton();
