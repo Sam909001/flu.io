@@ -1141,4 +1141,123 @@ const button = document.getElementById('walletButton');
   }
 });
 </script>
+
+  <script>
+    import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
+
+class MobileWalletConnect {
+  constructor(options) {
+    this.connector = null;
+    this.options = {
+      projectId:847bc5b9b1e3b0dfd4a102b191bb0f7d, // WalletConnect V2 Project ID
+      metadata: {
+        name: options.appName || "Presale Dapp",
+        description: options.description || "Mobile Wallet Connection",
+        url: options.url || window.location.origin,
+        icons: options.icons || []
+      }
+    };
+  }
+
+  async initMobileConnect() {
+    // Check if it's a mobile device
+    if (!this.isMobileDevice()) return;
+
+    try {
+      // Initialize WalletConnect
+      this.connector = new WalletConnect({
+        projectId: this.options.projectId,
+        metadata: this.options.metadata
+      });
+
+      // Listen for connection events
+      this.connector.on("connect", this.onConnect.bind(this));
+      this.connector.on("disconnect", this.onDisconnect.bind(this));
+
+      // Create and display mobile connect button
+      this.createMobileConnectButton();
+    } catch (error) {
+      console.error("Wallet Connect Initialization Error:", error);
+    }
+  }
+
+  createMobileConnectButton() {
+    const button = document.createElement('button');
+    button.id = 'mobile-wallet-connect-btn';
+    button.style.display = 'none'; // Hidden by default
+    button.textContent = 'Connect Mobile Wallet';
+    button.addEventListener('click', () => this.connectMobileWallet());
+    document.body.appendChild(button);
+
+    // Show button only on mobile
+    if (this.isMobileDevice()) {
+      button.style.display = 'block';
+    }
+  }
+
+  async connectMobileWallet() {
+    try {
+      // Create new session
+      const session = await this.connector.connect({
+        chainId: 1, // Ethereum mainnet, change as needed
+        accounts: []
+      });
+
+      // Handle deep linking for mobile wallets
+      if (this.isMobileDevice()) {
+        this.handleMobileDeepLink(session);
+      }
+    } catch (error) {
+      console.error("Mobile Wallet Connection Error:", error);
+    }
+  }
+
+  handleMobileDeepLink(session) {
+    // Attempt to open wallet via deep link
+    const uri = this.connector.uri;
+    const walletDeepLinks = {
+      // Add mobile wallet deep links here
+      'metamask': `metamask://wc?uri=${encodeURIComponent(uri)}`,
+      'trust': `trust://wc?uri=${encodeURIComponent(uri)}`,
+      // Add more wallet deep links as needed
+    };
+
+    // Attempt to open a specific wallet or fallback to WalletConnect modal
+    Object.values(walletDeepLinks).some(deepLink => {
+      window.location.href = deepLink;
+    });
+
+    // Fallback to QR Code Modal if deep linking fails
+    QRCodeModal.open(uri, () => {
+      console.log("QR Code Modal Opened");
+    });
+  }
+
+  isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  onConnect(error, payload) {
+    if (error) {
+      console.error("Connection Error:", error);
+      return;
+    }
+
+    const { accounts, chainId } = payload.params[0];
+    console.log("Connected Accounts:", accounts);
+    console.log("Connected Chain ID:", chainId);
+
+    // Implement your connection logic here
+  }
+
+  onDisconnect() {
+    console.log("Wallet Disconnected");
+    // Implement disconnect handling
+  }
+}
+
+// Export for use
+export default MobileWalletConnect;
+  </script>
 </html>
