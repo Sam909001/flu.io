@@ -859,6 +859,36 @@ function resetTimer() {
 #walletconnect-mobile-btn.connected:hover {
   background-color: #059669 !important;
 }
+
+  .wallet-options-modal {
+    transition: all 0.3s ease;
+  }
+  
+  .wallet-option {
+    transition: transform 0.2s;
+  }
+  
+  .wallet-option:hover {
+    transform: translateY(-2px);
+  }
+  
+  #walletconnect-mobile-btn.connected {
+    background-color: #10B981 !important;
+    border-color: #10B981 !important;
+  }
+  
+  #walletButton.connected {
+    background-color: #10B981 !important;
+  }
+  
+  .wallet-error {
+    animation: fadeIn 0.3s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
     <!-- About Section -->
@@ -1195,88 +1225,194 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
+<!-- Place this right before </body> -->
 <script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
+  import { WalletConnectModal } from "@walletconnect/modal";
+  import { EthersProvider } from "@walletconnect/ethers-provider";
+  import { ethers } from "ethers";
 
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
+  // Configuration
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Replace with your WC Project ID
+  const chains = ["eip155:56"]; // BSC Mainnet
+  const methods = ["eth_sendTransaction", "personal_sign"];
+  const events = ["chainChanged", "accountsChanged"];
 
-  const modal = new WalletConnectModal({
+  // Initialize WalletConnect Modal
+  const walletConnectModal = new WalletConnectModal({
     projectId,
-    walletConnectVersion: 2,
-    themeMode: document.documentElement.classList.contains("dark") ? "dark" : "light",
-    chains: [56], // BSC
-    standaloneChains: ["eip155:56"],
-    providerMetadata: {
-      name: "Fluffi Presale",
-      description: "Buy & Stake $FLUFFI",
-      url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"]
-    }
+    chains,
+    enableStandaloneMode: true,
+    explorerRecommendedWalletIds: [
+      "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96", // MetaMask
+      "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0", // Trust Wallet
+      "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa"  // Coinbase Wallet
+    ],
+    mobileWallets: [
+      {
+        id: "metamask",
+        name: "MetaMask",
+        links: {
+          native: "metamask://",
+          universal: "https://metamask.app.link"
+        }
+      },
+      {
+        id: "trust",
+        name: "Trust Wallet",
+        links: {
+          native: "trust://",
+          universal: "https://link.trustwallet.com"
+        }
+      },
+      {
+        id: "coinbase",
+        name: "Coinbase Wallet",
+        links: {
+          native: "coinbasewallet://",
+          universal: "https://go.cb-w.com"
+        }
+      }
+    ]
   });
 
-  // Initialize modal
-  modal.init().catch(err => {
-    console.error("Modal initialization failed:", err);
-  });
+  // Global provider reference
+  let walletConnectProvider;
 
-  window.connectMobileWallet = async function () {
+  // Connect Wallet Function
+  window.connectMobileWallet = async function() {
     try {
-      if (!modal.initialized) {
-        await modal.init();
-      }
-      
-      const { provider } = await modal.connect();
-      
-      if (!provider) {
-        throw new Error("Provider not returned from WalletConnect");
+      // Open WalletConnect modal
+      const { uri, approval } = await walletConnectModal.connect({
+        chains,
+        methods,
+        events
+      });
+
+      // Create deep links for mobile wallets
+      if (uri) {
+        const metamaskLink = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
+        const trustLink = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
+        const coinbaseLink = `https://go.cb-w.com/wc?uri=${encodeURIComponent(uri)}`;
+        
+        // Detect mobile device
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          // Try to open directly
+          window.location.href = metamaskLink; // First try MetaMask
+          
+          // Fallback to modal with options
+          setTimeout(() => {
+            showWalletOptions(metamaskLink, trustLink, coinbaseLink);
+          }, 1000);
+        }
       }
 
-      const ethersProvider = new ethers.BrowserProvider(provider);
+      // Wait for session approval
+      walletConnectProvider = await approval();
+      
+      // Initialize Ethers provider
+      const ethersProvider = new ethers.BrowserProvider(walletConnectProvider);
       const signer = await ethersProvider.getSigner();
       const address = await signer.getAddress();
 
-      // Update mobile button
-      const mobileBtn = document.getElementById("walletconnect-mobile-btn");
-      if (mobileBtn) {
-        mobileBtn.innerHTML = `✅ ${address.slice(0, 6)}...${address.slice(-4)}`;
-        mobileBtn.classList.add('connected');
-      }
-
-      // Update main wallet button
-      const mainBtn = document.getElementById("walletButton");
-      if (mainBtn) {
-        mainBtn.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`;
-        mainBtn.classList.add('bg-green-700');
-      }
-
-      // Store references
-      window.walletConnectProvider = provider;
-      window.walletConnectSigner = signer;
-      window.walletConnectAddress = address;
-
-      // Set up event listeners
-      provider.on("accountsChanged", () => window.location.reload());
-      provider.on("chainChanged", () => window.location.reload());
-      provider.on("disconnect", () => {
-        window.location.reload();
-      });
-
-    } catch (err) {
-      console.error("WalletConnect error:", err);
-      const errorEl = document.createElement('div');
-      errorEl.className = 'text-red-500 text-sm mt-2';
-      errorEl.textContent = `Connection failed: ${err.message || "Unknown error"}`;
+      // Update UI
+      updateWalletUI(address);
       
-      const mobileSection = document.getElementById("walletconnect-mobile");
-      if (mobileSection) {
-        mobileSection.appendChild(errorEl);
-        setTimeout(() => errorEl.remove(), 5000);
-      } else {
-        alert(`Wallet connection failed: ${err.message || "Unknown error"}`);
-      }
+      // Set up event listeners
+      walletConnectProvider.on("accountsChanged", handleAccountsChanged);
+      walletConnectProvider.on("chainChanged", handleChainChanged);
+      walletConnectProvider.on("disconnect", handleDisconnect);
+
+    } catch (error) {
+      console.error("Wallet connection error:", error);
+      showError(error.message || "Failed to connect wallet");
     }
   };
+
+  // UI Update Function
+  function updateWalletUI(address) {
+    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    
+    // Update mobile button
+    const mobileBtn = document.getElementById("walletconnect-mobile-btn");
+    if (mobileBtn) {
+      mobileBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
+      mobileBtn.classList.add("connected");
+    }
+    
+    // Update main wallet button
+    const mainBtn = document.getElementById("walletButton");
+    if (mainBtn) {
+      mainBtn.textContent = shortAddress;
+      mainBtn.classList.add("connected");
+    }
+  }
+
+  // Show Wallet Options Modal
+  function showWalletOptions(metamaskLink, trustLink, coinbaseLink) {
+    const modalHtml = `
+      <div class="wallet-options-modal fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+          <h3 class="text-xl font-bold mb-4">Choose Wallet</h3>
+          <div class="grid gap-4">
+            <a href="${metamaskLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-8 h-8 mr-3">
+              <span>MetaMask</span>
+            </a>
+            <a href="${trustLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-8 h-8 mr-3">
+              <span>Trust Wallet</span>
+            </a>
+            <a href="${coinbaseLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="w-8 h-8 mr-3">
+              <span>Coinbase Wallet</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Close modal when clicking outside
+    document.querySelector('.wallet-options-modal').addEventListener('click', (e) => {
+      if (e.target.classList.contains('wallet-options-modal')) {
+        e.target.remove();
+      }
+    });
+  }
+
+  // Event Handlers
+  function handleAccountsChanged(accounts) {
+    if (accounts.length > 0) {
+      updateWalletUI(accounts[0]);
+    } else {
+      handleDisconnect();
+    }
+  }
+
+  function handleChainChanged(chainId) {
+    window.location.reload();
+  }
+
+  function handleDisconnect() {
+    walletConnectProvider = null;
+    document.getElementById("walletconnect-mobile-btn").innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet';
+    document.getElementById("walletButton").textContent = 'Connect Wallet';
+  }
+
+  // Error Display
+  function showError(message) {
+    const errorEl = document.createElement('div');
+    errorEl.className = 'wallet-error bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded';
+    errorEl.innerHTML = `<p>${message}</p>`;
+    
+    const container = document.getElementById("walletconnect-mobile") || document.body;
+    container.appendChild(errorEl);
+    
+    setTimeout(() => {
+      errorEl.remove();
+    }, 5000);
+  }
 </script>
 </body>
 </html>
