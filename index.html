@@ -1241,7 +1241,7 @@ const button = document.getElementById('walletButton');
   
 <script>
 // WalletConnect v2 Configuration
-const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Your actual project ID
+const WC_PROJECT_ID = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Replace with your actual project ID
 const WC_CHAIN_ID = 56; // BSC
 const WC_RPC_URL = "https://bsc-dataseed.binance.org/";
 
@@ -1253,31 +1253,13 @@ let web3Modal = null;
 
 // Initialize Web3Modal
 function initWeb3Modal() {
-  if (!web3Modal) {
+  if (!web3Modal && window.WalletConnectModal) {
     web3Modal = new WalletConnectModal.default({
       projectId: WC_PROJECT_ID,
       chains: [`eip155:${WC_CHAIN_ID}`],
       themeVariables: {
         '--wcm-z-index': '9999'
-      },
-      mobileWallets: [
-        {
-          id: "metamask",
-          name: "MetaMask",
-          links: {
-            native: "metamask://",
-            universal: "https://metamask.app.link"
-          }
-        },
-        {
-          id: "trust",
-          name: "Trust Wallet",
-          links: {
-            native: "trust://",
-            universal: "https://link.trustwallet.com"
-          }
-        }
-      ]
+      }
     });
   }
 }
@@ -1290,19 +1272,30 @@ function isMobileDevice() {
 
 // Initialize WalletConnect provider
 async function initWalletConnect() {
-  initWeb3Modal();
-  
-  if (!walletConnectProvider) {
-    walletConnectProvider = new WalletConnectProvider.default({
-      projectId: WC_PROJECT_ID,
-      chains: [WC_CHAIN_ID],
-      showQrModal: true, // Let WalletConnect handle the modal
-      rpcMap: {
-        [WC_CHAIN_ID]: WC_RPC_URL
-      }
-    });
+  try {
+    initWeb3Modal();
+    
+    if (!walletConnectProvider && window.WalletConnectProvider) {
+      walletConnectProvider = new WalletConnectProvider.default({
+        projectId: WC_PROJECT_ID,
+        chains: [WC_CHAIN_ID],
+        showQrModal: true, // Let WalletConnect handle the modal
+        rpcMap: {
+          [WC_CHAIN_ID]: WC_RPC_URL
+        },
+        metadata: {
+          name: "FLUFFI Presale",
+          description: "Connect to FLUFFI Presale",
+          url: window.location.href,
+          icons: ["https://fluffi.site/favicon.ico"]
+        }
+      });
+    }
+    return walletConnectProvider;
+  } catch (error) {
+    console.error("Provider init error:", error);
+    throw error;
   }
-  return walletConnectProvider;
 }
 
 // Main connection function
@@ -1316,14 +1309,17 @@ async function connectMobileWallet() {
 
     const provider = await initWalletConnect();
     
-    // Set timeout (30 seconds)
+    // Set timeout (25 seconds)
     const timeout = setTimeout(() => {
       if (!walletConnectAddress) {
-        handleWalletConnectError(new Error('Connection timed out'));
+        handleWalletConnectError(new Error('Connection timed out after 25 seconds'));
       }
-    }, 30000);
+    }, 25000);
 
-    await provider.enable();
+    // Enable connection
+    await provider.enable().catch(err => {
+      throw new Error(`Connection rejected: ${err.message}`);
+    });
 
     // Setup provider with Ethers v6
     const ethersProvider = new ethers.BrowserProvider(provider);
@@ -1345,8 +1341,10 @@ async function connectMobileWallet() {
     provider.on("chainChanged", () => window.location.reload());
     provider.on("disconnect", disconnectMobileWallet);
 
+    clearTimeout(timeout);
+
   } catch (error) {
-    console.error("WalletConnect error:", error);
+    console.error("Connection error:", error);
     handleWalletConnectError(error);
   }
 }
@@ -1355,7 +1353,6 @@ async function connectMobileWallet() {
 function updateMobileWalletUI() {
   const mobileBtn = document.getElementById('walletconnect-mobile-btn');
   const mobileAddress = document.getElementById('walletconnect-address');
-  const walletButton = document.getElementById('walletButton');
   
   if (walletConnectAddress) {
     if (mobileBtn) {
@@ -1366,11 +1363,6 @@ function updateMobileWalletUI() {
       mobileAddress.textContent = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
       mobileAddress.classList.remove('hidden');
     }
-    if (walletButton) {
-      walletButton.textContent = 'Connected ✓';
-    }
-  } else {
-    resetMobileButton();
   }
 }
 
@@ -1404,23 +1396,38 @@ function handleWalletConnectError(error) {
     message = 'Please scan the QR code with your wallet app';
   } else if (error.message.includes("timed out")) {
     message = 'Connection timed out. Please try again.';
+  } else if (error.message.includes("rejected")) {
+    message = 'Connection request was rejected';
   }
   
-  alert(message);
+  const errorEl = document.getElementById('walletError');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+    setTimeout(() => errorEl.classList.add('hidden'), 5000);
+  }
+  
   resetMobileButton();
 }
 
 // Initialize on mobile devices
 document.addEventListener('DOMContentLoaded', function() {
+  // Check if dependencies are loaded
+  if (!window.WalletConnectProvider || !window.WalletConnectModal || !window.ethers) {
+    console.error("WalletConnect dependencies not loaded");
+    return;
+  }
+
   if (isMobileDevice()) {
     const mobileSection = document.getElementById('walletconnect-mobile');
     if (mobileSection) {
       mobileSection.innerHTML = `
         <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold">
-          <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+          <i class="fas fa-mobile-alt mr-2"></i> Connect Wallet
         </button>
         <div id="walletconnect-address" class="hidden mt-2 text-sm text-center"></div>
+        <div id="walletError" class="hidden mt-2 text-red-500 text-sm"></div>
         <p class="text-xs mt-2 text-gray-500 dark:text-gray-400 text-center">
           Works with MetaMask, Trust Wallet, and others
         </p>
