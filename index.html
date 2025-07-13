@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.css">
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -1225,193 +1228,208 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
-<!-- Place this right before </body> -->
 <script type="module">
-  import { WalletConnectModal } from "@walletconnect/modal";
-  import { EthersProvider } from "@walletconnect/ethers-provider";
-  import { ethers } from "ethers";
-
+  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
+  
   // Configuration
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Replace with your WC Project ID
-  const chains = ["eip155:56"]; // BSC Mainnet
-  const methods = ["eth_sendTransaction", "personal_sign"];
-  const events = ["chainChanged", "accountsChanged"];
-
-  // Initialize WalletConnect Modal
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Your WC Project ID
+  const chains = ["eip155:56"]; // BSC Chain
+  
+  // Initialize modal
   const walletConnectModal = new WalletConnectModal({
     projectId,
     chains,
-    enableStandaloneMode: true,
-    explorerRecommendedWalletIds: [
-      "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96", // MetaMask
-      "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0", // Trust Wallet
-      "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa"  // Coinbase Wallet
-    ],
     mobileWallets: [
       {
         id: "metamask",
         name: "MetaMask",
         links: {
-          native: "metamask://",
-          universal: "https://metamask.app.link"
+          native: "metamask://wc?uri={wcUri}",
+          universal: "https://metamask.app.link/wc?uri={wcUri}"
         }
       },
       {
         id: "trust",
         name: "Trust Wallet",
         links: {
-          native: "trust://",
-          universal: "https://link.trustwallet.com"
+          native: "trust://wc?uri={wcUri}",
+          universal: "https://link.trustwallet.com/wc?uri={wcUri}"
         }
       },
       {
         id: "coinbase",
         name: "Coinbase Wallet",
         links: {
-          native: "coinbasewallet://",
-          universal: "https://go.cb-w.com"
+          native: "coinbase-wallet://wc?uri={wcUri}",
+          universal: "https://go.cb-w.com/wc?uri={wcUri}"
         }
       }
     ]
   });
 
-  // Global provider reference
-  let walletConnectProvider;
+  // Debugging flags
+  let isConnecting = false;
+  let lastError = null;
 
-  // Connect Wallet Function
   window.connectMobileWallet = async function() {
+    if (isConnecting) {
+      console.warn("Connection already in progress");
+      return;
+    }
+
     try {
-      // Open WalletConnect modal
+      isConnecting = true;
+      updateButtonState("connecting");
+      
+      // Step 1: Initiate connection
       const { uri, approval } = await walletConnectModal.connect({
-        chains,
-        methods,
-        events
+        requiredNamespaces: {
+          eip155: {
+            methods: ["eth_sendTransaction", "personal_sign"],
+            chains: ["eip155:56"],
+            events: ["chainChanged", "accountsChanged"]
+          }
+        }
       });
 
-      // Create deep links for mobile wallets
+      // Step 2: Handle deep linking
       if (uri) {
-        const metamaskLink = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-        const trustLink = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
-        const coinbaseLink = `https://go.cb-w.com/wc?uri=${encodeURIComponent(uri)}`;
-        
-        // Detect mobile device
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          // Try to open directly
-          window.location.href = metamaskLink; // First try MetaMask
-          
-          // Fallback to modal with options
-          setTimeout(() => {
-            showWalletOptions(metamaskLink, trustLink, coinbaseLink);
-          }, 1000);
-        }
+        handleMobileDeepLinking(uri);
       }
 
-      // Wait for session approval
-      walletConnectProvider = await approval();
+      // Step 3: Wait for approval
+      const provider = await approval();
       
-      // Initialize Ethers provider
-      const ethersProvider = new ethers.BrowserProvider(walletConnectProvider);
-      const signer = await ethersProvider.getSigner();
+      // Step 4: Initialize Ethers
+      const ethersProvider = new ethers.providers.Web3Provider(provider);
+      const signer = ethersProvider.getSigner();
       const address = await signer.getAddress();
 
-      // Update UI
-      updateWalletUI(address);
-      
-      // Set up event listeners
-      walletConnectProvider.on("accountsChanged", handleAccountsChanged);
-      walletConnectProvider.on("chainChanged", handleChainChanged);
-      walletConnectProvider.on("disconnect", handleDisconnect);
+      // Success!
+      updateButtonState("connected", address);
+      setupEventListeners(provider);
 
     } catch (error) {
-      console.error("Wallet connection error:", error);
-      showError(error.message || "Failed to connect wallet");
+      lastError = error;
+      console.error("Connection failed:", error);
+      updateButtonState("error", error.message);
+    } finally {
+      isConnecting = false;
     }
   };
 
-  // UI Update Function
-  function updateWalletUI(address) {
-    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+  function handleMobileDeepLinking(uri) {
+    if (!isMobile()) return;
     
-    // Update mobile button
-    const mobileBtn = document.getElementById("walletconnect-mobile-btn");
-    if (mobileBtn) {
-      mobileBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
-      mobileBtn.classList.add("connected");
-    }
+    // Try MetaMask first
+    const mmLink = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
     
-    // Update main wallet button
-    const mainBtn = document.getElementById("walletButton");
-    if (mainBtn) {
-      mainBtn.textContent = shortAddress;
-      mainBtn.classList.add("connected");
-    }
+    // Fallback to Trust Wallet
+    const twLink = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
+    
+    // Last resort: Coinbase Wallet
+    const cbLink = `https://go.cb-w.com/wc?uri=${encodeURIComponent(uri)}`;
+    
+    // Try opening directly
+    window.location.href = mmLink;
+    
+    // Show fallback options if still here after 1 second
+    setTimeout(() => {
+      showWalletChooser(mmLink, twLink, cbLink);
+    }, 1000);
   }
 
-  // Show Wallet Options Modal
-  function showWalletOptions(metamaskLink, trustLink, coinbaseLink) {
-    const modalHtml = `
-      <div class="wallet-options-modal fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-          <h3 class="text-xl font-bold mb-4">Choose Wallet</h3>
-          <div class="grid gap-4">
-            <a href="${metamaskLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-8 h-8 mr-3">
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  function showWalletChooser(mmLink, twLink, cbLink) {
+    const modal = document.createElement("div");
+    modal.innerHTML = `
+      <div class="wc-modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm p-6">
+          <h3 class="text-lg font-bold mb-4">Choose Wallet</h3>
+          <div class="space-y-3">
+            <a href="${mmLink}" class="wallet-option flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-8 h-8">
               <span>MetaMask</span>
             </a>
-            <a href="${trustLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-              <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-8 h-8 mr-3">
+            <a href="${twLink}" class="wallet-option flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-8 h-8">
               <span>Trust Wallet</span>
             </a>
-            <a href="${coinbaseLink}" class="wallet-option flex items-center p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-              <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="w-8 h-8 mr-3">
+            <a href="${cbLink}" class="wallet-option flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="w-8 h-8">
               <span>Coinbase Wallet</span>
             </a>
           </div>
         </div>
       </div>
     `;
+    document.body.appendChild(modal);
     
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // Close modal when clicking outside
-    document.querySelector('.wallet-options-modal').addEventListener('click', (e) => {
-      if (e.target.classList.contains('wallet-options-modal')) {
-        e.target.remove();
+    // Close when clicking outside
+    modal.addEventListener("click", (e) => {
+      if (e.target.classList.contains("wc-modal-overlay")) {
+        modal.remove();
       }
     });
   }
 
-  // Event Handlers
-  function handleAccountsChanged(accounts) {
-    if (accounts.length > 0) {
-      updateWalletUI(accounts[0]);
-    } else {
-      handleDisconnect();
+  function updateButtonState(state, data = null) {
+    const btn = document.getElementById("walletconnect-mobile-btn");
+    if (!btn) return;
+    
+    btn.disabled = state === "connecting";
+    
+    switch (state) {
+      case "connecting":
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...`;
+        break;
+      case "connected":
+        const shortAddr = `${data.slice(0, 6)}...${data.slice(-4)}`;
+        btn.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${shortAddr}`;
+        btn.classList.add("connected");
+        break;
+      case "error":
+        btn.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> Retry`;
+        showErrorToast(data || "Connection failed");
+        break;
+      default:
+        btn.innerHTML = `<i class="fas fa-wallet mr-2"></i> Connect Wallet`;
     }
   }
 
-  function handleChainChanged(chainId) {
-    window.location.reload();
+  function showErrorToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "wc-toast fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 5000);
+  }
+
+  function setupEventListeners(provider) {
+    provider.on("accountsChanged", (accounts) => {
+      if (accounts.length > 0) {
+        updateButtonState("connected", accounts[0]);
+      } else {
+        handleDisconnect();
+      }
+    });
+    
+    provider.on("chainChanged", () => {
+      window.location.reload();
+    });
+    
+    provider.on("disconnect", handleDisconnect);
   }
 
   function handleDisconnect() {
-    walletConnectProvider = null;
-    document.getElementById("walletconnect-mobile-btn").innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet';
-    document.getElementById("walletButton").textContent = 'Connect Wallet';
-  }
-
-  // Error Display
-  function showError(message) {
-    const errorEl = document.createElement('div');
-    errorEl.className = 'wallet-error bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded';
-    errorEl.innerHTML = `<p>${message}</p>`;
-    
-    const container = document.getElementById("walletconnect-mobile") || document.body;
-    container.appendChild(errorEl);
-    
-    setTimeout(() => {
-      errorEl.remove();
-    }, 5000);
+    updateButtonState("default");
+    // Add any cleanup logic here
   }
 </script>
 </body>
