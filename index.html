@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script type="module" src="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm"></script>
+  <script src="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -247,12 +247,13 @@
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress"></span>
       
- <div id="walletconnect-mobile" class="text-center my-4 md:hidden">
+<div id="walletconnect-mobile" class="text-center my-4 md:hidden">
   <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-    class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm font-semibold">
+    class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm">
     <i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet
   </button>
   <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
+  <div id="walletError" class="text-red-500 text-sm mt-2 hidden"></div>
 </div>
 
       <button onclick="disconnectWallet()">Disconnect</button>
@@ -972,6 +973,7 @@ function resetTimer() {
   }
   .hidden { display: none !important; }
 </style>
+  
 <body>
   <script>
 async function connectWithWalletConnect() {
@@ -1227,51 +1229,56 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
-<script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.js";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
+<script>
+const projectId = "YOUR_PROJECT_ID"; // Replace with your WalletConnect projectId
 
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Use your real WalletConnect project ID
+const web3Modal = new WalletConnectModal.default({
+  projectId,
+  walletConnectVersion: 2,
+  themeMode: "dark",
+  chains: [56],
+  standaloneChains: ["eip155:56"],
+  metadata: {
+    name: "Fluffi Token",
+    description: "Buy & Stake $FLUFFI",
+    url: "https://fluffi.site",
+    icons: ["https://fluffi.site/logo.png"]
+  }
+});
 
-  const modal = new WalletConnectModal({
-    projectId,
-    themeMode: "dark",
-    walletConnectVersion: 2,
-    chains: [56],
-    standaloneChains: ["eip155:56"],
-    metadata: {
-      name: "Fluffi Token",
-      description: "Buy & Stake $FLUFFI",
-      url: "https://fluffi.site",
-      icons: ["https://fluffi.site/logo.png"]
-    }
-  });
+let walletConnectSigner = null;
+let walletConnectAddress = null;
 
-  let walletConnectAddress = null;
-  let walletConnectSigner = null;
+async function connectMobileWallet() {
+  const btn = document.getElementById('walletconnect-mobile-btn');
+  const errorBox = document.getElementById('walletError');
+  try {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Connecting...';
 
-  document.getElementById('walletconnect-mobile-btn').addEventListener('click', async () => {
-    try {
-      const { provider } = await modal.connect();
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      walletConnectSigner = await ethersProvider.getSigner();
-      walletConnectAddress = await walletConnectSigner.getAddress();
+    const { provider } = await web3Modal.connect();
 
-      // Update UI
-      const btn = document.getElementById('walletconnect-mobile-btn');
-      const addr = document.getElementById('walletconnect-address');
-      btn.innerHTML = '✅ Connected';
-      addr.innerText = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
-      addr.classList.remove('hidden');
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    walletConnectSigner = await ethersProvider.getSigner();
+    walletConnectAddress = await walletConnectSigner.getAddress();
 
-      // Events
-      provider.on("accountsChanged", () => window.location.reload());
-      provider.on("disconnect", () => window.location.reload());
+    btn.innerHTML = '✅ Connected';
+    document.getElementById('walletconnect-address').textContent =
+      `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
+    document.getElementById('walletconnect-address').classList.remove('hidden');
+    errorBox.classList.add('hidden');
 
-    } catch (err) {
-      console.error("Wallet connection failed:", err);
-      alert("Wallet connection failed: " + (err.message || "Unknown error"));
-    }
-  });
+    provider.on("accountsChanged", () => window.location.reload());
+    provider.on("disconnect", () => window.location.reload());
+  } catch (err) {
+    console.error("WalletConnect failed:", err);
+    errorBox.textContent = err.message || "Wallet connection failed.";
+    errorBox.classList.remove('hidden');
+    btn.innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet';
+  } finally {
+    btn.disabled = false;
+  }
+}
 </script>
+</body>
 </html>
