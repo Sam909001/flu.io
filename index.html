@@ -1229,48 +1229,47 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
-<script>
-const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Your WalletConnect Project ID
+<!-- WalletConnect & Ethers Setup -->
+  <script>
+    const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Replace with your real WC Project ID
+    let walletConnectAddress = null;
+    let walletConnectSigner = null;
 
-let walletConnectAddress = null;
-let walletConnectSigner = null;
+    const web3Modal = new window.WalletConnectModal.default({
+      projectId,
+      walletConnectVersion: 2,
+      themeMode: "dark",
+      chains: [56],
+      standaloneChains: ["eip155:56"],
+      metadata: {
+        name: "Fluffi Token",
+        description: "Buy & Stake $FLUFFI",
+        url: "https://fluffi.site",
+        icons: ["https://fluffi.site/logo.png"]
+      }
+    });
 
-// ✅ This must come before the connectMobileWallet function
-const web3Modal = new window.WalletConnectModal.default({
-  projectId,
-  walletConnectVersion: 2,
-  themeMode: "dark",
-  chains: [56],
-  standaloneChains: ["eip155:56"],
-  metadata: {
-    name: "Fluffi Token",
-    description: "Buy & Stake $FLUFFI",
-    url: "https://fluffi.site",
-    icons: ["https://fluffi.site/logo.png"]
-  }
-});
+    async function connectMobileWallet() {
+      try {
+        const { provider } = await web3Modal.connect();
+        const ethersProvider = new ethers.BrowserProvider(provider);
+        walletConnectSigner = await ethersProvider.getSigner();
+        walletConnectAddress = await walletConnectSigner.getAddress();
 
-async function connectMobileWallet() {
-  try {
-    const { provider } = await web3Modal.connect();
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    walletConnectSigner = await ethersProvider.getSigner();
-    walletConnectAddress = await walletConnectSigner.getAddress();
+        const btn = document.getElementById('walletconnect-mobile-btn');
+        const addr = document.getElementById('walletconnect-address');
+        btn.innerHTML = '✅ Connected';
+        btn.classList.replace('bg-green-600', 'bg-gray-700');
+        addr.textContent = walletConnectAddress.slice(0, 6) + "..." + walletConnectAddress.slice(-4);
+        addr.classList.remove("hidden");
 
-    const btn = document.getElementById('walletconnect-mobile-btn');
-    const addr = document.getElementById('walletconnect-address');
-    btn.innerHTML = '✅ Connected';
-    btn.classList.replace('bg-green-600', 'bg-gray-700');
-    addr.textContent = walletConnectAddress.slice(0, 6) + "..." + walletConnectAddress.slice(-4);
-    addr.classList.remove("hidden");
-
-    provider.on("accountsChanged", () => location.reload());
-    provider.on("disconnect", () => location.reload());
-  } catch (e) {
-    console.error("WalletConnect Error:", e);
-    alert("❌ Wallet connection failed: " + (e.message || "Unknown error"));
-  }
-}
-</script>
+        provider.on("accountsChanged", () => location.reload());
+        provider.on("disconnect", () => location.reload());
+      } catch (e) {
+        console.error("WalletConnect Error:", e);
+        alert("❌ Wallet connection failed: " + (e.message || "Unknown error"));
+      }
+    }
+  </script>
 </body>
 </html>
