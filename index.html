@@ -1230,9 +1230,13 @@ const button = document.getElementById('walletButton');
 </script>
 
 <script>
-const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // Replace with your WalletConnect projectId
+const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Your WalletConnect Project ID
 
-const web3Modal = new WalletConnectModal.default({
+let walletConnectAddress = null;
+let walletConnectSigner = null;
+
+// ✅ This must come before the connectMobileWallet function
+const web3Modal = new window.WalletConnectModal.default({
   projectId,
   walletConnectVersion: 2,
   themeMode: "dark",
@@ -1246,37 +1250,25 @@ const web3Modal = new WalletConnectModal.default({
   }
 });
 
-let walletConnectSigner = null;
-let walletConnectAddress = null;
-
 async function connectMobileWallet() {
-  const btn = document.getElementById('walletconnect-mobile-btn');
-  const errorBox = document.getElementById('walletError');
   try {
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Connecting...';
-
     const { provider } = await web3Modal.connect();
-
     const ethersProvider = new ethers.BrowserProvider(provider);
     walletConnectSigner = await ethersProvider.getSigner();
     walletConnectAddress = await walletConnectSigner.getAddress();
 
+    const btn = document.getElementById('walletconnect-mobile-btn');
+    const addr = document.getElementById('walletconnect-address');
     btn.innerHTML = '✅ Connected';
-    document.getElementById('walletconnect-address').textContent =
-      `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
-    document.getElementById('walletconnect-address').classList.remove('hidden');
-    errorBox.classList.add('hidden');
+    btn.classList.replace('bg-green-600', 'bg-gray-700');
+    addr.textContent = walletConnectAddress.slice(0, 6) + "..." + walletConnectAddress.slice(-4);
+    addr.classList.remove("hidden");
 
-    provider.on("accountsChanged", () => window.location.reload());
-    provider.on("disconnect", () => window.location.reload());
-  } catch (err) {
-    console.error("WalletConnect failed:", err);
-    errorBox.textContent = err.message || "Wallet connection failed.";
-    errorBox.classList.remove('hidden');
-    btn.innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet';
-  } finally {
-    btn.disabled = false;
+    provider.on("accountsChanged", () => location.reload());
+    provider.on("disconnect", () => location.reload());
+  } catch (e) {
+    console.error("WalletConnect Error:", e);
+    alert("❌ Wallet connection failed: " + (e.message || "Unknown error"));
   }
 }
 </script>
