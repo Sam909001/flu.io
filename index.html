@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.7.1/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -802,7 +802,7 @@ function resetTimer() {
       width: 100%;
     }
   }
-/* WalletConnect Button Styles */
+  
 .wallet-connect-btn {
   background: #3b82f6;
   color: white;
@@ -854,43 +854,144 @@ function resetTimer() {
 .error-message.show {
   opacity: 1;
 }
-  /* WalletConnect Button States */
-#walletconnect-mobile-btn.connected {
-  background-color: #10B981 !important;
-}
-
-#walletconnect-mobile-btn.connected:hover {
-  background-color: #059669 !important;
-}
-
-  .wallet-options-modal {
-    transition: all 0.3s ease;
+  <style>
+  /* Wallet Connect Styles */
+  .wallet-connect-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
   }
   
-  .wallet-option {
-    transition: transform 0.2s;
+  .wallet-connect-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
   }
   
-  .wallet-option:hover {
-    transform: translateY(-2px);
+  .wallet-connect-btn.connected {
+    background: #10b981;
   }
   
-  #walletconnect-mobile-btn.connected {
-    background-color: #10B981 !important;
-    border-color: #10B981 !important;
+  .wallet-connect-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
   
-  #walletButton.connected {
-    background-color: #10B981 !important;
+  .wallet-address {
+    margin-top: 8px;
+    font-size: 14px;
+    word-break: break-all;
   }
   
   .wallet-error {
-    animation: fadeIn 0.3s;
+    color: #ef4444;
+    margin-top: 8px;
+    font-size: 14px;
   }
   
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+  /* Modal Styles */
+  .wallet-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .wallet-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  
+  .wallet-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .wallet-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .close-modal {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 10px;
+  }
+  
+  .wallet-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .wallet-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .wallet-option:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .wallet-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  
+  /* Spinner animation */
+  .fa-spinner.fa-spin {
+    animation: fa-spin 1s infinite linear;
+  }
+  
+  @keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Dark mode support */
+  .dark .wallet-modal-content {
+    background: #1f2937;
+    color: white;
+  }
+  
+  .dark .wallet-option {
+    border-color: #374151;
+    background: #111827;
+  }
+  
+  .dark .wallet-option:hover {
+    background: #1f2937;
+  }
+  
+  .hidden {
+    display: none !important;
   }
 </style>
 
@@ -975,22 +1076,275 @@ function resetTimer() {
 </style>
   
 <body>
-  <script>
-async function connectWithWalletConnect() {
-  const provider = new WalletConnectProvider.default({
-    rpc: {
-      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
+  <!-- Wallet Connection Modal (add to your HTML body) -->
+<div id="walletModal" class="wallet-modal hidden">
+  <div class="wallet-modal-content">
+    <div class="wallet-modal-header">
+      <h3>Connect Wallet</h3>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="wallet-options-grid">
+      <!-- Options will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Wallet Button (keep your existing button) -->
+<div id="walletconnect-mobile" class="text-center my-4 md:hidden">
+  <button id="walletconnect-mobile-btn" class="wallet-connect-btn">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+  </button>
+  <div id="walletconnect-address" class="wallet-address hidden"></div>
+  <div id="walletError" class="wallet-error hidden"></div>
+</div>
+
+<!-- Main Wallet Button -->
+<button id="walletButton" class="wallet-connect-btn">
+  <i class="fas fa-wallet mr-2"></i> Connect Wallet
+</button>
+
+<!-- Place this script before </body> -->
+<script type="module">
+  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
+  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
+
+  // Configuration
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
+  const chains = ["eip155:56"]; // BSC Chain
+  let walletConnectProvider;
+
+  // Wallet options configuration
+  const walletOptions = {
+    metamask: {
+      name: "MetaMask",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+      mobile: {
+        native: "metamask://wc?uri={wcUri}",
+        universal: "https://metamask.app.link/wc?uri={wcUri}"
+      }
     },
-    chainId: 56
+    trust: {
+      name: "Trust Wallet",
+      icon: "https://trustwallet.com/assets/images/media/assets/TWT.png",
+      mobile: {
+        native: "trust://wc?uri={wcUri}",
+        universal: "https://link.trustwallet.com/wc?uri={wcUri}"
+      }
+    },
+    coinbase: {
+      name: "Coinbase Wallet",
+      icon: "https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png",
+      mobile: {
+        native: "coinbase-wallet://wc?uri={wcUri}",
+        universal: "https://go.cb-w.com/wc?uri={wcUri}"
+      }
+    },
+    walletconnect: {
+      name: "Other Wallets",
+      icon: "https://walletconnect.com/walletconnect-logo.png"
+    }
+  };
+
+  // Initialize WalletConnect Modal
+  const walletConnectModal = new WalletConnectModal({
+    projectId,
+    chains,
+    mobileWallets: Object.values(walletOptions)
+      .filter(wallet => wallet.mobile)
+      .map(wallet => ({
+        id: wallet.name.toLowerCase().replace(' ', ''),
+        name: wallet.name,
+        links: wallet.mobile
+      }))
   });
 
-  await provider.enable();
-  const web3 = new Web3(provider);
-  const accounts = await web3.eth.getAccounts();
-  const userWallet = accounts[0];
+  // Initialize modal
+  async function initWalletConnect() {
+    try {
+      await walletConnectModal.init();
+      console.log("WalletConnect initialized");
+    } catch (err) {
+      console.error("WalletConnect init error:", err);
+      showError("Wallet system initialization failed");
+    }
+  }
 
-  alert("Connected via WalletConnect: " + userWallet);
-}
+  // Main wallet connection function
+  async function connectWallet(walletType) {
+    try {
+      // Set loading state
+      setLoadingState(true);
+      
+      let provider;
+      let address;
+
+      if (walletType === 'browser' && window.ethereum) {
+        // Browser extension (MetaMask, etc.)
+        provider = new ethers.BrowserProvider(window.ethereum);
+        address = (await provider.getSigner()).address;
+      } else {
+        // WalletConnect flow
+        const { provider: wcProvider } = await walletConnectModal.connect();
+        walletConnectProvider = wcProvider;
+        provider = new ethers.BrowserProvider(wcProvider);
+        address = (await provider.getSigner()).address;
+        
+        // Set up WalletConnect event listeners
+        wcProvider.on("accountsChanged", handleAccountsChanged);
+        wcProvider.on("chainChanged", handleChainChanged);
+        wcProvider.on("disconnect", handleDisconnect);
+      }
+
+      // Update UI
+      updateWalletUI(address);
+      closeModal();
+
+    } catch (error) {
+      console.error("Connection error:", error);
+      showError(error.message || "Failed to connect wallet");
+      resetConnectionState();
+    } finally {
+      setLoadingState(false);
+    }
+  }
+
+  // Mobile wallet connection
+  window.connectMobileWallet = async function() {
+    if (isMobile()) {
+      await connectWallet('walletconnect');
+    } else {
+      openModal();
+    }
+  };
+
+  // UI Functions
+  function updateWalletUI(address) {
+    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    
+    // Update buttons
+    document.getElementById('walletButton').innerHTML = 
+      `<i class="fas fa-check-circle mr-2"></i> ${shortAddress}`;
+    document.getElementById('walletconnect-mobile-btn').innerHTML = 
+      `<i class="fas fa-check-circle mr-2"></i> ${shortAddress}`;
+    
+    // Show full address
+    const addressDisplay = document.getElementById('walletconnect-address');
+    addressDisplay.textContent = address;
+    addressDisplay.classList.remove('hidden');
+    
+    // Add connected class
+    document.getElementById('walletButton').classList.add('connected');
+    document.getElementById('walletconnect-mobile-btn').classList.add('connected');
+  }
+
+  function resetConnectionState() {
+    document.getElementById('walletButton').innerHTML = 
+      `<i class="fas fa-wallet mr-2"></i> Connect Wallet`;
+    document.getElementById('walletconnect-mobile-btn').innerHTML = 
+      `<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet`;
+    
+    document.getElementById('walletconnect-address').classList.add('hidden');
+    document.getElementById('walletButton').classList.remove('connected');
+    document.getElementById('walletconnect-mobile-btn').classList.remove('connected');
+  }
+
+  function setLoadingState(isLoading) {
+    const buttons = [
+      document.getElementById('walletButton'),
+      document.getElementById('walletconnect-mobile-btn')
+    ];
+    
+    buttons.forEach(btn => {
+      if (btn) {
+        btn.disabled = isLoading;
+        if (isLoading) {
+          btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...`;
+        }
+      }
+    });
+  }
+
+  function showError(message) {
+    const errorDisplay = document.getElementById('walletError');
+    errorDisplay.textContent = message;
+    errorDisplay.classList.remove('hidden');
+    setTimeout(() => errorDisplay.classList.add('hidden'), 5000);
+  }
+
+  // Event Handlers
+  function handleAccountsChanged(accounts) {
+    if (accounts.length === 0) {
+      handleDisconnect();
+    } else {
+      updateWalletUI(accounts[0]);
+    }
+  }
+
+  function handleChainChanged() {
+    window.location.reload();
+  }
+
+  function handleDisconnect() {
+    resetConnectionState();
+    walletConnectProvider = null;
+  }
+
+  // Modal Functions
+  function openModal() {
+    const modal = document.getElementById('walletModal');
+    const grid = modal.querySelector('.wallet-options-grid');
+    
+    // Clear previous options
+    grid.innerHTML = '';
+    
+    // Add browser option if MetaMask is available
+    if (window.ethereum) {
+      grid.appendChild(createWalletOption('browser', walletOptions.metamask));
+    }
+    
+    // Add WalletConnect options
+    Object.entries(walletOptions).forEach(([key, wallet]) => {
+      if (key !== 'metamask') { // Already added as browser option
+        grid.appendChild(createWalletOption('walletconnect', wallet));
+      }
+    });
+    
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('walletModal').classList.add('hidden');
+  }
+
+  function createWalletOption(walletType, wallet) {
+    const option = document.createElement('div');
+    option.className = 'wallet-option';
+    option.innerHTML = `
+      <img src="${wallet.icon}" alt="${wallet.name}" class="wallet-icon">
+      <span>${wallet.name}</span>
+    `;
+    option.addEventListener('click', () => connectWallet(walletType));
+    return option;
+  }
+
+  // Helper function
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    initWalletConnect();
+    
+    // Set up event listeners
+    document.getElementById('walletButton').addEventListener('click', openModal);
+    document.querySelector('.close-modal').addEventListener('click', closeModal);
+    document.getElementById('walletModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('walletModal')) {
+        closeModal();
+      }
+    });
+  });
 </script>
 <script>
     let userWalletAddress = null;
@@ -1052,40 +1406,6 @@ async function connectWithWalletConnect() {
         }
       }
     }
-
-  async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          document.getElementById('walletButton').textContent = 'Connected ✓';
-        } catch (error) {
-          alert('Wallet connection denied.');
-        }
-      } else {
-        alert('MetaMask not detected. Please install MetaMask.');
-      }
-    }
-
-    async function connectReferralWallet() {
-      await connectWallet();
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
-  // Your existing disconnect function (with dark mode preservation)
-function disconnectWallet() {
-  userWalletAddress = null;
-const button = document.getElementById('walletButton');
-  button.textContent = 'Connect Wallet';
-  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
-  document.getElementById('walletStatus').classList.add('hidden');
-  
-  // Preserve dark mode classes
-  if (document.documentElement.classList.contains('dark')) {
-    button.classList.add('dark:bg-gray-800');
-  }
-}
   
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
@@ -1227,106 +1547,6 @@ const button = document.getElementById('walletButton');
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
-</script>
-
-  <script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
-
-  // Configuration
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
-  const chains = ["eip155:56"]; // BSC Chain
-
-  // Initialize WalletConnect
-  const walletConnectModal = new WalletConnectModal({
-    projectId,
-    chains,
-    mobileWallets: [
-      {
-        id: "metamask",
-        name: "MetaMask",
-        links: {
-          native: "metamask://wc?uri={wcUri}",
-          universal: "https://metamask.app.link/wc?uri={wcUri}"
-        }
-      },
-      {
-        id: "trust",
-        name: "Trust Wallet",
-        links: {
-          native: "trust://wc?uri={wcUri}",
-          universal: "https://link.trustwallet.com/wc?uri={wcUri}"
-        }
-      },
-      {
-        id: "coinbase",
-        name: "Coinbase Wallet",
-        links: {
-          native: "coinbase-wallet://wc?uri={wcUri}",
-          universal: "https://go.cb-w.com/wc?uri={wcUri}"
-        }
-      }
-    ]
-  });
-
-  // Initialize modal
-  await walletConnectModal.init().catch(err => {
-    console.error("Initialization failed:", err);
-    showError("Wallet system initialization failed");
-  });
-
-  window.connectMobileWallet = async function() {
-    try {
-      const btn = document.getElementById("walletconnect-mobile-btn");
-      const addressDisplay = document.getElementById("walletconnect-address");
-      const errorDisplay = document.getElementById("walletError");
-      
-      // Show loading state
-      btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Connecting...`;
-      btn.disabled = true;
-      errorDisplay.classList.add("hidden");
-
-      // Connect wallet
-      const { provider } = await walletConnectModal.connect();
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const address = await signer.getAddress();
-
-      // Update UI
-      btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Connected`;
-      btn.classList.add("connected");
-      addressDisplay.textContent = address;
-      addressDisplay.classList.remove("hidden");
-
-      // Event listeners
-      provider.on("accountsChanged", () => window.location.reload());
-      provider.on("chainChanged", () => window.location.reload());
-      provider.on("disconnect", () => {
-        btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
-        btn.classList.remove("connected");
-        addressDisplay.classList.add("hidden");
-      });
-
-    } catch (error) {
-      console.error("Connection error:", error);
-      showError(error.message || "Failed to connect wallet");
-      resetButton();
-    }
-  };
-
-  function showError(message) {
-    const errorDisplay = document.getElementById("walletError");
-    errorDisplay.textContent = message;
-    errorDisplay.classList.remove("hidden");
-    setTimeout(() => errorDisplay.classList.add("hidden"), 5000);
-  }
-
-  function resetButton() {
-    const btn = document.getElementById("walletconnect-mobile-btn");
-    btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
-    btn.disabled = false;
-    btn.classList.remove("connected");
-  }
 </script>
 </body>
 </html>
