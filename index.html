@@ -1229,148 +1229,103 @@ const button = document.getElementById('walletButton');
 });
 </script>
 
-<!-- Place this right before </body> -->
-<script type="module">
+  <script type="module">
   import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
 
   // Configuration
   const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
-  const chains = ["eip155:56"]; // BSC Chain ID 56
+  const chains = ["eip155:56"]; // BSC Chain
 
-  // Initialize modal with error handling
-  let walletConnectModal;
-  try {
-    walletConnectModal = new WalletConnectModal({
-      projectId,
-      chains,
-      mobileWallets: [
-        {
-          id: "metamask",
-          name: "MetaMask",
-          links: {
-            native: "metamask://wc?uri={wcUri}",
-            universal: "https://metamask.app.link/wc?uri={wcUri}"
-          }
-        },
-        {
-          id: "trust",
-          name: "Trust Wallet",
-          links: {
-            native: "trust://wc?uri={wcUri}",
-            universal: "https://link.trustwallet.com/wc?uri={wcUri}"
-          }
-        },
-        {
-          id: "coinbase",
-          name: "Coinbase Wallet",
-          links: {
-            native: "coinbase-wallet://wc?uri={wcUri}",
-            universal: "https://go.cb-w.com/wc?uri={wcUri}"
-          }
+  // Initialize WalletConnect
+  const walletConnectModal = new WalletConnectModal({
+    projectId,
+    chains,
+    mobileWallets: [
+      {
+        id: "metamask",
+        name: "MetaMask",
+        links: {
+          native: "metamask://wc?uri={wcUri}",
+          universal: "https://metamask.app.link/wc?uri={wcUri}"
         }
-      ]
-    });
+      },
+      {
+        id: "trust",
+        name: "Trust Wallet",
+        links: {
+          native: "trust://wc?uri={wcUri}",
+          universal: "https://link.trustwallet.com/wc?uri={wcUri}"
+        }
+      },
+      {
+        id: "coinbase",
+        name: "Coinbase Wallet",
+        links: {
+          native: "coinbase-wallet://wc?uri={wcUri}",
+          universal: "https://go.cb-w.com/wc?uri={wcUri}"
+        }
+      }
+    ]
+  });
 
-    // Explicit initialization
-    await walletConnectModal.init();
-  } catch (err) {
-    console.error("Initialization error:", err);
+  // Initialize modal
+  await walletConnectModal.init().catch(err => {
+    console.error("Initialization failed:", err);
     showError("Wallet system initialization failed");
-    return;
-  }
-
-  // Global connection state
-  let isConnecting = false;
+  });
 
   window.connectMobileWallet = async function() {
-    if (isConnecting) return;
-    isConnecting = true;
-    
     try {
       const btn = document.getElementById("walletconnect-mobile-btn");
-      if (btn) {
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Connecting...`;
-        btn.disabled = true;
-      }
-
-      // 1. Connect to WalletConnect
-      const { provider } = await walletConnectModal.connect();
+      const addressDisplay = document.getElementById("walletconnect-address");
+      const errorDisplay = document.getElementById("walletError");
       
-      if (!provider) {
-        throw new Error("No provider returned");
-      }
+      // Show loading state
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Connecting...`;
+      btn.disabled = true;
+      errorDisplay.classList.add("hidden");
 
-      // 2. Initialize Ethers
+      // Connect wallet
+      const { provider } = await walletConnectModal.connect();
       const ethersProvider = new ethers.BrowserProvider(provider);
       const signer = await ethersProvider.getSigner();
       const address = await signer.getAddress();
 
-      // 3. Update UI
-      if (btn) {
-        const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-        btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
-        btn.classList.add("connected");
-        btn.disabled = false;
-      }
+      // Update UI
+      btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Connected`;
+      btn.classList.add("connected");
+      addressDisplay.textContent = address;
+      addressDisplay.classList.remove("hidden");
 
-      // 4. Set up event listeners
-      provider.on("accountsChanged", handleAccountsChanged);
-      provider.on("chainChanged", handleChainChanged);
-      provider.on("disconnect", handleDisconnect);
+      // Event listeners
+      provider.on("accountsChanged", () => window.location.reload());
+      provider.on("chainChanged", () => window.location.reload());
+      provider.on("disconnect", () => {
+        btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
+        btn.classList.remove("connected");
+        addressDisplay.classList.add("hidden");
+      });
 
     } catch (error) {
       console.error("Connection error:", error);
-      showError(error.message || "Connection failed");
-      
-      const btn = document.getElementById("walletconnect-mobile-btn");
-      if (btn) {
-        btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
-        btn.disabled = false;
-      }
-    } finally {
-      isConnecting = false;
+      showError(error.message || "Failed to connect wallet");
+      resetButton();
     }
   };
 
-  function handleAccountsChanged(accounts) {
-    if (accounts.length === 0) {
-      handleDisconnect();
-    } else {
-      const btn = document.getElementById("walletconnect-mobile-btn");
-      if (btn) {
-        const shortAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-        btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
-      }
-    }
-  }
-
-  function handleChainChanged() {
-    window.location.reload();
-  }
-
-  function handleDisconnect() {
-    const btn = document.getElementById("walletconnect-mobile-btn");
-    if (btn) {
-      btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
-      btn.classList.remove("connected");
-    }
-  }
-
   function showError(message) {
-    const errorEl = document.getElementById("wallet-error");
-    if (!errorEl) {
-      const container = document.createElement("div");
-      container.id = "wallet-error";
-      container.className = "text-red-500 text-sm mt-2 text-center";
-      document.getElementById("walletconnect-mobile").appendChild(container);
-    }
-    
-    document.getElementById("wallet-error").textContent = message;
-    setTimeout(() => {
-      const el = document.getElementById("wallet-error");
-      if (el) el.textContent = '';
-    }, 5000);
+    const errorDisplay = document.getElementById("walletError");
+    errorDisplay.textContent = message;
+    errorDisplay.classList.remove("hidden");
+    setTimeout(() => errorDisplay.classList.add("hidden"), 5000);
+  }
+
+  function resetButton() {
+    const btn = document.getElementById("walletconnect-mobile-btn");
+    btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Wallet`;
+    btn.disabled = false;
+    btn.classList.remove("connected");
   }
 </script>
 </body>
