@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script type="module" src="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -1226,73 +1228,50 @@ const button = document.getElementById('walletButton');
 </script>
 
 <script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
+  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.js";
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
 
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
+  const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d"; // Use your real WalletConnect project ID
 
-  const walletConnectModal = new WalletConnectModal({
+  const modal = new WalletConnectModal({
     projectId,
-    chains: ["eip155:56"],
+    themeMode: "dark",
+    walletConnectVersion: 2,
+    chains: [56],
+    standaloneChains: ["eip155:56"],
     metadata: {
-      name: "FLUFFI Token",
+      name: "Fluffi Token",
       description: "Buy & Stake $FLUFFI",
       url: "https://fluffi.site",
       icons: ["https://fluffi.site/logo.png"]
-    },
-    mobileWallets: [
-      {
-        id: "metamask",
-        name: "MetaMask",
-        links: {
-          native: "metamask://wc?uri={wcUri}",
-          universal: "https://metamask.app.link/wc?uri={wcUri}"
-        }
-      },
-      {
-        id: "trust",
-        name: "Trust Wallet",
-        links: {
-          native: "trust://wc?uri={wcUri}",
-          universal: "https://link.trustwallet.com/wc?uri={wcUri}"
-        }
-      },
-      {
-        id: "coinbase",
-        name: "Coinbase Wallet",
-        links: {
-          native: "coinbase-wallet://wc?uri={wcUri}",
-          universal: "https://go.cb-w.com/wc?uri={wcUri}"
-        }
-      }
-    ]
+    }
   });
 
-  window.connectMobileWallet = async function () {
-    const btn = document.getElementById("walletconnect-mobile-btn");
+  let walletConnectAddress = null;
+  let walletConnectSigner = null;
+
+  document.getElementById('walletconnect-mobile-btn').addEventListener('click', async () => {
     try {
-      btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Connecting...`;
-      btn.disabled = true;
-
-      const { provider } = await walletConnectModal.connect();
+      const { provider } = await modal.connect();
       const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const address = await signer.getAddress();
+      walletConnectSigner = await ethersProvider.getSigner();
+      walletConnectAddress = await walletConnectSigner.getAddress();
 
-      btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${address.slice(0, 6)}...${address.slice(-4)}`;
-      btn.classList.add("connected");
-      btn.disabled = false;
+      // Update UI
+      const btn = document.getElementById('walletconnect-mobile-btn');
+      const addr = document.getElementById('walletconnect-address');
+      btn.innerHTML = '✅ Connected';
+      addr.innerText = `${walletConnectAddress.slice(0, 6)}...${walletConnectAddress.slice(-4)}`;
+      addr.classList.remove('hidden');
 
-      // Add listeners
-      provider.on("disconnect", () => window.location.reload());
+      // Events
       provider.on("accountsChanged", () => window.location.reload());
-      provider.on("chainChanged", () => window.location.reload());
+      provider.on("disconnect", () => window.location.reload());
+
     } catch (err) {
-      console.error(err);
-      btn.innerHTML = `<i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet`;
-      btn.disabled = false;
-      alert("Wallet connection failed.");
+      console.error("Wallet connection failed:", err);
+      alert("Wallet connection failed: " + (err.message || "Unknown error"));
     }
-  };
+  });
 </script>
 </html>
