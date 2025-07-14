@@ -1277,266 +1277,166 @@ function resetTimer() {
   }
 });
 </script>
-  <!-- Wallet Connection Modal (add to your HTML body) -->
-<div id="walletModal" class="wallet-modal hidden">
-  <div class="wallet-modal-content">
-    <div class="wallet-modal-header">
-      <h3>Connect Wallet</h3>
-      <span class="close-modal">&times;</span>
-    </div>
-    <div class="wallet-options-grid">
-      <!-- Options will be populated by JavaScript -->
-    </div>
-  </div>
-</div>
+  
+  <script>
+// Wallet Connection State
+let userWalletAddress = null;
+let walletConnectProvider = null;
 
-<!-- Main Wallet Button -->
-<button id="walletButton" class="wallet-connect-btn">
-  <i class="fas fa-wallet mr-2"></i> Connect Wallet
-</button>
-
-<!-- Place this script before </body> -->
-<script type="module">
-  import { WalletConnectModal } from "https://unpkg.com/@walletconnect/modal@2.6.5?module";
-  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.7.0/+esm";
-
-  // Configuration
-  const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
-  const chains = ["eip155:56"]; // BSC Chain
-  let walletConnectProvider;
-
-  // Wallet options configuration
-  const walletOptions = {
-    metamask: {
-      name: "MetaMask",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-      mobile: {
-        native: "metamask://wc?uri={wcUri}",
-        universal: "https://metamask.app.link/wc?uri={wcUri}"
-      }
-    },
-    trust: {
-      name: "Trust Wallet",
-      icon: "https://trustwallet.com/assets/images/media/assets/TWT.png",
-      mobile: {
-        native: "trust://wc?uri={wcUri}",
-        universal: "https://link.trustwallet.com/wc?uri={wcUri}"
-      }
-    },
-    coinbase: {
-      name: "Coinbase Wallet",
-      icon: "https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png",
-      mobile: {
-        native: "coinbase-wallet://wc?uri={wcUri}",
-        universal: "https://go.cb-w.com/wc?uri={wcUri}"
-      }
-    },
-    walletconnect: {
-      name: "Other Wallets",
-      icon: "https://walletconnect.com/walletconnect-logo.png"
-    }
-  };
-
-  // Initialize WalletConnect Modal
-  const walletConnectModal = new WalletConnectModal({
-    projectId,
-    chains,
-    mobileWallets: Object.values(walletOptions)
-      .filter(wallet => wallet.mobile)
-      .map(wallet => ({
-        id: wallet.name.toLowerCase().replace(' ', ''),
-        name: wallet.name,
-        links: wallet.mobile
-      }))
-  });
-
-  // Initialize modal
-  async function initWalletConnect() {
-    try {
-      await walletConnectModal.init();
-      console.log("WalletConnect initialized");
-    } catch (err) {
-      console.error("WalletConnect init error:", err);
-      showError("Wallet system initialization failed");
-    }
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if already connected
+  if (localStorage.getItem('walletConnected') === 'true') {
+    initWallet();
   }
-
-  // Main wallet connection function
-  async function connectWallet(walletType) {
-    try {
-      // Set loading state
-      setLoadingState(true);
-      
-      let provider;
-      let address;
-
-      if (walletType === 'browser' && window.ethereum) {
-        // Browser extension (MetaMask, etc.)
-        provider = new ethers.BrowserProvider(window.ethereum);
-        address = (await provider.getSigner()).address;
-      } else {
-        // WalletConnect flow
-        const { provider: wcProvider } = await walletConnectModal.connect();
-        walletConnectProvider = wcProvider;
-        provider = new ethers.BrowserProvider(wcProvider);
-        address = (await provider.getSigner()).address;
-        
-        // Set up WalletConnect event listeners
-        wcProvider.on("accountsChanged", handleAccountsChanged);
-        wcProvider.on("chainChanged", handleChainChanged);
-        wcProvider.on("disconnect", handleDisconnect);
-      }
-
-      // Update UI
-      updateWalletUI(address);
-      closeModal();
-
-    } catch (error) {
-      console.error("Connection error:", error);
-      showError(error.message || "Failed to connect wallet");
-      resetConnectionState();
-    } finally {
-      setLoadingState(false);
-    }
-  }
-
-  // Mobile wallet connection
-  window.connectMobileWallet = async function() {
-    if (isMobile()) {
-      await connectWallet('walletconnect');
+  
+  // Set up wallet button click
+  document.getElementById('walletButton').addEventListener('click', () => {
+    if (userWalletAddress) {
+      disconnectWallet();
     } else {
       openModal();
     }
-  };
+  });
+});
 
-  // UI Functions
-  function updateWalletUI(address) {
-    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+// Modal Functions
+function openModal() {
+  document.getElementById('walletModal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('walletModal').classList.add('hidden');
+}
+
+// Connection Functions
+async function connectBrowserWallet() {
+  try {
+    if (!window.ethereum) {
+      throw new Error('No Ethereum wallet detected. Please install MetaMask or another wallet extension.');
+    }
     
-    // Update buttons
-    document.getElementById('walletButton').innerHTML = 
-      `<i class="fas fa-check-circle mr-2"></i> ${shortAddress}`;
-    document.getElementById('walletconnect-mobile-btn').innerHTML = 
-      `<i class="fas fa-check-circle mr-2"></i> ${shortAddress}`;
-    
-    // Show full address
-    const addressDisplay = document.getElementById('walletconnect-address');
-    addressDisplay.textContent = address;
-    addressDisplay.classList.remove('hidden');
-    
-    // Add connected class
-    document.getElementById('walletButton').classList.add('connected');
-    document.getElementById('walletconnect-mobile-btn').classList.add('connected');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    userWalletAddress = accounts[0];
+    updateUI();
+    setupEventListeners();
+    closeModal();
+  } catch (error) {
+    console.error('Browser wallet connection error:', error);
+    alert(`Connection failed: ${error.message}`);
   }
+}
 
-  function resetConnectionState() {
-    document.getElementById('walletButton').innerHTML = 
-      `<i class="fas fa-wallet mr-2"></i> Connect Wallet`;
-    document.getElementById('walletconnect-mobile-btn').innerHTML = 
-      `<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet`;
+async function connectWalletConnect() {
+  try {
+    // Load WalletConnect provider dynamically
+    const { WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
     
-    document.getElementById('walletconnect-address').classList.add('hidden');
-    document.getElementById('walletButton').classList.remove('connected');
-    document.getElementById('walletconnect-mobile-btn').classList.remove('connected');
+    // Initialize WalletConnect Provider
+    walletConnectProvider = new WalletConnectProvider({
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a', 
+      chains: [56], //
+      showQrModal: true
+    });
+    
+    // Enable session
+    await walletConnectProvider.enable();
+    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+    userWalletAddress = accounts[0];
+    updateUI();
+    setupWalletConnectEvents();
+    closeModal();
+  } catch (error) {
+    console.error('WalletConnect error:', error);
+    alert(`WalletConnect failed: ${error.message}`);
   }
+}
 
-  function setLoadingState(isLoading) {
-    const buttons = [
-      document.getElementById('walletButton'),
-      document.getElementById('walletconnect-mobile-btn')
-    ];
+async function connectCoinbaseWallet() {
+  try {
+    if (window.ethereum?.isCoinbaseWallet) {
+      return connectBrowserWallet();
+    }
     
-    buttons.forEach(btn => {
-      if (btn) {
-        btn.disabled = isLoading;
-        if (isLoading) {
-          btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...`;
-        }
+    // Try deep linking for mobile
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      window.location.href = 'https://go.cb-w.com/wc?uri=' + encodeURIComponent(window.location.href);
+      return;
+    }
+    
+    throw new Error('Coinbase Wallet not detected');
+  } catch (error) {
+    console.error('Coinbase Wallet error:', error);
+    alert(`Coinbase Wallet connection failed: ${error.message}`);
+  }
+}
+
+// UI Updates
+function updateUI() {
+  const walletBtn = document.getElementById('walletButton');
+  const walletAddress = document.getElementById('walletAddress');
+  
+  if (userWalletAddress) {
+    const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+    walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
+    walletAddress.textContent = userWalletAddress;
+    walletAddress.classList.remove('hidden');
+    localStorage.setItem('walletConnected', 'true');
+  } else {
+    walletBtn.innerHTML = `<i class="fas fa-wallet mr-1"></i> Connect Wallet`;
+    walletAddress.classList.add('hidden');
+    localStorage.removeItem('walletConnected');
+  }
+}
+
+// Event Listeners
+function setupEventListeners() {
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else {
+        userWalletAddress = accounts[0];
+        updateUI();
       }
     });
+    
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
   }
+}
 
-  function showError(message) {
-    const errorDisplay = document.getElementById('walletError');
-    errorDisplay.textContent = message;
-    errorDisplay.classList.remove('hidden');
-    setTimeout(() => errorDisplay.classList.add('hidden'), 5000);
+function setupWalletConnectEvents() {
+  if (walletConnectProvider) {
+    walletConnectProvider.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else {
+        userWalletAddress = accounts[0];
+        updateUI();
+      }
+    });
+    
+    walletConnectProvider.on('chainChanged', () => {
+      window.location.reload();
+    });
+    
+    walletConnectProvider.on('disconnect', () => {
+      disconnectWallet();
+    });
   }
+}
 
-  // Event Handlers
-  function handleAccountsChanged(accounts) {
-    if (accounts.length === 0) {
-      handleDisconnect();
-    } else {
-      updateWalletUI(accounts[0]);
-    }
-  }
-
-  function handleChainChanged() {
-    window.location.reload();
-  }
-
-  function handleDisconnect() {
-    resetConnectionState();
+// Disconnection
+function disconnectWallet() {
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
     walletConnectProvider = null;
   }
-
-  // Modal Functions
-  function openModal() {
-    const modal = document.getElementById('walletModal');
-    const grid = modal.querySelector('.wallet-options-grid');
-    
-    // Clear previous options
-    grid.innerHTML = '';
-    
-    // Add browser option if MetaMask is available
-    if (window.ethereum) {
-      grid.appendChild(createWalletOption('browser', walletOptions.metamask));
-    }
-    
-    // Add WalletConnect options
-    Object.entries(walletOptions).forEach(([key, wallet]) => {
-      if (key !== 'metamask') { // Already added as browser option
-        grid.appendChild(createWalletOption('walletconnect', wallet));
-      }
-    });
-    
-    modal.classList.remove('hidden');
-  }
-
-  function closeModal() {
-    document.getElementById('walletModal').classList.add('hidden');
-  }
-
-  function createWalletOption(walletType, wallet) {
-    const option = document.createElement('div');
-    option.className = 'wallet-option';
-    option.innerHTML = `
-      <img src="${wallet.icon}" alt="${wallet.name}" class="wallet-icon">
-      <span>${wallet.name}</span>
-    `;
-    option.addEventListener('click', () => connectWallet(walletType));
-    return option;
-  }
-
-  // Helper function
-  function isMobile() {
-    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
-
-  // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    initWalletConnect();
-    
-    // Set up event listeners
-    document.getElementById('walletButton').addEventListener('click', openModal);
-    document.querySelector('.close-modal').addEventListener('click', closeModal);
-    document.getElementById('walletModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('walletModal')) {
-        closeModal();
-      }
-    });
-  });
+  userWalletAddress = null;
+  updateUI();
+}
 </script>
 </body>
 </html>
