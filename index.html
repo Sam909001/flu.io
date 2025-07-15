@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/solana-provider@1.0.0/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.70.1/lib/index.iife.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
@@ -1316,27 +1316,7 @@ function resetTimer() {
       }
     }
 
-  async function connectWalletConnect() {
-  const btn = document.querySelector('[onclick="connectWalletConnect()"]');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-  
-  try {
-    // Initialize WalletConnect Solana Provider
-    const solanaProvider = new WalletConnectSolanaProvider({
-      rpc: {
-        1: "https://api.mainnet-beta.solana.com" // Mainnet RPC
-        // 2: "https://api.testnet.solana.com" // Testnet if needed
-      },
-      relayUrl: "wss://relay.walletconnect.com",
-      metadata: {
-        name: "$FLUFFI Presale",
-        description: "Connect to $FLUFFI Presale",
-        url: window.location.href,
-        icons: ["https://your-site.com/fluffi.jpg"]
-      }
-    });
-
+ 
     // Enable session
     await solanaProvider.connect();
     
@@ -1410,44 +1390,42 @@ function resetTimer() {
       }
     }
 
-    // Event Listeners
-    function setupEventListeners() {
-      if (window.ethereum) {
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length === 0) {
-            disconnectWallet();
-          } else {
-            userWalletAddress = accounts[0];
-            updateUI();
-          }
-        });
-        
-        window.ethereum.on('chainChanged', () => {
-          window.location.reload();
-        });
-      }
-    }
+  <script>
+let walletConnectProvider;
 
-    function setupWalletConnectEvents() {
-      if (walletConnectProvider) {
-        walletConnectProvider.on('accountsChanged', (accounts) => {
-          if (accounts.length === 0) {
-            disconnectWallet();
-          } else {
-            userWalletAddress = accounts[0];
-            updateUI();
-          }
-        });
-        
-        walletConnectProvider.on('chainChanged', () => {
-          window.location.reload();
-        });
-        
-        walletConnectProvider.on('disconnect', () => {
-          disconnectWallet();
-        });
-      }
-    }
+async function connectWalletConnect() {
+  const btn = document.querySelector('[onclick="connectWalletConnect()"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+  try {
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/"
+      },
+      chainId: 56
+    });
+
+    await walletConnectProvider.enable();
+
+    const provider = new ethers.providers.Web3Provider(walletConnectProvider);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    
+    userWalletAddress = address;
+    updateUI();
+    closeModal();
+
+    // Event listeners
+    setupWalletConnectEvents();
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    alert("WalletConnect connection failed: " + error.message);
+  } finally {
+    btn.innerHTML = originalText;
+  }
+}
+</script>
 
     // Disconnection
    function disconnectWallet() {
