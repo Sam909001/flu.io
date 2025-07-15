@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.70.1/lib/index.iife.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1000,6 +1000,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNextIncreaseTime();
   }, 1000);
 });
+        document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    if (isMobile) {
+      document.getElementById('walletconnect-mobile')?.classList.remove('hidden');
+    }
+  });
 
 /* Testing function - remove in production */
 function resetTimer() {
@@ -1326,6 +1332,54 @@ const button = document.getElementById('walletButton');
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
+</script>
+  <script>
+const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d";
+
+const metadata = {
+  name: "FLUFFI Token",
+  description: "Presale + Staking",
+  url: "https://fluffi.site", // Your site
+  icons: ["https://fluffi.site/logo.png"] // Your logo
+};
+
+const web3Modal = new window.Web3Modal.default({
+  projectId,
+  walletConnectVersion: 2,
+  themeMode: "dark",
+  standaloneChains: ["eip155:56"],
+  chains: [56],
+  metadata,
+});
+
+let walletConnectProvider = null;
+let walletConnectSigner = null;
+let walletConnectAddress = null;
+
+async function connectMobileWallet() {
+  try {
+    const { provider } = await web3Modal.connect();
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    walletConnectSigner = await ethersProvider.getSigner();
+    walletConnectAddress = await walletConnectSigner.getAddress();
+
+    const btn = document.getElementById('walletconnect-mobile-btn');
+    const addr = document.getElementById('walletconnect-address');
+    if (btn && addr) {
+      btn.innerHTML = '✅ Connected';
+      btn.classList.add('bg-green-600');
+      addr.textContent = walletConnectAddress.slice(0, 6) + "..." + walletConnectAddress.slice(-4);
+      addr.classList.remove('hidden');
+    }
+
+    provider.on("accountsChanged", () => location.reload());
+    provider.on("disconnect", () => location.reload());
+
+  } catch (err) {
+    console.error("WalletConnect failed:", err);
+    alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
+  }
+}
 </script>
 </body>
 </html>
