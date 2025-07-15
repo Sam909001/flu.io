@@ -915,6 +915,7 @@
   </div>
 </section>
   </main>
+  <body>
  <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1053,7 +1054,103 @@ function resetTimer() {
   location.reload();
 }
 </script>
-<script>
+  <script>
+    let userWalletAddress = null;
+    const initialPrice = 0.0001;
+    const stages = 15;
+    const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
+    const startTime = Date.now();
+
+    function updateStage() {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
+      const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
+      
+      // Update stage info
+      const currentStageEl = document.getElementById('currentStage');
+      const currentPriceEl = document.getElementById('currentPrice');
+      const progressBarEl = document.getElementById('progressBar');
+      
+      if (currentStageEl) currentStageEl.textContent = stage + 1;
+      if (currentPriceEl) currentPriceEl.textContent = `$${price}`;
+      if (progressBarEl) progressBarEl.style.width = `${((stage + 1) / stages) * 100}%`;
+    }
+
+    function updateCountdown() {
+      const end = startTime + 30 * 24 * 60 * 60 * 1000;
+      const left = end - Date.now();
+      const days = Math.floor(left / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((left / (1000 * 60)) % 60);
+      const seconds = Math.floor((left / 1000) % 60);
+      const countdownEl = document.getElementById('countdown');
+      if (countdownEl) {
+        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+    }
+
+    function updateStageTimer() {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const currentStageIndex = Math.floor(elapsed / stageDuration);
+      const stageStartTime = startTime + (currentStageIndex * stageDuration);
+      const stageEndTime = stageStartTime + stageDuration;
+      const stageTimeLeft = stageEndTime - now;
+      
+      if (stageTimeLeft > 0) {
+        const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((stageTimeLeft / (1000 * 60)) % 60);
+        const seconds = Math.floor((stageTimeLeft / 1000) % 60);
+        
+        const stageTimerEl = document.getElementById('stageTimer');
+        if (stageTimerEl) {
+          stageTimerEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
+        }
+      } else {
+        const stageTimerEl = document.getElementById('stageTimer');
+        if (stageTimerEl) {
+          stageTimerEl.textContent = "Stage Complete";
+        }
+      }
+    }
+  
+    function showReferralUI(wallet) {
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+      
+      document.getElementById('referralSection').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2 font-semibold">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="referralLinkInput" 
+                     value="${referralLink}" 
+                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          </div>
+          
+          <div class="mt-4">
+            <p class="text-sm mb-2 font-semibold">Share your link:</p>
+            <div class="flex space-x-3">
+              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                🐦 Twitter
+              </button>
+              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                📱 Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
       async function buyFluffi() {
       const amount = document.getElementById('amountInput').value;
       const currency = document.getElementById('currencySelect').value;
