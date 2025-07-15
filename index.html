@@ -1047,7 +1047,8 @@
                 case 'metamask':
                     return `https://metamask.app.link/wc?uri=${encodedUri}`;
                 case 'trust':
-                    return `trust://link.trustwallet.com/wc?uri=${encodedUri}`;
+                    return window.location.href = `https://link.trustwallet.com/wc?uri=${encodedUri}`;
+        }, 500);
                 case 'coinbase':
                     return `https://go.cb-w.com/wc?uri=${encodedUri}`;
                 default:
