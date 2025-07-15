@@ -1087,25 +1087,6 @@ function resetTimer() {
     attributes: true,
     attributeFilter: ['class']
   });
-</script>
-  <script>
-async function connectWithWalletConnect() {
-  const provider = new WalletConnectProvider.default({
-    rpc: {
-      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
-    },
-    chainId: 56
-  });
-
-  await provider.enable();
-  const web3 = new Web3(provider);
-  const accounts = await web3.eth.getAccounts();
-  const userWallet = accounts[0];
-
-  alert("Connected via WalletConnect: " + userWallet);
-}
-</script>
-<script>
     let userWalletAddress = null;
     const initialPrice = 0.0001;
     const stages = 15;
