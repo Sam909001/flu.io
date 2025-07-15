@@ -14,14 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     
-    <!-- Load ethers.js first -->
+    <!-- Original ethers and Web3 setup -->
     <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
-    
-    <!-- Then load Web3 and WalletConnect -->
     <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Analytics -->
@@ -97,6 +93,17 @@
             height: 100%;
             background: linear-gradient(90deg, #4CAF50, #2E7D32);
             transition: width 0.5s ease;
+        }
+
+        /* Mobile-only wallet connect */
+        .mobile-wallet-section {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-wallet-section {
+                display: block;
+            }
         }
 
         /* Wallet Modal Styles */
@@ -417,12 +424,6 @@
         .hidden { 
             display: none !important; 
         }
-
-        /* Processing button styles */
-        .btn-processing {
-            background: #6b7280 !important;
-            cursor: not-allowed !important;
-        }
     </style>
 </head>
 
@@ -451,6 +452,16 @@
     </header>
 
     <main class="p-6 mx-auto w-full max-w-6xl">
+        
+        <!-- Mobile Wallet Connect Section (Only visible on mobile) -->
+        <div class="mobile-wallet-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
+            <h3 class="text-lg font-bold mb-3 text-center">📱 Mobile Wallet Connect</h3>
+            <button onclick="showMobileWalletModal()" id="mobileWalletBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold">
+                <i class="fas fa-mobile-alt mr-2"></i>Connect Mobile Wallet
+            </button>
+            <div id="mobileWalletStatus" class="mt-2 text-center text-sm"></div>
+        </div>
+
         <!-- Timer Section -->
         <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
             <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
@@ -516,7 +527,7 @@
                 </select>
             </div>
             <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" />
-            <button onclick="buyFluffi()" id="buyButton" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+            <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
                 🚀 Buy Now
             </button>
         </section>
@@ -722,11 +733,11 @@
         </div>
     </footer>
 
-    <!-- Wallet Selection Modal -->
+    <!-- Mobile Wallet Selection Modal -->
     <div id="walletModal" class="wallet-modal">
         <div class="wallet-modal-content">
             <span class="close-modal" onclick="closeMobileWalletModal()">&times;</span>
-            <h3 style="margin-top: 0; text-align: center;">Choose Your Wallet</h3>
+            <h3 style="margin-top: 0; text-align: center;">Choose Your Mobile Wallet</h3>
 
             <div class="wallet-option" onclick="connectMobileWallet('metamask')">
                 <div class="wallet-icon" style="background: linear-gradient(135deg, #f6851b, #e2761b);">
@@ -763,20 +774,22 @@
     </div>
 
     <script>
-        // ===== ENSURE ETHERS IS AVAILABLE =====
-        console.log('Ethers available:', typeof ethers !== 'undefined');
-        console.log('Web3 available:', typeof Web3 !== 'undefined');
-        console.log('WalletConnect available:', typeof WalletConnectProvider !== 'undefined');
-
-        // ===== GLOBAL VARIABLES =====
+        // ===== ORIGINAL GLOBAL VARIABLES (from your first HTML) =====
         let userWalletAddress = null;
-        let web3Instance = null;
-        let currentProvider = null;
-        let currentAccount = null;
+        const initialPrice = 0.0001;
+        const stages = 15;
+        const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
+        const startTime = Date.now();
 
-        // ===== CONTRACT CONFIGURATION =====
-        const CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-        const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        // ===== MOBILE WALLET CONNECT VARIABLES =====
+        let mobileWeb3Instance = null;
+        let mobileProvider = null;
+        let mobileAccount = null;
+
+        // ===== TIMER CONFIGURATION =====
+        const TOTAL_STAGES = 15;
+        const STAGE_DURATION = 60 * 1000; // 1 minute per stage
+        const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
 
         // ===== WALLET CONNECT CONFIGURATION =====
         const WALLET_CONFIG = {
@@ -790,11 +803,6 @@
             }
         };
 
-        // ===== TIMER CONFIGURATION =====
-        const TOTAL_STAGES = 15;
-        const STAGE_DURATION = 60 * 1000; // 1 minute per stage
-        const PRESALE_DURATION = TOTAL_STAGES * STAGE_DURATION; // 15 minutes total
-
         // ===== UTILITY FUNCTIONS =====
         function isMobile() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -804,7 +812,6 @@
             document.documentElement.classList.toggle('dark');
             localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
             
-            // Update chart colors if chart exists
             if (window.tokenChart) {
                 const isDark = document.documentElement.classList.contains('dark');
                 window.tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
@@ -812,7 +819,7 @@
             }
         }
 
-        // ===== TIMER FUNCTIONS =====
+        // ===== ORIGINAL TIMER FUNCTIONS (from your first HTML) =====
         function getPresaleStartTime() {
             let startTime = localStorage.getItem('presaleStartTime');
             if (!startTime) {
@@ -884,19 +891,12 @@
             }
         }
 
-        // ===== WALLET CONNECTION FUNCTIONS =====
+        // ===== ORIGINAL WALLET FUNCTIONS (from your first HTML) =====
         async function connectWallet() {
-            if (isMobile()) {
-                showMobileWalletModal();
-                return;
-            }
-
-            // Desktop wallet connection
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userWalletAddress = accounts[0];
-                    currentAccount = accounts[0];
                     
                     updateWalletUI(accounts[0]);
                     showReferralUI(accounts[0]);
@@ -905,7 +905,7 @@
                     alert('Failed to connect wallet. Please try again.');
                 }
             } else {
-                alert('MetaMask is not installed. Please install MetaMask or use mobile wallet connect.');
+                alert('MetaMask is not installed. Please install MetaMask or use the mobile wallet option below.');
             }
         }
 
@@ -929,9 +929,6 @@
 
         function disconnectWallet() {
             userWalletAddress = null;
-            currentAccount = null;
-            currentProvider = null;
-            web3Instance = null;
 
             const walletButton = document.getElementById('walletButton');
             const walletAddress = document.getElementById('walletAddress');
@@ -955,6 +952,66 @@
                     </button>
                 `;
             }
+        }
+
+        // ===== ORIGINAL BUY FUNCTION (from your first HTML) =====
+        async function buyFluffi() {
+            const amount = document.getElementById('amountInput').value;
+            const currency = document.getElementById('currencySelect').value;
+            const ref = document.getElementById('refInput').value;
+            
+            if (!userWalletAddress && !mobileAccount) {
+                alert('Please connect your wallet first.');
+                return;
+            }
+            if (!amount || isNaN(amount) || Number(amount) <= 0) {
+                alert('Please enter a valid amount.');
+                return;
+            }
+            
+            let ethValue;
+            if (currency === 'USD') {
+                const usdToEth = 3000; // 1 ETH = 3000 USD
+                ethValue = (Number(amount) / usdToEth).toFixed(6);
+            } else {
+                ethValue = Number(amount).toFixed(6);
+            }
+            
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+                const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+                const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+                const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
+                
+                const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+                const prevText = buyBtn.textContent;
+                buyBtn.textContent = '⏳ Processing...';
+                buyBtn.disabled = true;
+                
+                const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
+                await tx.wait();
+                
+                buyBtn.textContent = prevText;
+                buyBtn.disabled = false;
+                alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+            } catch (err) {
+                const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+                if (buyBtn) {
+                    buyBtn.textContent = '🚀 Buy Now';
+                    buyBtn.disabled = false;
+                }
+                if (err && err.message) {
+                    alert('❌ Transaction failed: ' + err.message);
+                } else {
+                    alert('❌ Transaction failed.');
+                }
+            }
+        }
+
+        function stakeFluffi() {
+            alert('Staking feature coming soon!');
         }
 
         // ===== MOBILE WALLET FUNCTIONS =====
@@ -1002,7 +1059,6 @@
             showStatus('Initializing connection...', 'success');
 
             try {
-                // Check if WalletConnectProvider is available
                 if (typeof WalletConnectProvider === 'undefined') {
                     throw new Error('WalletConnect not loaded');
                 }
@@ -1019,17 +1075,15 @@
                                 const deepLink = generateDeepLink(walletType, uri);
                                 showStatus(`Opening ${walletType}...`, 'success');
                                 
-                                // Open the wallet app
                                 window.open(deepLink, '_blank');
                                 
-                                // Set up connection timeout
                                 setTimeout(() => {
-                                    if (!currentAccount) {
+                                    if (!mobileAccount) {
                                         showStatus('Connection timeout. Please try again.', 'error');
                                     }
                                 }, 30000);
                             } else {
-                                showStatus('Please use mobile device or scan QR code', 'error');
+                                showStatus('Please use mobile device', 'error');
                             }
                         },
                         close: () => {
@@ -1041,53 +1095,91 @@
                 showStatus('Enabling session...', 'success');
                 await provider.enable();
                 
-                web3Instance = new Web3(provider);
-                currentProvider = provider;
+                mobileWeb3Instance = new Web3(provider);
+                mobileProvider = provider;
 
-                const accounts = await web3Instance.eth.getAccounts();
+                const accounts = await mobileWeb3Instance.eth.getAccounts();
                 if (accounts.length > 0) {
-                    currentAccount = accounts[0];
-                    userWalletAddress = accounts[0];
+                    mobileAccount = accounts[0];
+                    userWalletAddress = accounts[0]; // Set this for the buy function
 
-                    showStatus(`Connected! ${currentAccount.substring(0, 6)}...${currentAccount.substring(38)}`, 'success');
+                    showStatus(`Connected! ${mobileAccount.substring(0, 6)}...${mobileAccount.substring(38)}`, 'success');
+
+                    // Update mobile wallet status
+                    const mobileStatus = document.getElementById('mobileWalletStatus');
+                    if (mobileStatus) {
+                        mobileStatus.innerHTML = `<span class="text-green-600">✅ Connected: ${mobileAccount.substring(0, 6)}...${mobileAccount.substring(38)}</span>`;
+                    }
+
+                    // Update mobile button
+                    const mobileBtn = document.getElementById('mobileWalletBtn');
+                    if (mobileBtn) {
+                        mobileBtn.textContent = 'Mobile Wallet Connected';
+                        mobileBtn.className = 'w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold';
+                    }
 
                     setTimeout(() => {
                         closeMobileWalletModal();
-                        updateWalletUI(currentAccount);
-                        showReferralUI(currentAccount);
+                        showReferralUI(mobileAccount);
                     }, 2000);
 
-                    setupProviderListeners(provider);
+                    setupMobileProviderListeners(provider);
                 } else {
                     throw new Error('No accounts found');
                 }
 
             } catch (error) {
-                console.error('Connection error:', error);
+                console.error('Mobile connection error:', error);
                 showStatus(`Connection failed: ${error.message}`, 'error');
             }
         }
 
-        function setupProviderListeners(provider) {
+        function setupMobileProviderListeners(provider) {
             provider.on('accountsChanged', (accounts) => {
-                console.log('Accounts changed:', accounts);
+                console.log('Mobile accounts changed:', accounts);
                 if (accounts.length === 0) {
-                    disconnectWallet();
+                    disconnectMobileWallet();
                 } else {
-                    currentAccount = accounts[0];
+                    mobileAccount = accounts[0];
                     userWalletAddress = accounts[0];
-                    updateWalletUI(accounts[0]);
+                    updateMobileWalletUI(accounts[0]);
                 }
             });
 
             provider.on('chainChanged', (chainId) => {
-                console.log('Chain changed:', chainId);
+                console.log('Mobile chain changed:', chainId);
             });
 
             provider.on('disconnect', (code, reason) => {
-                console.log('Disconnected:', code, reason);
-                disconnectWallet();
+                console.log('Mobile disconnected:', code, reason);
+                disconnectMobileWallet();
             });
+        }
+
+        function disconnectMobileWallet() {
+            mobileAccount = null;
+            mobileProvider = null;
+            mobileWeb3Instance = null;
+            userWalletAddress = null;
+
+            const mobileBtn = document.getElementById('mobileWalletBtn');
+            const mobileStatus = document.getElementById('mobileWalletStatus');
+            
+            if (mobileBtn) {
+                mobileBtn.textContent = 'Connect Mobile Wallet';
+                mobileBtn.className = 'w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold';
+            }
+            
+            if (mobileStatus) {
+                mobileStatus.innerHTML = '';
+            }
+        }
+
+        function updateMobileWalletUI(address) {
+            const mobileStatus = document.getElementById('mobileWalletStatus');
+            if (mobileStatus) {
+                mobileStatus.innerHTML = `<span class="text-green-600">✅ Connected: ${address.substring(0, 6)}...${address.substring(38)}</span>`;
+            }
         }
 
         // ===== REFERRAL FUNCTIONS =====
@@ -1154,96 +1246,6 @@
                 const link = encodeURIComponent(input.value);
                 window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
             }
-        }
-
-        // ===== TRANSACTION FUNCTIONS =====
-        async function buyFluffi() {
-            const amountInput = document.getElementById('amountInput');
-            const currencySelect = document.getElementById('currencySelect');
-            const refInput = document.getElementById('refInput');
-            const buyButton = document.getElementById('buyButton');
-            
-            if (!userWalletAddress) {
-                alert('Please connect your wallet first.');
-                return;
-            }
-            
-            if (!amountInput || !amountInput.value || isNaN(amountInput.value) || Number(amountInput.value) <= 0) {
-                alert('Please enter a valid amount.');
-                return;
-            }
-
-            const amount = amountInput.value;
-            const currency = currencySelect ? currencySelect.value : 'USD';
-            const ref = refInput ? refInput.value : '';
-
-            let ethValue;
-            if (currency === 'USD') {
-                const usdToEth = 3000; // 1 ETH = 3000 USD (you should get this from an API)
-                ethValue = (Number(amount) / usdToEth).toFixed(6);
-            } else {
-                ethValue = Number(amount).toFixed(6);
-            }
-
-            // Set button to processing state
-            const originalText = buyButton.textContent;
-            buyButton.textContent = '⏳ Processing...';
-            buyButton.disabled = true;
-            buyButton.classList.add('btn-processing');
-
-            try {
-                const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
-                
-                if (currentProvider && web3Instance) {
-                    // Mobile wallet connection using Web3
-                    console.log('Using mobile wallet connection');
-                    const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                    
-                    const tx = await contract.methods.contribute(refAddr).send({
-                        from: userWalletAddress,
-                        value: web3Instance.utils.toWei(ethValue.toString(), 'ether')
-                    });
-                    
-                    alert('🎉 Purchase successful! Transaction hash: ' + tx.transactionHash);
-                    
-                } else if (typeof window.ethereum !== 'undefined' && typeof ethers !== 'undefined') {
-                    // Desktop MetaMask connection using ethers
-                    console.log('Using desktop wallet connection');
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const signer = provider.getSigner();
-                    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    
-                    const tx = await contract.contribute(refAddr, { 
-                        value: ethers.utils.parseEther(ethValue.toString()) 
-                    });
-                    await tx.wait();
-                    
-                    alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
-                } else {
-                    throw new Error('No wallet connection available');
-                }
-                
-            } catch (err) {
-                console.error('Transaction error:', err);
-                let errorMessage = 'Unknown error occurred';
-                
-                if (err.message) {
-                    errorMessage = err.message;
-                } else if (err.error && err.error.message) {
-                    errorMessage = err.error.message;
-                }
-                
-                alert('❌ Transaction failed: ' + errorMessage);
-            } finally {
-                // Reset button state
-                buyButton.textContent = originalText;
-                buyButton.disabled = false;
-                buyButton.classList.remove('btn-processing');
-            }
-        }
-
-        function stakeFluffi() {
-            alert('Staking feature coming soon!');
         }
 
         // ===== CHART INITIALIZATION =====
