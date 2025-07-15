@@ -930,68 +930,7 @@
 </section>
   </main>
   <body>
- <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const ctx = document.getElementById('tokenChart').getContext('2d');
-
-  // Detect initial dark mode
-  function getLabelColor() {
-    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
-  }
-
-  let chartConfig = {
-    type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', // Green
-          '#3B82F6', // Blue
-          '#F59E0B', // Yellow
-          '#EF4444', // Red
-          '#8B5CF6'  // Purple
-        ],
-        borderWidth: 2,
-        borderColor: '#ffffff'
-      }]
-    },
-    options: {
-      cutout: '65%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: getLabelColor(),
-            font: {
-              size: 14,
-              family: "'Inter', sans-serif"
-            },
-            padding: 20,
-          }
-        }
-      },
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  };
-
-  let tokenChart = new Chart(ctx, chartConfig);
-
-  // Optional: update legend color when theme is toggled
-  const observer = new MutationObserver(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  });
-</script>
-<script>
+    <script>
  // Timer Configuration - 1 MINUTE STAGES
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
@@ -1068,7 +1007,91 @@ function resetTimer() {
   location.reload();
 }
 </script>
+
+<!-- Testing button - remove in production -->
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+  Reset Timer (For Testing)
+</button>
+    <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('tokenChart').getContext('2d');
+
+  // Detect initial dark mode
+  function getLabelColor() {
+    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+  }
+
+  let chartConfig = {
+    type: 'doughnut',
+    data: {
+      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+      datasets: [{
+        data: [40, 30, 20, 5, 5],
+        backgroundColor: [
+          '#10B981', // Green
+          '#3B82F6', // Blue
+          '#F59E0B', // Yellow
+          '#EF4444', // Red
+          '#8B5CF6'  // Purple
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: getLabelColor(),
+            font: {
+              size: 14,
+              family: "'Inter', sans-serif"
+            },
+            padding: 20,
+          }
+        }
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  };
+
+  let tokenChart = new Chart(ctx, chartConfig);
+
+  // Optional: update legend color when theme is toggled
+  const observer = new MutationObserver(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+</script>
+    </body>
   <script>
+async function connectWithWalletConnect() {
+  const provider = new WalletConnectProvider.default({
+    rpc: {
+      56: "https://bsc-dataseed.binance.org/" // Change to your chain ID and RPC
+    },
+    chainId: 56
+  });
+
+  await provider.enable();
+  const web3 = new Web3(provider);
+  const accounts = await web3.eth.getAccounts();
+  const userWallet = accounts[0];
+
+  alert("Connected via WalletConnect: " + userWallet);
+}
+</script>
+<script>
     let userWalletAddress = null;
     const initialPrice = 0.0001;
     const stages = 15;
@@ -1128,6 +1151,40 @@ function resetTimer() {
         }
       }
     }
+
+  async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          document.getElementById('walletButton').textContent = 'Connected ✓';
+        } catch (error) {
+          alert('Wallet connection denied.');
+        }
+      } else {
+        alert('MetaMask not detected. Please install MetaMask.');
+      }
+    }
+
+    async function connectReferralWallet() {
+      await connectWallet();
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
+    }
+  // Your existing disconnect function (with dark mode preservation)
+function disconnectWallet() {
+  userWalletAddress = null;
+const button = document.getElementById('walletButton');
+  button.textContent = 'Connect Wallet';
+  button.className = button.className.replace('bg-green-700', 'bg-green-800'); // Revert color
+  document.getElementById('walletStatus').classList.add('hidden');
+  
+  // Preserve dark mode classes
+  if (document.documentElement.classList.contains('dark')) {
+    button.classList.add('dark:bg-gray-800');
+  }
+}
   
     function showReferralUI(wallet) {
       const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
@@ -1165,7 +1222,25 @@ function resetTimer() {
         </div>
       `;
     }
-      async function buyFluffi() {
+
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
+    }
+    
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
+    }
+    
+    function shareOnTelegram() {
+      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
+      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
+    }
+
+    async function buyFluffi() {
       const amount = document.getElementById('amountInput').value;
       const currency = document.getElementById('currencySelect').value;
       const ref = document.getElementById('refInput').value;
@@ -1228,7 +1303,8 @@ function resetTimer() {
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
     }
-      // Initialize dark mode from localStorage
+
+    // Initialize dark mode from localStorage
     if (localStorage.getItem('darkMode') === 'true') {
       document.documentElement.classList.add('dark');
     }
@@ -1250,207 +1326,6 @@ function resetTimer() {
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
-  <script>
-        function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
-    }
-    
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
-    }
-    
-    function shareOnTelegram() {
-      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
-      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
-    }
 </script>
-  <script>
-    // Wallet Connection State
-    let userWalletAddress = null;
-    let walletConnectProvider = null;
-
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      // Check if already connected
-      if (localStorage.getItem('walletConnected') === 'true') {
-        initWallet();
-      }
-      
-      // Set up wallet button click
-      document.getElementById('walletButton').addEventListener('click', () => {
-        if (userWalletAddress) {
-          disconnectWallet();
-        } else {
-          openModal();
-        }
-      });
-    });
-
-    // Modal Functions
-    function openModal() {
-      document.getElementById('walletModal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('walletModal').classList.add('hidden');
-    }
-
-    // Connection Functions
-    async function connectBrowserWallet() {
-      try {
-        if (!window.ethereum) {
-          throw new Error('No Ethereum wallet detected. Please install MetaMask or another wallet extension.');
-        }
-        
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userWalletAddress = accounts[0];
-        updateUI();
-        setupEventListeners();
-        closeModal();
-      } catch (error) {
-        console.error('Browser wallet connection error:', error);
-        alert(`Connection failed: ${error.message}`);
-      }
-    }
-
- 
-    // Enable session
-    await solanaProvider.connect();
-    
-    // Get accounts
-    const accounts = await solanaProvider.getAccounts();
-    
-    if (accounts.length === 0) {
-      throw new Error("No accounts found");
-    }
-    
-    userWalletAddress = accounts[0];
-    updateUI();
-    closeModal();
-    
-    // Setup event listeners
-    solanaProvider.on("accountsChanged", (accounts) => {
-      userWalletAddress = accounts[0] || null;
-      updateUI();
-    });
-    
-    solanaProvider.on("disconnect", () => {
-      disconnectWallet();
-    });
-
- } catch (error) {
-  console.error("WalletConnect error:", error);
-  let message = "Connection failed";
-  if (error.message.includes("User rejected")) {
-    message = "Connection cancelled by user";
-  } else if (error.message.includes("Session expired")) {
-    message = "Session expired - please reconnect";
-  }
-  alert(`${message}: ${error.message}`);
-  btn.innerHTML = originalText;
-}
-
-    async function connectCoinbaseWallet() {
-      try {
-        if (window.ethereum?.isCoinbaseWallet) {
-          return connectBrowserWallet();
-        }
-        
-        // Try deep linking for mobile
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          window.location.href = 'https://go.cb-w.com/wc?uri=' + encodeURIComponent(window.location.href);
-          return;
-        }
-        
-        throw new Error('Coinbase Wallet not detected');
-      } catch (error) {
-        console.error('Coinbase Wallet error:', error);
-        alert(`Coinbase Wallet connection failed: ${error.message}`);
-      }
-    }
-
-    // UI Updates
-    function updateUI() {
-      const walletBtn = document.getElementById('walletButton');
-      const walletAddress = document.getElementById('walletAddress');
-      
-      if (userWalletAddress) {
-        const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
-        walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
-        walletAddress.textContent = userWalletAddress;
-        walletAddress.classList.remove('hidden');
-        localStorage.setItem('walletConnected', 'true');
-      } else {
-        walletBtn.innerHTML = `<i class="fas fa-wallet mr-1"></i> Connect Wallet`;
-        walletAddress.classList.add('hidden');
-        localStorage.removeItem('walletConnected');
-      }
-    }
-
-  <script>
-let walletConnectProvider;
-
-async function connectWalletConnect() {
-  const btn = document.querySelector('[onclick="connectWalletConnect()"]');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-
-  try {
-    walletConnectProvider = new WalletConnectProvider.default({
-      rpc: {
-        56: "https://bsc-dataseed.binance.org/"
-      },
-      chainId: 56
-    });
-
-    await walletConnectProvider.enable();
-
-    const provider = new ethers.providers.Web3Provider(walletConnectProvider);
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    
-    userWalletAddress = address;
-    updateUI();
-    closeModal();
-
-    // Event listeners
-    setupWalletConnectEvents();
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    alert("WalletConnect connection failed: " + error.message);
-  } finally {
-    btn.innerHTML = originalText;
-  }
-}
-</script>
-
-    // Disconnection
-   function disconnectWallet() {
-  if (walletConnectProvider) {
-    // For WalletConnect Solana
-    if (walletConnectProvider.disconnect) {
-      walletConnectProvider.disconnect();
-    }
-    walletConnectProvider = null;
-  }
-  userWalletAddress = null;
-  updateUI();
-}
-
-    // Dark mode toggle
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    }
-
-    // Initialize dark mode from localStorage
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.documentElement.classList.add('dark');
-    }
-  </script>
 </body>
 </html>
