@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/@walletconnect/modal@2.6.5/dist/index.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
 <script src="https://unpkg.com/@walletconnect/modal@2.4.4/dist/index.umd.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -624,15 +625,16 @@
     </nav>
   </header>
 
-  <!-- Wallet Modal -->
-  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
-        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+ <!-- Wallet Modal -->
+<div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full text-center">
+    <h2 class="mb-4 text-lg font-bold">Choose Wallet</h2>
+    <button onclick="connectBrowserWallet()" class="wallet-btn w-full mb-3">🦊 MetaMask</button>
+    <button onclick="connectMobileWallet()" class="wallet-btn w-full">📱 WalletConnect</button>
+    <button onclick="closeWalletModal()" class="mt-4 text-red-500">Cancel</button>
+  </div>
+</div>
+  
       <div class="grid grid-cols-1 gap-3">
         <button onclick="connectBrowserWallet()" class="wallet-option">
           <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
@@ -1340,52 +1342,84 @@ const button = document.getElementById('walletButton');
   }
 });
 </script>
-  <script>
+<script>
 const projectId = "847bc5b9b1e3b0dfd4a102b191bb0f7d";
-
 const metadata = {
   name: "FLUFFI Token",
-  description: "Presale + Staking",
-  url: "https://fluffi.site", // Your site
-  icons: ["https://fluffi.site/logo.png"] // Your logo
+  description: "FLUFFI Presale & Staking",
+  url: "https://fluffi.site",
+  icons: ["https://fluffi.site/logo.png"]
 };
 
 const web3Modal = new window.Web3Modal.default({
   projectId,
   walletConnectVersion: 2,
-  themeMode: "dark",
   standaloneChains: ["eip155:56"],
   chains: [56],
-  metadata,
+  themeMode: "dark",
+  metadata
 });
 
-let walletConnectProvider = null;
-let walletConnectSigner = null;
-let walletConnectAddress = null;
+let walletProvider = null;
+let walletSigner = null;
+let walletAddress = null;
 
 async function connectMobileWallet() {
   try {
     const { provider } = await web3Modal.connect();
     const ethersProvider = new ethers.BrowserProvider(provider);
-    walletConnectSigner = await ethersProvider.getSigner();
-    walletConnectAddress = await walletConnectSigner.getAddress();
+    walletSigner = await ethersProvider.getSigner();
+    walletAddress = await walletSigner.getAddress();
 
-    const btn = document.getElementById('walletconnect-mobile-btn');
-    const addr = document.getElementById('walletconnect-address');
-    if (btn && addr) {
-      btn.innerHTML = '✅ Connected';
-      btn.classList.add('bg-green-600');
-      addr.textContent = walletConnectAddress.slice(0, 6) + "..." + walletConnectAddress.slice(-4);
-      addr.classList.remove('hidden');
-    }
+    const mobileBtn = document.getElementById('walletconnect-mobile-btn');
+    const mobileAddr = document.getElementById('walletconnect-address');
+    mobileBtn.textContent = "✅ Connected";
+    mobileBtn.classList.add("connected");
+    mobileAddr.textContent = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+    mobileAddr.classList.remove("hidden");
 
     provider.on("accountsChanged", () => location.reload());
     provider.on("disconnect", () => location.reload());
 
   } catch (err) {
-    console.error("WalletConnect failed:", err);
-    alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
+    console.error("Mobile WalletConnect failed:", err);
+    alert("❌ WalletConnect failed: " + err.message);
   }
+}
+
+async function connectBrowserWallet() {
+  try {
+    if (!window.ethereum) {
+      alert("MetaMask not found. Please install MetaMask.");
+      return;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    walletAddress = accounts[0];
+
+    const btn = document.getElementById('walletButton');
+    const addr = document.getElementById('walletAddress');
+    btn.textContent = "✅ Connected";
+    btn.classList.add("connected");
+    addr.textContent = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+    addr.classList.remove("hidden");
+
+    window.ethereum.on('accountsChanged', () => location.reload());
+    window.ethereum.on('disconnect', () => location.reload());
+
+    closeWalletModal();
+  } catch (err) {
+    console.error("Browser wallet connect failed:", err);
+    alert("❌ Wallet connection failed: " + err.message);
+  }
+}
+
+function openWalletModal() {
+  document.getElementById("walletModal").classList.remove("hidden");
+}
+
+function closeWalletModal() {
+  document.getElementById("walletModal").classList.add("hidden");
 }
 </script>
 </body>
