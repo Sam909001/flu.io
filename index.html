@@ -221,7 +221,6 @@
 .dark .price-tooltip .fa-info-circle {
   color: #60A5FA !important; /* blue-400 */
 }
-      <style>
   .split-sections {
     display: flex;
     gap: 40px;
@@ -426,7 +425,6 @@
 .error-message.show {
   opacity: 1;
 }
-  <style>
   /* Wallet Connect Styles */
   .wallet-connect-btn {
     background: #3b82f6;
@@ -565,6 +563,18 @@
   .hidden {
     display: none !important;
   }
+    .wallet-option {
+      @apply p-4 border rounded-lg flex flex-col items-center 
+             hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+    }
+    .wallet-icon {
+      @apply w-10 h-10 mb-2;
+    }
+    .hidden { display: none !important; }
+    #walletAddress {
+      @apply font-mono text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded;
+    }
+    
   .wallet-option {
     @apply p-4 border rounded-lg flex flex-col items-center 
            hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
@@ -573,7 +583,6 @@
     @apply w-10 h-10 mb-2;
   }
   .hidden { display: none !important; }
-
   </style>
 </head>
 <body class="text-gray-800 dark:text-white">
@@ -595,28 +604,42 @@
         How to Buy FLUFFI
       </a>
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 hover:bg-gray-400 px-2 rounded text-black">🌙</button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
-      <span id="walletAddress"></span>
-      
-<div id="walletconnect-mobile" class="text-center my-4 md:hidden">
-  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-    class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm">
-    <i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet
-  </button>
-  <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
-  <div id="walletError" class="text-red-500 text-sm mt-2 hidden"></div>
-</div>
-
-      <button onclick="disconnectWallet()">Disconnect</button>
-      </div>
-      <div id="walletMobileInstructions" class="wallet-mobile-instructions">
-        </div>
-      </nav>
+      <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">
+        <i class="fas fa-wallet mr-1"></i> Connect Wallet
+      </button>
+      <span id="walletAddress" class="hidden ml-2 text-sm"></span>
+    </nav>
   </header>
 
+  <!-- Wallet Modal -->
+  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-1 gap-3">
+        <button onclick="connectBrowserWallet()" class="wallet-option">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+          <span>Browser Wallet</span>
+        </button>
+        <button onclick="connectWalletConnect()" class="wallet-option">
+          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
+          <span>WalletConnect</span>
+        </button>
+        <button onclick="connectCoinbaseWallet()" class="wallet-option">
+          <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
+          <span>Coinbase Wallet</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
   <main class="p-6 mx-auto w-full max-w-6xl">
-
-    <!-- Timer Section -->
+    
+<!-- Timer Section -->
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300 space-x-3">
@@ -642,8 +665,8 @@
 <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
   Reset Timer (For Testing)
 </button>
-    
-<!-- Presale Section -->
+    </div>
+    <!-- Presale Section -->
 <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
   <h2 class="section-title">🚀 Presale is Live!</h2>
 
@@ -699,8 +722,7 @@
     🚀 Buy Now
   </button>
 </section>
-    
-    <!-- Referral Section -->
+     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
       <div id="referralSection">
@@ -769,68 +791,6 @@
     </div>
   </div>
 </section>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const ctx = document.getElementById('tokenChart').getContext('2d');
-
-  // Detect initial dark mode
-  function getLabelColor() {
-    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
-  }
-
-  let chartConfig = {
-    type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', // Green
-          '#3B82F6', // Blue
-          '#F59E0B', // Yellow
-          '#EF4444', // Red
-          '#8B5CF6'  // Purple
-        ],
-        borderWidth: 2,
-        borderColor: '#ffffff'
-      }]
-    },
-    options: {
-      cutout: '65%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: getLabelColor(),
-            font: {
-              size: 14,
-              family: "'Inter', sans-serif"
-            },
-            padding: 20,
-          }
-        }
-      },
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  };
-
-  let tokenChart = new Chart(ctx, chartConfig);
-
-  // Optional: update legend color when theme is toggled
-  const observer = new MutationObserver(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  });
-</script>
     
 <!-- FAQ Section -->
 <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
@@ -921,7 +881,6 @@
     </div>
   </details>
 </section>
-
     <!-- About Section -->
   <section id="about">
     <h2>Why Fluffi Coin?</h2>
@@ -936,9 +895,9 @@
     </div>
   </section>
 </div>
-
     
 <div class="split-sections">
+  
   <!-- Team Section -->
 <section id="team">
   <h2>Our Team</h2>
@@ -955,45 +914,69 @@
     </div>
   </div>
 </section>
-  
-  <footer class="flex justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
-    <div>© 2025 $FLUFFI Token - All Rights Reserved</div>
-    <div class="flex gap-4">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" title="Telegram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5">
-      </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" title="Twitter" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5">
-      </a>
-    </div>
-  </footer>
-    <!-- Wallet Modal -->
-  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
-        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="grid grid-cols-1 gap-3">
-        <button onclick="connectBrowserWallet()" class="wallet-option">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
-          <span>Browser Wallet</span>
-        </button>
-        <button onclick="connectWalletConnect()" class="wallet-option">
-          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
-          <span>WalletConnect</span>
-        </button>
-        <button onclick="connectCoinbaseWallet()" class="wallet-option">
-          <img src="https://cdn.iconscout.com/icon/free/png-256/coinbase-3521427-2944929.png" class="wallet-icon">
-          <span>Coinbase Wallet</span>
-        </button>
-      </div>
-    </div>
-  </div>
-<body>
-    <script>
+  </main>
+ <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('tokenChart').getContext('2d');
+
+  // Detect initial dark mode
+  function getLabelColor() {
+    return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+  }
+
+  let chartConfig = {
+    type: 'doughnut',
+    data: {
+      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+      datasets: [{
+        data: [40, 30, 20, 5, 5],
+        backgroundColor: [
+          '#10B981', // Green
+          '#3B82F6', // Blue
+          '#F59E0B', // Yellow
+          '#EF4444', // Red
+          '#8B5CF6'  // Purple
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: getLabelColor(),
+            font: {
+              size: 14,
+              family: "'Inter', sans-serif"
+            },
+            padding: 20,
+          }
+        }
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  };
+
+  let tokenChart = new Chart(ctx, chartConfig);
+
+  // Optional: update legend color when theme is toggled
+  const observer = new MutationObserver(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+</script>
+<script>
  // Timer Configuration - 1 MINUTE STAGES
 const TOTAL_STAGES = 15;
 const STAGE_DURATION = 60 * 1000; // 1 minute per stage
@@ -1071,121 +1054,7 @@ function resetTimer() {
 }
 </script>
 <script>
-    let userWalletAddress = null;
-    const initialPrice = 0.0001;
-    const stages = 15;
-    const stageDuration = 1000 * 60 * 60 * 48; // 48 hours per stage
-    const startTime = Date.now();
-
-    function updateStage() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const stage = Math.min(Math.floor(elapsed / stageDuration), stages - 1);
-      const price = (initialPrice * Math.pow(1.05, stage)).toFixed(6);
-      
-      // Update stage info
-      const currentStageEl = document.getElementById('currentStage');
-      const currentPriceEl = document.getElementById('currentPrice');
-      const progressBarEl = document.getElementById('progressBar');
-      
-      if (currentStageEl) currentStageEl.textContent = stage + 1;
-      if (currentPriceEl) currentPriceEl.textContent = `$${price}`;
-      if (progressBarEl) progressBarEl.style.width = `${((stage + 1) / stages) * 100}%`;
-    }
-
-    function updateCountdown() {
-      const end = startTime + 30 * 24 * 60 * 60 * 1000;
-      const left = end - Date.now();
-      const days = Math.floor(left / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((left / (1000 * 60)) % 60);
-      const seconds = Math.floor((left / 1000) % 60);
-      const countdownEl = document.getElementById('countdown');
-      if (countdownEl) {
-        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }
-    }
-
-    function updateStageTimer() {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const currentStageIndex = Math.floor(elapsed / stageDuration);
-      const stageStartTime = startTime + (currentStageIndex * stageDuration);
-      const stageEndTime = stageStartTime + stageDuration;
-      const stageTimeLeft = stageEndTime - now;
-      
-      if (stageTimeLeft > 0) {
-        const hours = Math.floor(stageTimeLeft / (1000 * 60 * 60));
-        const minutes = Math.floor((stageTimeLeft / (1000 * 60)) % 60);
-        const seconds = Math.floor((stageTimeLeft / 1000) % 60);
-        
-        const stageTimerEl = document.getElementById('stageTimer');
-        if (stageTimerEl) {
-          stageTimerEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
-        }
-      } else {
-        const stageTimerEl = document.getElementById('stageTimer');
-        if (stageTimerEl) {
-          stageTimerEl.textContent = "Stage Complete";
-        }
-      }
-    }
-  
-    function showReferralUI(wallet) {
-      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      
-      document.getElementById('referralSection').innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-2 font-semibold">Your referral link:</label>
-            <div class="flex">
-              <input type="text" id="referralLinkInput" 
-                     value="${referralLink}" 
-                     class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-                Copy
-              </button>
-            </div>
-          </div>
-          
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-          </div>
-          
-          <div class="mt-4">
-            <p class="text-sm mb-2 font-semibold">Share your link:</p>
-            <div class="flex space-x-3">
-              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                🐦 Twitter
-              </button>
-              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-                📱 Telegram
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
-    }
-    
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
-    }
-    
-    function shareOnTelegram() {
-      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
-      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
-    }
-
-    async function buyFluffi() {
+      async function buyFluffi() {
       const amount = document.getElementById('amountInput').value;
       const currency = document.getElementById('currencySelect').value;
       const ref = document.getElementById('refInput').value;
@@ -1248,8 +1117,7 @@ function resetTimer() {
       document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
     }
-
-    // Initialize dark mode from localStorage
+      // Initialize dark mode from localStorage
     if (localStorage.getItem('darkMode') === 'true') {
       document.documentElement.classList.add('dark');
     }
@@ -1271,167 +1139,194 @@ function resetTimer() {
     if (mobileBtn) mobileBtn.classList.remove('hidden');
   }
 });
-</script>
-  
   <script>
-// Wallet Connection State
-let userWalletAddress = null;
-let walletConnectProvider = null;
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  // Check if already connected
-  if (localStorage.getItem('walletConnected') === 'true') {
-    initWallet();
-  }
-  
-  // Set up wallet button click
-  document.getElementById('walletButton').addEventListener('click', () => {
-    if (userWalletAddress) {
-      disconnectWallet();
-    } else {
-      openModal();
-    }
-  });
-});
-
-// Modal Functions
-function openModal() {
-  document.getElementById('walletModal').classList.remove('hidden');
-}
-
-function closeModal() {
-  document.getElementById('walletModal').classList.add('hidden');
-}
-
-// Connection Functions
-async function connectBrowserWallet() {
-  try {
-    if (!window.ethereum) {
-      throw new Error('No Ethereum wallet detected. Please install MetaMask or another wallet extension.');
+        function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
     }
     
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    userWalletAddress = accounts[0];
-    updateUI();
-    setupEventListeners();
-    closeModal();
-  } catch (error) {
-    console.error('Browser wallet connection error:', error);
-    alert(`Connection failed: ${error.message}`);
-  }
-}
-
-async function connectWalletConnect() {
-  try {
-    // Load WalletConnect provider dynamically
-    const { WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
-    
-    // Initialize WalletConnect Provider
-    walletConnectProvider = new WalletConnectProvider({
-      projectId: 'b74a733c47def7b6672eb9ad072c4e8a', 
-      chains: [56], //
-      showQrModal: true
-    });
-    
-    // Enable session
-    await walletConnectProvider.enable();
-    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
-    userWalletAddress = accounts[0];
-    updateUI();
-    setupWalletConnectEvents();
-    closeModal();
-  } catch (error) {
-    console.error('WalletConnect error:', error);
-    alert(`WalletConnect failed: ${error.message}`);
-  }
-}
-
-async function connectCoinbaseWallet() {
-  try {
-    if (window.ethereum?.isCoinbaseWallet) {
-      return connectBrowserWallet();
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
     }
     
-    // Try deep linking for mobile
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      window.location.href = 'https://go.cb-w.com/wc?uri=' + encodeURIComponent(window.location.href);
-      return;
+    function shareOnTelegram() {
+      const link = encodeURIComponent(document.getElementById('referralLinkInput').value);
+      window.open(`https://t.me/share/url?url=${link}&text=Check%20out%20$FLUFFI%20presale%20with%20my%20referral%20link!`, '_blank');
     }
-    
-    throw new Error('Coinbase Wallet not detected');
-  } catch (error) {
-    console.error('Coinbase Wallet error:', error);
-    alert(`Coinbase Wallet connection failed: ${error.message}`);
-  }
-}
-
-// UI Updates
-function updateUI() {
-  const walletBtn = document.getElementById('walletButton');
-  const walletAddress = document.getElementById('walletAddress');
-  
-  if (userWalletAddress) {
-    const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
-    walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
-    walletAddress.textContent = userWalletAddress;
-    walletAddress.classList.remove('hidden');
-    localStorage.setItem('walletConnected', 'true');
-  } else {
-    walletBtn.innerHTML = `<i class="fas fa-wallet mr-1"></i> Connect Wallet`;
-    walletAddress.classList.add('hidden');
-    localStorage.removeItem('walletConnected');
-  }
-}
-
-// Event Listeners
-function setupEventListeners() {
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts) => {
-      if (accounts.length === 0) {
-        disconnectWallet();
-      } else {
-        userWalletAddress = accounts[0];
-        updateUI();
-      }
-    });
-    
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload();
-    });
-  }
-}
-
-function setupWalletConnectEvents() {
-  if (walletConnectProvider) {
-    walletConnectProvider.on('accountsChanged', (accounts) => {
-      if (accounts.length === 0) {
-        disconnectWallet();
-      } else {
-        userWalletAddress = accounts[0];
-        updateUI();
-      }
-    });
-    
-    walletConnectProvider.on('chainChanged', () => {
-      window.location.reload();
-    });
-    
-    walletConnectProvider.on('disconnect', () => {
-      disconnectWallet();
-    });
-  }
-}
-
-// Disconnection
-function disconnectWallet() {
-  if (walletConnectProvider) {
-    walletConnectProvider.disconnect();
-    walletConnectProvider = null;
-  }
-  userWalletAddress = null;
-  updateUI();
-}
 </script>
+  <script>
+    // Wallet Connection State
+    let userWalletAddress = null;
+    let walletConnectProvider = null;
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if already connected
+      if (localStorage.getItem('walletConnected') === 'true') {
+        initWallet();
+      }
+      
+      // Set up wallet button click
+      document.getElementById('walletButton').addEventListener('click', () => {
+        if (userWalletAddress) {
+          disconnectWallet();
+        } else {
+          openModal();
+        }
+      });
+    });
+
+    // Modal Functions
+    function openModal() {
+      document.getElementById('walletModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('walletModal').classList.add('hidden');
+    }
+
+    // Connection Functions
+    async function connectBrowserWallet() {
+      try {
+        if (!window.ethereum) {
+          throw new Error('No Ethereum wallet detected. Please install MetaMask or another wallet extension.');
+        }
+        
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userWalletAddress = accounts[0];
+        updateUI();
+        setupEventListeners();
+        closeModal();
+      } catch (error) {
+        console.error('Browser wallet connection error:', error);
+        alert(`Connection failed: ${error.message}`);
+      }
+    }
+
+    async function connectWalletConnect() {
+      try {
+        // Load WalletConnect provider dynamically
+        const { WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
+        
+        // Initialize WalletConnect Provider
+        walletConnectProvider = new WalletConnectProvider({
+          projectId: 'b74a733c47def7b6672eb9ad072c4e8a', 
+          chains: [56], // BSC Chain
+          showQrModal: true
+        });
+        
+        // Enable session
+        await walletConnectProvider.enable();
+        const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+        userWalletAddress = accounts[0];
+        updateUI();
+        setupWalletConnectEvents();
+        closeModal();
+      } catch (error) {
+        console.error('WalletConnect error:', error);
+        alert(`WalletConnect failed: ${error.message}`);
+      }
+    }
+
+    async function connectCoinbaseWallet() {
+      try {
+        if (window.ethereum?.isCoinbaseWallet) {
+          return connectBrowserWallet();
+        }
+        
+        // Try deep linking for mobile
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          window.location.href = 'https://go.cb-w.com/wc?uri=' + encodeURIComponent(window.location.href);
+          return;
+        }
+        
+        throw new Error('Coinbase Wallet not detected');
+      } catch (error) {
+        console.error('Coinbase Wallet error:', error);
+        alert(`Coinbase Wallet connection failed: ${error.message}`);
+      }
+    }
+
+    // UI Updates
+    function updateUI() {
+      const walletBtn = document.getElementById('walletButton');
+      const walletAddress = document.getElementById('walletAddress');
+      
+      if (userWalletAddress) {
+        const shortAddress = `${userWalletAddress.substring(0, 6)}...${userWalletAddress.substring(38)}`;
+        walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddress}`;
+        walletAddress.textContent = userWalletAddress;
+        walletAddress.classList.remove('hidden');
+        localStorage.setItem('walletConnected', 'true');
+      } else {
+        walletBtn.innerHTML = `<i class="fas fa-wallet mr-1"></i> Connect Wallet`;
+        walletAddress.classList.add('hidden');
+        localStorage.removeItem('walletConnected');
+      }
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      if (window.ethereum) {
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            userWalletAddress = accounts[0];
+            updateUI();
+          }
+        });
+        
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload();
+        });
+      }
+    }
+
+    function setupWalletConnectEvents() {
+      if (walletConnectProvider) {
+        walletConnectProvider.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            userWalletAddress = accounts[0];
+            updateUI();
+          }
+        });
+        
+        walletConnectProvider.on('chainChanged', () => {
+          window.location.reload();
+        });
+        
+        walletConnectProvider.on('disconnect', () => {
+          disconnectWallet();
+        });
+      }
+    }
+
+    // Disconnection
+    function disconnectWallet() {
+      if (walletConnectProvider) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+      userWalletAddress = null;
+      updateUI();
+    }
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    }
+
+    // Initialize dark mode from localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </body>
 </html>
