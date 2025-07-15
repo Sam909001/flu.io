@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
-<script src="https://unpkg.com/@walletconnect/web3modal@2.5.0/dist/web3modal.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/modal@2.4.4/dist/index.umd.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -650,6 +649,14 @@
       </div>
     </div>
   </div>
+
+  <div id="walletconnect-mobile" class="text-center my-4 sm:hidden"> <!-- hidden on PC -->
+  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+    class="bg-green-600 text-white py-2 px-4 text-sm rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+  </button>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
+</div>
   
   <main class="p-6 mx-auto w-full max-w-6xl">
     
