@@ -1292,5 +1292,18 @@ function shareOnTelegram() {
   window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank');
 }
 </script>
+  <script>
+  // Check for saved theme preference
+  if (localStorage.getItem('darkMode') === 'true' || 
+      (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+  }
+
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('darkMode', html.classList.contains('dark'));
+  }
+</script>
 </body>
 </html>
