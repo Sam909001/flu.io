@@ -1153,6 +1153,10 @@ function resetTimer() {
       }
     }
 
+  // Global wallet variables
+let userWalletAddress = null;
+let walletConnectProvider = null;
+let ethersProvider = null;
   async function connectWallet() {
       if (window.ethereum) {
         try {
@@ -1238,62 +1242,55 @@ const button = document.getElementById('walletButton');
     
    async function buyFluffi() {
   if (!userWalletAddress) {
-    alert("Please connect your wallet first!");
+    alert('Please connect your wallet first!');
     return;
   }
 
   const amount = document.getElementById('amountInput').value;
-  const refWallet = document.getElementById('refInput').value;
-
-  if (!amount || isNaN(amount)) {
-    alert("Please enter a valid amount!");
+  const ref = document.getElementById('refInput').value;
+  
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    alert('Please enter a valid amount!');
     return;
   }
 
   try {
-    // Initialize provider (MetaMask or WalletConnect)
-    let provider;
-    if (window.ethereum) {
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-    } else if (walletConnectProvider) {
-      provider = new ethers.providers.Web3Provider(walletConnectProvider);
-    } else {
-      throw new Error("No wallet connected");
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    const originalText = buyBtn.textContent;
+    buyBtn.textContent = 'Processing...';
+    buyBtn.disabled = true;
+
+    // Use the global provider
+    if (!ethersProvider) {
+      throw new Error("Wallet not properly connected");
     }
 
-    const signer = provider.getSigner();
-
-    // Your BSC Presale Contract ABI & Address
-    const presaleContractAddress = "0xYOUR_PRESALE_CONTRACT_ADDRESS";
-    const presaleABI = [
+    const signer = ethersProvider.getSigner();
+    const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+    const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]
       "function buyTokens(address referral) payable",
       "event TokensPurchased(address buyer, uint256 amount)"
     ];
 
-    const presaleContract = new ethers.Contract(
-      presaleContractAddress,
-      presaleABI,
-      signer
-    );
-
-    // Convert BNB amount to Wei
-    const bnbAmount = ethers.utils.parseEther(amount);
-
-    // Execute transaction
-    const tx = await presaleContract.buyTokens(refWallet || ethers.constants.AddressZero, {
-      value: bnbAmount,
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const tx = await contract.buyTokens(ref || ethers.constants.AddressZero, {
+      value: ethers.utils.parseEther(amount.toString())
     });
 
-    // Wait for confirmation
     await tx.wait();
-    alert("🎉 Purchase successful! TX: " + tx.hash);
+    alert(`Purchase successful! TX: ${tx.hash}`);
 
   } catch (error) {
     console.error("Buy error:", error);
-    alert(`❌ Transaction failed: ${error.message}`);
+    alert(`Transaction failed: ${error.message}`);
+  } finally {
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    if (buyBtn) {
+      buyBtn.textContent = '🚀 Buy Now';
+      buyBtn.disabled = false;
+    }
   }
 }
-
     function stakeFluffi() {
       alert('Staking feature coming soon!');
     }
@@ -1371,18 +1368,73 @@ async function connectMobileWallet() {
   }
 }
 
+// Unified wallet connection management
 async function connectBrowserWallet() {
-  if (!window.ethereum) {
-    alert("Please install MetaMask or a BSC-compatible wallet!");
-    return;
-  }
-
   try {
-    // Switch to BSC network (chainId: 56)
+    if (!window.ethereum) {
+      alert("Please install MetaMask or a BSC-compatible wallet!");
+      return;
+    }
+
+    // Switch to BSC network
+    await setupBscNetwork();
+    
+    const accounts = await window.ethereum.request({ 
+      method: "eth_requestAccounts" 
+    });
+    
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+    updateWalletUI();
+    closeWalletModal();
+    
+    // Set up event listeners
+    window.ethereum.on("accountsChanged", () => window.location.reload());
+    window.ethereum.on("chainChanged", () => window.location.reload());
+
+  } catch (error) {
+    console.error("Browser wallet connection failed:", error);
+    alert(`Connection failed: ${error.message}`);
+  }
+}
+
+async function connectWalletConnect() {
+  try {
+    walletConnectProvider = new WalletConnectProvider({
+      projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
+      chains: [56], // BSC chainId
+      showQrModal: true,
+    });
+
+    await walletConnectProvider.enable();
+    const accounts = await walletConnectProvider.request({ 
+      method: "eth_accounts" 
+    });
+    
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
+    updateWalletUI();
+    closeWalletModal();
+    
+    // Set up event listeners
+    walletConnectProvider.on("disconnect", () => {
+      userWalletAddress = null;
+      updateWalletUI();
+    });
+
+  } catch (error) {
+    console.error("WalletConnect failed:", error);
+    alert(`WalletConnect error: ${error.message}`);
+  }
+}
+
+// Helper function to ensure BSC network
+async function setupBscNetwork() {
+  try {
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
       params: [{
-        chainId: "0x38", // BSC Mainnet
+        chainId: "0x38",
         chainName: "Binance Smart Chain",
         nativeCurrency: {
           name: "BNB",
@@ -1393,30 +1445,25 @@ async function connectBrowserWallet() {
         blockExplorerUrls: ["https://bscscan.com"]
       }]
     });
-
-    // Request accounts
-    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-    userWalletAddress = accounts[0];
-    
-// Update wallet button when connected
-function updateWalletUI() {
-  const walletBtn = document.getElementById('walletButton');
-  if (userWalletAddress) {
-    walletBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-    walletBtn.classList.add("connected");
-  } else {
-    walletBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
-    walletBtn.classList.remove("connected");
+  } catch (error) {
+    console.error("Failed to switch to BSC:", error);
+    throw error;
   }
 }
-    
-    // Listen for account changes
-    window.ethereum.on("accountsChanged", () => window.location.reload());
-    window.ethereum.on("chainChanged", () => window.location.reload());
 
-  } catch (error) {
-    console.error("Wallet connection failed:", error);
-    alert(`Error: ${error.message}`);
+// Unified UI update function
+function updateWalletUI() {
+  const walletBtn = document.getElementById('walletButton');
+  const walletAddr = document.getElementById('walletAddress');
+  
+  if (userWalletAddress) {
+    const shortAddr = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+    walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddr}`;
+    walletAddr.textContent = userWalletAddress;
+    walletAddr.classList.remove('hidden');
+  } else {
+    walletBtn.innerHTML = '<i class="fas fa-wallet mr-1"></i> Connect Wallet';
+    walletAddr.classList.add('hidden');
   }
 }
 
@@ -1459,6 +1506,25 @@ async function connectWalletConnect() {
     alert(`WalletConnect error: ${error.message}`);
   }
 }
+  // Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if wallet is already connected
+  if (window.ethereum && window.ethereum.selectedAddress) {
+    userWalletAddress = window.ethereum.selectedAddress;
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+    updateWalletUI();
+  }
+  
+  // Set up wallet button click
+  document.getElementById('walletButton').addEventListener('click', () => {
+    if (userWalletAddress) {
+      userWalletAddress = null;
+      updateWalletUI();
+    } else {
+      openWalletModal();
+    }
+  });
+});
 </script>
 </body>
 </html>
