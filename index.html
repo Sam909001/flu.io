@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
@@ -222,8 +223,368 @@
 .dark .price-tooltip .fa-info-circle {
   color: #60A5FA !important; /* blue-400 */
 }
+  .split-sections {
+    display: flex;
+    gap: 40px;
+    margin: 60px 0;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  #team, #about {
+    flex: 1;
+    min-width: 320px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    color: #333;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .dark #team, .dark #about {
+    background: #1c1c1c;
+    color: #eeeeee;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
+  }
+
+  #team h2, #about h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+    color: #28a745;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  .team-grid {
+    display: grid;
+    gap: 30px;
+  }
+
+  .team-member {
+    text-align: center;
+  }
+
+  .team-member img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #28a745;
+    filter: grayscale(0%) contrast(110%);
+  }
+
+.team-member h3 {
+  position: relative; /* Add this */
+  font-size: 1.2rem;
+  margin: 15px 0 5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.team-member h3::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  bottom: -5px;
+  left: 25%;
+  border-radius: 2px;
+}
+  
+  .team-member h3 {
+    font-size: 1.2rem;
+    margin: 15px 0 5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+ 
+  .team-member p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .team-member a i {
+    color: #28a745;
+    font-size: 1.2rem;
+  }
+
+  .team-member {
+  transition: transform 0.3s;
+}
+.team-member:hover {
+  transform: translateY(-5px);
+}
+
+  .about-content {
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .about-content ul {
+    margin: 25px 0;
+    padding-left: 20px;
+  }
+
+  .about-content li {
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 35px;
+    font-size: 1.05rem;
+  }
+
+  .about-content li:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: invert(33%) sepia(98%) saturate(393%) hue-rotate(86deg) brightness(88%) contrast(96%);
+  }
+
+  .dark .about-content li:before {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(190deg) brightness(150%) contrast(90%);
+  }
+
+  .about-content li:nth-child(1):before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
+  }
+
+  .about-content li:nth-child(2):before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+  }
+
+  .about-content li:nth-child(3):before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
+  }
+
+  @media (max-width: 768px) {
+    .split-sections {
+      flex-direction: column;
+    }
+
+    #team, #about {
+      width: 100%;
+    }
+  }
+  
+.wallet-connect-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.wallet-connect-btn:hover {
+  background: #2563eb;
+}
+
+.wallet-connect-btn.connected {
+  background: #10b981;
+}
+
+.wallet-connect-btn:disabled {
+  opacity: 0.7;
+}
+
+/* Spinner Animation */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.error-message {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  text-align: center;
+}
+
+.error-message.show {
+  opacity: 1;
+}
+  /* Wallet Connect Styles */
+  .wallet-connect-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .wallet-connect-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+  
+  .wallet-connect-btn.connected {
+    background: #10b981;
+  }
+  
+  .wallet-connect-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .wallet-address {
+    margin-top: 8px;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  
+  .wallet-error {
+    color: #ef4444;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  
+  /* Modal Styles */
+  .wallet-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .wallet-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  
+  .wallet-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .wallet-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .close-modal {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 10px;
+  }
+  
+  .wallet-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .wallet-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .wallet-option:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .wallet-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  
+  /* Spinner animation */
+  .fa-spinner.fa-spin {
+    animation: fa-spin 1s infinite linear;
+  }
+  
+  @keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Dark mode support */
+  .dark .wallet-modal-content {
+    background: #1f2937;
+    color: white;
+  }
+  
+  .dark .wallet-option {
+    border-color: #374151;
+    background: #111827;
+  }
+  
+  .dark .wallet-option:hover {
+    background: #1f2937;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  .wallet-option {
+    @apply p-4 border rounded-lg flex flex-col items-center 
+           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+  }
+  
+  .wallet-icon {
+    @apply w-10 h-10 mb-2;
+  }
+  
+  .hidden { 
+    display: none !important; 
+  }
+  
+  /* Mobile wallet button */
+  #walletconnect-mobile-btn.connected {
+    @apply bg-green-600;
+  }
   </style>
 </head>
+  
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
@@ -648,369 +1009,6 @@ function resetTimer() {
   </details>
 </section>
 
-<style>
-  .split-sections {
-    display: flex;
-    gap: 40px;
-    margin: 60px 0;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  #team, #about {
-    flex: 1;
-    min-width: 320px;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    color: #333;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .dark #team, .dark #about {
-    background: #1c1c1c;
-    color: #eeeeee;
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
-  }
-
-  #team h2, #about h2 {
-    font-size: 2rem;
-    margin-bottom: 25px;
-    color: #28a745;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-
-  .team-grid {
-    display: grid;
-    gap: 30px;
-  }
-
-  .team-member {
-    text-align: center;
-  }
-
-  .team-member img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #28a745;
-    filter: grayscale(0%) contrast(110%);
-  }
-
-.team-member h3 {
-  position: relative; /* Add this */
-  font-size: 1.2rem;
-  margin: 15px 0 5px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.team-member h3::after {
-  content: '';
-  position: absolute;
-  width: 50%;
-  height: 2px;
-  background: linear-gradient(90deg, #FFD700, #FFA500);
-  bottom: -5px;
-  left: 25%;
-  border-radius: 2px;
-}
-  
-  .team-member h3 {
-    font-size: 1.2rem;
-    margin: 15px 0 5px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
- 
-  .team-member p {
-    font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 10px;
-  }
-
-  .team-member a i {
-    color: #28a745;
-    font-size: 1.2rem;
-  }
-
-  .team-member {
-  transition: transform 0.3s;
-}
-.team-member:hover {
-  transform: translateY(-5px);
-}
-
-  .about-content {
-    font-size: 1.05rem;
-    line-height: 1.7;
-  }
-
-  .about-content ul {
-    margin: 25px 0;
-    padding-left: 20px;
-  }
-
-  .about-content li {
-    margin-bottom: 15px;
-    position: relative;
-    padding-left: 35px;
-    font-size: 1.05rem;
-  }
-
-  .about-content li:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    filter: invert(33%) sepia(98%) saturate(393%) hue-rotate(86deg) brightness(88%) contrast(96%);
-  }
-
-  .dark .about-content li:before {
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(190deg) brightness(150%) contrast(90%);
-  }
-
-  .about-content li:nth-child(1):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/></svg>');
-  }
-
-  .about-content li:nth-child(2):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
-  }
-
-  .about-content li:nth-child(3):before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>');
-  }
-
-  @media (max-width: 768px) {
-    .split-sections {
-      flex-direction: column;
-    }
-
-    #team, #about {
-      width: 100%;
-    }
-  }
-  
-.wallet-connect-btn {
-  background: #3b82f6;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  width: 100%;
-  transition: all 0.3s;
-}
-
-.wallet-connect-btn:hover {
-  background: #2563eb;
-}
-
-.wallet-connect-btn.connected {
-  background: #10b981;
-}
-
-.wallet-connect-btn:disabled {
-  opacity: 0.7;
-}
-
-/* Spinner Animation */
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Error Message */
-.error-message {
-  color: #ef4444;
-  font-size: 14px;
-  margin-top: 8px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  text-align: center;
-}
-
-.error-message.show {
-  opacity: 1;
-}
-  <style>
-  /* Wallet Connect Styles */
-  .wallet-connect-btn {
-    background: #3b82f6;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  .wallet-connect-btn:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-  }
-  
-  .wallet-connect-btn.connected {
-    background: #10b981;
-  }
-  
-  .wallet-connect-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .wallet-address {
-    margin-top: 8px;
-    font-size: 14px;
-    word-break: break-all;
-  }
-  
-  .wallet-error {
-    color: #ef4444;
-    margin-top: 8px;
-    font-size: 14px;
-  }
-  
-  /* Modal Styles */
-  .wallet-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .wallet-modal-content {
-    background: white;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
-  
-  .wallet-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .wallet-modal-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-  
-  .close-modal {
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0 10px;
-  }
-  
-  .wallet-options-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-  
-  .wallet-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .wallet-option:hover {
-    background: #f3f4f6;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
-  
-  .wallet-icon {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 10px;
-  }
-  
-  /* Spinner animation */
-  .fa-spinner.fa-spin {
-    animation: fa-spin 1s infinite linear;
-  }
-  
-  @keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* Dark mode support */
-  .dark .wallet-modal-content {
-    background: #1f2937;
-    color: white;
-  }
-  
-  .dark .wallet-option {
-    border-color: #374151;
-    background: #111827;
-  }
-  
-  .dark .wallet-option:hover {
-    background: #1f2937;
-  }
-  
-  .hidden {
-    display: none !important;
-  }
-  .wallet-option {
-    @apply p-4 border rounded-lg flex flex-col items-center 
-           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
-  }
-  
-  .wallet-icon {
-    @apply w-10 h-10 mb-2;
-  }
-  
-  .hidden { 
-    display: none !important; 
-  }
-  
-  /* Mobile wallet button */
-  #walletconnect-mobile-btn.connected {
-    @apply bg-green-600;
-  }
-</style>
-
     <!-- About Section -->
   <section id="about">
     <h2>Why Fluffi Coin?</h2>
@@ -1025,7 +1023,6 @@ function resetTimer() {
     </div>
   </section>
 </div>
-
     
 <div class="split-sections">
   <!-- Team Section -->
@@ -1056,5 +1053,244 @@ function resetTimer() {
       </a>
     </div>
   </footer>
+
+  <!-- Wallet Modal -->
+<div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
+      <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+      <button onclick="connectBrowserWallet()" class="wallet-option">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+        <span>Browser Wallet</span>
+      </button>
+      
+      <button onclick="connectWalletConnect()" class="wallet-option">
+        <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon">
+        <span>WalletConnect</span>
+      </button>
+    </div>
+    
+    <div id="walletError" class="mt-4 text-red-500 text-sm hidden"></div>
+  </div>
+</div>
+
+  <script>
+// Global wallet state
+let userWalletAddress = null;
+let walletProvider = null;
+let ethersProvider = null;
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.ethereum && window.ethereum.selectedAddress) {
+    connectBrowserWallet();
+  }
+  
+  document.getElementById('walletButton').addEventListener('click', () => {
+    if (userWalletAddress) {
+      disconnectWallet();
+    } else {
+      openWalletModal();
+    }
+  });
+  
+  // Mobile detection
+  if (/Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)) {
+    document.getElementById('walletconnect-mobile')?.classList.remove('hidden');
+  }
+});
+
+// ===== CONNECTION FUNCTIONS =====
+async function connectBrowserWallet() {
+  try {
+    if (!window.ethereum) {
+      throw new Error("Please install MetaMask or another wallet extension");
+    }
+    
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+    
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    window.ethereum.on('chainChanged', handleChainChanged);
+    
+    updateWalletUI();
+    closeWalletModal();
+  } catch (error) {
+    showWalletError(error.message);
+  }
+}
+
+async function connectWalletConnect() {
+  try {
+    walletProvider = new WalletConnectProvider({
+      projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
+      chains: [56], // BSC chain ID
+      showQrModal: true
+    });
+    
+    await walletProvider.enable();
+    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+    
+    walletProvider.on('accountsChanged', handleAccountsChanged);
+    walletProvider.on('chainChanged', handleChainChanged);
+    walletProvider.on('disconnect', handleDisconnect);
+    
+    updateWalletUI();
+    closeWalletModal();
+  } catch (error) {
+    showWalletError(error.message);
+    if (walletProvider) {
+      await walletProvider.disconnect();
+    }
+  }
+}
+
+async function connectMobileWallet() {
+  return connectWalletConnect();
+}
+
+// ===== EVENT HANDLERS =====
+function handleAccountsChanged(accounts) {
+  if (accounts.length === 0) {
+    disconnectWallet();
+  } else {
+    userWalletAddress = accounts[0];
+    updateWalletUI();
+  }
+}
+
+function handleChainChanged() {
+  window.location.reload();
+}
+
+function handleDisconnect() {
+  disconnectWallet();
+}
+
+// ===== CORE FUNCTIONS =====
+function disconnectWallet() {
+  if (walletProvider?.disconnect) {
+    walletProvider.disconnect();
+  }
+  userWalletAddress = null;
+  walletProvider = null;
+  ethersProvider = null;
+  updateWalletUI();
+}
+
+function updateWalletUI() {
+  const walletBtn = document.getElementById('walletButton');
+  const walletAddr = document.getElementById('walletAddress');
+  const mobileBtn = document.getElementById('walletconnect-mobile-btn');
+  const mobileAddr = document.getElementById('walletconnect-address');
+  
+  if (userWalletAddress) {
+    const shortAddr = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
+    walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddr}`;
+    walletAddr.textContent = userWalletAddress;
+    walletAddr.classList.remove('hidden');
+    
+    if (mobileBtn && mobileAddr) {
+      mobileBtn.textContent = "Connected ✓";
+      mobileBtn.classList.add("connected");
+      mobileAddr.textContent = shortAddr;
+      mobileAddr.classList.remove("hidden");
+    }
+  } else {
+    walletBtn.innerHTML = '<i class="fas fa-wallet mr-1"></i> Connect Wallet';
+    walletAddr.classList.add('hidden');
+    
+    if (mobileBtn && mobileAddr) {
+      mobileBtn.textContent = "Connect Mobile Wallet";
+      mobileBtn.classList.remove("connected");
+      mobileAddr.classList.add("hidden");
+    }
+  }
+}
+
+function openWalletModal() {
+  document.getElementById("walletModal").classList.remove("hidden");
+}
+
+function closeWalletModal() {
+  document.getElementById("walletModal").classList.add("hidden");
+  document.getElementById("walletError").classList.add("hidden");
+}
+
+function showWalletError(message) {
+  const errorEl = document.getElementById("walletError");
+  errorEl.textContent = message;
+  errorEl.classList.remove("hidden");
+}
+
+// Connect wallet for referrals
+async function connectReferralWallet() {
+  if (!userWalletAddress) {
+    await connectBrowserWallet();
+  }
+  if (userWalletAddress) {
+    showReferralUI(userWalletAddress);
+  }
+}
+
+function showReferralUI(wallet) {
+  const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+  document.getElementById('referralSection').innerHTML = `
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-2 font-semibold">Your referral link:</label>
+        <div class="flex">
+          <input type="text" id="referralLinkInput" value="${referralLink}" 
+                 class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+          <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+      </div>
+      <div class="mt-4">
+        <p class="text-sm mb-2 font-semibold">Share your link:</p>
+        <div class="flex space-x-3">
+          <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+            🐦 Twitter
+          </button>
+          <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+            📱 Telegram
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function copyReferralLink() {
+  const input = document.getElementById('referralLinkInput');
+  input.select();
+  document.execCommand('copy');
+  alert("Referral link copied to clipboard!");
+}
+
+function shareOnTwitter() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank');
+}
+
+function shareOnTelegram() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank');
+}
+</script>
 </body>
 </html>
