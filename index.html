@@ -1078,6 +1078,15 @@
         }
       }
     }
+    if (userWalletAddress) {
+    updateUserBalances(); // Initial update
+    const balanceInterval = setInterval(updateUserBalances, 30000); // Update every 30 seconds
+    
+    // Clear interval when wallet disconnects
+    window.addEventListener('beforeunload', () => {
+      clearInterval(balanceInterval);
+    });
+  }
 
     function openWalletModal() {
       document.getElementById("walletModal").classList.remove("hidden");
@@ -1275,6 +1284,8 @@
       const html = document.documentElement;
       html.classList.toggle('dark');
       localStorage.setItem('darkMode', html.classList.contains('dark'));
+      if (localStorage.getItem('darkMode') === 'true' || 
+    (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       
       // Update icon
       const darkModeIcon = document.getElementById('darkModeIcon');
@@ -1410,7 +1421,7 @@
     showWalletError(error.message || "Transaction failed");
   }
 }
-    async function updateUserBalances() {
+   async function updateUserBalances() {
   if (!userWalletAddress) return;
   
   try {
@@ -1420,31 +1431,23 @@
       FLUFFI_CONTRACT_ABI,
       signer
     );
-        // Set up periodic balance updates
-    setInterval(updateUserBalances, 30000); // Update every 30 seconds
-  }
-}
     
-    // Get token balance
-    const balance = await fluffiContract.balanceOf(userWalletAddress);
-    const formattedBalance = ethers.utils.formatUnits(balance, 18);
-    document.getElementById('userBalance').textContent = formattedBalance;
+    // Get balances (adjust based on your contract)
+    const [balance, staked, rewards] = await Promise.all([
+      fluffiContract.balanceOf(userWalletAddress),
+      fluffiContract.stakedBalance(userWalletAddress),
+      fluffiContract.calculateRewards(userWalletAddress)
+    ]);
     
-    // Get staked balance
-    const staked = await fluffiContract.stakedBalance(userWalletAddress);
-    const formattedStaked = ethers.utils.formatUnits(staked, 18);
-    document.getElementById('userStaked').textContent = formattedStaked;
-    
-    // Get rewards
-    const rewards = await fluffiContract.calculateRewards(userWalletAddress);
-    const formattedRewards = ethers.utils.formatUnits(rewards, 18);
-    document.getElementById('userRewards').textContent = formattedRewards;
+    // Update UI
+    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
+    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
+    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
     
   } catch (error) {
     console.error("Balance update error:", error);
   }
 }
-
     // Initialize timers
     updateTimers();
     updateNextIncreaseTime();
