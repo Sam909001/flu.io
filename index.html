@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Ethers v6 -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+
+<!-- Web3Modal + WalletConnect SDK (v2) -->
+<script src="https://unpkg.com/@walletconnect/web3modal@2.7.2/dist/web3modal.umd.js"></script>
+<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.6.4/dist/umd/index.min.js"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1062,6 +1069,15 @@ function resetTimer() {
   </div>
 </div>
 
+  <div id="walletconnect-mobile" class="text-center my-4 sm:hidden">
+  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+    class="bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-4 rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet
+  </button>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
+</div>
+
+
 <style>
   .wallet-option {
     @apply p-4 border rounded-lg flex flex-col items-center 
@@ -1348,44 +1364,44 @@ async function connectWalletConnect() {
     // Load WalletConnect provider dynamically
     const { WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
     
-    // Initialize WalletConnect Provider
-    walletConnectProvider = new WalletConnectProvider({
-      projectId: 'b74a733c47def7b6672eb9ad072c4e8a', 
-      chains: [56], //
-      showQrModal: true
-    });
-    
-    // Enable session
-    await walletConnectProvider.enable();
-    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
-    userWalletAddress = accounts[0];
-    updateUI();
-    setupWalletConnectEvents();
-    closeModal();
-  } catch (error) {
-    console.error('WalletConnect error:', error);
-    alert(`WalletConnect failed: ${error.message}`);
-  }
-}
+<script>
+  const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // From cloud.walletconnect.com
 
-async function connectCoinbaseWallet() {
-  try {
-    if (window.ethereum?.isCoinbaseWallet) {
-      return connectBrowserWallet();
+  const metadata = {
+    name: "Fluffi Token",
+    description: "Presale DApp",
+    url: "https://fluffi.site",
+    icons: ["https://fluffi.site/logo.png"],
+  };
+
+  const modal = new window.Web3Modal.default({
+    projectId,
+    themeMode: "dark",
+    themeVariables: {
+      "--w3m-accent": "#34d399"
+    },
+    walletConnectVersion: 2,
+    standaloneChains: ["eip155:56"],
+    metadata
+  });
+
+  let signer;
+  let address;
+
+  async function connectMobileWallet() {
+    try {
+      const { provider } = await modal.connect();
+      const ethersProvider = new ethers.BrowserProvider(provider);
+      signer = await ethersProvider.getSigner();
+      address = await signer.getAddress();
+
+      document.getElementById('walletconnect-mobile-btn').innerHTML = `✅ ${address.slice(0, 6)}...${address.slice(-4)}`;
+      document.getElementById('walletconnect-address').classList.remove("hidden");
+    } catch (err) {
+      console.error("WalletConnect error:", err);
+      alert("❌ Wallet connection failed: " + (err.message || "Unknown error"));
     }
-    
-    // Try deep linking for mobile
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      window.location.href = 'https://go.cb-w.com/wc?uri=' + encodeURIComponent(window.location.href);
-      return;
-    }
-    
-    throw new Error('Coinbase Wallet not detected');
-  } catch (error) {
-    console.error('Coinbase Wallet error:', error);
-    alert(`Coinbase Wallet connection failed: ${error.message}`);
   }
-}
 
 // UI Updates
 function updateUI() {
