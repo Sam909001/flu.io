@@ -689,8 +689,31 @@
     <!-- Claim Section -->
     <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
       <h2 class="section-title">🎁 Claim $FLUFFI</h2>
+        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+    <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Wallet Balance:</p>
+        <p class="font-mono text-lg font-bold" id="userBalance">0</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Staked:</p>
+        <p class="font-mono text-lg font-bold" id="userStaked">0</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Rewards:</p>
+        <p class="font-mono text-lg font-bold" id="userRewards">0</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Presale Allocation:</p>
+        <p class="font-mono text-lg font-bold" id="userPresale">0</p>
+      </div>
+    </div>
+  </div>
       <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">Claim Tokens</button>
+     <button onclick="claimTokens()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">
+  Claim Tokens
+</button>
     </section>
 
     <!-- Staking Section -->
@@ -1263,39 +1286,164 @@
     }
 
     // ===== PRESALE FUNCTIONS =====
-    function buyFluffi() {
-      if (!userWalletAddress) {
-        showWalletError("Please connect your wallet first");
-        openWalletModal();
-        return;
-      }
-      
-      const amount = document.getElementById('amountInput').value;
-      if (!amount || isNaN(amount) {
-        alert("Please enter a valid amount");
-        return;
-      }
-      
-      alert(`Buying ${amount} FLUFFI tokens...`);
-      // In a real implementation, this would call a smart contract
+ async function buyFluffi() {
+  try {
+    if (!userWalletAddress) {
+      showWalletError("Please connect your wallet first");
+      openWalletModal();
+      return;
     }
+    
+    const amount = document.getElementById('amountInput').value;
+    if (!amount || isNaN(amount)) {
+      alert("Please enter a valid amount");
+      return;
+    }
+    
+    // Get the signer
+    const signer = ethersProvider.getSigner();
+    
+    // Create contract instance
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_CONTRACT_ADDRESS,
+      FLUFFI_CONTRACT_ABI,
+      signer
+    );
+    
+    // Get referral address if provided
+    const referralAddress = document.getElementById('refInput').value || 
+      ethers.constants.AddressZero;
+    
+    // Convert amount to wei (adjust decimals as needed)
+    const amountWei = ethers.utils.parseUnits(amount, 18);
+    
+    // Call the contract
+    const tx = await fluffiContract.buyTokens(referralAddress, {
+      value: amountWei
+    });
+    
+    // Show transaction hash
+    alert(`Transaction submitted! TX Hash: ${tx.hash}`);
+    
+    // Wait for confirmation
+    await tx.wait();
+    alert("Transaction confirmed! Tokens purchased successfully.");
+    
+  } catch (error) {
+    console.error("Buy error:", error);
+    showWalletError(error.message || "Transaction failed");
+  }
+}
 
-    function stakeFluffi() {
-      if (!userWalletAddress) {
-        showWalletError("Please connect your wallet first");
-        openWalletModal();
-        return;
-      }
-      
-      const amount = document.getElementById('stakeInput').value;
-      if (!amount || isNaN(amount)) {
-        alert("Please enter a valid amount");
-        return;
-      }
-      
-      alert(`Staking ${amount} FLUFFI tokens...`);
-      // In a real implementation, this would call a smart contract
+   async function stakeFluffi() {
+  try {
+    if (!userWalletAddress) {
+      showWalletError("Please connect your wallet first");
+      openWalletModal();
+      return;
     }
+    
+    const amount = document.getElementById('stakeInput').value;
+    if (!amount || isNaN(amount)) {
+      alert("Please enter a valid amount");
+      return;
+    }
+    
+    // Get the signer
+    const signer = ethersProvider.getSigner();
+    
+    // Create contract instance
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_CONTRACT_ADDRESS,
+      FLUFFI_CONTRACT_ABI,
+      signer
+    );
+    
+    // Convert amount to wei (adjust decimals as needed)
+    const amountWei = ethers.utils.parseUnits(amount, 18);
+    
+    // Call the contract
+    const tx = await fluffiContract.stake(amountWei);
+    
+    // Show transaction hash
+    alert(`Transaction submitted! TX Hash: ${tx.hash}`);
+    
+    // Wait for confirmation
+    await tx.wait();
+    alert("Transaction confirmed! Tokens staked successfully.");
+    
+  } catch (error) {
+    console.error("Stake error:", error);
+    showWalletError(error.message || "Transaction failed");
+  }
+}
+    async function claimTokens() {
+  try {
+    if (!userWalletAddress) {
+      showWalletError("Please connect your wallet first");
+      openWalletModal();
+      return;
+    }
+    
+    // Get the signer
+    const signer = ethersProvider.getSigner();
+    
+    // Create contract instance
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_CONTRACT_ADDRESS,
+      FLUFFI_CONTRACT_ABI,
+      signer
+    );
+    
+    // Call the contract
+    const tx = await fluffiContract.claim();
+    
+    // Show transaction hash
+    alert(`Transaction submitted! TX Hash: ${tx.hash}`);
+    
+    // Wait for confirmation
+    await tx.wait();
+    alert("Transaction confirmed! Tokens claimed successfully.");
+    
+  } catch (error) {
+    console.error("Claim error:", error);
+    showWalletError(error.message || "Transaction failed");
+  }
+}
+    async function updateUserBalances() {
+  if (!userWalletAddress) return;
+  
+  try {
+    const signer = ethersProvider.getSigner();
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_CONTRACT_ADDRESS,
+      FLUFFI_CONTRACT_ABI,
+      signer
+    );
+        // Set up periodic balance updates
+    setInterval(updateUserBalances, 30000); // Update every 30 seconds
+  }
+}
+    
+    // Get token balance
+    const balance = await fluffiContract.balanceOf(userWalletAddress);
+    const formattedBalance = ethers.utils.formatUnits(balance, 18);
+    document.getElementById('userBalance').textContent = formattedBalance;
+    
+    // Get staked balance
+    const staked = await fluffiContract.stakedBalance(userWalletAddress);
+    const formattedStaked = ethers.utils.formatUnits(staked, 18);
+    document.getElementById('userStaked').textContent = formattedStaked;
+    
+    // Get rewards
+    const rewards = await fluffiContract.calculateRewards(userWalletAddress);
+    const formattedRewards = ethers.utils.formatUnits(rewards, 18);
+    document.getElementById('userRewards').textContent = formattedRewards;
+    
+  } catch (error) {
+    console.error("Balance update error:", error);
+  }
+}
 
     // Initialize timers
     updateTimers();
