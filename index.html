@@ -11,7 +11,9 @@
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
   
   <!-- External Resources -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+<!-- Replace old WalletConnect import with these two -->
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -1049,34 +1051,33 @@ async function connectMobileWallet() {
     btn.disabled = true;
 
     // Initialize WalletConnect
-    const { WalletConnectProvider } = window.WalletConnectProvider;
-    
-    walletProvider = new WalletConnectProvider({
-      projectId: "b74a733c47def7b6672eb9ad072c4e8a", 
-      chains: [56], 
+    if (typeof WalletConnectProvider === 'undefined') {
+      throw new Error("WalletConnect provider not loaded");
+    }
+
+    const provider = new WalletConnectProvider.default({
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // REPLACE WITH YOUR PROJECT ID
+      chains: [1], // Ethereum mainnet
       showQrModal: true,
       qrModalOptions: {
         themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-        mobileLinks: [
-          'metamask',
-          'trust',
-          'rainbow',
-          'argent',
-          'imtoken',
-          'pillar'
-        ]
+        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent']
       }
     });
 
-    await walletProvider.enable();
+    await provider.enable();
     
-    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    const accounts = await provider.request({ method: 'eth_accounts' });
     userWalletAddress = accounts[0];
-    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+    ethersProvider = new ethers.providers.Web3Provider(provider);
     
-    walletProvider.on('accountsChanged', handleAccountsChanged);
-    walletProvider.on('chainChanged', handleChainChanged);
-    walletProvider.on('disconnect', handleDisconnect);
+    // Store provider globally
+    walletProvider = provider;
+
+    // Set up event listeners
+    provider.on('accountsChanged', handleAccountsChanged);
+    provider.on('chainChanged', handleChainChanged);
+    provider.on('disconnect', handleDisconnect);
     
     updateWalletUI();
   } catch (error) {
