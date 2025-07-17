@@ -593,14 +593,13 @@
       <span id="walletAddress" class="hidden"></span>
       
       <div id="walletconnect-mobile" class="text-center my-4 md:hidden">
-        <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
-          class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm">
-          <i class="fas fa-mobile-alt mr-1"></i> Connect Mobile Wallet
-        </button>
-        <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
-        <div id="walletError" class="text-red-500 text-sm mt-2 hidden"></div>
-      </div>
-    </nav>
+  <button id="walletconnect-mobile-btn" onclick="connectMobileWallet()" 
+    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-semibold">
+    <i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet
+  </button>
+  <div id="walletconnect-address" class="hidden mt-2 text-sm text-white"></div>
+  <div id="walletError" class="text-red-500 text-sm mt-2 hidden"></div>
+</div>
   </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
@@ -1041,9 +1040,45 @@ function resetTimer() {
       }
     }
 
-    async function connectMobileWallet() {
-      return connectWalletConnect();
+ async function connectMobileWallet() {
+  try {
+    // Initialize WalletConnect provider
+    walletProvider = new WalletConnectProvider({
+      projectId: "YOUR_REAL_PROJECT_ID", // Replace with actual ID
+      chains: [1], // Mainnet - adjust as needed
+      showQrModal: true,
+      qrModalOptions: {
+        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      }
+    });
+
+    // Enable session
+    await walletProvider.enable();
+    
+    // Get accounts
+    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+    
+    // Set up event listeners
+    walletProvider.on('accountsChanged', handleAccountsChanged);
+    walletProvider.on('chainChanged', handleChainChanged);
+    walletProvider.on('disconnect', handleDisconnect);
+    
+    updateWalletUI();
+  } catch (error) {
+    console.error("Mobile wallet error:", error);
+    showWalletError(error.message);
+    if (walletProvider) {
+      await walletProvider.disconnect();
     }
+  }
+}
+    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  document.getElementById('walletconnect-mobile').classList.remove('hidden');
+  // Optionally hide the desktop button on mobile
+  document.getElementById('walletButton').classList.add('hidden');
+}
 
     // ===== EVENT HANDLERS =====
     function handleAccountsChanged(accounts) {
