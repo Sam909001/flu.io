@@ -967,7 +967,12 @@
       // Initialize token chart
       initTokenChart();
     });
-
+document.getElementById('amountInput').addEventListener('input', (e) => {
+  const value = e.target.value;
+  if (value && isNaN(value)) {
+    e.target.value = value.slice(0, -1); // Remove last character if not number
+  }
+});
     // ===== WALLET FUNCTIONS =====
     async function connectBrowserWallet() {
       try {
@@ -1057,7 +1062,8 @@
       
       if (userWalletAddress) {
         const shortAddr = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-        walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${shortAddr}`;
+        walletBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i>';
+walletBtn.appendChild(document.createTextNode(shortAddr));
         walletAddr.textContent = userWalletAddress;
         walletAddr.classList.remove('hidden');
         
@@ -1281,11 +1287,14 @@
 
     // ===== DARK MODE =====
     function toggleDarkMode() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
-      if (localStorage.getItem('darkMode') === 'true' || 
-    (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+}
       
       // Update icon
       const darkModeIcon = document.getElementById('darkModeIcon');
@@ -1297,7 +1306,7 @@
     }
 
     // ===== PRESALE FUNCTIONS =====
- async function buyFluffi() {
+async function buyFluffi() {
   try {
     if (!userWalletAddress) {
       showWalletError("Please connect your wallet first");
@@ -1306,43 +1315,70 @@
     }
     
     const amount = document.getElementById('amountInput').value;
-    if (!amount || isNaN(amount)) {
+    const amountNum = parseFloat(amount);
+    
+    if (isNaN(amountNum) {
       alert("Please enter a valid amount");
       return;
     }
     
-    // Get the signer
     const signer = ethersProvider.getSigner();
-    
-    // Create contract instance
     const fluffiContract = new ethers.Contract(
       FLUFFI_CONTRACT_ADDRESS,
       FLUFFI_CONTRACT_ABI,
       signer
     );
     
-    // Get referral address if provided
-    const referralAddress = document.getElementById('refInput').value || 
-      ethers.constants.AddressZero;
+    // Validate referral address if provided
+    let referralAddress = ethers.constants.AddressZero;
+    const refInput = document.getElementById('refInput').value.trim();
+    if (refInput) {
+      if (!ethers.utils.isAddress(refInput)) {
+        throw new Error("Invalid referral address");
+      }
+      referralAddress = refInput;
+    }
     
-    // Convert amount to wei (adjust decimals as needed)
+    // Convert amount to wei
     const amountWei = ethers.utils.parseUnits(amount, 18);
     
-    // Call the contract
-    const tx = await fluffiContract.buyTokens(referralAddress, {
+    // Estimate gas first
+    const gasEstimate = await fluffiContract.estimateGas.buyTokens(referralAddress, {
       value: amountWei
     });
     
-    // Show transaction hash
-    alert(`Transaction submitted! TX Hash: ${tx.hash}`);
+    // Send with 20% more gas than estimate
+    const tx = await fluffiContract.buyTokens(referralAddress, {
+      value: amountWei,
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
     
-    // Wait for confirmation
+    // Show loading state
+    const buyBtn = document.querySelector('#presale button');
+    const originalText = buyBtn.textContent;
+    buyBtn.disabled = true;
+    buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    
     await tx.wait();
-    alert("Transaction confirmed! Tokens purchased successfully.");
     
+    // Reset button
+    buyBtn.disabled = false;
+    buyBtn.textContent = originalText;
+    
+    // Update balances
+    await updateUserBalances();
+    
+    alert("Purchase successful!");
   } catch (error) {
-    console.error("Buy error:", error);
-    showWalletError(error.message || "Transaction failed");
+    console.error("Purchase error:", error);
+    showWalletError(error.message || "Purchase failed");
+    
+    // Reset button if error occurs
+    const buyBtn = document.querySelector('#presale button');
+    if (buyBtn) {
+      buyBtn.disabled = false;
+      buyBtn.textContent = '🚀 Buy Now';
+    }
   }
 }
 
@@ -1388,37 +1424,57 @@
     showWalletError(error.message || "Transaction failed");
   }
 }
-    async function claimTokens() {
+async function claimTokens() {
   try {
     if (!userWalletAddress) {
-      showWalletError("Please connect your wallet first");
-      openWalletModal();
-      return;
+      throw new Error("Please connect your wallet first");
     }
     
-    // Get the signer
     const signer = ethersProvider.getSigner();
-    
-    // Create contract instance
     const fluffiContract = new ethers.Contract(
       FLUFFI_CONTRACT_ADDRESS,
       FLUFFI_CONTRACT_ABI,
       signer
     );
     
-    // Call the contract
+    // Check if presale has ended
+    const presaleEnded = await fluffiContract.presaleEnded();
+    if (!presaleEnded) {
+      throw new Error("Presale has not ended yet");
+    }
+    
+    // Check if user has tokens to claim
+    const claimable = await fluffiContract.getClaimableAmount(userWalletAddress);
+    if (claimable.lte(0)) {
+      throw new Error("No tokens available to claim");
+    }
+    
     const tx = await fluffiContract.claim();
     
-    // Show transaction hash
-    alert(`Transaction submitted! TX Hash: ${tx.hash}`);
+    // Show loading state
+    const claimBtn = document.querySelector('#claim button');
+    const originalText = claimBtn.textContent;
+    claimBtn.disabled = true;
+    claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
     
-    // Wait for confirmation
     await tx.wait();
-    alert("Transaction confirmed! Tokens claimed successfully.");
     
+    // Reset button and update balances
+    claimBtn.disabled = false;
+    claimBtn.textContent = originalText;
+    await updateUserBalances();
+    
+    alert("Tokens claimed successfully!");
   } catch (error) {
     console.error("Claim error:", error);
-    showWalletError(error.message || "Transaction failed");
+    showWalletError(error.message || "Claim failed");
+    
+    // Reset button if error occurs
+    const claimBtn = document.querySelector('#claim button');
+    if (claimBtn) {
+      claimBtn.disabled = false;
+      claimBtn.textContent = 'Claim Tokens';
+    }
   }
 }
    async function updateUserBalances() {
@@ -1461,6 +1517,11 @@
       localStorage.removeItem('presaleStartTime');
       location.reload();
     }
+
+    <!-- Testing button - remove in production -->
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+  Reset Timer (For Testing)
+</button>
   </script>
 </body>
 </html>
