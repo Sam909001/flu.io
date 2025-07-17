@@ -1319,30 +1319,37 @@ function resetTimer() {
     }
 
     // ===== PRESALE FUNCTIONS =====
-    async function buyFluffi() {
+  async function buyFluffi() {
+      const amount = document.getElementById('amountInput').value;
+      const currency = document.getElementById('currencySelect').value;
+      const ref = document.getElementById('refInput').value;
+      
+      if (!userWalletAddress) {
+        alert('Please connect your wallet first.');
+        return;
+      }
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+      
+      let ethValue;
+      if (currency === 'USD') {
+        const usdToEth = 3000; // 1 ETH = 3000 USD
+        ethValue = (Number(amount) / usdToEth).toFixed(6);
+      } else {
+        ethValue = Number(amount).toFixed(6);
+      }
+      
       try {
-        if (!userWalletAddress) {
-          showWalletError("Please connect your wallet first");
-          openWalletModal();
-          return;
-        }
-        
-        const amount = document.getElementById('amountInput').value;
-        const amountNum = parseFloat(amount);
-        
-        if (isNaN(amountNum)) {
-          alert("Please enter a valid amount");
-          return;
-        }
-        
-        const signer = ethersProvider.getSigner();
-        const fluffiContract = new ethers.Contract(
-          FLUFFI_CONTRACT_ADDRESS,
-          FLUFFI_CONTRACT_ABI,
-          signer
-        );
-        
-        // Validate referral address if provided
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+        const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+        const refAddr = (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) ? ref : '0x0000000000000000000000000000000000000000';
+
+            // Validate referral address if provided
         let referralAddress = ethers.constants.AddressZero;
         const refInput = document.getElementById('refInput').value.trim();
         if (refInput) {
@@ -1351,49 +1358,32 @@ function resetTimer() {
           }
           referralAddress = refInput;
         }
-        
-        // Convert amount to wei
-        const amountWei = ethers.utils.parseUnits(amount, 18);
-        
-        // Estimate gas first
-        const gasEstimate = await fluffiContract.estimateGas.buyTokens(referralAddress, {
-          value: amountWei
-        });
-        
-        // Show loading state
-        const buyBtn = document.querySelector('#presale button');
-        const originalText = buyBtn.textContent;
+      
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+        const prevText = buyBtn.textContent;
+        buyBtn.textContent = '⏳ Processing...';
         buyBtn.disabled = true;
-        buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
         
-        // Send with 20% more gas than estimate
-        const tx = await fluffiContract.buyTokens(referralAddress, {
-          value: amountWei,
-          gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-        });
-        
+        const tx = await contract.contribute(refAddr, { value: ethers.utils.parseEther(ethValue.toString()) });
         await tx.wait();
         
-        // Reset button
+        buyBtn.textContent = prevText;
         buyBtn.disabled = false;
-        buyBtn.textContent = originalText;
-        
-        // Update balances
-        await updateUserBalances();
-        
-        alert("Purchase successful!");
-      } catch (error) {
-        console.error("Purchase error:", error);
-        showWalletError(error.message || "Purchase failed");
-        
-        // Reset button if error occurs
-        const buyBtn = document.querySelector('#presale button');
+        alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+      } catch (err) {
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
         if (buyBtn) {
-          buyBtn.disabled = false;
           buyBtn.textContent = '🚀 Buy Now';
+          buyBtn.disabled = false;
+        }
+        if (err && err.message) {
+          alert('❌ Transaction failed: ' + err.message);
+        } else {
+          alert('❌ Transaction failed.');
         }
       }
     }
+
 
     async function stakeFluffi() {
       try {
