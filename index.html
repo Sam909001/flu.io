@@ -1053,67 +1053,72 @@ function resetTimer() {
 async function connectMobileWallet() {
   const btn = document.getElementById('walletconnect-mobile-btn');
   const errorEl = document.getElementById('walletError');
-  console.log("WalletConnect available:", !!window.WalletConnectProvider);
-console.log("Ethers available:", !!window.ethers);
   
   try {
-    // Show loading state
+    // 1. Verify WalletConnect is properly loaded
+    if (typeof WalletConnectProvider === 'undefined') {
+      throw new Error("WalletConnect not loaded. Please refresh the page.");
+    }
+
+    // 2. Show loading state
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...';
     btn.disabled = true;
     errorEl.classList.add('hidden');
 
-    // 1. Verify WalletConnect is loaded
-    if (!window.WalletConnectProvider) {
-      throw new Error("WalletConnect resources not loaded. Please refresh the page.");
-    }
-
-    // 2. Initialize Provider
-    const provider = new window.WalletConnectProvider.default({
-      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Get from https://cloud.walletconnect.com
-      chains: [56], 
+    // 3. Initialize with your actual Project ID
+    const provider = new WalletConnectProvider({
+      projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
+      chains: [56], // BSC chain ID
       showQrModal: true,
       qrModalOptions: {
         themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent', 'imtoken']
+        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent'],
+        desktopLinks: []
       }
     });
 
-    // 3. Enable Connection
+    // 4. Enable connection
     await provider.enable();
 
-    // 4. Set Up Provider
+    // 5. Set up provider
     userWalletAddress = provider.accounts[0];
     ethersProvider = new ethers.providers.Web3Provider(provider);
     walletProvider = provider;
 
-    // 5. Set Up Event Listeners
+    // 6. Set up event listeners
     provider.on("accountsChanged", handleAccountsChanged);
     provider.on("chainChanged", handleChainChanged);
-    provider.on("disconnect", handleDisconnect);
+    provider.on("disconnect", () => {
+      console.log("WalletConnect disconnected");
+      disconnectWallet();
+    });
 
-    // 6. Update UI
+    // 7. Update UI
     updateWalletUI();
 
   } catch (error) {
     console.error("WalletConnect Error:", error);
-    errorEl.textContent = error.message || "Failed to connect. Try another method.";
+    
+    // User-friendly error messages
+    const errorMessage = error.message.includes('User closed modal') 
+      ? "Connection cancelled by user" 
+      : error.message.includes('Session expired')
+      ? "Session expired. Please reconnect."
+      : "Failed to connect. Please try again.";
+    
+    errorEl.textContent = errorMessage;
     errorEl.classList.remove('hidden');
     
-    // Reset WalletConnect if error occurred
+    // Clean up if error occurred
     if (walletProvider?.disconnect) {
       await walletProvider.disconnect();
     }
   } finally {
-    btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
+    // Reset button state
+    btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet';
     btn.disabled = false;
   }
 }
-    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-  document.getElementById('walletconnect-mobile').classList.remove('hidden');
-  // Optionally hide the desktop button on mobile
-  document.getElementById('walletButton').classList.add('hidden');
-}
-
     // ===== EVENT HANDLERS =====
     function handleAccountsChanged(accounts) {
       if (accounts.length === 0) {
