@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Load these FIRST -->
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    console.log("WalletConnect loaded:", typeof WalletConnectProvider !== 'undefined');
+    console.log("Ethers loaded:", typeof ethers !== 'undefined');
+  });
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -9,14 +19,6 @@
   <meta name="author" content="FLUFFI Team">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
-  
-  <!-- External Resources -->
-<!-- WalletConnect Provider + QR Modal (MUST LOAD FIRST) -->
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
-
-<!-- Ethers.js (load after WalletConnect) -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
