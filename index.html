@@ -1042,6 +1042,7 @@ function resetTimer() {
 
     async function connectWalletConnect() {
       try {
+        const { default: WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
         walletProvider = new WalletConnectProvider({
           projectId: "b74a733c47def7b6672eb9ad072c4e8a",
           chains: [56], // BSC chain ID
