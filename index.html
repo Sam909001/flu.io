@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Load these FIRST -->
+ <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
 <script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
 <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
+  
     <script>
     window.addEventListener('load', () => {
       console.log('WalletConnect loaded:', !!window.WalletConnectProvider);
@@ -1084,7 +1084,7 @@ function resetTimer() {
       // ✅ Initialize WalletConnect
       const provider = new WalletConnectProvider({
         projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
-        chains: [56],
+        chains: [1],
         showQrModal: true,
         qrModalOptions: {
           themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
