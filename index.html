@@ -2,15 +2,9 @@
 <html lang="en">
 <head>
   <!-- Load these FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script>
-  window.addEventListener('load', () => {
-    console.log("WalletConnect loaded:", typeof WalletConnectProvider !== 'undefined');
-    console.log("Ethers loaded:", typeof ethers !== 'undefined');
-  });
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -29,6 +23,26 @@
       console.log('Ethers loaded:', !!window.ethers);
     });
   </script>
+  <script>
+  function loadFallback() {
+    const fallback = document.createElement('script');
+    fallback.src = 'https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js';
+    fallback.onerror = () => {
+      console.error("All CDNs failed - using local copy");
+      // Host these files yourself if needed:
+      // /js/walletconnect-web3-provider.min.js
+      // /js/walletconnect-qrcode-modal.min.js
+    };
+    document.head.appendChild(fallback);
+  }
+  loadFallback();
+</script>
+  <script>
+  window.addEventListener('load', () => {
+    console.log("WalletConnect loaded:", typeof WalletConnectProvider !== 'undefined');
+    console.log("Ethers loaded:", typeof ethers !== 'undefined');
+  });
+</script>
   <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
