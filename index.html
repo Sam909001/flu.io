@@ -1045,54 +1045,59 @@ function resetTimer() {
     }
 
 async function connectMobileWallet() {
+  const btn = document.getElementById('walletconnect-mobile-btn');
+  const errorEl = document.getElementById('walletError');
+  
   try {
     // Show loading state
-    const btn = document.getElementById('walletconnect-mobile-btn');
-    const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...';
     btn.disabled = true;
+    errorEl.classList.add('hidden');
 
-    // Initialize WalletConnect
-    if (typeof WalletConnectProvider === 'undefined') {
-      throw new Error("WalletConnect provider not loaded");
+    // 1. Verify WalletConnect is loaded
+    if (!window.WalletConnectProvider) {
+      throw new Error("WalletConnect resources not loaded. Please refresh the page.");
     }
 
-    const provider = new WalletConnectProvider.default({
-      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // REPLACE WITH YOUR PROJECT ID
-      chains: [1], // Ethereum mainnet
+    // 2. Initialize Provider
+    const provider = new window.WalletConnectProvider.default({
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Get from https://cloud.walletconnect.com
+      chains: [56], 
       showQrModal: true,
       qrModalOptions: {
         themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent']
+        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent', 'imtoken']
       }
     });
 
+    // 3. Enable Connection
     await provider.enable();
-    
-    const accounts = await provider.request({ method: 'eth_accounts' });
-    userWalletAddress = accounts[0];
+
+    // 4. Set Up Provider
+    userWalletAddress = provider.accounts[0];
     ethersProvider = new ethers.providers.Web3Provider(provider);
-    
-    // Store provider globally
     walletProvider = provider;
 
-    // Set up event listeners
-    provider.on('accountsChanged', handleAccountsChanged);
-    provider.on('chainChanged', handleChainChanged);
-    provider.on('disconnect', handleDisconnect);
-    
+    // 5. Set Up Event Listeners
+    provider.on("accountsChanged", handleAccountsChanged);
+    provider.on("chainChanged", handleChainChanged);
+    provider.on("disconnect", handleDisconnect);
+
+    // 6. Update UI
     updateWalletUI();
+
   } catch (error) {
-    console.error("Mobile wallet error:", error);
-    const errorEl = document.getElementById('walletError');
-    errorEl.textContent = error.message || "Connection failed";
+    console.error("WalletConnect Error:", error);
+    errorEl.textContent = error.message || "Failed to connect. Try another method.";
     errorEl.classList.remove('hidden');
-  } finally {
-    const btn = document.getElementById('walletconnect-mobile-btn');
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = originalText || '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
+    
+    // Reset WalletConnect if error occurred
+    if (walletProvider?.disconnect) {
+      await walletProvider.disconnect();
     }
+  } finally {
+    btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Mobile Wallet';
+    btn.disabled = false;
   }
 }
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
