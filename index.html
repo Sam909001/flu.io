@@ -1068,75 +1068,68 @@ function resetTimer() {
       }
     }
 
-async function connectMobileWallet() {
-  const btn = document.getElementById('walletconnect-mobile-btn');
-  const errorEl = document.getElementById('walletError');
-  
-  try {
-    // 1. Verify WalletConnect is properly loaded
-    if (typeof WalletConnectProvider === 'undefined') {
-      throw new Error("WalletConnect not loaded. Please refresh the page.");
-    }
+ async function connectMobileWallet() {
+    const btn = document.getElementById('walletconnect-mobile-btn');
+    const errorEl = document.getElementById('walletError');
 
-    // 2. Show loading state
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...';
-    btn.disabled = true;
-    errorEl.classList.add('hidden');
+    try {
+      // ✅ Dynamically load WalletConnectProvider
+      const { default: WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
 
-    // 3. Initialize with your actual Project ID
-    const provider = new WalletConnectProvider({
-      projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
-      chains: [56], // BSC chain ID
-      showQrModal: true,
-      qrModalOptions: {
-        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-        mobileLinks: ['metamask', 'trust', 'rainbow', 'argent'],
-        desktopLinks: []
+      // ✅ Show loading state
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connecting...';
+      btn.disabled = true;
+      errorEl.classList.add('hidden');
+
+      // ✅ Initialize WalletConnect
+      const provider = new WalletConnectProvider({
+        projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
+        chains: [56],
+        showQrModal: true,
+        qrModalOptions: {
+          themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+          mobileLinks: ['metamask', 'trust', 'rainbow', 'argent'],
+          desktopLinks: []
+        }
+      });
+
+      // ✅ Enable WalletConnect session
+      await provider.enable();
+
+      // ✅ Assign data
+      userWalletAddress = provider.accounts[0];
+      ethersProvider = new ethers.providers.Web3Provider(provider);
+      walletProvider = provider;
+
+      // ✅ Event listeners
+      provider.on("accountsChanged", handleAccountsChanged);
+      provider.on("chainChanged", handleChainChanged);
+      provider.on("disconnect", () => {
+        console.log("WalletConnect disconnected");
+        disconnectWallet();
+      });
+
+      // ✅ Update UI
+      updateWalletUI();
+
+    } catch (error) {
+      console.error("WalletConnect Error:", error);
+      const errorMessage = error.message.includes('User closed modal')
+        ? "Connection cancelled by user"
+        : error.message.includes('Session expired')
+        ? "Session expired. Please reconnect."
+        : "Failed to connect. Please try again.";
+      errorEl.textContent = errorMessage;
+      errorEl.classList.remove('hidden');
+
+      if (walletProvider?.disconnect) {
+        await walletProvider.disconnect();
       }
-    });
-
-    // 4. Enable connection
-    await provider.enable();
-
-    // 5. Set up provider
-    userWalletAddress = provider.accounts[0];
-    ethersProvider = new ethers.providers.Web3Provider(provider);
-    walletProvider = provider;
-
-    // 6. Set up event listeners
-    provider.on("accountsChanged", handleAccountsChanged);
-    provider.on("chainChanged", handleChainChanged);
-    provider.on("disconnect", () => {
-      console.log("WalletConnect disconnected");
-      disconnectWallet();
-    });
-
-    // 7. Update UI
-    updateWalletUI();
-
-  } catch (error) {
-    console.error("WalletConnect Error:", error);
-    
-    // User-friendly error messages
-    const errorMessage = error.message.includes('User closed modal') 
-      ? "Connection cancelled by user" 
-      : error.message.includes('Session expired')
-      ? "Session expired. Please reconnect."
-      : "Failed to connect. Please try again.";
-    
-    errorEl.textContent = errorMessage;
-    errorEl.classList.remove('hidden');
-    
-    // Clean up if error occurred
-    if (walletProvider?.disconnect) {
-      await walletProvider.disconnect();
+    } finally {
+      btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet';
+      btn.disabled = false;
     }
-  } finally {
-    // Reset button state
-    btn.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i> Connect Wallet';
-    btn.disabled = false;
   }
-}
     // ===== EVENT HANDLERS =====
     function handleAccountsChanged(accounts) {
       if (accounts.length === 0) {
