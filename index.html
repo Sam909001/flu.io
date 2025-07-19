@@ -1273,6 +1273,28 @@ function resetTimer() {
       }
     }
 
+   async function switchToBSCMainnet() {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: BSC_MAINNET.chainId }],
+    });
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [BSC_MAINNET],
+        });
+      } catch (addError) {
+        throw new Error('❌ Failed to add BSC Mainnet to wallet');
+      }
+    } else {
+      throw switchError;
+    }
+  }
+}
+
     // Browser wallet connection (MetaMask)
     async function connectBrowserWallet() {
       const btn = document.getElementById('metamaskBtn');
