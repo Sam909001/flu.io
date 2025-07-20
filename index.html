@@ -1729,7 +1729,7 @@ function resetTimer() {
     }
 
     // ===== PRESALE FUNCTIONS =====
-  async function buyFluffi() {
+async function buyFluffi() {
   try {
     // First ensure connected to BSC Testnet
     await switchToBSCTestnet();
@@ -1744,12 +1744,21 @@ function resetTimer() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     
-    // Contract details 
+    // Contract details - verify these with the project team!
     const contractAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-    const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]
+    const contractAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
     
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
     
+    // Get referral address (or use zero address if none provided)
+    const refInput = document.getElementById('refInput').value.trim();
+    let referralAddress = ethers.constants.AddressZero; // Default to zero address
+    if (refInput && ethers.utils.isAddress(refInput)) {
+      referralAddress = refInput;
+    } else if (refInput) {
+      throw new Error("Invalid referral address");
+    }
+
     // Convert amount to wei
     const amountWei = ethers.utils.parseEther(amount);
     
@@ -1757,19 +1766,19 @@ function resetTimer() {
     const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
     buyBtn.disabled = true;
     buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-   
-    // Send transaction with increased gas limit
-    const tx = await contract.contribute({
+    
+    // Call contribute() with referral address and send ETH value separately
+    const tx = await contract.contribute(referralAddress, {
       value: amountWei,
       gasLimit: 300000 // Increased gas limit
     });
     
     await tx.wait();
-    alert('Purchase successful!');
+    alert('Purchase successful! Tx hash: ' + tx.hash);
     
   } catch (error) {
     console.error("Buy error:", error);
-    alert(`Failed: ${error.message || "Unknown error"}`);
+    alert(`Failed: ${error.reason || error.message || "Unknown error"}`);
   } finally {
     const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
     if (buyBtn) {
@@ -1778,8 +1787,7 @@ function resetTimer() {
     }
   }
 }
-
-
+   
     async function stakeFluffi() {
       try {
         if (!userWalletAddress) {
