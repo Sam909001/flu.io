@@ -1379,9 +1379,6 @@ class MobileWalletConnect {
   }
 }
 
-// Usage Example:
-const wallet = new MobileWalletConnect();
-
 // Connect to MetaMask
 wallet.connect('metamask')
   .then(address => console.log('Connected:', address))
@@ -1402,10 +1399,14 @@ wallet.connect('walletconnect')
       }
 
       // Initialize WalletConnect provider with projectId
-      walletConnectProvider = new WalletConnectProvider.default({
-        projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Your WalletConnect Project ID
-        chains: [97, 56, 43114, 137], // Supported chain IDs
-        showQrModal: true,
+      import { WalletConnectConnector } from "@walletconnect/web3-provider";
+walletConnectProvider = new WalletConnectConnector({
+  rpc: {
+    56: "https://bsc-dataseed.binance.org/",
+    97: "https://data-seed-prebsc-1-s1.binance.org:8545/"
+  },
+  qrcode: true
+});
         metadata: {
           name: "FLUFFI Presale",
           description: "FLUFFI Token Presale and Staking",
@@ -1626,7 +1627,7 @@ deeplink = `https://metamask.app.link/dapp/${fullUrl}`;
     }
 
     // 3. Get provider and detect chain
-    const provider = new ethers.providers.Web3Provider(walletProvider);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const { chainId } = await provider.getNetwork();
     const chainConfig = CHAIN_CONFIGS[chainId];
 
