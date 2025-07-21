@@ -1617,24 +1617,7 @@ function resetTimer() {
         buyBtn.innerHTML = originalText;
     }
 }
-    function showReferralStats(walletAddress) {
-    const contract = new ethers.Contract(
-        FLUFFI_CONTRACT_ADDRESS,
-        FLUFFI_CONTRACT_ABI,
-        new ethers.providers.Web3Provider(window.ethereum).getSigner()
-    );
 
-    // Fetch referral data
-    contract.referralCounts(walletAddress).then(count => {
-        contract.referralRewards(walletAddress).then(rewards => {
-            document.getElementById("referralSection").innerHTML = `
-                <h3>Your Referrals</h3>
-                <p>Total Referrals: <strong>${count.toString()}</strong></p>
-                <p>Earned Rewards: <strong>${ethers.utils.formatEther(rewards)} FLUFFI</strong></p>
-            `;
-        });
-    });
-}
     async function stakeFluffi() {
       const stakeBtn = document.querySelector('#staking button');
       const originalText = stakeBtn.innerHTML;
