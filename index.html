@@ -1555,88 +1555,109 @@
     }
 
     // ===== PRESALE FUNCTIONS =====
-    async function buyFluffiMultiChain() {
-      const buyBtn = document.querySelector('button[onclick="buyFluffiMultiChain()"]');
-      const originalText = buyBtn.innerHTML;
+   async function buyFluffiMultiChain() {
+  const buyBtn = document.querySelector('button[onclick="buyFluffiMultiChain()"]');
+  const originalText = buyBtn.innerHTML;
+
+  try {
+    // 1. Validate input
+    const amount = document.getElementById("amountInput").value;
+    if (!amount || isNaN(amount)) {
+      throw new Error("Please enter a valid amount");
+    }
+
+    // 2. Check wallet connection (mobile-friendly)
+    if (!userWalletAddress) {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      try {
-        // 1. Validate input
-        const amount = document.getElementById("amountInput").value;
-        if (!amount || isNaN(amount) {
-          throw new Error("Please enter a valid amount");
-        }
+      if (isMobile) {
+        // Auto-open WalletConnect for mobile if no wallet connected
+        await connectWalletConnect();
+      } else {
+        await connectBrowserWallet();
+      }
 
-        // 2. Check wallet connection
-        if (!userWalletAddress) {
-          await connectBrowserWallet();
-          if (!userWalletAddress) {
-            throw new Error("Wallet not connected");
-          }
-        }
-
-        // 3. Get provider and detect chain
-        const provider = new ethers.providers.Web3Provider(walletProvider);
-        const { chainId } = await provider.getNetwork();
-        const chainConfig = CHAIN_CONFIGS[chainId];
-
-        // 4. Check if chain is supported
-        if (!chainConfig?.contract) {
-          throw new Error(`Unsupported chain. Please switch to a supported network.`);
-        }
-
-        // 5. Initialize contract
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-          chainConfig.contract,
-          chainConfig.abi,
-          signer
-        );
-
-        // 6. Handle referral
-        const refInput = document.getElementById("refInput").value.trim();
-        const referralAddress = refInput && ethers.utils.isAddress(refInput) 
-          ? refInput 
-          : ethers.constants.AddressZero;
-
-        // 7. Update UI
-        buyBtn.disabled = true;
-        buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-        // 8. Send transaction
-        const tx = await contract.buyTokens(referralAddress, {
-          value: ethers.utils.parseEther(amount),
-          gasLimit: 300000,
-        });
-
-        // Wait for transaction confirmation
-        const receipt = await tx.wait();
-        
-        // Show success message with transaction link
-        const explorerUrl = `${chainConfig.explorer}/tx/${tx.hash}`;
-        alert(`✅ Transaction successful!\n\nView on explorer: ${explorerUrl}`);
-
-      } catch (error) {
-        console.error("Buy error:", error);
-        
-        // Show user-friendly error messages
-        let errorMessage = "Transaction failed";
-        if (error.message.includes("user rejected transaction")) {
-          errorMessage = "Transaction rejected by user";
-        } else if (error.message.includes("insufficient funds")) {
-          errorMessage = "Insufficient balance for transaction";
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-        
-        alert(`❌ Error: ${errorMessage}`);
-      } finally {
-        if (buyBtn) {
-          buyBtn.disabled = false;
-          buyBtn.innerHTML = originalText;
-        }
+      if (!userWalletAddress) {
+        throw new Error("Wallet not connected");
       }
     }
 
+    // 3. Get provider and detect chain
+    const provider = new ethers.providers.Web3Provider(walletProvider);
+    const { chainId } = await provider.getNetwork();
+    const chainConfig = CHAIN_CONFIGS[chainId];
+
+    // 4. Auto-switch if unsupported chain (mobile wallets need this)
+    if (!chainConfig?.contract) {
+      await switchChain(97); // Default to BSC Testnet
+      return buyFluffiMultiChain(); // Retry after switch
+    }
+
+    // 5. Initialize contract
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(
+      chainConfig.contract,
+      chainConfig.abi,
+      signer
+    );
+
+    // 6. Handle referral (if any)
+    const refInput = document.getElementById("refInput").value.trim();
+    const referralAddress = refInput && ethers.utils.isAddress(refInput) 
+      ? refInput 
+      : ethers.constants.AddressZero;
+
+    // 7. Update UI (mobile-friendly loading state)
+    buyBtn.disabled = true;
+    buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    // 8. Estimate gas (adjust for mobile wallets)
+    let gasEstimate;
+    try {
+      gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
+        value: ethers.utils.parseEther(amount),
+      });
+    } catch (estimateError) {
+      console.warn("Gas estimate failed, using fallback:", estimateError);
+      gasEstimate = ethers.BigNumber.from("300000"); // Fallback gas limit
+    }
+
+    // 9. Send transaction (mobile wallets may need higher gas)
+    const tx = await contract.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(amount),
+      gasLimit: gasEstimate.mul(130).div(100), // 30% buffer for mobile
+    });
+
+    // 10. Wait for confirmation (mobile wallets sometimes take longer)
+    const receipt = await tx.wait();
+
+    // 11. Show success (with explorer link)
+    const explorerUrl = `${chainConfig.explorer}/tx/${tx.hash}`;
+    alert(`✅ Success! View TX: ${explorerUrl}`);
+
+  } catch (error) {
+    console.error("Buy error:", error);
+    
+    // Mobile-friendly error messages
+    let errorMessage = "Transaction failed";
+    if (error.message.includes("user rejected transaction")) {
+      errorMessage = "You rejected the transaction";
+    } else if (error.message.includes("insufficient funds")) {
+      errorMessage = "Insufficient balance";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    alert(`❌ Error: ${errorMessage}`);
+
+  } finally {
+    // Reset UI
+    if (buyBtn) {
+      buyBtn.disabled = false;
+      buyBtn.innerHTML = originalText;
+    }
+  }
+}
     async function stakeFluffi() {
       const stakeBtn = document.querySelector('#staking button');
       const originalText = stakeBtn.innerHTML;
