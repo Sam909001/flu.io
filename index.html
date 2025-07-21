@@ -1271,123 +1271,111 @@ function resetTimer() {
       }
     }
 
-   /**
- * Mobile Wallet Connector for Web3 (Solana + EVM)
-
- */
-class MobileWalletConnect {
-  constructor() {
-    this.provider = null;
-    this.walletConnect = null;
-  }
-
-  // Initialize WalletConnect
-  async initWalletConnect() {
-    if (typeof WalletConnectProvider !== 'undefined') {
-      this.walletConnect = new WalletConnectProvider({
-        rpc: {
-          1: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY',
-          56: 'https://bsc-dataseed.binance.org/',
-          // Add other chains as needed
-        },
-      });
-      return this.walletConnect;
-    }
-    throw new Error('WalletConnect not available');
-  }
-
-  // Connect to MetaMask (EVM)
-  async connectMetaMask() {
-    if (window.ethereum) {
-      try {
-        this.provider = window.ethereum;
-        const accounts = await this.provider.request({ method: 'eth_requestAccounts' });
-        return accounts[0];
-      } catch (error) {
-        console.error('MetaMask connection error:', error);
-        throw error;
+    // ===== WALLET CONNECTION FUNCTIONS =====
+    async function connectWallet() {
+      if (userWalletAddress) {
+        disconnectWallet();
+      } else {
+        openWalletModal();
       }
     }
-    throw new Error('MetaMask not installed');
-  }
 
-  // Connect via WalletConnect (Mobile)
-  async connectWalletConnect() {
-    const connector = await this.initWalletConnect();
-    try {
-      await connector.enable();
-      this.provider = connector;
-      return connector.accounts[0];
-    } catch (error) {
-      console.error('WalletConnect error:', error);
-      throw error;
-    }
-  }
-
-  // Connect to Phantom (Solana)
-  async connectPhantom() {
-    if (window.solana && window.solana.isPhantom) {
+    async function connectBrowserWallet() {
+      const btn = document.getElementById('metamaskBtn');
+      const originalText = btn?.innerHTML;
+      
       try {
-        const response = await window.solana.connect();
-        return response.publicKey.toString();
+        if (typeof window.ethereum === 'undefined') {
+          throw new Error('MetaMask or compatible wallet is not installed');
+        }
+
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+          btn.disabled = true;
+        }
+
+        // Request accounts
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        if (accounts.length === 0) {
+          throw new Error('No accounts found. Please unlock your wallet.');
+        }
+
+        // Get current chain
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        const parsedChainId = parseInt(chainId, 16);
+        
+        // If not a supported chain, switch to BSC Testnet
+        if (!CHAIN_CONFIGS[parsedChainId]) {
+          await switchChain(97); // Default to BSC Testnet
+        }
+        
+        userWalletAddress = accounts[0];
+        walletProvider = window.ethereum;
+        ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+
+        // Add event listeners
+        window.ethereum.on('accountsChanged', handleAccountsChanged);
+        window.ethereum.on('chainChanged', handleChainChanged);
+
+        updateWalletUI();
+        closeWalletModal();
+
       } catch (error) {
-        console.error('Phantom connection error:', error);
-        throw error;
+        console.error('Browser wallet connection error:', error);
+        showWalletError(error.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText || '<i class="fab fa-ethereum"></i> MetaMask';
+        }
       }
     }
-    throw new Error('Phantom wallet not installed');
-  }
 
-  // Connect to Coinbase Wallet
-  async connectCoinbase() {
-    if (window.coinbaseWalletExtension) {
+    async function connectTrustWallet() {
+      const btn = document.getElementById('trustBtn');
+      const originalText = btn?.innerHTML;
+      
       try {
-        this.provider = window.coinbaseWalletExtension;
-        const accounts = await this.provider.request({ method: 'eth_requestAccounts' });
-        return accounts[0];
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+          btn.disabled = true;
+        }
+
+        // Check if Trust Wallet is available via window.ethereum
+        if (window.ethereum && window.ethereum.isTrust) {
+          await connectBrowserWallet();
+          return;
+        }
+
+        // Mobile deeplink approach
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          // Try to open Trust Wallet directly
+          window.location.href = `trust://browser?url=${encodeURIComponent(window.location.href)}`;
+          
+          // Fallback after timeout
+          setTimeout(() => {
+            if (!userWalletAddress) {
+              window.location.href = 'https://trustwallet.com/download';
+            }
+          }, 2000);
+        } else {
+          window.open('https://trustwallet.com/', '_blank');
+          throw new Error('Trust Wallet not detected. Please install Trust Wallet.');
+        }
+
       } catch (error) {
-        console.error('Coinbase Wallet error:', error);
-        throw error;
+        console.error('Trust Wallet connection error:', error);
+        showWalletError(error.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText || '<i class="fas fa-shield-alt"></i> Trust Wallet';
+        }
       }
     }
-    throw new Error('Coinbase Wallet not available');
-  }
 
-  // Unified connect method
-  async connect(walletType) {
-    switch (walletType) {
-      case 'metamask':
-        return this.connectMetaMask();
-      case 'walletconnect':
-        return this.connectWalletConnect();
-      case 'phantom':
-        return this.connectPhantom();
-      case 'coinbase':
-        return this.connectCoinbase();
-      default:
-        throw new Error('Unsupported wallet type');
-    }
-  }
-
-  // Disconnect wallet
-  async disconnect() {
-    if (this.walletConnect) {
-      await this.walletConnect.disconnect();
-    }
-    this.provider = null;
-    this.walletConnect = null;
-  }
-}
-
-// Connect to MetaMask
-wallet.connect('metamask')
-  .then(address => console.log('Connected:', address))
-  .catch(err => console.error(err));
-
-// Connect via WalletConnect (for mobile)
-wallet.connect('walletconnect')
-  .then(address => console.log('Connected:', address))
-  .catch(err => console.error(err));
       async function connectWalletConnect() {
     const btn = document.getElementById('walletConnectBtn');
     const originalText = btn?.innerHTML;
@@ -1399,14 +1387,10 @@ wallet.connect('walletconnect')
       }
 
       // Initialize WalletConnect provider with projectId
-      import { WalletConnectConnector } from "@walletconnect/web3-provider";
-walletConnectProvider = new WalletConnectConnector({
-  rpc: {
-    56: "https://bsc-dataseed.binance.org/",
-    97: "https://data-seed-prebsc-1-s1.binance.org:8545/"
-  },
-  qrcode: true
-});
+      walletConnectProvider = new WalletConnectProvider.default({
+        projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Your WalletConnect Project ID
+        chains: [97, 56, 43114, 137], // Supported chain IDs
+        showQrModal: true,
         metadata: {
           name: "FLUFFI Presale",
           description: "FLUFFI Token Presale and Staking",
@@ -1627,7 +1611,7 @@ deeplink = `https://metamask.app.link/dapp/${fullUrl}`;
     }
 
     // 3. Get provider and detect chain
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(walletProvider);
     const { chainId } = await provider.getNetwork();
     const chainConfig = CHAIN_CONFIGS[chainId];
 
