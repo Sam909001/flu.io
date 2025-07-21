@@ -1349,63 +1349,64 @@
       }
     }
 
-    async function connectWalletConnect() {
-      const btn = document.getElementById('walletConnectBtn');
-      const originalText = btn?.innerHTML;
+      async function connectWalletConnect() {
+    const btn = document.getElementById('walletConnectBtn');
+    const originalText = btn?.innerHTML;
+    
+    try {
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+        btn.disabled = true;
+      }
+
+      // Initialize WalletConnect provider with projectId
+      walletConnectProvider = new WalletConnectProvider.default({
+        projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Your WalletConnect Project ID
+        chains: [97, 56, 43114, 137], // Supported chain IDs
+        showQrModal: true,
+        metadata: {
+          name: "FLUFFI Presale",
+          description: "FLUFFI Token Presale and Staking",
+          url: window.location.href,
+          icons: ["https://yourdomain.com/fluffi.jpg"]
+        }
+      });
+
+      // Enable session (triggers QR code modal)
+      await walletConnectProvider.enable();
       
-      try {
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-          btn.disabled = true;
-        }
+      // Get accounts
+      const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+      if (accounts.length === 0) {
+        throw new Error('No accounts found. Please connect your wallet.');
+      }
 
-        // Initialize WalletConnect provider
-        walletConnectProvider = new WalletConnectProvider.default({
-          rpc: {
-            97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-            56: "https://bsc-dataseed.binance.org/",
-            43114: "https://api.avax.network/ext/bc/C/rpc",
-            137: "https://polygon-rpc.com/"
-          },
-          chainId: 97, // Default to BSC Testnet
-          bridge: "https://bridge.walletconnect.org"
-        });
+      userWalletAddress = accounts[0];
+      ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
+      walletProvider = walletConnectProvider;
+      
+      // Add event listeners
+      walletConnectProvider.on('accountsChanged', handleAccountsChanged);
+      walletConnectProvider.on('chainChanged', handleChainChanged);
+      walletConnectProvider.on('disconnect', handleDisconnect);
+      
+      updateWalletUI();
+      closeWalletModal();
+      closeMobileWalletModal();
 
-        // Enable session (triggers QR code modal)
-        await walletConnectProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
-        if (accounts.length === 0) {
-          throw new Error('No accounts found. Please connect your wallet.');
-        }
-
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
-        walletProvider = walletConnectProvider;
-        
-        // Add event listeners
-        walletConnectProvider.on('accountsChanged', handleAccountsChanged);
-        walletConnectProvider.on('chainChanged', handleChainChanged);
-        walletConnectProvider.on('disconnect', handleDisconnect);
-        
-        updateWalletUI();
-        closeWalletModal();
-        closeMobileWalletModal();
-
-      } catch (error) {
-        console.error('WalletConnect error:', error);
-        showWalletError(error.message);
-        if (walletConnectProvider) {
-          await walletConnectProvider.disconnect();
-        }
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = originalText || '<i class="fas fa-link"></i> WalletConnect';
-        }
+    } catch (error) {
+      console.error('WalletConnect error:', error);
+      showWalletError(error.message);
+      if (walletConnectProvider) {
+        await walletConnectProvider.disconnect();
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText || '<i class="fas fa-link"></i> WalletConnect';
       }
     }
+  }
 
     // ===== CHAIN MANAGEMENT =====
     async function switchChain(chainId) {
