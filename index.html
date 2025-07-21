@@ -1636,10 +1636,10 @@ function resetTimer() {
     }
 
     // 9. Send transaction (mobile wallets may need higher gas)
-    const tx = await contract.buyTokens(referralAddress, {
-      value: ethers.utils.parseEther(amount),
-      gasLimit: gasEstimate.mul(130).div(100), // 30% buffer for mobile
-    });
+   const tx = await contract.contribute(referralAddress, {
+  value: ethers.utils.parseEther(amount),
+  gasLimit: gasEstimate.mul(130).div(100), // 30% buffer for mobile
+});
 
     // 10. Wait for confirmation (mobile wallets sometimes take longer)
     const receipt = await tx.wait();
