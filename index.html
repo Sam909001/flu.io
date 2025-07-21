@@ -1483,7 +1483,8 @@ function resetTimer() {
             deeplink = `trust://browser?url=${currentUrl}`;
             break;
           case 'metamask':
-            deeplink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+            const fullUrl = window.location.href.replace(/^https?:\/\//, '');
+deeplink = `https://metamask.app.link/dapp/${fullUrl}`;
             break;
           case 'walletconnect':
             connectWalletConnect();
