@@ -1138,6 +1138,10 @@ function resetTimer() {
         </div>
       </div>
       
+        <div id="mobileWalletError" class="wallet-error hidden mt-4"></div>
+  </div>
+</div>
+      
       <div class="mobile-wallet-option" onclick="handleMobileWalletClick('trust')">
         <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet" class="mobile-wallet-icon">
         <div class="mobile-wallet-info">
@@ -1156,18 +1160,7 @@ function resetTimer() {
     </div>
   </div>
 </div>
-        
-  <div class="mobile-wallet-option" onclick="handleMobileWalletClick('rainbow')">
-  <img src="https://avatars.githubusercontent.com/u/48327834?s=200&v=4" alt="Rainbow" class="mobile-wallet-icon">
-  <div class="mobile-wallet-info">
-    <h4>Rainbow</h4>
-    <p>Fun, simple & secure</p>
-  </div>
-</div>
-      
-      <div id="mobileWalletError" class="wallet-error hidden"></div>
-    </div>
-  </div>
+  
 
   <script>
     // ===== MULTI-CHAIN CONFIGURATION =====
@@ -1250,15 +1243,15 @@ function resetTimer() {
         }
         
 function isWalletAppInstalled(walletType) {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined' || !window.ethereum) return false;
   
   switch(walletType) {
     case 'metamask':
-      return typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask;
+      return window.ethereum.isMetaMask;
     case 'trust':
-      return typeof window.ethereum !== 'undefined' && window.ethereum.isTrust;
+      return window.ethereum.isTrust;
     case 'rainbow':
-      return typeof window.ethereum !== 'undefined' && window.ethereum.isRainbow;
+      return window.ethereum.isRainbow;
     default:
       return false;
   }
@@ -1349,20 +1342,28 @@ function isWalletAppInstalled(walletType) {
         ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
 
         function handleMobileWalletClick(walletType) {
-  // Check if wallet is already installed
-  if (isWalletAppInstalled(walletType)) {
-    switch(walletType) {
-      case 'metamask':
-      case 'trust':
-        connectBrowserWallet();
-        break;
-      case 'rainbow':
-        connectWalletConnect();
-        break;
+  try {
+    // Check if wallet is installed
+    if (isWalletAppInstalled(walletType)) {
+      switch(walletType) {
+        case 'metamask':
+        case 'trust':
+          connectBrowserWallet();
+          break;
+        case 'rainbow':
+          connectWalletConnect();
+          break;
+      }
+      closeMobileWalletModal();
+      return;
     }
-    closeMobileWalletModal();
-  } else {
+    
+    // If not installed, try deep linking
     openMobileWallet(walletType);
+    
+  } catch (error) {
+    console.error('Mobile wallet error:', error);
+    showMobileWalletError(error.message);
   }
 }
       
@@ -1550,53 +1551,41 @@ function isWalletAppInstalled(walletType) {
     // ===== MOBILE WALLET FUNCTIONS =====
    function openMobileWallet(walletType) {
   try {
-    // Store the wallet type in session storage
     sessionStorage.setItem('pendingWalletConnection', walletType);
     
-    // Different approaches for different wallets
     const currentUrl = encodeURIComponent(window.location.href);
     const urlWithoutProtocol = window.location.href.replace(/^https?:\/\//, '');
-
-    let deeplink = '';
-    let fallbackUrl = '';
-
-    switch(walletType) {
-      case 'trust':
-        deeplink = `https://link.trustwallet.com/open_url?coin_id=20000714&url=${currentUrl}`;
-        fallbackUrl = 'https://trustwallet.com/download';
-        break;
-      case 'metamask':
-        deeplink = `https://metamask.app.link/dapp/${urlWithoutProtocol}`;
-        fallbackUrl = 'https://metamask.io/download.html';
-        break;
-      case 'rainbow':
-        deeplink = `rainbow://wc?uri=${encodeURIComponent(`https://walletconnect.org/wc?uri=${currentUrl}`)}`;
-        fallbackUrl = 'https://rainbow.me/';
-        break;
-      default:
-        throw new Error('Unsupported wallet type');
+    
+    const deeplinks = {
+      'trust': {
+        url: `https://link.trustwallet.com/open_url?coin_id=20000714&url=${currentUrl}`,
+        fallback: 'https://trustwallet.com/download'
+      },
+      'metamask': {
+        url: `https://metamask.app.link/dapp/${urlWithoutProtocol}`,
+        fallback: 'https://metamask.io/download.html'
+      },
+      'rainbow': {
+        url: `https://rainbow.me/wc?uri=${encodeURIComponent(`https://walletconnect.org/wc?uri=${currentUrl}`)}`,
+        fallback: 'https://rainbow.me/'
+      }
+    };
+    
+    const walletConfig = deeplinks[walletType];
+    if (!walletConfig) {
+      throw new Error('Unsupported wallet type');
     }
-
-    // Create hidden iframe for deeplinking
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = deeplink;
-    document.body.appendChild(iframe);
-
+    
+    // Try to open the wallet directly
+    window.location.href = walletConfig.url;
+    
     // Fallback after timeout
     setTimeout(() => {
       if (!userWalletAddress) {
-        window.location.href = fallbackUrl;
+        window.location.href = walletConfig.fallback;
       }
     }, 1000);
-
-    // Clean up iframe after a delay
-    setTimeout(() => {
-      if (iframe.parentNode) {
-        document.body.removeChild(iframe);
-      }
-    }, 3000);
-
+    
   } catch (error) {
     console.error('Mobile wallet error:', error);
     showMobileWalletError(error.message);
@@ -2232,7 +2221,26 @@ function closeMobileWalletModal() {
         updateNextIncreaseTime();
       }, 1000);
     });
-  
+  // Check for pending wallet connection on return from deep link
+window.addEventListener('load', () => {
+  const pendingWallet = sessionStorage.getItem('pendingWalletConnection');
+  if (pendingWallet && !userWalletAddress) {
+    setTimeout(() => {
+      switch(pendingWallet) {
+        case 'trust':
+        case 'metamask':
+          if (isWalletAppInstalled(pendingWallet)) {
+            connectBrowserWallet();
+          }
+          break;
+        case 'rainbow':
+          connectWalletConnect();
+          break;
+      }
+      sessionStorage.removeItem('pendingWalletConnection');
+    }, 500);
+  }
+});
   </script>
 </body>
 </html>
