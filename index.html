@@ -723,6 +723,15 @@
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+    /* Ensure WalletConnect modal appears above everything */
+.walletconnect-modal__container {
+  z-index: 9999 !important;
+}
+
+/* Mobile wallet modal improvements */
+.mobile-wallet-modal {
+  z-index: 9998;
+}
   </style>
 </head>
   
@@ -1131,33 +1140,33 @@ function resetTimer() {
     </div>
     
     <div class="mobile-wallet-options-grid">
-      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('metamask')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="mobile-wallet-icon">
-        <div class="mobile-wallet-info">
-          <h4>MetaMask</h4>
-          <p>Most popular Ethereum wallet</p>
-        </div>
-      </div>
+     <div class="mobile-wallet-option" onclick="handleMobileWalletClick('metamask')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="mobile-wallet-icon">
+  <div class="mobile-wallet-info">
+    <h4>MetaMask</h4>
+    <p>Most popular Ethereum wallet</p>
+  </div>
+</div>
       
         <div id="mobileWalletError" class="wallet-error hidden mt-4"></div>
   </div>
 </div>
       
-      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('trust')">
-        <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet" class="mobile-wallet-icon">
-        <div class="mobile-wallet-info">
-          <h4>Trust Wallet</h4>
-          <p>Secure multi-crypto wallet</p>
-        </div>
-      </div>
+    <div class="mobile-wallet-option" onclick="handleMobileWalletClick('trust')">
+  <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="mobile-wallet-icon">
+  <div class="mobile-wallet-info">
+    <h4>Trust Wallet</h4>
+    <p>Secure multi-crypto wallet</p>
+  </div>
+</div>
       
-      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('rainbow')">
-        <img src="https://avatars.githubusercontent.com/u/48327834?s=200&v=4" alt="Rainbow" class="mobile-wallet-icon">
-        <div class="mobile-wallet-info">
-          <h4>Rainbow</h4>
-          <p>Fun, simple & secure</p>
-        </div>
-      </div>
+ <div class="mobile-wallet-option" onclick="handleMobileWalletClick('rainbow')">
+  <img src="https://rainbow.me/images/rainbow-app-icon.png" alt="Rainbow" class="mobile-wallet-icon">
+  <div class="mobile-wallet-info">
+    <h4>Rainbow</h4>
+    <p>Fun, simple & secure</p>
+  </div>
+</div>
     </div>
   </div>
 </div>
@@ -1211,6 +1220,65 @@ function resetTimer() {
     let walletConnectProvider = null;
 
     // ===== UTILITY FUNCTIONS =====
+    let walletConnectProvider = null;
+
+async function connectWalletConnect() {
+  const btn = document.getElementById('walletConnectBtn');
+  const originalText = btn?.innerHTML;
+  
+  try {
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+      btn.disabled = true;
+    }
+
+    // Initialize WalletConnect provider
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/",
+        97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        137: "https://polygon-rpc.com/",
+        43114: "https://api.avax.network/ext/bc/C/rpc"
+      }
+    });
+
+    // Enable session (triggers QR modal)
+    await walletConnectProvider.enable();
+
+    // Get accounts
+    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+    if (accounts.length === 0) throw new Error('No accounts found');
+
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
+    walletProvider = walletConnectProvider;
+
+    // Event listeners
+    walletConnectProvider.on('accountsChanged', handleAccountsChanged);
+    walletConnectProvider.on('chainChanged', handleChainChanged);
+    walletConnectProvider.on('disconnect', handleDisconnect);
+
+    updateWalletUI();
+    closeWalletModal();
+    closeMobileWalletModal();
+  } catch (error) {
+    console.error('WalletConnect error:', error);
+    showWalletError(error.message);
+    if (walletConnectProvider) {
+      try {
+        await walletConnectProvider.disconnect();
+      } catch (e) {
+        console.error('Error disconnecting:', e);
+      }
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText || '<i class="fas fa-link"></i> WalletConnect';
+    }
+  }
+}
+    
     function showWalletError(message) {
       const errorEl = document.getElementById('walletError');
       if (errorEl) {
@@ -1377,6 +1445,30 @@ function isWalletAppInstalled(walletType) {
     showMobileWalletError(error.message);
   }
 }
+
+function isWalletAppInstalled(walletType) {
+  if (typeof window === 'undefined' || !window.ethereum) return false;
+  
+  switch(walletType) {
+    case 'metamask':
+      return window.ethereum.isMetaMask;
+    case 'trust':
+      return window.ethereum.isTrust;
+    case 'rainbow':
+      return window.ethereum.isRainbow;
+    default:
+      return false;
+  }
+}
+    
+    // If not installed, try deep linking
+    openMobileWallet(walletType);
+    
+  } catch (error) {
+    console.error('Mobile wallet error:', error);
+    showMobileWalletError(error.message);
+  }
+}
         async function ensureCorrectChain() {
   const network = await ethersProvider.getNetwork();
   const supported = [56, 97]; // Add more if needed
@@ -1505,7 +1597,7 @@ function isWalletAppInstalled(walletType) {
     }
 
     // ===== MOBILE WALLET FUNCTIONS =====
-   function openMobileWallet(walletType) {
+function openMobileWallet(walletType) {
   try {
     sessionStorage.setItem('pendingWalletConnection', walletType);
     
