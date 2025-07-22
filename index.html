@@ -1376,15 +1376,8 @@ function isWalletAppInstalled(walletType) {
       }
     }
     // ===== WALLET CONNECTION FUNCTIONS =====
-    async function connectWallet() {
-      if (userWalletAddress) {
-        disconnectWallet();
-      } else {
-        openWalletModal();
-      }
-    }
 
-    async function connectBrowserWallet() {
+     async function connectBrowserWallet() {
       const btn = document.getElementById('metamaskBtn');
       const originalText = btn?.innerHTML;
       
@@ -1476,8 +1469,6 @@ function isWalletAppInstalled(walletType) {
     throw new Error("Unsupported chain");
   }
 }
-
-      
         // Add event listeners
         window.ethereum.on('accountsChanged', handleAccountsChanged);
         window.ethereum.on('chainChanged', handleChainChanged);
