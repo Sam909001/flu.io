@@ -1104,50 +1104,42 @@ function resetTimer() {
   </div>
 
   <!-- Enhanced Mobile Wallet Modal -->
-  <div id="mobileWalletModal" class="hidden mobile-wallet-modal">
-    <div class="mobile-wallet-modal-content">
-      <div class="mobile-wallet-modal-header">
-        <h3>Connect Mobile Wallet</h3>
-        <span class="close-modal" onclick="closeMobileWalletModal()">&times;</span>
-      </div>
-      
-      <div class="mobile-wallet-options-grid">
-        <div class="mobile-wallet-option" onclick="openMobileWallet('trust')">
-          <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet" class="mobile-wallet-icon">
-          <div class="mobile-wallet-info">
-            <h4>Trust Wallet</h4>
-            <p>Secure multi-crypto wallet</p>
-          </div>
-        </div>
-        
-        <div class="mobile-wallet-option" onclick="openMobileWallet('metamask')">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="mobile-wallet-icon">
-          <div class="mobile-wallet-info">
-            <h4>MetaMask Mobile</h4>
-            <p>Most popular Ethereum wallet</p>
-          </div>
-        </div>
-        
-        <div class="mobile-wallet-option" onclick="openMobileWallet('walletconnect')">
-          <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect" class="mobile-wallet-icon">
-          <div class="mobile-wallet-info">
-            <h4>WalletConnect</h4>
-            <p>Connect any mobile wallet</p>
-          </div>
-        </div>
-        
-        <div class="mobile-wallet-option" onclick="openMobileWallet('rainbow')">
-          <img src="https://avatars.githubusercontent.com/u/48327834?s=200&v=4" alt="Rainbow" class="mobile-wallet-icon">
-          <div class="mobile-wallet-info">
-            <h4>Rainbow</h4>
-            <p>Fun, simple & secure</p>
-          </div>
-        </div>
-      </div>
-      
-      <div id="mobileWalletError" class="wallet-error hidden"></div>
+  <div id="mobileWalletModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+    <div class="modal-header flex justify-between items-center p-4 border-b">
+      <h3 class="text-xl font-bold dark:text-white">Connect Mobile Wallet</h3>
+      <button onclick="closeMobileWalletModal()" class="text-2xl dark:text-white">×</button>
     </div>
+    
+    <div class="space-y-4 p-4">
+      <button 
+        id="mobileMetamaskBtn" 
+        data-wallet-type="metamask"
+        class="wallet-btn w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+      >
+        <i class="fab fa-ethereum mr-2"></i> MetaMask
+      </button>
+      
+      <button 
+        id="mobileTrustBtn" 
+        data-wallet-type="trust"
+        class="wallet-btn w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+      >
+        <i class="fas fa-shield-alt mr-2"></i> Trust Wallet
+      </button>
+      
+      <button 
+        id="mobileWalletConnectBtn" 
+        data-wallet-type="walletconnect"
+        class="wallet-btn w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+      >
+        <i class="fas fa-link mr-2"></i> WalletConnect
+      </button>
+    </div>
+    
+    <div id="mobileWalletError" class="hidden p-4 text-red-500 bg-red-50 dark:bg-red-900 dark:text-red-200"></div>
   </div>
+</div>
 
   <script>
     // ===== MULTI-CHAIN CONFIGURATION =====
