@@ -1157,9 +1157,8 @@ function resetTimer() {
   </div>
 </div>
   
-
-  <script>
     // ===== MULTI-CHAIN CONFIGURATION =====
+  <script>
     const CHAIN_CONFIGS = {
       // BSC Testnet
       97: {
@@ -1199,13 +1198,15 @@ function resetTimer() {
       }
     };
   </script>
-  <script>
-    // Global wallet state
-    let userWalletAddress = null;
-    let walletProvider = null;
-    let ethersProvider = null;
-    let walletConnectProvider = null;
+  <!-- ===== WALLET CONNECTION & CHAIN MANAGEMENT ===== -->
+<script>
+// Global wallet state
+let userWalletAddress = null;
+let walletProvider = null;
+let ethersProvider = null;
+let walletConnectProvider = null;
 
+// WalletConnect connection (FIXED)
 async function connectWalletConnect() {
   const btn = document.getElementById('walletConnectBtn');
   const originalText = btn?.innerHTML;
@@ -1223,10 +1224,12 @@ async function connectWalletConnect() {
         97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
         137: "https://polygon-rpc.com/",
         43114: "https://api.avax.network/ext/bc/C/rpc"
-      }
+      },
+      chainId: 97, // Default to BSC Testnet
+      bridge: "https://bridge.walletconnect.org" // Required bridge
     });
 
-    // Enable session (triggers QR modal)
+    // Enable session
     await walletConnectProvider.enable();
 
     // Get accounts
@@ -1262,8 +1265,6 @@ async function connectWalletConnect() {
     }
   }
 }
-  </script>
-    <script>
     function showWalletError(message) {
       const errorEl = document.getElementById('walletError');
       if (errorEl) {
@@ -1687,7 +1688,6 @@ function closeMobileWalletModal() {
       document.getElementById("walletModal").classList.add("hidden");
     }
   </script>
-
     <script>
     // ===== PRESALE FUNCTIONS =====
   async function buyFluffiMultiChain() {
@@ -2046,9 +2046,7 @@ function closeMobileWalletModal() {
         </div>
       `;
     }
-    </script>
-
-  <script>
+      
     function copyReferralLink() {
       const input = document.getElementById('referralLinkInput');
       input.select();
@@ -2065,8 +2063,6 @@ function closeMobileWalletModal() {
       const link = document.getElementById('referralLinkInput').value;
       window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
     }
-  </script>
-  <script>
     // ===== TOKEN CHART =====
     function initTokenChart() {
       const ctx = document.getElementById('tokenChart').getContext('2d');
