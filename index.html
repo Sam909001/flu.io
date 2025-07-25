@@ -3,7 +3,6 @@
 <head>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Presale & Staking</title>
@@ -1091,33 +1090,6 @@ function resetTimer() {
     </div>
   </footer>
 
-  <!-- Wallet Modal -->
-  <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold dark:text-white">Connect Wallet</h3>
-        <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close wallet modal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="grid grid-cols-2 gap-4">
-        <button onclick="connectBrowserWallet()" class="wallet-option">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon" alt="MetaMask" width="40" height="40">
-          <span>Browser Wallet</span>
-        </button>
-        
-        <button onclick="connectWalletConnect()" class="wallet-option">
-          <img src="https://walletconnect.com/walletconnect-logo.png" class="wallet-icon" alt="WalletConnect" width="40" height="40">
-          <span>WalletConnect</span>
-        </button>
-      </div>
-      
-      <div id="walletError" class="mt-4 text-red-500 text-sm hidden"></div>
-    </div>
-  </div>
-
-  <!-- Enhanced Mobile Wallet Modal -->
  <div id="mobileWalletModal" class="hidden mobile-wallet-modal">
   <div class="mobile-wallet-modal-content">
     <div class="mobile-wallet-modal-header">
@@ -1126,15 +1098,32 @@ function resetTimer() {
     </div>
     
     <div class="mobile-wallet-options-grid">
-     <div class="mobile-wallet-option" onclick="handleMobileWalletClick('metamask')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="mobile-wallet-icon">
-  <div class="mobile-wallet-info">
-    <h4>MetaMask</h4>
-    <p>Most popular Ethereum wallet</p>
-  </div>
-</div>
+      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('metamask')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="mobile-wallet-icon">
+        <div class="mobile-wallet-info">
+          <h4>MetaMask</h4>
+          <p>Most popular Ethereum wallet</p>
+        </div>
+      </div>
       
-        <div id="mobileWalletError" class="wallet-error hidden mt-4"></div>
+      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('trust')">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="mobile-wallet-icon">
+        <div class="mobile-wallet-info">
+          <h4>Trust Wallet</h4>
+          <p>Secure multi-crypto wallet</p>
+        </div>
+      </div>
+      
+      <div class="mobile-wallet-option" onclick="handleMobileWalletClick('rainbow')">
+        <img src="https://rainbow.me/images/rainbow-app-icon.png" alt="Rainbow" class="mobile-wallet-icon">
+        <div class="mobile-wallet-info">
+          <h4>Rainbow</h4>
+          <p>Fun, simple & secure</p>
+        </div>
+      </div>
+    </div>
+    
+    <div id="mobileWalletError" class="wallet-error hidden mt-4"></div>
   </div>
 </div>
       
@@ -1200,7 +1189,7 @@ function resetTimer() {
   </script>
   <!-- ===== WALLET CONNECTION & CHAIN MANAGEMENT ===== -->
 <script>
-// Global wallet state
+  // Global wallet state
 let userWalletAddress = null;
 let walletProvider = null;
 let ethersProvider = null;
@@ -1217,8 +1206,8 @@ async function connectWalletConnect() {
       btn.disabled = true;
     }
 
-    // Initialize WalletConnect provider
-    walletConnectProvider = new WalletConnectProvider.default({
+    // Initialize WalletConnect provider - FIXED INITIALIZATION
+    walletConnectProvider = new window.WalletConnectProvider.default({
       rpc: {
         56: "https://bsc-dataseed.binance.org/",
         97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
@@ -1265,141 +1254,9 @@ async function connectWalletConnect() {
     }
   }
 }
-    function showWalletError(message) {
-      const errorEl = document.getElementById('walletError');
-      if (errorEl) {
-        errorEl.textContent = message;
-        errorEl.classList.remove('hidden');
-        setTimeout(() => {
-          errorEl.classList.add('hidden');
-        }, 5000);
-      }
-    }
 
-    function showMobileWalletError(message) {
-      const errorEl = document.getElementById('mobileWalletError');
-      if (errorEl) {
-        errorEl.textContent = message;
-        errorEl.classList.remove('hidden');
-        setTimeout(() => {
-          errorEl.classList.add('hidden');
-        }, 5000);
-      }
-    }
-
-    function updateWalletUI() {
-      const statusEl = document.getElementById('walletStatus');
-      const addressEl = document.getElementById('connectedAddress');
-      
-      if (userWalletAddress) {
-        statusEl?.classList.remove('hidden');
-        if (addressEl) {
-          addressEl.textContent = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-        }
-
-        function updateWalletUI() {
-  const addr = userWalletAddress;
-  if (!addr) return;
-
-  const short = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  const walletBtn = document.getElementById('walletButton');
-  if (walletBtn) {
-    walletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${short}`;
-  }
-}
-        
-function isWalletAppInstalled(walletType) {
-  if (typeof window === 'undefined' || !window.ethereum) return false;
-  
-  switch(walletType) {
-    case 'metamask':
-      return window.ethereum.isMetaMask;
-    case 'trust':
-      return window.ethereum.isTrust;
-    case 'rainbow':
-      return window.ethereum.isRainbow;
-    default:
-      return false;
-  }
-}
-        // Update button states
-        const buttons = ['metamaskBtn', 'mobileWalletBtn', 'trustBtn', 'walletConnectBtn'];
-        buttons.forEach(id => {
-          const btn = document.getElementById(id);
-          if (btn) {
-            btn.innerHTML = '<i class="fas fa-check-circle"></i> Connected';
-            btn.classList.add('connected');
-          }
-        });
-        
-        // Update main wallet button
-        const walletBtn = document.getElementById('walletButton');
-        if (walletBtn) {
-          walletBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i>${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-        }
-        
-      } else {
-        statusEl?.classList.add('hidden');
-        
-        // Reset button states
-        const resetButtons = [
-          ['metamaskBtn', '<i class="fab fa-ethereum"></i> MetaMask'],
-          ['mobileWalletBtn', '<i class="fas fa-mobile-alt"></i> Mobile Wallets'],
-          ['trustBtn', '<i class="fas fa-shield-alt"></i> Trust Wallet'],
-          ['walletConnectBtn', '<i class="fas fa-link"></i> WalletConnect']
-        ];
-        
-        resetButtons.forEach(([id, text]) => {
-          const btn = document.getElementById(id);
-          if (btn) {
-            btn.innerHTML = text;
-            btn.classList.remove('connected');
-          }
-        });
-        
-        const walletBtn = document.getElementById('walletButton');
-        if (walletBtn) {
-          walletBtn.innerHTML = '<i class="fas fa-wallet mr-1"></i> Connect Wallet';
-        }
-      }
-    }
-    // ===== WALLET CONNECTION FUNCTIONS =====
-
-     async function connectBrowserWallet() {
-      const btn = document.getElementById('metamaskBtn');
-      const originalText = btn?.innerHTML;
-      
-      try {
-        if (typeof window.ethereum === 'undefined') {
-          throw new Error('MetaMask or compatible wallet is not installed');
-        }
-
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-          btn.disabled = true;
-        }
-
-        // Request accounts
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        if (accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock your wallet.');
-        }
-
-        // Get current chain
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        const parsedChainId = parseInt(chainId, 16);
-        
-        // If not a supported chain, switch to BSC Testnet
-        if (!CHAIN_CONFIGS[parsedChainId]) {
-          await switchChain(97); // Default to BSC Testnet
-        }
-        
-        userWalletAddress = accounts[0];
-        walletProvider = window.ethereum;
-        ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-
-        function handleMobileWalletClick(walletType) {
+// Add this function to handle mobile wallet clicks
+function handleMobileWalletClick(walletType) {
   try {
     // Check if wallet is installed
     if (isWalletAppInstalled(walletType)) {
@@ -1425,6 +1282,7 @@ function isWalletAppInstalled(walletType) {
   }
 }
 
+// Add this function to check wallet installation
 function isWalletAppInstalled(walletType) {
   if (typeof window === 'undefined' || !window.ethereum) return false;
   
@@ -1437,9 +1295,7 @@ function isWalletAppInstalled(walletType) {
       return window.ethereum.isRainbow;
     default:
       return false;
-  }
-}
-    
+  } 
     // If not installed, try deep linking
     openMobileWallet(walletType);
     
