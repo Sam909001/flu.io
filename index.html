@@ -791,10 +791,9 @@ function resetTimer() {
       <div class="wallet-connect-section">
         <h3 class="text-lg font-semibold mb-3 dark:text-white">Connect Your Wallet</h3>
         
-        <div class="wallet-buttons-grid">
-          <button onclick="connectBrowserWallet()" id="metamaskBtn" class="wallet-connect-btn metamask-btn">
-            <i class="fab fa-ethereum"></i> MetaMask
-          </button>
+    <button id="metamaskBtn" class="wallet-connect-btn metamask-btn">
+  <i class="fab fa-ethereum"></i> MetaMask
+</button>
           
           <button onclick="openMobileWalletModal()" id="mobileWalletBtn" class="wallet-connect-btn mobile-wallets-btn">
             <i class="fas fa-mobile-alt"></i> Mobile Wallets
@@ -1226,6 +1225,41 @@ let walletConnectProvider = null;
       openMobileWalletModal();
     }
   }
+async function connectBrowserWallet() {
+  const btn = document.getElementById('metamaskBtn');
+  const originalText = btn?.innerHTML;
+  
+  try {
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+      btn.disabled = true;
+    }
+
+    // Request account access
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    userWalletAddress = accounts[0];
+    
+    // Create provider
+    ethersProvider = new ethers.BrowserProvider(window.ethereum);
+    walletProvider = window.ethereum;
+
+    // Add event listeners
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    window.ethereum.on('chainChanged', handleChainChanged);
+
+    updateWalletUI();
+    closeWalletModal();
+
+  } catch (error) {
+    console.error('Browser wallet connection error:', error);
+    showWalletError(error.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText || '<i class="fab fa-ethereum"></i> MetaMask';
+    }
+  }
+}
 
 // WalletConnect connection (FIXED)
 async function connectWalletConnect() {
@@ -2065,6 +2099,7 @@ function closeMobileWalletModal() {
   <script>
     // ===== INITIALIZATION =====
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('metamaskBtn').addEventListener('click', connectBrowserWallet);
        // Check for pending wallet connection on page load
   const pendingWallet = sessionStorage.getItem('pendingWalletConnection');
   if (pendingWallet) {
