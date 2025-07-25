@@ -1218,6 +1218,15 @@ let walletProvider = null;
 let ethersProvider = null;
 let walletConnectProvider = null;
 
+    // ===== MAIN WALLET CONNECTION FUNCTION =====
+  function connectWallet() {
+    if (window.ethereum) {
+      connectBrowserWallet();
+    } else {
+      openMobileWalletModal();
+    }
+  }
+
 // WalletConnect connection (FIXED)
 async function connectWalletConnect() {
   const btn = document.getElementById('walletConnectBtn');
