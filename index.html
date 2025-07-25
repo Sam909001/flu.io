@@ -1207,7 +1207,7 @@ async function connectWalletConnect() {
     }
 
     // Initialize WalletConnect provider - FIXED INITIALIZATION
-    walletConnectProvider = new window.WalletConnectProvider.default({
+    walletConnectProvider = new window.WalletConnectProvider({
       rpc: {
         56: "https://bsc-dataseed.binance.org/",
         97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
@@ -1281,38 +1281,22 @@ function handleMobileWalletClick(walletType) {
     showMobileWalletError(error.message);
   }
 }
-
-// Add this function to check wallet installation
-function isWalletAppInstalled(walletType) {
-  if (typeof window === 'undefined' || !window.ethereum) return false;
-  
-  switch(walletType) {
-    case 'metamask':
-      return window.ethereum.isMetaMask;
-    case 'trust':
-      return window.ethereum.isTrust;
-    case 'rainbow':
-      return window.ethereum.isRainbow;
-    default:
-      return false;
-  } 
-    // If not installed, try deep linking
-    openMobileWallet(walletType);
-    
-  } catch (error) {
-    console.error('Mobile wallet error:', error);
-    showMobileWalletError(error.message);
-  }
-}
-        async function ensureCorrectChain() {
-  const network = await ethersProvider.getNetwork();
-  const supported = [56, 97]; // Add more if needed
+</script>
+  <script>
+// FIXED Chain validation
+async function ensureCorrectChain() {
+  const provider = new ethers.BrowserProvider(walletProvider);
+  const network = await provider.getNetwork();
+  const supported = [56, 97, 137, 43114]; // Supported chains
 
   if (!supported.includes(Number(network.chainId))) {
-    alert("Unsupported network. Please switch to BSC.");
+    alert("Unsupported network. Please switch to BSC, Polygon or Avalanche.");
     throw new Error("Unsupported chain");
   }
+  return Number(network.chainId);
 }
+</script>
+  <script>
         // Add event listeners
         window.ethereum.on('accountsChanged', handleAccountsChanged);
         window.ethereum.on('chainChanged', handleChainChanged);
