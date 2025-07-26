@@ -1308,17 +1308,51 @@ function resetTimer() {
         closeWalletModal();
 
       } catch (error) {
-        console.error('MetaMask connection error:', error);
-        showWalletError(error.message);
-        if (btn && originalText) {
-          btn.innerHTML = originalText;
-        }
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-        }
-      }
+    console.error('WalletConnect error:', error);
+    
+    // Mobile fallback
+    if (isMobileDevice()) {
+      openMobileWalletModal();
+    } else {
+      showWalletError(error.message || 'Connection failed');
     }
+  } finally {
+    if (btn && originalText) {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+}
+   // Mobile-specific connection handler
+async function handleMobileWalletConnect() {
+  return new Promise((resolve) => {
+    // Show mobile modal instead of QR code
+    openMobileWalletModal();
+    
+    // Set up connection listener
+    window.addEventListener('walletconnect_uri', (event) => {
+      const uri = event.detail;
+      // Implement deep linking for mobile wallets
+      if (isIOS()) {
+        window.location.href = `trust://wc?uri=${encodeURIComponent(uri)}`;
+      } else if (isAndroid()) {
+        window.location.href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
+      }
+    });
+    
+    // Resolve when connected
+    window.addEventListener('walletconnect_connect', () => resolve());
+  });
+}
+
+// Platform detection helpers
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isAndroid() {
+  return /Android/.test(navigator.userAgent);
+}
 
     // Trust Wallet connection
     async function connectTrustWallet() {
@@ -1472,17 +1506,38 @@ function resetTimer() {
         openWalletModal();
       }
     }
-
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js');
-        walletProvider = new WalletConnectProvider({
-          projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
-          chains: [56], // BSC 
-          showQrModal: true
-        });
-        
-        await walletProvider.enable();
+async function connectWalletConnect() {
+  const btn = document.getElementById('walletConnectBtn');
+  const originalText = btn?.innerHTML;
+  
+  try {
+    // Show loading state
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+      btn.disabled = true;
+    }
+    
+    // Check for global availability
+    if (typeof window.EthereumProvider === 'undefined') {
+      // Handle mobile-specific initialization
+      if (isMobileDevice()) {
+        return await handleMobileWalletConnect();
+      }
+      throw new Error('WalletConnect not available. Please try again later.');
+    }
+    
+    // Initialize provider
+    walletProvider = new window.EthereumProvider({
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a",
+      chains: [97],
+      showQrModal: true,
+      qrModalOptions: {
+        themeMode: 'light',
+        themeVariables: {'--wcm-z-index': '9999'}
+      }
+    });
+    
+    await walletProvider.enable();
         const accounts = await walletProvider.request({ method: 'eth_accounts' });
         userWalletAddress = accounts[0];
         ethersProvider = new ethers.providers.Web3Provider(walletProvider);
