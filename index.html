@@ -1390,158 +1390,222 @@ function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-async function connectTrustWallet() {
-  const btn = document.getElementById('trustBtn');
-  const originalText = btn?.innerHTML;
-  
-  try {
-    // Show loading state
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-      btn.disabled = true;
-    }
+// Trust Wallet Connection Manager
+class TrustWalletConnector {
+  constructor() {
+    this.connectionTimeout = 15000; // 15 seconds
+    this.pingInterval = 500; // Check every 500ms
+    this.setupEventListeners();
+  }
 
-    // Case 1: Trust Wallet extension is installed
-    if (window.ethereum?.isTrust) {
-      try {
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        
-        await switchToBSCTestnet();
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-        walletProvider = window.ethereum;
-        updateWalletUI();
-        return; // Successfully connected
-      } catch (error) {
-        throw new Error('Failed to connect Trust Wallet: ' + error.message);
+  setupEventListeners() {
+    // Listen for Ethereum provider injection
+    window.addEventListener('ethereum#initialized', this.handleProvider.bind(this), {
+      once: true
+    });
+
+    // Listen for potential mobile wallet returns
+    window.addEventListener('load', this.checkReturnFromWallet.bind(this));
+  }
+
+  async connect() {
+    const btn = document.getElementById('trustBtn');
+    try {
+      this.setButtonState(btn, 'loading');
+
+      if (this.isExtensionAvailable()) {
+        await this.connectExtension();
+      } else if (this.isMobile()) {
+        await this.connectMobile();
+      } else {
+        this.guideDesktopInstallation();
+      }
+    } catch (error) {
+      this.handleError(error, btn);
+    }
+  }
+
+  async connectExtension() {
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts'
+    });
+    await this.switchToBSCTestnet();
+    this.handleSuccess(accounts[0]);
+  }
+
+  async connectMobile() {
+    return new Promise((resolve, reject) => {
+      // Store current session
+      sessionStorage.setItem('walletConnectionPending', 'trust');
+
+      // Open Trust Wallet
+      this.openDeepLink('trust');
+
+      // Setup connection verification
+      const connectionCheck = setInterval(() => {
+        if (window.ethereum?.isTrust && window.ethereum.selectedAddress) {
+          clearInterval(connectionCheck);
+          clearTimeout(timeout);
+          this.handleSuccess(window.ethereum.selectedAddress);
+          resolve();
+        }
+      }, this.pingInterval);
+
+      // Setup timeout
+      const timeout = setTimeout(() => {
+        clearInterval(connectionCheck);
+        reject(new Error('Connection timed out. Please try again.'));
+      }, this.connectionTimeout);
+    });
+  }
+
+  openDeepLink(walletType) {
+    const urls = {
+      trust: `trust://wc?uri=${encodeURIComponent(window.location.href)}`,
+      metamask: `metamask://dapp/${window.location.host}${window.location.pathname}`,
+      rainbow: `rainbow://dapp?url=${encodeURIComponent(window.location.href)}`
+    };
+
+    window.location.href = urls[walletType];
+  }
+
+  checkReturnFromWallet() {
+    if (sessionStorage.getItem('walletConnectionPending') === 'trust') {
+      sessionStorage.removeItem('walletConnectionPending');
+      
+      if (window.ethereum?.isTrust) {
+        this.connect();
+      } else {
+        this.showError('Returned from wallet but no connection established');
       }
     }
+  }
 
-    // Case 2: Mobile device (try deep linking)
-    if (isMobileDevice()) {
-      // Store current URL for callback
-      localStorage.setItem('trustWalletReturnUrl', window.location.href);
-      
-      // Try to open Trust Wallet
-      const deepLinkUrl = `trust://wc?uri=${encodeURIComponent(window.location.href)}`;
-      window.location.href = deepLinkUrl;
-      
-      // Fallback: If not redirected after 2 seconds, show instructions
-      setTimeout(() => {
-        if (!document.hidden) {
-          showWalletError('Trust Wallet not installed. Please install it from your app store.');
-          window.open('https://trustwallet.com/download', '_blank');
-        }
-      }, 2000);
-      
-      return;
+  handleProvider(event) {
+    if (event.detail.isTrust) {
+      this.connect();
     }
+  }
 
-    // Case 3: Desktop without extension
-    const shouldInstall = confirm('Trust Wallet extension not detected. Would you like to install it?');
-    if (shouldInstall) {
+  handleSuccess(address) {
+    userWalletAddress = address;
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+    walletProvider = window.ethereum;
+    updateWalletUI();
+    closeMobileWalletModal();
+  }
+
+  // Helper methods
+  isExtensionAvailable() {
+    return window.ethereum?.isTrust;
+  }
+
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  guideDesktopInstallation() {
+    if (confirm('Trust Wallet extension not found. Install it?')) {
       window.open('https://trustwallet.com/browser-extension', '_blank');
     }
     throw new Error('Trust Wallet extension required');
-
-  } catch (error) {
-    console.error('Trust Wallet connection error:', error);
-    showWalletError(error.message);
-  } finally {
-    // Reset button state
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = originalText || 'Connect Trust Wallet';
-    }
   }
-}
 
-// Add this to check for returning mobile users
-function checkReturnFromTrustWallet() {
-  if (localStorage.getItem('trustWalletReturnUrl')) {
-    localStorage.removeItem('trustWalletReturnUrl');
+  setButtonState(btn, state) {
+    if (!btn) return;
     
-    // Check if we have a provider now
-    if (window.ethereum?.isTrust) {
-      connectTrustWallet(); // Try to connect again
-    } else {
-      showWalletError('Returned from Trust Wallet but no connection was made');
-    }
-  }
-}
-
-// Call this on page load
-document.addEventListener('DOMContentLoaded', () => {
-  checkReturnFromTrustWallet();
-});
-// Enhanced Mobile Wallet Modal Functions
-function openMobileWalletModal() {
-  document.getElementById('mobileWalletModal')?.classList.remove('hidden');
-}
-
-function closeMobileWalletModal() {
-  document.getElementById('mobileWalletModal')?.classList.add('hidden');
-  const errorEl = document.getElementById('mobileWalletError');
-  if (errorEl) {
-    errorEl.classList.add('hidden');
-  }
-}
-
-function showMobileWalletError(message) {
-  const errorEl = document.getElementById('mobileWalletError');
-  if (errorEl) {
-    errorEl.textContent = message;
-    errorEl.classList.remove('hidden');
-    setTimeout(() => {
-      errorEl.classList.add('hidden');
-    }, 5000);
-  }
-}
-
-// Enhanced mobile wallet opening with better deeplinks
-function openMobileWallet(walletType) {
-  try {
-    const currentUrl = window.location.href;
-    const encodedUrl = encodeURIComponent(currentUrl);
-    
-    switch(walletType) {
-      case 'trust':
-        window.location.href = `trust://open_url?coin_id=20000714&url=${encodedUrl}`;
-        break;
-        
-      case 'metamask':
-        window.location.href = `metamask://dapp/${window.location.host}${window.location.pathname}`;
-        break;
-        
-      case 'rainbow':
-        window.location.href = `rainbow://dapp?url=${encodedUrl}`;
-        break;
-        
-      case 'walletconnect':
-        connectWalletConnect();
-        break;
-        
-      default:
-        throw new Error('Unsupported wallet type');
-    }
-    
-    closeMobileWalletModal();
-    
-    // Set timeout to check for connection
-    setTimeout(() => {
-      if (!window.ethereum) {
-        showMobileWalletError('Unable to connect. Please ensure your wallet app is installed and try again.');
+    const states = {
+      loading: {
+        html: '<i class="fas fa-spinner fa-spin"></i> Connecting...',
+        disabled: true
+      },
+      error: {
+        html: 'Connection Failed',
+        disabled: false
+      },
+      default: {
+        html: 'Connect Trust Wallet',
+        disabled: false
       }
-    }, 3000);
+    };
     
-  } catch (error) {
-    console.error('Mobile wallet connection error:', error);
-    showMobileWalletError(error.message);
+    Object.assign(btn, states[state] || states.default);
+  }
+
+  handleError(error, btn) {
+    console.error('TrustWallet Connection Error:', error);
+    this.showError(error.message);
+    this.setButtonState(btn, 'error');
+    setTimeout(() => this.setButtonState(btn, 'default'), 3000);
+  }
+
+  showError(message) {
+    const errorEl = document.getElementById('mobileWalletError') || 
+                   document.getElementById('walletError');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+      setTimeout(() => errorEl.classList.add('hidden'), 5000);
+    }
+  }
+
+  async switchToBSCTestnet() {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x61' }], // BSC Testnet
+      });
+    } catch (error) {
+      if (error.code === 4902) {
+        await this.addBSCTestnet();
+      }
+    }
+  }
+
+  async addBSCTestnet() {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: '0x61',
+        chainName: 'Binance Smart Chain Testnet',
+        nativeCurrency: {
+          name: 'BNB',
+          symbol: 'BNB',
+          decimals: 18
+        },
+        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+        blockExplorerUrls: ['https://testnet.bscscan.com/']
+      }]
+    });
   }
 }
 
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Instantiate connector
+  const trustWallet = new TrustWalletConnector();
+  
+  // Set up connect button
+  const trustBtn = document.getElementById('trustBtn');
+  if (trustBtn) {
+    trustBtn.addEventListener('click', () => trustWallet.connect());
+  }
+
+  // Set up mobile wallet modal
+  const mobileModal = document.getElementById('mobileWalletModal');
+  if (mobileModal) {
+    mobileModal.querySelectorAll('[data-wallet]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const walletType = btn.dataset.wallet;
+        if (walletType === 'trust') {
+          trustWallet.connect();
+        } else {
+          trustWallet.openDeepLink(walletType);
+        }
+      });
+    });
+  }
+});
 // WalletConnect connection
 async function connectWalletConnect() {
   const btn = document.getElementById('walletConnectBtn');
