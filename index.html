@@ -1395,82 +1395,87 @@ async function connectTrustWallet() {
   const originalText = btn?.innerHTML;
   
   try {
+    // Show loading state
     if (btn) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
       btn.disabled = true;
     }
 
-    // Check if Trust Wallet is available (both extension and injected provider)
+    // Case 1: Trust Wallet extension is installed
     if (window.ethereum?.isTrust) {
-      // Direct connection for Trust Wallet extension
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      
-      await switchToBSCTestnet();
-      userWalletAddress = accounts[0];
-      ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-      walletProvider = window.ethereum;
-      updateWalletUI();
-    } 
-    else if (isMobileDevice()) {
-      // Mobile handling with connection verification
-      let connected = false;
-      
-      // First try deep link
-      window.location.href = `trust://wc?uri=${encodeURIComponent(window.location.href)}`;
-      
-      // Set up a fallback handler
-      const connectionHandler = async () => {
-        if (window.ethereum?.isTrust) {
-          connected = true;
-          const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
-          });
-          userWalletAddress = accounts[0];
-          ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-          walletProvider = window.ethereum;
-          updateWalletUI();
-        }
-      };
-      
-      // Check periodically for connection
-      const connectionCheck = setInterval(() => {
-        if (window.ethereum?.isTrust) {
-          clearInterval(connectionCheck);
-          connectionHandler();
-        }
-      }, 500);
-      
-      // Timeout after 5 seconds if no connection
-      setTimeout(() => {
-        clearInterval(connectionCheck);
-        if (!connected) {
-          throw new Error('Trust Wallet not responding. Please ensure the app is installed and try again.');
-        }
-      }, 5000);
-    } 
-    else {
-      // Desktop without extension - guide to install
-      const install = confirm('Trust Wallet extension not detected. Would you like to install it?');
-      if (install) {
-        window.open('https://trustwallet.com/browser-extension', '_blank');
+      try {
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        await switchToBSCTestnet();
+        userWalletAddress = accounts[0];
+        ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+        walletProvider = window.ethereum;
+        updateWalletUI();
+        return; // Successfully connected
+      } catch (error) {
+        throw new Error('Failed to connect Trust Wallet: ' + error.message);
       }
-      throw new Error('Trust Wallet extension required.');
     }
+
+    // Case 2: Mobile device (try deep linking)
+    if (isMobileDevice()) {
+      // Store current URL for callback
+      localStorage.setItem('trustWalletReturnUrl', window.location.href);
+      
+      // Try to open Trust Wallet
+      const deepLinkUrl = `trust://wc?uri=${encodeURIComponent(window.location.href)}`;
+      window.location.href = deepLinkUrl;
+      
+      // Fallback: If not redirected after 2 seconds, show instructions
+      setTimeout(() => {
+        if (!document.hidden) {
+          showWalletError('Trust Wallet not installed. Please install it from your app store.');
+          window.open('https://trustwallet.com/download', '_blank');
+        }
+      }, 2000);
+      
+      return;
+    }
+
+    // Case 3: Desktop without extension
+    const shouldInstall = confirm('Trust Wallet extension not detected. Would you like to install it?');
+    if (shouldInstall) {
+      window.open('https://trustwallet.com/browser-extension', '_blank');
+    }
+    throw new Error('Trust Wallet extension required');
+
   } catch (error) {
     console.error('Trust Wallet connection error:', error);
     showWalletError(error.message);
-    if (btn && originalText) {
-      btn.innerHTML = originalText;
-    }
   } finally {
+    // Reset button state
     if (btn) {
       btn.disabled = false;
+      btn.innerHTML = originalText || 'Connect Trust Wallet';
     }
   }
 }
 
+// Add this to check for returning mobile users
+function checkReturnFromTrustWallet() {
+  if (localStorage.getItem('trustWalletReturnUrl')) {
+    localStorage.removeItem('trustWalletReturnUrl');
+    
+    // Check if we have a provider now
+    if (window.ethereum?.isTrust) {
+      connectTrustWallet(); // Try to connect again
+    } else {
+      showWalletError('Returned from Trust Wallet but no connection was made');
+    }
+  }
+}
+
+// Call this on page load
+document.addEventListener('DOMContentLoaded', () => {
+  checkReturnFromTrustWallet();
+});
 // Enhanced Mobile Wallet Modal Functions
 function openMobileWalletModal() {
   document.getElementById('mobileWalletModal')?.classList.remove('hidden');
