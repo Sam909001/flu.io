@@ -956,67 +956,6 @@ function resetTimer() {
         </div>
       </div>
     </section>
-<script>
-   // ===== TOKEN CHART =====
-    function initTokenChart() {
-      const ctx = document.getElementById('tokenChart').getContext('2d');
-
-      function getLabelColor() {
-        return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
-      }
-
-      const chartConfig = {
-        type: 'doughnut',
-        data: {
-          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-          datasets: [{
-            data: [40, 30, 20, 5, 5],
-            backgroundColor: [
-              '#10B981', // Green
-              '#3B82F6', // Blue
-              '#F59E0B', // Yellow
-              '#EF4444', // Red
-              '#8B5CF6'  // Purple
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-          }]
-        },
-        options: {
-          cutout: '65%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: getLabelColor(),
-                font: {
-                  size: 14,
-                  family: "'Inter', sans-serif"
-                },
-                padding: 20,
-              }
-            }
-          },
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      };
-
-      const tokenChart = new Chart(ctx, chartConfig);
-
-      // Update legend color when theme is toggled
-      const observer = new MutationObserver(() => {
-        const isDark = document.documentElement.classList.contains('dark');
-        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-        tokenChart.update();
-      });
-
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class']
-      });
-    }
-  </script>
     
     <!-- FAQ Section -->
     <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
@@ -1152,7 +1091,7 @@ function resetTimer() {
     </div>
   </footer>
 
-<!-- Wallet Modal -->
+  <!-- Wallet Modal -->
 <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
   <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
     <div class="flex justify-between items-center mb-4">
@@ -1224,28 +1163,7 @@ function resetTimer() {
   </div>
 </div>
 
-<!-- Test Interface -->
-<div class="container mx-auto p-4">
-  <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-    <h1 class="text-2xl font-bold text-center mb-6 dark:text-white">Wallet Connection Test</h1>
-    
-    <button id="walletButton" onclick="connectWallet()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mb-4">
-      <i class="fas fa-wallet mr-2"></i>Connect Wallet
-    </button>
-    
-    <button onclick="openMobileWalletModal()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-4">
-      <i class="fas fa-mobile-alt mr-2"></i>Mobile Wallets
-    </button>
-    
-    <div id="walletStatus" class="hidden">
-      <div class="bg-green-100 dark:bg-green-800 border border-green-400 text-green-700 dark:text-green-200 px-4 py-3 rounded">
-        <strong>Connected:</strong> <span id="connectedAddress"></span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
+  <script>
     // BSC Testnet Configuration
     const BSC_TESTNET = {
       chainId: '0x61', // 97 in hex
@@ -1622,8 +1540,8 @@ function resetTimer() {
       document.getElementById("walletModal").classList.add("hidden");
       document.getElementById("walletError").classList.add("hidden");
     }
- <script>
-   // Connect wallet for referrals
+
+    // Connect wallet for referrals
     async function connectReferralWallet() {
       if (!userWalletAddress) {
         await connectBrowserWallet();
@@ -1682,8 +1600,67 @@ function resetTimer() {
       const link = document.getElementById('referralLinkInput').value;
       window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
     }
- </script>
- <script>
+
+    // ===== TOKEN CHART =====
+    function initTokenChart() {
+      const ctx = document.getElementById('tokenChart').getContext('2d');
+
+      function getLabelColor() {
+        return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+      }
+
+      const chartConfig = {
+        type: 'doughnut',
+        data: {
+          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+          datasets: [{
+            data: [40, 30, 20, 5, 5],
+            backgroundColor: [
+              '#10B981', // Green
+              '#3B82F6', // Blue
+              '#F59E0B', // Yellow
+              '#EF4444', // Red
+              '#8B5CF6'  // Purple
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: getLabelColor(),
+                font: {
+                  size: 14,
+                  family: "'Inter', sans-serif"
+                },
+                padding: 20,
+              }
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      };
+
+      const tokenChart = new Chart(ctx, chartConfig);
+
+      // Update legend color when theme is toggled
+      const observer = new MutationObserver(() => {
+        const isDark = document.documentElement.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      });
+
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+
     // ===== TIMER FUNCTIONS =====
     function getPresaleStartTime() {
       let startTime = localStorage.getItem('presaleStartTime');
