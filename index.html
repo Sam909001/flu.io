@@ -1123,15 +1123,20 @@ function resetTimer() {
       </button>
     </div>
     
-    <div class="grid grid-cols-2 gap-4">
-      <button onclick="connectBrowserWallet()" class="wallet-option p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex flex-col items-center">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-10 h-10 mb-2" alt="MetaMask">
+    <div class="grid grid-cols-1 gap-4">
+      <button onclick="connectBrowserWallet()" class="wallet-option p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-10 h-10 mr-4" alt="MetaMask">
         <span class="dark:text-white">Browser Wallet</span>
       </button>
       
-      <button onclick="connectWalletConnect()" class="wallet-option p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex flex-col items-center">
-        <img src="https://docs.walletconnect.com/img/walletconnect-logo.svg" class="w-10 h-10 mb-2" alt="WalletConnect">
+      <button onclick="connectWalletConnect()" class="wallet-option p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center">
+        <img src="https://docs.walletconnect.com/img/walletconnect-logo.svg" class="w-10 h-10 mr-4" alt="WalletConnect">
         <span class="dark:text-white">WalletConnect</span>
+      </button>
+
+      <button onclick="connectTrustWallet()" class="wallet-option p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-10 h-10 mr-4" alt="Trust Wallet">
+        <span class="dark:text-white">Trust Wallet</span>
       </button>
     </div>
     
@@ -1317,10 +1322,24 @@ function resetTimer() {
     }
 
     // Mobile Wallet Functions
-    function openMobileWalletModal() {
-      document.getElementById('mobileWalletModal')?.classList.remove('hidden');
-    }
+   async function openMobileWallet(walletType) {
+  const links = getWalletDeepLink(walletType);
+  if (!links) {
+    showMobileWalletError('Unsupported wallet type');
+    return;
+  }
 
+  // Store connection state before redirecting
+  localStorage.setItem('walletConnectionInProgress', 'true');
+  localStorage.setItem('walletConnectionType', walletType);
+
+  // Try universal link first
+  if (links.universal) {
+    window.location.href = links.universal; // Use location.href instead of window.open
+  } else if (links.fallback) {
+    window.location.href = links.fallback;
+  }
+}
     function closeMobileWalletModal() {
       document.getElementById('mobileWalletModal')?.classList.add('hidden');
     }
@@ -1437,35 +1456,60 @@ function resetTimer() {
       }
     }
 
-    async function connectWalletConnect() {
-      const btn = document.getElementById('walletConnectBtn');
-      const originalText = btn?.innerHTML;
-      
-      try {
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-          btn.disabled = true;
-        }
+   async function connectWalletConnect() {
+  const btn = document.getElementById('walletConnectBtn');
+  const originalText = btn?.innerHTML;
+  
+  try {
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+      btn.disabled = true;
+    }
 
-        // First check for mobile devices
+    // Check for existing session first
+    if (walletProvider && walletProvider.connected) {
+      await walletProvider.enable();
+    } else {
+      // Initialize new provider
+      walletProvider = new window.WalletConnectProvider.default({
+        ...WALLETCONNECT_CONFIG,
+        qrModalOptions: {
+          themeMode: 'light',
+          themeVariables: {
+            '--wcm-z-index': '9999'
+          },
+          mobileWallets: [
+            {
+              id: 'trust',
+              name: 'Trust Wallet',
+              links: {
+                native: 'trust://',
+                universal: 'https://link.trustwallet.com'
+              }
+            },
+            {
+              id: 'metamask',
+              name: 'MetaMask',
+              links: {
+                native: 'metamask://',
+                universal: 'https://metamask.app.link'
+              }
+            }
+          ]
+        }
+      });
+
+      // Subscribe to connection events
+      walletProvider.on('display_uri', (uri) => {
+        // Handle mobile deep linking
         if (isMobileDevice()) {
-          try {
-            await handleMobileWalletConnect();
-            return;
-          } catch (mobileError) {
-            console.error('Mobile WalletConnect failed:', mobileError);
-          }
+          const wcLink = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
+          window.location.href = wcLink;
         }
+      });
 
-        // Initialize provider
-        if (!window.WalletConnectProvider) {
-          throw new Error('WalletConnect not available');
-        }
-
-        walletProvider = new window.WalletConnectProvider.default(WALLETCONNECT_CONFIG);
-
-        // Enable session
-        await walletProvider.enable();
+      await walletProvider.enable();
+    }
         
         // Get accounts
         const accounts = await walletProvider.request({ method: 'eth_accounts' });
@@ -1605,6 +1649,24 @@ function resetTimer() {
       document.querySelectorAll('.wallet-connect-btn').forEach(btn => {
         btn.dataset.originalText = btn.innerHTML;
       });
+      
+// DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if we're returning from a wallet connection attempt
+  if (localStorage.getItem('walletConnectionInProgress') === 'true') {
+    const connectionType = localStorage.getItem('walletConnectionType');
+    
+    // Clear the state
+    localStorage.removeItem('walletConnectionInProgress');
+    localStorage.removeItem('walletConnectionType');
+    
+    // Complete the connection based on type
+    if (connectionType === 'trust') {
+      setTimeout(() => connectTrustWallet(), 1000);
+    } else if (connectionType === 'metamask') {
+      setTimeout(() => connectBrowserWallet(), 1000);
+    }
+  }
 
       // Check for saved theme preference
       if (localStorage.getItem('darkMode') === 'true' || 
