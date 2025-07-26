@@ -17,6 +17,12 @@
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+ <meta property="al:ios:url" content="trust://wc?uri=${YOUR_URL}" />
+<meta property="al:ios:app_name" content="Trust Wallet" />
+<meta property="al:ios:app_store_id" content="1288339409" />
+<meta property="al:android:url" content="trust://wc?uri=${YOUR_URL}" />
+<meta property="al:android:app_name" content="Trust Wallet" />
+<meta property="al:android:package" content="com.wallet.crypto.trustapp" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
     <script>
@@ -1384,7 +1390,6 @@ function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Trust Wallet connection
 async function connectTrustWallet() {
   const btn = document.getElementById('trustBtn');
   const originalText = btn?.innerHTML;
@@ -1395,27 +1400,63 @@ async function connectTrustWallet() {
       btn.disabled = true;
     }
 
-    // Check if Trust Wallet is available
+    // Check if Trust Wallet is available (both extension and injected provider)
     if (window.ethereum?.isTrust) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      // Direct connection for Trust Wallet extension
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      
       await switchToBSCTestnet();
       userWalletAddress = accounts[0];
       ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
       walletProvider = window.ethereum;
       updateWalletUI();
-    } else if (isMobileDevice()) {
-      // Redirect to Trust Wallet
-      window.location.href = `trust://open_url?coin_id=20000714&url=${encodeURIComponent(window.location.href)}`;
+    } 
+    else if (isMobileDevice()) {
+      // Mobile handling with connection verification
+      let connected = false;
       
-      // Fallback in case the app doesn't open
-      setTimeout(() => {
-        if (!window.ethereum) {
-          throw new Error('Trust Wallet not detected. Please install Trust Wallet from the app store.');
+      // First try deep link
+      window.location.href = `trust://wc?uri=${encodeURIComponent(window.location.href)}`;
+      
+      // Set up a fallback handler
+      const connectionHandler = async () => {
+        if (window.ethereum?.isTrust) {
+          connected = true;
+          const accounts = await window.ethereum.request({ 
+            method: 'eth_requestAccounts' 
+          });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+          walletProvider = window.ethereum;
+          updateWalletUI();
         }
-      }, 2000);
-    } else {
-      window.open('https://trustwallet.com/', '_blank');
-      throw new Error('Trust Wallet not detected. Please install Trust Wallet extension.');
+      };
+      
+      // Check periodically for connection
+      const connectionCheck = setInterval(() => {
+        if (window.ethereum?.isTrust) {
+          clearInterval(connectionCheck);
+          connectionHandler();
+        }
+      }, 500);
+      
+      // Timeout after 5 seconds if no connection
+      setTimeout(() => {
+        clearInterval(connectionCheck);
+        if (!connected) {
+          throw new Error('Trust Wallet not responding. Please ensure the app is installed and try again.');
+        }
+      }, 5000);
+    } 
+    else {
+      // Desktop without extension - guide to install
+      const install = confirm('Trust Wallet extension not detected. Would you like to install it?');
+      if (install) {
+        window.open('https://trustwallet.com/browser-extension', '_blank');
+      }
+      throw new Error('Trust Wallet extension required.');
     }
   } catch (error) {
     console.error('Trust Wallet connection error:', error);
