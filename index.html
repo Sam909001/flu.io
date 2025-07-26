@@ -1386,60 +1386,71 @@ function resetTimer() {
     }
 
     // Wallet Connection Functions
-    async function connectBrowserWallet() {
-      const btn = document.getElementById('metamaskBtn');
-      const originalText = btn?.innerHTML;
-      
-      try {
-        if (typeof window.ethereum === 'undefined') {
-          if (isMobileDevice()) {
-            openMobileWalletModal();
-            return;
-          }
-          throw new Error('Please install MetaMask or a compatible wallet');
-        }
+async function connectBrowserWallet() {
+  try {
+    const btn = document.getElementById('metamaskBtn');
+    const originalText = btn?.innerHTML;
+    
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+      btn.disabled = true;
+    }
 
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-          btn.disabled = true;
-        }
-
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        if (accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock your wallet.');
-        }
-
-        const switched = await switchToBSCTestnet();
-        if (!switched) {
-          throw new Error('Failed to switch to BSC Testnet');
-        }
-        
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-        walletProvider = window.ethereum;
-
-        // Add event listeners
-        window.ethereum.on('accountsChanged', handleAccountsChanged);
-        window.ethereum.on('chainChanged', handleChainChanged);
-
-        updateWalletUI();
-        closeWalletModal();
-        closeMobileWalletModal();
-
-      } catch (error) {
-        console.error('Wallet connection error:', error);
-        showWalletError(error.message);
-        if (isMobileDevice()) {
-          showMobileWalletError(error.message);
-        }
-      } finally {
-        if (btn && originalText) {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }
+    // Detect wallet
+    const provider = await detectWallet();
+    
+    // Request accounts
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts found');
+    }
+    
+    // Switch to BSC Testnet
+    try {
+      await provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x61' }], // BSC Testnet
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask
+      if (switchError.code === 4902) {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [BSC_TESTNET],
+        });
+      } else {
+        throw switchError;
       }
     }
+    
+    // Set up provider and signer
+    ethersProvider = new ethers.providers.Web3Provider(provider);
+    walletProvider = provider;
+    userWalletAddress = accounts[0];
+    
+    // Set up event listeners
+    provider.on('accountsChanged', handleAccountsChanged);
+    provider.on('chainChanged', handleChainChanged);
+    
+    updateWalletUI();
+    
+  } catch (error) {
+    console.error('Wallet connection error:', error);
+    showWalletError(error.message);
+    
+    // If on mobile and no injected provider, open wallet modal
+    if (isMobileDevice() && error.message.includes('No Ethereum provider')) {
+      openMobileWalletModal();
+    }
+  } finally {
+    const btn = document.getElementById('metamaskBtn');
+    if (btn && originalText) {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+}
 
     async function connectTrustWallet() {
       try {
