@@ -1343,7 +1343,6 @@ function resetTimer() {
           // Redirect to Trust Wallet
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
           if (isMobile) {
-            window.location.href = `trust://open_url?coin_id=20000714&url=${encodeURIComponent(window.location.href)}`;
           } else {
             window.open('https://trustwallet.com/', '_blank');
             throw new Error('Trust Wallet not detected. Please install Trust Wallet.');
@@ -1364,6 +1363,9 @@ function resetTimer() {
     }
 
     // Enhanced Mobile Wallet Modal Functions
+   function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
     function openMobileWalletModal() {
       document.getElementById('mobileWalletModal').classList.remove('hidden');
     }
@@ -1395,20 +1397,7 @@ function resetTimer() {
       try {
         switch(walletType) {
           case 'trust':
-            // Trust Wallet deeplink for BSC
-            window.location.href = `trust://open_url?coin_id=20000714&url=${encodedUrl}`;
-            break;
-            
-          case 'metamask':
-            // MetaMask mobile deeplink
-            window.location.href = `metamask://dapp/${window.location.host}${window.location.pathname}`;
-            break;
-            
-          case 'rainbow':
-            // Rainbow wallet deeplink
-            window.location.href = `rainbow://dapp?url=${encodedUrl}`;
-            break;
-            
+           
           case 'walletconnect':
             // Use WalletConnect for broader compatibility
             connectWalletConnect();
@@ -1465,13 +1454,18 @@ function resetTimer() {
     });
 
     // ===== WALLET FUNCTIONS =====
-    function connectWallet() {
-      if (userWalletAddress) {
-        disconnectWallet();
-      } else {
-        openWalletModal();
-      }
-    }
+    async function connectWallet() {
+  if (userWalletAddress) {
+    disconnectWallet();
+    return;
+  }
+
+  if (isMobileDevice()) {
+    await connectWalletConnect(); // Always use WalletConnect for mobile
+  } else {
+    openWalletModal(); // Show modal for desktop browsers
+  }
+}
 
     async function connectWalletConnect() {
       try {
