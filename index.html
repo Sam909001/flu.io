@@ -1343,7 +1343,7 @@ function resetTimer() {
     this.chainConfigs = {
       '0x1': { // Ethereum
         name: 'Ethereum',
-        rpc: ['https://mainnet.infura.io/v3/YOUR_INFURA_KEY'],
+        rpc: ['https://mainnet.infura.io/v3f09a42b35c814e08ad7e92837f8db27f'],
         explorer: 'https://etherscan.io',
         currency: { name: 'ETH', symbol: 'ETH', decimals: 18 }
       },
@@ -1435,7 +1435,7 @@ function resetTimer() {
     const { EthereumProvider } = await import('@walletconnect/ethereum-provider');
     
     this.walletConnectProvider = await EthereumProvider.init({
-      projectId: 'YOUR_WALLETCONNECT_PROJECT_ID',
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
       chains: [parseInt(this.defaultChainId, 16)], // Convert hex to decimal
       showQrModal: true,
       qrModalOptions: {
