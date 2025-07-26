@@ -1451,6 +1451,44 @@ async function connectBrowserWallet() {
     }
   }
 }
+      function openMobileWalletModal() {
+  document.getElementById('mobileWalletModal').classList.remove('hidden');
+}
+
+function openMobileWallet(walletType) {
+  const links = {
+    trust: {
+      universal: 'https://link.trustwallet.com/open_url?coin_id=20000714&url=' + encodeURIComponent(window.location.href),
+      fallback: 'trust://wc?uri=' + encodeURIComponent(window.location.href)
+    },
+    metamask: {
+      universal: 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname,
+      fallback: 'metamask://wc?uri=' + encodeURIComponent(window.location.href)
+    },
+    walletconnect: {
+      universal: 'https://walletconnect.com/wc',
+      fallback: 'wc://'
+    }
+  };
+
+  const walletLinks = links[walletType];
+  if (!walletLinks) {
+    showMobileWalletError('Unsupported wallet type');
+    return;
+  }
+
+  // Try universal link first
+  if (walletLinks.universal) {
+    window.open(walletLinks.universal, '_blank');
+  }
+
+  // Fallback after delay
+  setTimeout(() => {
+    if (walletLinks.fallback) {
+      window.location.href = walletLinks.fallback;
+    }
+  }, 500);
+}
 
     async function connectTrustWallet() {
       try {
@@ -1477,97 +1515,106 @@ async function connectBrowserWallet() {
       btn.disabled = true;
     }
 
-    // Check for existing session first
-    if (walletProvider && walletProvider.connected) {
-      await walletProvider.enable();
-    } else {
-      // Initialize new provider
-      walletProvider = new window.WalletConnectProvider.default({
-        ...WALLETCONNECT_CONFIG,
-        qrModalOptions: {
-          themeMode: 'light',
-          themeVariables: {
-            '--wcm-z-index': '9999'
-          },
-          mobileWallets: [
-            {
-              id: 'trust',
-              name: 'Trust Wallet',
-              links: {
-                native: 'trust://',
-                universal: 'https://link.trustwallet.com'
-              }
-            },
-            {
-              id: 'metamask',
-              name: 'MetaMask',
-              links: {
-                native: 'metamask://',
-                universal: 'https://metamask.app.link'
-              }
+    // Initialize WalletConnect provider
+    walletProvider = new window.WalletConnectProvider.default({
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+      chains: [97], // BSC Testnet
+      showQrModal: true,
+      qrModalOptions: {
+        themeMode: 'light',
+        themeVariables: {
+          '--wcm-z-index': '9999'
+        },
+        mobileWallets: [
+          {
+            id: 'trust',
+            name: 'Trust Wallet',
+            links: {
+              native: 'trust://',
+              universal: 'https://link.trustwallet.com'
             }
-          ]
-        }
-      });
-
-      // Subscribe to connection events
-      walletProvider.on('display_uri', (uri) => {
-        // Handle mobile deep linking
-        if (isMobileDevice()) {
-          const wcLink = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
-          window.location.href = wcLink;
-        }
-      });
-
-      await walletProvider.enable();
-    }
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        
-        if (!accounts || accounts.length === 0) {
-          throw new Error('No accounts found. Please connect your wallet.');
-        }
-        
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Set up event listeners
-        walletProvider.on('accountsChanged', handleAccountsChanged);
-        walletProvider.on('chainChanged', handleChainChanged);
-        walletProvider.on('disconnect', handleDisconnect);
-        
-        updateWalletUI();
-        closeWalletModal();
-        closeMobileWalletModal();
-        
-      } catch (error) {
-        console.error('WalletConnect error:', error);
-        let errorMessage = error.message;
-        if (error.message.includes('User rejected')) {
-          errorMessage = 'Connection cancelled by user';
-        } else if (error.message.includes('not available')) {
-          errorMessage = 'WalletConnect not available. Please install a compatible wallet.';
-        }
-        
-        showWalletError(errorMessage);
-        showMobileWalletError(errorMessage);
-        
-        if (walletProvider) {
-          try {
-            await walletProvider.disconnect();
-          } catch (disconnectError) {
-            console.error('Disconnect error:', disconnectError);
+          },
+          {
+            id: 'metamask',
+            name: 'MetaMask',
+            links: {
+              native: 'metamask://',
+              universal: 'https://metamask.app.link'
+            }
           }
-        }
-      } finally {
-        if (btn && originalText) {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-        }
+        ]
+      }
+    });
+
+    // Enable session (triggers QR Code modal)
+    await walletProvider.enable();
+    
+    // Get accounts
+    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts found');
+    }
+    
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+    
+    // Set up event listeners
+    walletProvider.on('accountsChanged', handleAccountsChanged);
+    walletProvider.on('chainChanged', handleChainChanged);
+    walletProvider.on('disconnect', handleDisconnect);
+    
+    updateWalletUI();
+    
+  } catch (error) {
+    console.error('WalletConnect error:', error);
+    showWalletError(error.message || 'WalletConnect connection failed');
+    
+    if (walletProvider) {
+      try {
+        await walletProvider.disconnect();
+      } catch (e) {
+        console.error('Error disconnecting:', e);
       }
     }
+  } finally {
+    if (btn && originalText) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+}
+      function showWalletError(message) {
+  const errorEl = document.getElementById('walletError');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+    
+    // Scroll to error if it's not visible
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    setTimeout(() => errorEl.classList.add('hidden'), 8000);
+  }
+}
 
+function handleAccountsChanged(accounts) {
+  if (!accounts || accounts.length === 0) {
+    // Wallet was disconnected
+    disconnectWallet();
+  } else if (accounts[0] !== userWalletAddress) {
+    // Account changed
+    userWalletAddress = accounts[0];
+    updateWalletUI();
+  }
+}
+
+function handleChainChanged(chainId) {
+  // Reload page when chain changes
+  window.location.reload();
+}
+
+function handleDisconnect() {
+  disconnectWallet();
+}
     async function handleMobileWalletConnect() {
       if (!isMobileDevice()) return;
       
