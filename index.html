@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
-<script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
-<script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="description" content="Web3 DApp using WalletConnect" />
-  <title>$FLUFFI Presale & Staking</title>
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards.">
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token">
   <meta name="author" content="FLUFFI Team">
+  
+  <!-- Wallet Connection Meta -->
+  <meta property="al:ios:url" content="trust://wc?uri=${window.location.href}" />
+  <meta property="al:ios:app_name" content="Trust Wallet" />
+  <meta property="al:ios:app_store_id" content="1288339409" />
+  <meta property="al:android:url" content="trust://wc?uri=${window.location.href}" />
+  <meta property="al:android:app_name" content="Trust Wallet" />
+  <meta property="al:android:package" content="com.wallet.crypto.trustapp" />
+
+  <!-- Favicons -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
- <meta property="al:ios:url" content="trust://wc?uri=${YOUR_URL}" />
-<meta property="al:ios:app_name" content="Trust Wallet" />
-<meta property="al:ios:app_store_id" content="1288339409" />
-<meta property="al:android:url" content="trust://wc?uri=${YOUR_URL}" />
-<meta property="al:android:app_name" content="Trust Wallet" />
-<meta property="al:android:package" content="com.wallet.crypto.trustapp" />
+
+  <!-- JavaScript Libraries -->
+  <!-- Use only ONE WalletConnect provider version -->
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
     <script>
@@ -1333,147 +1338,218 @@ function resetTimer() {
 }
   </script>
  <script>
-   // Mobile-specific connection handler
-async function handleMobileWalletConnect() {
-  return new Promise((resolve, reject) => {
-    try {
-      // Show mobile modal instead of QR code
-      openMobileWalletModal();
-      
-      // Set up connection listener
-      const uriHandler = (event) => {
-        try {
-          const uri = event.detail;
-          // Implement deep linking for mobile wallets
-          if (isIOS()) {
-            window.location.href = `trust://wc?uri=${encodeURIComponent(uri)}`;
-          } else if (isAndroid()) {
-            window.location.href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
-          }
-        } catch (error) {
-          console.error('URI handling error:', error);
-          reject(error);
-        }
-      };
-      
-      const connectHandler = () => {
-        window.removeEventListener('walletconnect_uri', uriHandler);
-        window.removeEventListener('walletconnect_connect', connectHandler);
-        resolve();
-      };
-
-      window.addEventListener('walletconnect_uri', uriHandler);
-      window.addEventListener('walletconnect_connect', connectHandler);
-      
-      // Timeout after 30 seconds if no connection
-      setTimeout(() => {
-        window.removeEventListener('walletconnect_uri', uriHandler);
-        window.removeEventListener('walletconnect_connect', connectHandler);
-        reject(new Error('Connection timed out. Please try again.'));
-      }, 30000);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-// Platform detection helpers
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
-function isAndroid() {
-  return /Android/.test(navigator.userAgent);
-}
-
-function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// Trust Wallet Connection Manager
-class MultiChainWalletConnector {
-  constructor(defaultChainId = '0x1') { // Default: Ethereum Mainnet
-    this.defaultChainId = defaultChainId;
+  class UniversalWalletConnector {
+  constructor(defaultChainId = '0x1') { // Default: Ethereum
     this.chainConfigs = {
-      '0x1': { // Ethereum Mainnet
+      '0x1': { // Ethereum
         name: 'Ethereum',
-        rpc: ['https://mainnet.infura.io/v3/YOUR_PROJECT_ID'],
+        rpc: ['https://mainnet.infura.io/v3/YOUR_INFURA_KEY'],
         explorer: 'https://etherscan.io',
         currency: { name: 'ETH', symbol: 'ETH', decimals: 18 }
       },
-      '0x38': { // BSC Mainnet
+      '0x38': { // BSC
         name: 'Binance Smart Chain',
         rpc: ['https://bsc-dataseed.binance.org/'],
         explorer: 'https://bscscan.com',
         currency: { name: 'BNB', symbol: 'BNB', decimals: 18 }
       },
-      '0x61': { // BSC Testnet (kept as example)
-        name: 'BSC Testnet',
-        rpc: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
-        explorer: 'https://testnet.bscscan.com',
-        currency: { name: 'BNB', symbol: 'BNB', decimals: 18 }
+      '0x89': { // Polygon
+        name: 'Polygon',
+        rpc: ['https://polygon-rpc.com/'],
+        explorer: 'https://polygonscan.com',
+        currency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }
       }
     };
+    this.defaultChainId = defaultChainId;
+    this.walletConnectProvider = null;
   }
 
-  async switchChain(chainId = this.defaultChainId) {
+  // ================== CORE CONNECTION METHODS ================== //
+
+  async connect(walletType, targetChainId = this.defaultChainId) {
+    try {
+      switch(walletType) {
+        case 'metamask':
+          return await this.connectMetaMask(targetChainId);
+        case 'trust':
+          return await this.connectTrustWallet(targetChainId);
+        case 'walletconnect':
+          return await this.connectWalletConnect(targetChainId);
+        default:
+          throw new Error(`Unsupported wallet: ${walletType}`);
+      }
+    } catch (error) {
+      console.error(`${walletType} connection failed:`, error);
+      this.showError(error.message);
+      throw error;
+    }
+  }
+
+  // ================== WALLET-SPECIFIC HANDLERS ================== //
+
+  async connectMetaMask(chainId) {
+    if (!window.ethereum?.isMetaMask) {
+      if (this.isMobile()) {
+        this.openDeepLink('metamask');
+        return this.listenForMobileConnection('metamask', chainId);
+      }
+      throw new Error('MetaMask extension not detected');
+    }
+
+    const accounts = await window.ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+    await this.switchChain(chainId);
+    return this.handleSuccess(accounts[0], 'metamask');
+  }
+
+  async connectTrustWallet(chainId) {
+    if (!window.ethereum?.isTrust) {
+      if (this.isMobile()) {
+        this.openDeepLink('trust');
+        return this.listenForMobileConnection('trust', chainId);
+      }
+      throw new Error('Trust Wallet extension not detected');
+    }
+
+    const accounts = await window.ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+    await this.switchChain(chainId);
+    return this.handleSuccess(accounts[0], 'trust');
+  }
+
+  async connectWalletConnect(chainId) {
+    if (!this.walletConnectProvider) {
+      await this.initializeWalletConnect();
+    }
+
+    const accounts = await this.walletConnectProvider.enable();
+    await this.switchChain(chainId); // Works through WC session
+    return this.handleSuccess(accounts[0], 'walletconnect');
+  }
+
+  // ================== WALLETCONNECT SETUP ================== //
+
+  async initializeWalletConnect() {
+    const { EthereumProvider } = await import('@walletconnect/ethereum-provider');
+    
+    this.walletConnectProvider = await EthereumProvider.init({
+      projectId: 'YOUR_WALLETCONNECT_PROJECT_ID',
+      chains: [parseInt(this.defaultChainId, 16)], // Convert hex to decimal
+      showQrModal: true,
+      qrModalOptions: {
+        themeVariables: { '--wcm-z-index': '9999' }
+      }
+    });
+
+    this.walletConnectProvider.on('disconnect', () => {
+      console.log('WalletConnect session ended');
+    });
+  }
+
+  // ================== CHAIN MANAGEMENT ================== //
+
+  async switchChain(chainId) {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId }],
+        params: [{ chainId }]
       });
-      return true;
     } catch (error) {
-      if (error.code === 4902) { // Chain not added
-        return await this.addChain(chainId);
+      if (error.code === 4902) {
+        await this.addChain(chainId);
+      } else {
+        throw error;
       }
-      throw error;
     }
   }
 
   async addChain(chainId) {
     const config = this.chainConfigs[chainId];
     if (!config) throw new Error(`Unsupported chain: ${chainId}`);
-    
-    try {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId,
-          chainName: config.name,
-          nativeCurrency: config.currency,
-          rpcUrls: config.rpc,
-          blockExplorerUrls: [config.explorer]
-        }]
-      });
-      return true;
-    } catch (error) {
-      console.error(`Failed to add chain ${chainId}:`, error);
-      return false;
-    }
+
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId,
+        chainName: config.name,
+        nativeCurrency: config.currency,
+        rpcUrls: config.rpc,
+        blockExplorerUrls: [config.explorer]
+      }]
+    });
   }
 
-  // Add new chain configuration
-  addChainConfig(chainId, config) {
-    this.chainConfigs[chainId] = config;
+  // ================== MOBILE SUPPORT ================== //
+
+  listenForMobileConnection(walletType, chainId) {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error(`${walletType} connection timed out`));
+      }, 30000); // 30 seconds timeout
+
+      const checkInterval = setInterval(async () => {
+        if (window.ethereum && 
+            (walletType === 'trust' ? window.ethereum.isTrust : window.ethereum.isMetaMask)) {
+          clearInterval(checkInterval);
+          clearTimeout(timeout);
+          try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            await this.switchChain(chainId);
+            resolve(this.handleSuccess(accounts[0], walletType));
+          } catch (error) {
+            reject(error);
+          }
+        }
+      }, 1000); // Check every second
+    });
+  }
+
+  openDeepLink(walletType) {
+    const urls = {
+      trust: `trust://wc?uri=${encodeURIComponent(window.location.href)}`,
+      metamask: `metamask://dapp/${window.location.host}${window.location.pathname}`,
+      walletconnect: `https://walletconnect.com/wc?uri=${encodeURIComponent(this.walletConnectProvider.uri)}`
+    };
+    window.location.href = urls[walletType];
+  }
+
+  // ================== UTILITIES ================== //
+
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  handleSuccess(address, walletType) {
+    console.log(`${walletType} connected:`, address);
+    return {
+      address,
+      provider: window.ethereum || this.walletConnectProvider,
+      chainId: this.defaultChainId
+    };
+  }
+
+  showError(message) {
+    const errorEl = document.getElementById('walletError');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+      setTimeout(() => errorEl.classList.add('hidden'), 5000);
+    }
   }
 }
 
-// Usage Example:
-const wallet = new MultiChainWalletConnector('0x1'); // Default to Ethereum
+// ================== INITIALIZATION ================== //
+const wallet = new UniversalWalletConnector('0x38'); // Default to BSC
 
-// Connect to BSC Mainnet:
-await wallet.switchChain('0x38');
-
-// Connect to Polygon:
-wallet.addChainConfig('0x89', {
-  name: 'Polygon Mainnet',
-  rpc: ['https://polygon-rpc.com/'],
-  explorer: 'https://polygonscan.com',
-  currency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }
-});
-await wallet.switchChain('0x89');
-// WalletConnect connection
+// Example usage:
+document.getElementById('mmBtn').addEventListener('click', () => wallet.connect('metamask'));
+document.getElementById('trustBtn').addEventListener('click', () => wallet.connect('trust'));
+document.getElementById('wcBtn').addEventListener('click', () => wallet.connect('walletconnect'));
+ </script>
+ <script>
+//walletconnect connection
 async function connectWalletConnect() {
   const btn = document.getElementById('walletConnectBtn');
   const originalText = btn?.innerHTML;
