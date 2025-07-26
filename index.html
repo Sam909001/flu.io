@@ -1091,7 +1091,7 @@ function resetTimer() {
     </div>
   </footer>
 
- <!-- Wallet Modal -->
+<!-- Wallet Modal -->
 <div id="walletModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
   <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
     <div class="flex justify-between items-center mb-4">
@@ -1318,54 +1318,81 @@ function openMobileWallet(walletType) {
   const encodedUrl = encodeURIComponent(currentUrl);
   const hostname = window.location.hostname;
   
+  console.log('Opening mobile wallet:', walletType);
+  
   try {
-    let deepLink;
-    
     switch(walletType) {
       case 'trust':
-        // Trust Wallet proper deep link with connection request
-        deepLink = `trust://wc?uri=${encodedUrl}`;
-        // Fallback for direct dapp browser
-        const trustFallback = `trust://open_url?coin_id=20000714&url=${encodedUrl}`;
-        
-        // Try WalletConnect first, then fallback
-        setTimeout(() => {
-          if (!userWalletAddress) {
-            window.location.href = trustFallback;
-          }
-        }, 2000);
-        
-        window.location.href = deepLink;
+        // For Trust Wallet, try multiple approaches
+        if (window.ethereum && window.ethereum.isTrust) {
+          // Trust Wallet browser detected
+          connectBrowserWallet();
+        } else {
+          // Deep link to Trust Wallet
+          const trustDeepLink = `trust://open_url?coin_id=20000714&url=${encodedUrl}`;
+          console.log('Trust deep link:', trustDeepLink);
+          window.location.href = trustDeepLink;
+          
+          // Show loading message
+          showMobileWalletError('Opening Trust Wallet...');
+          
+          // Check for connection after 3 seconds
+          setTimeout(() => {
+            checkMobileConnection();
+          }, 3000);
+        }
         break;
         
       case 'metamask':
-        // MetaMask mobile proper deep link
-        deepLink = `metamask://dapp/${hostname}${window.location.pathname}${window.location.search}`;
-        window.location.href = deepLink;
-        
-        // Fallback to universal link
-        setTimeout(() => {
-          if (!userWalletAddress) {
-            window.location.href = `https://metamask.app.link/dapp/${hostname}${window.location.pathname}${window.location.search}`;
-          }
-        }, 1000);
+        // Check if MetaMask mobile is available
+        if (window.ethereum && window.ethereum.isMetaMask) {
+          connectBrowserWallet();
+        } else {
+          // Try MetaMask deep link
+          const metamaskDeepLink = `metamask://dapp/${hostname}${window.location.pathname}${window.location.search}`;
+          console.log('MetaMask deep link:', metamaskDeepLink);
+          
+          showMobileWalletError('Opening MetaMask...');
+          window.location.href = metamaskDeepLink;
+          
+          // Fallback to universal link after 2 seconds
+          setTimeout(() => {
+            if (!userWalletAddress) {
+              const universalLink = `https://metamask.app.link/dapp/${hostname}${window.location.pathname}${window.location.search}`;
+              console.log('MetaMask universal link:', universalLink);
+              window.location.href = universalLink;
+            }
+          }, 2000);
+          
+          setTimeout(() => {
+            checkMobileConnection();
+          }, 4000);
+        }
         break;
         
       case 'coinbase':
         // Coinbase Wallet deep link
-        deepLink = `coinbase-wallet://dapp?url=${encodedUrl}`;
-        window.location.href = deepLink;
+        const coinbaseDeepLink = `coinbase-wallet://dapp?url=${encodedUrl}`;
+        console.log('Coinbase deep link:', coinbaseDeepLink);
+        
+        showMobileWalletError('Opening Coinbase Wallet...');
+        window.location.href = coinbaseDeepLink;
         
         // Fallback to universal link
         setTimeout(() => {
           if (!userWalletAddress) {
             window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodedUrl}`;
           }
-        }, 1000);
+        }, 2000);
+        
+        setTimeout(() => {
+          checkMobileConnection();
+        }, 4000);
         break;
         
       case 'walletconnect':
-        // Use WalletConnect for broader compatibility
+        // Use WalletConnect modal
+        closeMobileWalletModal();
         connectWalletConnect();
         return;
         
@@ -1375,49 +1402,61 @@ function openMobileWallet(walletType) {
     
     closeMobileWalletModal();
     
-    // Check for connection after redirect attempt
-    setTimeout(() => {
-      checkMobileConnection();
-    }, 3000);
-    
   } catch (error) {
     console.error('Mobile wallet connection error:', error);
-    showMobileWalletError(error.message);
+    showMobileWalletError('Error: ' + error.message);
   }
 }
 
 // Check if mobile wallet connected after deep link
 function checkMobileConnection() {
+  console.log('Checking mobile connection...');
+  
   if (window.ethereum) {
-    // If ethereum provider is available, try to connect
+    console.log('Ethereum provider found, attempting connection...');
     connectBrowserWallet();
   } else {
-    // Show helpful message
-    showMobileWalletError('Please ensure your wallet app is installed and try again.');
+    console.log('No ethereum provider found');
+    // Try to detect if we're back from wallet app
+    setTimeout(() => {
+      if (document.visibilityState === 'visible' && !userWalletAddress) {
+        showMobileWalletError('Could not connect. Please ensure your wallet app is installed and try opening it manually.');
+      }
+    }, 2000);
   }
 }
 
+// Add visibility change listener to detect when user returns from wallet app
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !userWalletAddress) {
+    console.log('Page became visible, checking for wallet...');
+    setTimeout(() => {
+      if (window.ethereum && !userWalletAddress) {
+        console.log('Attempting auto-connection...');
+        connectBrowserWallet();
+      }
+    }, 1000);
+  }
+});
+
 async function connectWalletConnect() {
   try {
-    // Import WalletConnect v2
-    const WalletConnectProvider = (await import('https://unpkg.com/@walletconnect/ethereum-provider@2.10.0/dist/index.umd.js')).default;
+    // For mobile, directly try to use WalletConnect with QR modal
+    const { EthereumProvider } = await import('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.0/dist/index.es.js');
     
-    walletProvider = await WalletConnectProvider.init({
-      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Your project ID
+    walletProvider = await EthereumProvider.init({
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a",
       chains: [97], // BSC testnet
       showQrModal: true,
       qrModalOptions: {
-        themeMode: 'auto',
-        themeVariables: {
-          '--wcm-z-index': '1000'
-        }
+        themeMode: 'auto'
       }
     });
     
     await walletProvider.enable();
-    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    const accounts = walletProvider.accounts;
     
-    if (accounts.length === 0) {
+    if (!accounts || accounts.length === 0) {
       throw new Error('No accounts found');
     }
     
@@ -1435,11 +1474,14 @@ async function connectWalletConnect() {
     
   } catch (error) {
     console.error('WalletConnect error:', error);
-    showWalletError(error.message);
-    showMobileWalletError(error.message);
-    
-    if (walletProvider?.disconnect) {
-      await walletProvider.disconnect();
+    // Fallback to simple mobile wallet redirect
+    if (isMobile()) {
+      showMobileWalletError('Opening wallet app...');
+      setTimeout(() => {
+        window.location.href = `trust://wc?uri=${encodeURIComponent(window.location.href)}`;
+      }, 1000);
+    } else {
+      showWalletError('WalletConnect failed: ' + error.message);
     }
   }
 }
@@ -1504,16 +1546,40 @@ function closeMobileWalletModal() {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Page loaded, initializing...');
+  console.log('Is mobile:', isMobile());
+  console.log('Ethereum available:', !!window.ethereum);
+  
   // Auto-connect if ethereum provider exists and has connected accounts
   if (window.ethereum && window.ethereum.selectedAddress) {
+    console.log('Auto-connecting existing wallet...');
     connectBrowserWallet();
   }
   
-  // Show mobile modal by default on mobile devices for testing
-  if (isMobile() && !userWalletAddress) {
-    console.log('Mobile device detected');
+  // Add test buttons for debugging
+  if (isMobile()) {
+    const debugDiv = document.createElement('div');
+    debugDiv.className = 'fixed top-4 left-4 bg-yellow-100 p-2 rounded text-xs z-50';
+    debugDiv.innerHTML = `
+      <div>📱 Mobile Mode</div>
+      <div>ETH: ${!!window.ethereum}</div>
+      <button onclick="testTrustWallet()" class="bg-blue-500 text-white px-2 py-1 rounded mt-1 text-xs">Test Trust</button>
+      <button onclick="testMetaMask()" class="bg-orange-500 text-white px-2 py-1 rounded mt-1 text-xs">Test MM</button>
+    `;
+    document.body.appendChild(debugDiv);
   }
 });
+
+// Test functions for debugging
+function testTrustWallet() {
+  console.log('Testing Trust Wallet connection...');
+  openMobileWallet('trust');
+}
+
+function testMetaMask() {
+  console.log('Testing MetaMask connection...');
+  openMobileWallet('metamask');
+}
 
 // Add some visual feedback for mobile testing
 if (isMobile()) {
