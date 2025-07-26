@@ -1591,6 +1591,126 @@ if (isMobile()) {
 }
 </script>
  <script>
+   // Connect wallet for referrals
+    async function connectReferralWallet() {
+      if (!userWalletAddress) {
+        await connectBrowserWallet();
+      }
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
+    }
+
+    function showReferralUI(wallet) {
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+      document.getElementById('referralSection').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2 font-semibold">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="referralLinkInput" value="${referralLink}" 
+                    class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                Copy
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          </div>
+          <div class="mt-4">
+            <p class="text-sm mb-2 font-semibold">Share your link:</p>
+            <div class="flex space-x-3">
+              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                🐦 Twitter
+              </button>
+              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                📱 Telegram
+              </button>
+              </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
+    }
+
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+    }
+
+    function shareOnTelegram() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+    }
+  // ===== TOKEN CHART =====
+    function initTokenChart() {
+      const ctx = document.getElementById('tokenChart').getContext('2d');
+
+      function getLabelColor() {
+        return document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#111827';
+      }
+
+      const chartConfig = {
+        type: 'doughnut',
+        data: {
+          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+          datasets: [{
+            data: [40, 30, 20, 5, 5],
+            backgroundColor: [
+              '#10B981', // Green
+              '#3B82F6', // Blue
+              '#F59E0B', // Yellow
+              '#EF4444', // Red
+              '#8B5CF6'  // Purple
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: getLabelColor(),
+                font: {
+                  size: 14,
+                  family: "'Inter', sans-serif"
+                },
+                padding: 20,
+              }
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      };
+
+      const tokenChart = new Chart(ctx, chartConfig);
+
+      // Update legend color when theme is toggled
+      const observer = new MutationObserver(() => {
+        const isDark = document.documentElement.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      });
+
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+ </script>
+ <script>
     // ===== TIMER FUNCTIONS =====
     function getPresaleStartTime() {
       let startTime = localStorage.getItem('presaleStartTime');
