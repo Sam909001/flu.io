@@ -7,12 +7,14 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="description" content="Web3 DApp using WalletConnect" />
   <title>$FLUFFI Presale & Staking</title>
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards.">
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token">
   <meta name="author" content="FLUFFI Team">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1504,29 +1506,47 @@ async function connectWalletConnect() {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
       btn.disabled = true;
     }
-    
-    // Handle mobile-specific initialization
+
+    // First check for mobile devices
     if (isMobileDevice()) {
-      await handleMobileWalletConnect();
-      return;
+      try {
+        await handleMobileWalletConnect();
+        return;
+      } catch (mobileError) {
+        console.error('Mobile WalletConnect failed:', mobileError);
+        // Fall through to try regular WalletConnect
+      }
     }
+
+    // Check if WalletConnect is available (modern way)
+    const WalletConnectProvider = window.WalletConnectProvider || 
+                                window.EthereumProvider;
     
-    // Initialize provider if WalletConnect is available
-    if (typeof window.EthereumProvider === 'undefined') {
-      throw new Error('WalletConnect not available. Please try again later.');
+    if (!WalletConnectProvider) {
+      // Attempt to dynamically load WalletConnect
+      await loadWalletConnectLibrary();
+      
+      // Check again after loading
+      if (!window.WalletConnectProvider && !window.EthereumProvider) {
+        throw new Error('WalletConnect not available. Please ensure you have a compatible wallet installed.');
+      }
     }
-    
-    walletProvider = new window.EthereumProvider({
+
+    // Initialize provider
+    walletProvider = new (window.WalletConnectProvider || window.EthereumProvider)({
       projectId: "b74a733c47def7b6672eb9ad072c4e8a",
-      chains: [97],
+      chains: [97], // BSC Testnet
       showQrModal: true,
       qrModalOptions: {
         themeMode: 'light',
         themeVariables: {'--wcm-z-index': '9999'}
       }
     });
-    
+
+    // Enable session
     await walletProvider.enable();
+    
+    // Get accounts
     const accounts = await walletProvider.request({ method: 'eth_accounts' });
     
     if (!accounts || accounts.length === 0) {
@@ -1544,10 +1564,20 @@ async function connectWalletConnect() {
     updateWalletUI();
     closeWalletModal();
     closeMobileWalletModal();
+    
   } catch (error) {
     console.error('WalletConnect error:', error);
-    showWalletError(error.message);
-    showMobileWalletError(error.message);
+    
+    // More user-friendly error messages
+    let errorMessage = error.message;
+    if (error.message.includes('User rejected')) {
+      errorMessage = 'Connection cancelled by user';
+    } else if (error.message.includes('not available')) {
+      errorMessage = 'WalletConnect not available. Please install a compatible wallet.';
+    }
+    
+    showWalletError(errorMessage);
+    showMobileWalletError(errorMessage);
     
     if (walletProvider) {
       try {
@@ -1564,6 +1594,23 @@ async function connectWalletConnect() {
       }
     }
   }
+}
+
+// Helper function to dynamically load WalletConnect
+async function loadWalletConnectLibrary() {
+  return new Promise((resolve, reject) => {
+    // Check if already loaded
+    if (window.WalletConnectProvider || window.EthereumProvider) {
+      return resolve();
+    }
+
+    // Load the WalletConnect script dynamically
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@latest/dist/umd/index.min.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Failed to load WalletConnect library'));
+    document.head.appendChild(script);
+  });
 }
 
 // Initialize when page loads
