@@ -1391,221 +1391,88 @@ function isMobileDevice() {
 }
 
 // Trust Wallet Connection Manager
-class TrustWalletConnector {
-  constructor() {
-    this.connectionTimeout = 15000; // 15 seconds
-    this.pingInterval = 500; // Check every 500ms
-    this.setupEventListeners();
-  }
-
-  setupEventListeners() {
-    // Listen for Ethereum provider injection
-    window.addEventListener('ethereum#initialized', this.handleProvider.bind(this), {
-      once: true
-    });
-
-    // Listen for potential mobile wallet returns
-    window.addEventListener('load', this.checkReturnFromWallet.bind(this));
-  }
-
-  async connect() {
-    const btn = document.getElementById('trustBtn');
-    try {
-      this.setButtonState(btn, 'loading');
-
-      if (this.isExtensionAvailable()) {
-        await this.connectExtension();
-      } else if (this.isMobile()) {
-        await this.connectMobile();
-      } else {
-        this.guideDesktopInstallation();
-      }
-    } catch (error) {
-      this.handleError(error, btn);
-    }
-  }
-
-  async connectExtension() {
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts'
-    });
-    await this.switchToBSCTestnet();
-    this.handleSuccess(accounts[0]);
-  }
-
-  async connectMobile() {
-    return new Promise((resolve, reject) => {
-      // Store current session
-      sessionStorage.setItem('walletConnectionPending', 'trust');
-
-      // Open Trust Wallet
-      this.openDeepLink('trust');
-
-      // Setup connection verification
-      const connectionCheck = setInterval(() => {
-        if (window.ethereum?.isTrust && window.ethereum.selectedAddress) {
-          clearInterval(connectionCheck);
-          clearTimeout(timeout);
-          this.handleSuccess(window.ethereum.selectedAddress);
-          resolve();
-        }
-      }, this.pingInterval);
-
-      // Setup timeout
-      const timeout = setTimeout(() => {
-        clearInterval(connectionCheck);
-        reject(new Error('Connection timed out. Please try again.'));
-      }, this.connectionTimeout);
-    });
-  }
-
-  openDeepLink(walletType) {
-    const urls = {
-      trust: `trust://wc?uri=${encodeURIComponent(window.location.href)}`,
-      metamask: `metamask://dapp/${window.location.host}${window.location.pathname}`,
-      rainbow: `rainbow://dapp?url=${encodeURIComponent(window.location.href)}`
-    };
-
-    window.location.href = urls[walletType];
-  }
-
-  checkReturnFromWallet() {
-    if (sessionStorage.getItem('walletConnectionPending') === 'trust') {
-      sessionStorage.removeItem('walletConnectionPending');
-      
-      if (window.ethereum?.isTrust) {
-        this.connect();
-      } else {
-        this.showError('Returned from wallet but no connection established');
-      }
-    }
-  }
-
-  handleProvider(event) {
-    if (event.detail.isTrust) {
-      this.connect();
-    }
-  }
-
-  handleSuccess(address) {
-    userWalletAddress = address;
-    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-    walletProvider = window.ethereum;
-    updateWalletUI();
-    closeMobileWalletModal();
-  }
-
-  // Helper methods
-  isExtensionAvailable() {
-    return window.ethereum?.isTrust;
-  }
-
-  isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
-
-  guideDesktopInstallation() {
-    if (confirm('Trust Wallet extension not found. Install it?')) {
-      window.open('https://trustwallet.com/browser-extension', '_blank');
-    }
-    throw new Error('Trust Wallet extension required');
-  }
-
-  setButtonState(btn, state) {
-    if (!btn) return;
-    
-    const states = {
-      loading: {
-        html: '<i class="fas fa-spinner fa-spin"></i> Connecting...',
-        disabled: true
+class MultiChainWalletConnector {
+  constructor(defaultChainId = '0x1') { // Default: Ethereum Mainnet
+    this.defaultChainId = defaultChainId;
+    this.chainConfigs = {
+      '0x1': { // Ethereum Mainnet
+        name: 'Ethereum',
+        rpc: ['https://mainnet.infura.io/v3/YOUR_PROJECT_ID'],
+        explorer: 'https://etherscan.io',
+        currency: { name: 'ETH', symbol: 'ETH', decimals: 18 }
       },
-      error: {
-        html: 'Connection Failed',
-        disabled: false
+      '0x38': { // BSC Mainnet
+        name: 'Binance Smart Chain',
+        rpc: ['https://bsc-dataseed.binance.org/'],
+        explorer: 'https://bscscan.com',
+        currency: { name: 'BNB', symbol: 'BNB', decimals: 18 }
       },
-      default: {
-        html: 'Connect Trust Wallet',
-        disabled: false
+      '0x61': { // BSC Testnet (kept as example)
+        name: 'BSC Testnet',
+        rpc: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+        explorer: 'https://testnet.bscscan.com',
+        currency: { name: 'BNB', symbol: 'BNB', decimals: 18 }
       }
     };
-    
-    Object.assign(btn, states[state] || states.default);
   }
 
-  handleError(error, btn) {
-    console.error('TrustWallet Connection Error:', error);
-    this.showError(error.message);
-    this.setButtonState(btn, 'error');
-    setTimeout(() => this.setButtonState(btn, 'default'), 3000);
-  }
-
-  showError(message) {
-    const errorEl = document.getElementById('mobileWalletError') || 
-                   document.getElementById('walletError');
-    if (errorEl) {
-      errorEl.textContent = message;
-      errorEl.classList.remove('hidden');
-      setTimeout(() => errorEl.classList.add('hidden'), 5000);
-    }
-  }
-
-  async switchToBSCTestnet() {
+  async switchChain(chainId = this.defaultChainId) {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x61' }], // BSC Testnet
+        params: [{ chainId }],
       });
+      return true;
     } catch (error) {
-      if (error.code === 4902) {
-        await this.addBSCTestnet();
+      if (error.code === 4902) { // Chain not added
+        return await this.addChain(chainId);
       }
+      throw error;
     }
   }
 
-  async addBSCTestnet() {
-    await window.ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: '0x61',
-        chainName: 'Binance Smart Chain Testnet',
-        nativeCurrency: {
-          name: 'BNB',
-          symbol: 'BNB',
-          decimals: 18
-        },
-        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
-        blockExplorerUrls: ['https://testnet.bscscan.com/']
-      }]
-    });
+  async addChain(chainId) {
+    const config = this.chainConfigs[chainId];
+    if (!config) throw new Error(`Unsupported chain: ${chainId}`);
+    
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId,
+          chainName: config.name,
+          nativeCurrency: config.currency,
+          rpcUrls: config.rpc,
+          blockExplorerUrls: [config.explorer]
+        }]
+      });
+      return true;
+    } catch (error) {
+      console.error(`Failed to add chain ${chainId}:`, error);
+      return false;
+    }
+  }
+
+  // Add new chain configuration
+  addChainConfig(chainId, config) {
+    this.chainConfigs[chainId] = config;
   }
 }
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Instantiate connector
-  const trustWallet = new TrustWalletConnector();
-  
-  // Set up connect button
-  const trustBtn = document.getElementById('trustBtn');
-  if (trustBtn) {
-    trustBtn.addEventListener('click', () => trustWallet.connect());
-  }
+// Usage Example:
+const wallet = new MultiChainWalletConnector('0x1'); // Default to Ethereum
 
-  // Set up mobile wallet modal
-  const mobileModal = document.getElementById('mobileWalletModal');
-  if (mobileModal) {
-    mobileModal.querySelectorAll('[data-wallet]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const walletType = btn.dataset.wallet;
-        if (walletType === 'trust') {
-          trustWallet.connect();
-        } else {
-          trustWallet.openDeepLink(walletType);
-        }
-      });
-    });
-  }
+// Connect to BSC Mainnet:
+await wallet.switchChain('0x38');
+
+// Connect to Polygon:
+wallet.addChainConfig('0x89', {
+  name: 'Polygon Mainnet',
+  rpc: ['https://polygon-rpc.com/'],
+  explorer: 'https://polygonscan.com',
+  currency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }
 });
+await wallet.switchChain('0x89');
 // WalletConnect connection
 async function connectWalletConnect() {
   const btn = document.getElementById('walletConnectBtn');
