@@ -1592,7 +1592,10 @@ function initTokenChart() {
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
   if (!startTime) {
+    // Set initial start time to now (for testing)
     startTime = Date.now();
+    // For production, you might want to set a fixed start time:
+    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
     localStorage.setItem('presaleStartTime', startTime);
   }
   return parseInt(startTime);
@@ -1608,7 +1611,8 @@ function formatTime(ms) {
     days: days.toString().padStart(2, '0'),
     hours: hours.toString().padStart(2, '0'),
     minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0')
+    seconds: seconds.toString().padStart(2, '0'),
+    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
   };
 }
 
@@ -1619,8 +1623,7 @@ function updateNextIncreaseTime() {
   const timeLeft = nextStageTime - now;
   
   const formatted = formatTime(timeLeft);
-  document.getElementById('nextIncreaseTime').textContent = 
-    `${formatted.hours}h ${formatted.minutes}m ${formatted.seconds}s`;
+  document.getElementById('nextIncreaseTime').textContent = formatted.full;
 }
 
 function updateTimers() {
@@ -1659,19 +1662,66 @@ function updateTimers() {
     document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
     document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
     
-    document.getElementById('stage-time-left').textContent = 
-      `${formattedStage.days}d ${formattedStage.hours}h ${formattedStage.minutes}m ${formattedStage.seconds}s`;
+    document.getElementById('stage-time-left').textContent = formattedStage.full;
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize timers
+// Initialize the timer
+function initTimer() {
   updateTimers();
   updateNextIncreaseTime();
+  // Update every second
   setInterval(() => {
     updateTimers();
     updateNextIncreaseTime();
   }, 1000);
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  if (localStorage.getItem('darkMode') === 'true' || 
+      (localStorage.getItem('darkMode') === null && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+
+  // Check if MetaMask is installed
+  if (window.ethereum?.isMetaMask) {
+    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+  }
+
+  // Initialize token chart
+  initTokenChart();
+
+  // Initialize timers
+  initTimer();
+
+  // Check for referral parameter
+  checkReferral();
+});
+
+// Toggle dark mode function
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  }
+}
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
       const urlParams = new URLSearchParams(window.location.search);
