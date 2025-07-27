@@ -543,27 +543,29 @@
   </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
-    <!-- Timer Section -->
-    <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
-      <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
-      <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300 space-x-3">
-  <span id="presale-hours">00</span>:<span id="presale-minutes">00</span>:<span id="presale-seconds">00</span>
-</div>
-      
-      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
-        
-        <!-- Progress Bar -->
-        <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
-          <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
-        </div>
-
-        <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
-          <span>Stage: <span id="current-stage">1</span>/15</span>
-          <span>Ends in: <span id="stage-seconds">60</span>s</span>
-        </div>
-      </div>
+   <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+  <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
+  <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300">
+    <span id="presale-days">00</span>d 
+    <span id="presale-hours">00</span>h 
+    <span id="presale-minutes">00</span>m 
+    <span id="presale-seconds">00</span>s
+  </div>
+  
+  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
+    
+    <!-- Progress Bar -->
+    <div class="w-full bg-gray-300 dark:bg-gray-600 h-4 rounded-full overflow-hidden mb-2">
+      <div id="stageProgressBar" class="h-full bg-green-500 transition-all duration-1000 ease-in-out" style="width: 0%"></div>
     </div>
+
+    <div class="flex justify-between text-sm font-mono text-gray-700 dark:text-gray-300">
+      <span>Stage: <span id="current-stage">1</span>/15</span>
+      <span>Ends in: <span id="stage-time-left">00d 00h 00m 00s</span></span>
+    </div>
+  </div>
+</div>
 
     <script>
     /* Testing function - remove in production */
@@ -1586,7 +1588,6 @@ function initTokenChart() {
     }
   });
 }
-    // ===== TIMER FUNCTIONS =====
 // ===== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
@@ -1597,17 +1598,29 @@ function getPresaleStartTime() {
   return parseInt(startTime);
 }
 
+function formatTime(ms) {
+  const days = Math.floor(ms / (24 * 3600 * 1000));
+  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
+  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+  
+  return {
+    days: days.toString().padStart(2, '0'),
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: seconds.toString().padStart(2, '0')
+  };
+}
+
 function updateNextIncreaseTime() {
   const now = Date.now();
   const startTime = getPresaleStartTime();
   const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
   const timeLeft = nextStageTime - now;
   
-  const hours = Math.floor(timeLeft / (3600 * 1000));
-  const mins = Math.floor((timeLeft % (3600 * 1000)) / (60 * 1000));
-  const secs = Math.floor((timeLeft % (60 * 1000)) / 1000);
+  const formatted = formatTime(timeLeft);
   document.getElementById('nextIncreaseTime').textContent = 
-    `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    `${formatted.hours}h ${formatted.minutes}m ${formatted.seconds}s`;
 }
 
 function updateTimers() {
@@ -1631,26 +1644,34 @@ function updateTimers() {
 
   // Update price
   const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00:00:00</span></span></span>`;
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
 
   // Update timers
   if (timeLeft <= 0) {
     document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-seconds').textContent = "0";
+    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
   } else {
-    const days = Math.floor(timeLeft / (24 * 3600 * 1000));
-    const hours = Math.floor((timeLeft % (24 * 3600 * 1000)) / (3600 * 1000));
-    const mins = Math.floor((timeLeft % (3600 * 1000)) / (60 * 1000));
-    const secs = Math.floor((timeLeft % (60 * 1000)) / 1000);
+    const formattedTotal = formatTime(timeLeft);
+    const formattedStage = formatTime(stageTimeLeft);
     
-    document.getElementById('presale-days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('presale-hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('presale-minutes').textContent = mins.toString().padStart(2, '0');
-    document.getElementById('presale-seconds').textContent = secs.toString().padStart(2, '0');
+    document.getElementById('presale-days').textContent = formattedTotal.days;
+    document.getElementById('presale-hours').textContent = formattedTotal.hours;
+    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
+    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
     
-    document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
+    document.getElementById('stage-time-left').textContent = 
+      `${formattedStage.days}d ${formattedStage.hours}h ${formattedStage.minutes}m ${formattedStage.seconds}s`;
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize timers
+  updateTimers();
+  updateNextIncreaseTime();
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime();
+  }, 1000);
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
       const urlParams = new URLSearchParams(window.location.search);
