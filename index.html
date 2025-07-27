@@ -1083,70 +1083,122 @@
       setTimeout(() => errorElement.classList.add('hidden'), 5000);
     }
 
+async function connectTrustWallet() {
+  try {
+    if (window.ethereum?.isTrust) {
+      return connectMetaMask(); // Trust Wallet uses same API as MetaMask
+    }
+    return connectWalletConnect(); // Fallback to WalletConnect
+  } catch (error) {
+    console.error("Trust Wallet error:", error);
+    showWalletError("Trust Wallet connection failed: " + error.message);
+  }
+}
+
+async function connectBinanceWallet() {
+  try {
+    if (window.BinanceChain) {
+      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      ethersProvider = new ethers.providers.Web3Provider(window.BinanceChain);
+      updateWalletUI();
+      closeWalletModal();
+    } else {
+      window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
+    }
+  } catch (error) {
+    console.error("Binance Wallet error:", error);
+    showWalletError("Binance Wallet connection failed: " + error.message);
+  }
+}
+
+async function connectCoinbaseWallet() {
+  try {
+    if (window.coinbaseWalletExtension) {
+      const accounts = await window.coinbaseWalletExtension.request({ method: 'eth_requestAccounts' });
+      userWalletAddress = accounts[0];
+      ethersProvider = new ethers.providers.Web3Provider(window.coinbaseWalletExtension);
+      updateWalletUI();
+      closeWalletModal();
+    } else {
+      window.open('https://www.coinbase.com/wallet', '_blank');
+    }
+  } catch (error) {
+    console.error("Coinbase Wallet error:", error);
+    showWalletError("Coinbase Wallet connection failed: " + error.message);
+  }
+}
     // ===== PRESALE FUNCTIONS =====
     async function buyFluffi() {
-      const amount = document.getElementById('amountInput').value;
-      const currency = document.getElementById('currencySelect').value;
-      const ref = document.getElementById('refInput').value;
-      
-      if (!userWalletAddress) {
-        showWalletError('Please connect your wallet first.');
-        openWalletModal();
-        return;
-      }
-      
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        showWalletError('Please enter a valid amount.');
-        return;
-      }
-      
-      try {
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        const prevText = buyBtn.textContent;
-        buyBtn.textContent = '⏳ Processing...';
-        buyBtn.disabled = true;
-        
-        // Convert amount to ETH value
-        let ethValue;
-        if (currency === 'USD') {
-          const usdToEth = 3000; // Example rate
-          ethValue = (Number(amount) / usdToEth).toFixed(6);
-        } else {
-          ethValue = Number(amount).toFixed(6);
-        }
-        
-        // Validate referral address if provided
-        let referralAddress = ethers.constants.AddressZero;
-        if (ref) {
-          if (!ethers.utils.isAddress(ref)) {
-            throw new Error("Invalid referral address");
-          }
-          referralAddress = ref;
-        }
-        
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
-        
-        const tx = await contract.contribute(referralAddress, { 
-          value: ethers.utils.parseEther(ethValue.toString()) 
-        });
-        
-        await tx.wait();
-        
-        buyBtn.textContent = prevText;
-        buyBtn.disabled = false;
-        alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
-      } catch (err) {
-        console.error("Buy error:", err);
-        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-        if (buyBtn) {
-          buyBtn.textContent = '🚀 Buy Now';
-          buyBtn.disabled = false;
-        }
-        showWalletError(err.message || "Transaction failed");
-      }
+  const amount = document.getElementById('amountInput').value;
+  const currency = document.getElementById('currencySelect').value;
+  const ref = document.getElementById('refInput').value;
+  
+  if (!userWalletAddress) {
+    showWalletError('Please connect your wallet first.');
+    openWalletModal();
+    return;
+  }
+  
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    showWalletError('Please enter a valid amount.');
+    return;
+  }
+  
+  try {
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    const prevText = buyBtn.textContent;
+    buyBtn.textContent = '⏳ Processing...';
+    buyBtn.disabled = true;
+    
+    let ethValue;
+    if (currency === 'USD') {
+      const usdToEth = 3000; // Example rate
+      ethValue = (Number(amount) / usdToEth).toFixed(6);
+    } else {
+      ethValue = Number(amount).toFixed(6);
     }
+    
+    let referralAddress = ethers.constants.AddressZero;
+    if (ref) {
+      if (!ethers.utils.isAddress(ref)) {
+        throw new Error("Invalid referral address");
+      }
+      referralAddress = ref;
+    }
+    
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+    
+    // Estimate gas first
+    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+      value: ethers.utils.parseEther(ethValue.toString())
+    });
+    
+    const tx = await contract.contribute(referralAddress, { 
+      value: ethers.utils.parseEther(ethValue.toString()),
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
+    
+    await tx.wait();
+    
+    buyBtn.textContent = prevText;
+    buyBtn.disabled = false;
+    alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+    
+    // Update displayed balances
+    await updateUserBalances();
+  } catch (err) {
+    console.error("Buy error:", err);
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    if (buyBtn) {
+      buyBtn.textContent = '🚀 Buy Now';
+      buyBtn.disabled = false;
+    }
+    showWalletError(err.message || "Transaction failed");
+  }
+}
 
     // ===== STAKING FUNCTIONS =====
     async function stakeFluffi() {
@@ -1160,7 +1212,7 @@
         const amount = document.getElementById('stakeInput').value;
         const amountNum = parseFloat(amount);
         
-        if (isNaN(amountNum) {
+        if (isNaN(amountNum)) {
           showWalletError("Please enter a valid amount");
           return;
         }
@@ -1208,46 +1260,61 @@
 
     // ===== CLAIM FUNCTIONS =====
     async function claimTokens() {
-      try {
-        if (!userWalletAddress) {
-          throw new Error("Please connect your wallet first");
-        }
-        
-        const signer = ethersProvider.getSigner();
-        const fluffiContract = new ethers.Contract(
-          FLUFFI_CONTRACT_ADDRESS,
-          FLUFFI_CONTRACT_ABI,
-          signer
-        );
-        
-        // Show loading state
-        const claimBtn = document.querySelector('#claim button');
-        const originalText = claimBtn.textContent;
-        claimBtn.disabled = true;
-        claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
-        
-        // Send transaction
-        const tx = await fluffiContract.claim();
-        await tx.wait();
-        
-        // Reset button and update balances
-        claimBtn.disabled = false;
-        claimBtn.textContent = originalText;
-        await updateUserBalances();
-        
-        alert("Tokens claimed successfully!");
-      } catch (error) {
-        console.error("Claim error:", error);
-        showWalletError(error.message || "Claim failed");
-        
-        // Reset button if error occurs
-        const claimBtn = document.querySelector('#claim button');
-        if (claimBtn) {
-          claimBtn.disabled = false;
-          claimBtn.textContent = 'Claim Tokens';
-        }
-      }
+  try {
+    if (!userWalletAddress) {
+      throw new Error("Please connect your wallet first");
     }
+    
+    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_CONTRACT_ADDRESS,
+      FLUFFI_CONTRACT_ABI,
+      signer
+    );
+    
+    // Check if presale has ended
+    const presaleEnded = await fluffiContract.presaleEnded();
+    if (!presaleEnded) {
+      throw new Error("Presale has not ended yet");
+    }
+    
+    // Check claimable amount
+    const claimable = await fluffiContract.getClaimableAmount(userWalletAddress);
+    if (claimable.lte(0)) {
+      throw new Error("No tokens available to claim");
+    }
+
+    const claimBtn = document.querySelector('#claim button');
+    const originalText = claimBtn.textContent;
+    claimBtn.disabled = true;
+    claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
+
+    // Estimate gas first
+    const gasEstimate = await fluffiContract.estimateGas.claim();
+    
+    const tx = await fluffiContract.claim({
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
+    
+    await tx.wait();
+    
+    claimBtn.disabled = false;
+    claimBtn.textContent = originalText;
+    await updateUserBalances();
+    
+    alert("Tokens claimed successfully!");
+  } catch (error) {
+    console.error("Claim error:", error);
+    showWalletError(error.message || "Claim failed");
+    
+    const claimBtn = document.querySelector('#claim button');
+    if (claimBtn) {
+      claimBtn.disabled = false;
+      claimBtn.textContent = 'Claim Tokens';
+    }
+  }
+}
 
     // ===== UTILITY FUNCTIONS =====
     async function updateUserBalances() {
@@ -1292,48 +1359,52 @@
         tokenChart.update();
       }
     }
-
-    function initTokenChart() {
-      const ctx = document.getElementById('tokenChart').getContext('2d');
-      const isDark = document.documentElement.classList.contains('dark');
-
-      tokenChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-          datasets: [{
-            data: [40, 30, 20, 5, 5],
-            backgroundColor: [
-              '#10B981', // Green
-              '#3B82F6', // Blue
-              '#F59E0B', // Yellow
-              '#EF4444', // Red
-              '#8B5CF6'  // Purple
-            ],
-            borderWidth: 2,
-            borderColor: isDark ? '#1F2937' : '#FFFFFF'
-          }]
-        },
-        options: {
-          cutout: '65%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: isDark ? '#FFFFFF' : '#111827',
-                font: {
-                  size: 14
-                },
-                padding: 20,
-              }
-            }
-          },
-          responsive: true,
-          maintainAspectRatio: false
+function initTokenChart() {
+  const ctx = document.getElementById('tokenChart');
+  if (!ctx) return;
+  
+  const isDark = document.documentElement.classList.contains('dark');
+  
+  tokenChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+      datasets: [{
+        data: [40, 30, 20, 5, 5],
+        backgroundColor: [
+          '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
+        ],
+        borderWidth: 2,
+        borderColor: isDark ? '#1F2937' : '#FFFFFF'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: window.innerWidth < 768 ? 'bottom' : 'right',
+          labels: {
+            color: isDark ? '#FFFFFF' : '#111827',
+            font: {
+              size: window.innerWidth < 768 ? 12 : 14
+            },
+            padding: 20,
+          }
         }
-      });
+      },
+      cutout: '65%'
     }
+  });
 
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (tokenChart) {
+      tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
+      tokenChart.update();
+    }
+  });
+}
     // ===== TIMER FUNCTIONS =====
     function getPresaleStartTime() {
       let startTime = localStorage.getItem('presaleStartTime');
