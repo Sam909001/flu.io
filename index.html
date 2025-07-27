@@ -64,6 +64,36 @@
   </style>
 </head>
 
+  <!-- WalletConnect Modal -->
+<div id="walletConnectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+    <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+      <h3 class="text-lg font-bold">Connect Wallet</h3>
+      <button onclick="closeWalletConnectModal()" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
+      
+      <div class="text-center">
+        <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <a id="metamaskMobileLink" href="#" class="flex items-center justify-center bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-4 py-2 rounded-lg">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-5 h-5 mr-2" alt="MetaMask">
+            MetaMask
+          </a>
+          <a id="trustMobileLink" href="#" class="flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-lg">
+            <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-5 h-5 mr-2" alt="Trust Wallet">
+            Trust Wallet
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
@@ -130,43 +160,26 @@
     
     <!-- Airdrop Form -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
-      
-      <div id="walletStatus" class="hidden mb-4 p-3 bg-gray-100 dark:bg-gray-700 rounded">
-        <p class="font-medium">Connected Wallet: <span id="connectedAddress" class="font-mono"></span></p>
-      </div>
-      
-      <div id="walletError" class="hidden mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded"></div>
-      
-      <form id="airdropForm">
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-          <input type="email" id="email" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black dark:text-white" required>
-        </div>
-        
-        <div class="mb-4">
-          <label for="walletAddress" class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-          <input type="text" id="walletAddress" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black dark:text-white" required>
-        </div>
-        
-        <div class="mb-6">
-          <label class="flex items-center">
-            <input type="checkbox" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" required>
-            <span class="ml-2 text-gray-700 dark:text-gray-300">I agree to the <a href="#" class="text-green-600 dark:text-green-400 hover:underline">Terms & Conditions</a></span>
-          </label>
-        </div>
-        
-        <div class="space-y-3">
-          <button type="button" onclick="connectWallet()" id="connectWalletBtn" class="w-full btn-primary py-3 px-6 rounded-lg font-semibold">
-            Connect Wallet
-          </button>
-          
-          <button type="submit" id="submitBtn" class="w-full btn-secondary py-3 px-6 rounded-lg font-semibold hidden">
-            Claim Airdrop
-          </button>
-        </div>
-      </form>
+  <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
+  
+  <form id="airdropForm">
+    <div class="mb-4">
+      <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+      <input type="email" required class="w-full p-3 border rounded-lg">
     </div>
+    
+    <div class="mb-4">
+      <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+      <input type="text" id="walletAddress" required 
+             placeholder="0x..." 
+             class="w-full p-3 border rounded-lg">
+    </div>
+
+    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
+      Claim Airdrop
+    </button>
+  </form>
+</div>
     
     <!-- Tasks Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
@@ -212,63 +225,142 @@
     </div>
   </footer>
 
-  <!-- JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script>
-    // Wallet connection functionality
-    let ethersProvider = null;
-    let userWalletAddress = null;
+ <!-- JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize dark mode
-      if (localStorage.getItem('darkMode') === 'true' || 
-          (localStorage.getItem('darkMode') === null && 
-          window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkModeIcon').textContent = '☀️';
-      }
-      
-      // Check if wallet is already connected
-      if (window.ethereum && window.ethereum.selectedAddress) {
-        handleWalletConnection(window.ethereum.selectedAddress);
-      }
-      
-      // Setup form submission
-      document.getElementById('airdropForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        claimAirdrop();
-      });
+<script>
+  // Wallet connection functionality
+  let walletConnectProvider = null;
+  let ethersProvider = null;
+  let userWalletAddress = null;
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dark mode
+    if (localStorage.getItem('darkMode') === 'true' || 
+        (localStorage.getItem('darkMode') === null && 
+        window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('darkModeIcon').textContent = '☀️';
+    }
+    
+    // Setup form submission
+    document.getElementById('airdropForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      claimAirdrop();
     });
+    
+    // Check if wallet is already connected
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      handleWalletConnection(window.ethereum.selectedAddress);
+    }
+  });
 
-    async function connectWallet() {
-      try {
-        if (window.ethereum) {
+  async function connectWallet() {
+    try {
+      // Check if we're on mobile
+      if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        // First try direct connection if MetaMask mobile browser
+        if (window.ethereum && window.ethereum.isMetaMask) {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
           handleWalletConnection(accounts[0]);
         } else {
-          showWalletError("Please install MetaMask or another Ethereum wallet");
+          // Show WalletConnect modal for other mobile cases
+          openWalletConnectModal();
         }
-      } catch (error) {
-        console.error("Wallet connection error:", error);
-        showWalletError("Wallet connection failed: " + error.message);
+      } 
+      // Desktop browser
+      else if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } else {
+        showWalletError("Please install MetaMask or another Ethereum wallet");
       }
+    } catch (error) {
+      console.error("Connection error:", error);
+      showWalletError(error.message || "Connection failed");
     }
+  }
 
-    function handleWalletConnection(address) {
-      userWalletAddress = address;
-      ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+  function openWalletConnectModal() {
+    initWalletConnect();
+    document.getElementById('walletConnectModal').classList.remove('hidden');
+  }
+
+  function closeWalletConnectModal() {
+    document.getElementById('walletConnectModal').classList.add('hidden');
+  }
+
+  async function initWalletConnect() {
+    try {
+      // Initialize WalletConnect provider
+      walletConnectProvider = new WalletConnectProvider.default({
+        rpc: {
+          56: "https://bsc-dataseed.binance.org/" // BSC Mainnet
+        },
+        bridge: "https://bridge.walletconnect.org",
+        qrcodeModalOptions: {
+          mobileLinks: ["metamask", "trust"]
+        }
+      });
+
+      // Subscribe to events
+      walletConnectProvider.on("connect", (error, payload) => {
+        if (error) throw error;
+      });
+
+      walletConnectProvider.on("disconnect", (error) => {
+        if (error) throw error;
+        disconnectWallet();
+      });
+
+      // Create QR code
+      await walletConnectProvider.enable();
+      const uri = walletConnectProvider.connector.uri;
       
-      // Update UI
-      const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-      document.getElementById('walletButton').textContent = shortAddress;
-      document.getElementById('connectedAddress').textContent = shortAddress;
-      document.getElementById('walletStatus').classList.remove('hidden');
-      document.getElementById('walletAddress').value = address;
-      document.getElementById('connectWalletBtn').classList.add('hidden');
-      document.getElementById('submitBtn').classList.remove('hidden');
-      
-      // Set up event listeners
+      // Generate QR code
+      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+          light: '#00000000'
+        }
+      }, (error) => {
+        if (error) console.error("QR code error:", error);
+      });
+
+      // Set up mobile deep links
+      document.getElementById('metamaskMobileLink').href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
+      document.getElementById('trustMobileLink').href = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
+
+      // Get accounts
+      const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+      if (accounts.length > 0) {
+        handleWalletConnection(accounts[0]);
+        closeWalletConnectModal();
+      }
+    } catch (error) {
+      console.error("WalletConnect error:", error);
+      showWalletError("WalletConnect failed: " + error.message);
+    }
+  }
+
+  function handleWalletConnection(address) {
+    userWalletAddress = address;
+    ethersProvider = window.ethereum ? 
+      new ethers.providers.Web3Provider(window.ethereum) :
+      new ethers.providers.Web3Provider(walletConnectProvider);
+    
+    // Update UI
+    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    document.getElementById('walletButton').textContent = shortAddress;
+    document.getElementById('walletAddress').value = address;
+    
+    // Set up event listeners
+    if (window.ethereum) {
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length === 0) {
           disconnectWallet();
@@ -277,73 +369,73 @@
         }
       });
     }
+  }
 
-    function disconnectWallet() {
-      if (window.ethereum && window.ethereum.removeListener) {
-        window.ethereum.removeListener('accountsChanged', handleWalletConnection);
-      }
-      
-      ethersProvider = null;
-      userWalletAddress = null;
-      
-      // Update UI
-      document.getElementById('walletButton').textContent = 'Connect Wallet';
-      document.getElementById('walletStatus').classList.add('hidden');
-      document.getElementById('connectWalletBtn').classList.remove('hidden');
-      document.getElementById('submitBtn').classList.add('hidden');
+  function disconnectWallet() {
+    if (walletConnectProvider) {
+      walletConnectProvider.disconnect();
+      walletConnectProvider = null;
     }
+    
+    if (window.ethereum && window.ethereum.removeListener) {
+      window.ethereum.removeListener('accountsChanged', handleWalletConnection);
+    }
+    
+    ethersProvider = null;
+    userWalletAddress = null;
+    document.getElementById('walletButton').textContent = 'Connect Wallet';
+    document.getElementById('walletAddress').value = '';
+  }
 
-    function showWalletError(message) {
-      const errorElement = document.getElementById('walletError');
-      errorElement.textContent = message;
-      errorElement.classList.remove('hidden');
-      setTimeout(() => errorElement.classList.add('hidden'), 5000);
-    }
+  function showWalletError(message) {
+    alert(message); // Simple alert for demo - replace with your error display
+  }
 
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
-      
-      // Update icon
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-    }
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('darkMode', html.classList.contains('dark'));
+    
+    // Update icon
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  }
 
-    async function claimAirdrop() {
-      const email = document.getElementById('email').value;
-      const walletAddress = document.getElementById('walletAddress').value;
-      
-      if (!userWalletAddress) {
-        showWalletError("Please connect your wallet first");
-        return;
-      }
-      
-      if (!email || !walletAddress) {
-        showWalletError("Please fill in all required fields");
-        return;
-      }
-      
-      try {
-        const submitBtn = document.getElementById('submitBtn');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Success message
-        alert("🎉 Airdrop claimed successfully! Tokens will be distributed after the verification process.");
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      } catch (error) {
-        console.error("Airdrop error:", error);
-        showWalletError("Airdrop claim failed: " + error.message);
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').textContent = 'Claim Airdrop';
-      }
+  async function claimAirdrop() {
+    const email = document.getElementById('email').value;
+    const walletAddress = document.getElementById('walletAddress').value;
+    
+    if (!walletAddress) {
+      showWalletError("Please connect your wallet first");
+      return;
     }
-  </script>
+    
+    if (!email || !walletAddress) {
+      showWalletError("Please fill in all required fields");
+      return;
+    }
+    
+    try {
+      const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Success message
+      alert("🎉 Airdrop claimed successfully! Tokens will be distributed after verification.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    } catch (error) {
+      console.error("Airdrop error:", error);
+      showWalletError("Airdrop claim failed: " + error.message);
+      const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Claim Airdrop';
+    }
+  }
+</script>
 </body>
 </html>
