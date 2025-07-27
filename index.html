@@ -1185,6 +1185,54 @@ async function connectCoinbaseWallet() {
     showWalletError("Coinbase Wallet connection failed: " + error.message);
   }
 }
+    async function connectMobileWallet() {
+  try {
+    walletProvider = new WalletConnectProvider.default({
+      ...WALLETCONNECT_CONFIG,
+      qrModalOptions: {
+        themeMode: 'dark',
+        mobileWallets: [
+          {
+            id: 'metamask',
+            name: 'MetaMask',
+            links: {
+              native: 'metamask://wc?uri={wcUri}',
+              universal: 'https://metamask.app.link/wc?uri={wcUri}'
+            }
+          },
+          {
+            id: 'trust',
+            name: 'Trust Wallet',
+            links: {
+              native: 'trust://wc?uri={wcUri}',
+              universal: 'https://link.trustwallet.com/wc?uri={wcUri}'
+            }
+          }
+        ]
+      }
+    });
+
+    walletProvider.on("display_uri", (uri) => {
+      const encodedUri = encodeURIComponent(uri);
+      const mobileLinks = `
+        <div class="mobile-wallet-buttons">
+          <a href="metamask://wc?uri=${encodedUri}" class="metamask-button">
+            Open in MetaMask
+          </a>
+          <a href="trust://wc?uri=${encodedUri}" class="trust-button">
+            Open in Trust Wallet
+          </a>
+        </div>
+      `;
+      // Show QR code + mobile buttons
+    });
+
+    await walletProvider.enable();
+    // Handle connection...
+  } catch (error) {
+    console.error("Connection error:", error);
+  }
+}
   </script>
     <script>
     // ===== PRESALE FUNCTIONS =====
