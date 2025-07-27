@@ -1001,23 +1001,36 @@ function resetTimer() {
 
     async function connectMetaMask() {
   try {
-    if (window.ethereum) {
-      // Try regular connection first
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    // First try direct connection
+    if (window.ethereum?.isMetaMask) {
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
       userWalletAddress = accounts[0];
       ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
       updateWalletUI();
       closeWalletModal();
-    } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Mobile deep link
-      window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}`;
+      return;
+    }
+
+    // Mobile handling
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      // Create a hidden iframe to trigger MetaMask without full redirect
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}?redirect_url=${encodeURIComponent(window.location.href)}`;
+      document.body.appendChild(iframe);
+      
+      // Fallback in case iframe doesn't work
+      setTimeout(() => {
+        window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}`;
+      }, 500);
     } else {
-      // Desktop fallback
       window.open('https://metamask.io/download.html', '_blank');
     }
   } catch (error) {
     console.error("MetaMask error:", error);
-    showWalletError("MetaMask connection failed: " + error.message);
+    showWalletError("Connection failed: " + (error.message || error));
   }
 }
     async function connectWalletConnect() {
@@ -1109,17 +1122,29 @@ function resetTimer() {
 
 async function connectTrustWallet() {
   try {
+    // First try direct connection
     if (window.ethereum?.isTrust) {
-      return connectMetaMask(); // Trust Wallet uses same API as MetaMask
-    } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Mobile deep link
-      window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+      return connectMetaMask(); // Shares same API as MetaMask
+    }
+
+    // Mobile handling
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      // Use a more direct approach
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `trust://browser?url=${encodeURIComponent(window.location.href)}`;
+      document.body.appendChild(iframe);
+      
+      // Fallback after delay
+      setTimeout(() => {
+        window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+      }, 300);
     } else {
       return connectWalletConnect(); // Desktop fallback
     }
   } catch (error) {
     console.error("Trust Wallet error:", error);
-    showWalletError("Trust Wallet connection failed: " + error.message);
+    showWalletError("Connection failed: " + (error.message || error));
   }
 }
 async function connectBinanceWallet() {
