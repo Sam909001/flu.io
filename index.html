@@ -564,6 +564,19 @@
         </div>
       </div>
     </div>
+
+    <script>
+    /* Testing function - remove in production */
+function resetTimer() {
+  localStorage.removeItem('presaleStartTime');
+  location.reload();
+}
+</script>
+
+<!-- Testing button - remove in production -->
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+  Reset Timer (For Testing)
+</button>
     
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
