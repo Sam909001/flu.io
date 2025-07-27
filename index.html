@@ -1587,6 +1587,7 @@ function initTokenChart() {
   });
 }
     // ===== TIMER FUNCTIONS =====
+// ===== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
   if (!startTime) {
@@ -1599,7 +1600,7 @@ function getPresaleStartTime() {
 function updateNextIncreaseTime() {
   const now = Date.now();
   const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000) + 1) * (48 * 3600 * 1000);
+  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
   const timeLeft = nextStageTime - now;
   
   const hours = Math.floor(timeLeft / (3600 * 1000));
@@ -1637,10 +1638,12 @@ function updateTimers() {
     document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
     document.getElementById('stage-seconds').textContent = "0";
   } else {
-    const hours = Math.floor(timeLeft / (3600 * 1000));
+    const days = Math.floor(timeLeft / (24 * 3600 * 1000));
+    const hours = Math.floor((timeLeft % (24 * 3600 * 1000)) / (3600 * 1000));
     const mins = Math.floor((timeLeft % (3600 * 1000)) / (60 * 1000));
     const secs = Math.floor((timeLeft % (60 * 1000)) / 1000);
     
+    document.getElementById('presale-days').textContent = days.toString().padStart(2, '0');
     document.getElementById('presale-hours').textContent = hours.toString().padStart(2, '0');
     document.getElementById('presale-minutes').textContent = mins.toString().padStart(2, '0');
     document.getElementById('presale-seconds').textContent = secs.toString().padStart(2, '0');
@@ -1648,7 +1651,6 @@ function updateTimers() {
     document.getElementById('stage-seconds').textContent = Math.floor(stageTimeLeft / 1000);
   }
 }
-
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
       const urlParams = new URLSearchParams(window.location.search);
