@@ -285,8 +285,104 @@
   </header>
 
   <main class="p-6 mx-auto w-full max-w-2xl">
-    <!-- ... (rest of your HTML content remains the same until the wallet modal) ... -->
-  </main>
+  <!-- Airdrop Information -->
+  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold mb-4 text-center">🚀 $FLUFFI Airdrop</h2>
+    <p class="text-gray-700 dark:text-gray-300 mb-4">
+      Join the $FLUFFI revolution! Complete simple tasks to earn free $FLUFFI tokens.
+    </p>
+    <div class="flex items-center justify-center mb-4">
+      <div class="text-center">
+        <div class="text-3xl font-bold text-green-600" id="countdown">00:00:00</div>
+        <div class="text-gray-600 dark:text-gray-400">Until airdrop ends</div>
+      </div>
+    </div>
+    <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+      Limited time offer. 1,000,000 $FLUFFI tokens allocated for this airdrop.
+    </p>
+  </section>
+
+  <!-- Tasks Section -->
+  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+    <h2 class="text-xl font-bold mb-4">Complete Tasks to Qualify</h2>
+    
+    <div class="space-y-4">
+      <!-- Task 1 -->
+      <div class="flex items-start">
+        <input type="checkbox" id="task1" class="mt-1 mr-3" disabled>
+        <div class="flex-1">
+          <label for="task1" class="font-medium">Follow @FLUFFIOFFICIAL on Twitter</label>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Stay updated with our latest news and announcements
+            <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
+          </p>
+        </div>
+        <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
+      </div>
+      
+      <!-- Task 2 -->
+      <div class="flex items-start">
+        <input type="checkbox" id="task2" class="mt-1 mr-3" disabled>
+        <div class="flex-1">
+          <label for="task2" class="font-medium">Join our Telegram group</label>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Be part of our growing community
+            <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
+          </p>
+        </div>
+        <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
+      </div>
+      
+      <!-- Task 3 -->
+      <div class="flex items-start">
+        <input type="checkbox" id="task3" class="mt-1 mr-3" disabled>
+        <div class="flex-1">
+          <label for="task3" class="font-medium">Like & Retweet our pinned tweet</label>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Help spread the word about $FLUFFI
+            <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
+          </p>
+        </div>
+        <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Claim Form -->
+  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-bold mb-4">Claim Your Airdrop</h2>
+    <form id="airdropForm" class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+        <input type="email" id="email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600">
+      </div>
+      
+      <div>
+        <label for="walletAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Wallet Address</label>
+        <input type="text" id="walletAddress" readonly class="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
+      </div>
+      
+      <button type="submit" class="w-full btn-primary py-3 px-4 rounded-lg font-semibold text-white transition-colors">
+        Claim Airdrop
+      </button>
+    </form>
+    
+    <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+      <p>By claiming, you agree to our Terms and Conditions.</p>
+    </div>
+  </section>
+
+  <!-- Hidden Dev Section -->
+  <div id="devSection" class="hidden mt-6 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+    <h3 class="font-bold mb-2">Developer Tools</h3>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="simulateTwitterFollow()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Twitter</button>
+      <button onclick="simulateTelegramJoin()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Telegram</button>
+      <button onclick="simulateRetweet()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Retweet</button>
+      <button onclick="resetTasks()" class="px-3 py-1 bg-red-500 text-white rounded text-sm">Reset Tasks</button>
+    </div>
+  </div>
+</main>
 
   <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
