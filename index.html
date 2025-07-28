@@ -498,103 +498,102 @@
     }
 
     // Wallet connection functions
-    function openWalletModal() {
-      document.getElementById('walletModal').classList.add('active');
-    }
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('active');
+}
 
-    function closeWalletModal() {
-      document.getElementById('walletModal').classList.remove('active');
-    }
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('active');
+}
 
-    async function connectWallet(walletType) {
-      try {
-        closeWalletModal();
+async function connectWallet(walletType) {
+  try {
+    closeWalletModal();
+    
+    if (walletType === 'metamask') {
+      // MetaMask connection (works for both browser and mobile)
+      if (window.ethereum && window.ethereum.isMetaMask) {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
         
-        if (walletType === 'metamask' || walletType === 'trust') {
-          // For MetaMask and Trust Wallet
-          if (window.ethereum) {
-            try {
-              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-              handleWalletConnection(accounts[0]);
-              
-              // Set up event listeners for account changes
-              window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                  disconnectWallet();
-                } else {
-                  handleWalletConnection(accounts[0]);
-                }
-              });
-            } catch (error) {
-              // Handle mobile case
-              if (walletType === 'metamask' && isMobile()) {
-                window.location.href = 'https://metamask.app.link/dapp/' + window.location.hostname;
-                return;
-              } else if (walletType === 'trust' && isMobile()) {
-                window.location.href = 'https://link.trustwallet.com/open_url?url=' + encodeURIComponent(window.location.href);
-                return;
-              }
-              throw error;
-            }
-          } else {
-            // Handle mobile case when no ethereum provider
-            if (walletType === 'metamask' && isMobile()) {
-              window.location.href = 'https://metamask.app.link/dapp/' + window.location.hostname;
-              return;
-            } else if (walletType === 'trust' && isMobile()) {
-              window.location.href = 'https://link.trustwallet.com/open_url?url=' + encodeURIComponent(window.location.href);
-              return;
-            }
-            showWalletError("Please install MetaMask or Trust Wallet");
-          }
-        } else if (walletType === 'walletconnect') {
-          // Initialize WalletConnect provider
-          walletConnectProvider = new WalletConnectProvider.default({
-            rpc: {
-              1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
-              56: "https://bsc-dataseed.binance.org/",
-              137: "https://polygon-rpc.com/"
-            },
-            bridge: "https://bridge.walletconnect.org",
-            qrcodeModal: true
-          });
-
-          // Enable session (triggers QR Code modal)
-          await walletConnectProvider.enable();
-          
-          // Subscribe to events
-          walletConnectProvider.on("connect", (error, payload) => {
-            if (error) throw error;
-            const { accounts } = payload.params[0];
-            handleWalletConnection(accounts[0]);
-          });
-
-          walletConnectProvider.on("disconnect", (error) => {
-            if (error) throw error;
+        // Set up event listeners for account changes
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
             disconnectWallet();
-          });
-        } else if (walletType === 'phantom') {
-          // For Phantom wallet (Solana)
-          if (window.solana && window.solana.isPhantom) {
-            const response = await window.solana.connect();
-            handleWalletConnection(response.publicKey.toString());
-          } else if (isMobile()) {
-            // Handle Phantom mobile case
-            window.location.href = 'https://phantom.app/ul/browse/' + encodeURIComponent(window.location.href);
           } else {
-            showWalletError("Please install Phantom Wallet");
+            handleWalletConnection(accounts[0]);
           }
-        }
-      } catch (error) {
-        console.error("Wallet connection error:", error);
-        showWalletError(error.message || "Wallet connection failed");
+        });
+      } else if (isMobile()) {
+        // Mobile fallback for MetaMask
+        window.location.href = `https://metamask.app.link/dapp/${window.location.hostname}`;
+        return;
+      } else {
+        showWalletError("Please install MetaMask");
       }
     }
-
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    else if (walletType === 'trust') {
+      // Trust Wallet connection
+      if (window.ethereum && window.ethereum.isTrust) {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } else if (isMobile()) {
+        // Mobile fallback for Trust Wallet
+        window.location.href = `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}`;
+        return;
+      } else {
+        showWalletError("Please install Trust Wallet");
+      }
     }
+    else if (walletType === 'walletconnect') {
+      // WalletConnect connection
+      walletConnectProvider = new WalletConnectProvider.default({
+        rpc: {
+          1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+          56: "https://bsc-dataseed.binance.org/",
+          137: "https://polygon-rpc.com/"
+        },
+        bridge: "https://bridge.walletconnect.org",
+        qrcodeModal: true
+      });
 
+      // Enable session (triggers QR Code modal)
+      await walletConnectProvider.enable();
+      
+      // Subscribe to events
+      walletConnectProvider.on("connect", (error, payload) => {
+        if (error) throw error;
+        const { accounts } = payload.params[0];
+        handleWalletConnection(accounts[0]);
+      });
+
+      walletConnectProvider.on("disconnect", (error) => {
+        if (error) throw error;
+        disconnectWallet();
+      });
+    }
+    else if (walletType === 'phantom') {
+      // Phantom Wallet connection
+      if (window.solana && window.solana.isPhantom) {
+        const response = await window.solana.connect();
+        handleWalletConnection(response.publicKey.toString());
+      } else if (isMobile()) {
+        // Mobile fallback for Phantom
+        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}`;
+      } else {
+        showWalletError("Please install Phantom Wallet");
+      }
+    }
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+    showWalletError(error.message || "Wallet connection failed");
+  }
+}
+
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+    
     function handleWalletConnection(address) {
       userWalletAddress = address;
       
