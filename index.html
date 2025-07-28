@@ -61,39 +61,118 @@
       color: white;
       border-color: #4B5563;
     }
+    
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .wallet-btn:hover {
+      background: #e1e1e1;
+    }
+    
+    .wallet-btn img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .dark .wallet-btn {
+      background: #374151;
+      color: white;
+    }
+    
+    .dark .wallet-btn:hover {
+      background: #4B5563;
+    }
+    
+    .wallet-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .dark .wallet-modal-content {
+      background: #1f2937;
+    }
+    
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .wallet-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .dark .wallet-option:hover {
+      background: #374151;
+    }
+    
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .wallet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .wallet-close {
+      cursor: pointer;
+      font-size: 24px;
+    }
+    
+    .task-completed {
+      color: #10B981;
+    }
+    
+    .task-incomplete {
+      color: #EF4444;
+    }
   </style>
 </head>
 
-  <!-- WalletConnect Modal -->
-<div id="walletConnectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-    <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-      <h3 class="text-lg font-bold">Connect Wallet</h3>
-      <button onclick="closeWalletConnectModal()" class="text-gray-500 hover:text-gray-700">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="p-6">
-      <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
-      
-      <div class="text-center">
-        <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <a id="metamaskMobileLink" href="#" class="flex items-center justify-center bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-4 py-2 rounded-lg">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="w-5 h-5 mr-2" alt="MetaMask">
-            MetaMask
-          </a>
-          <a id="trustMobileLink" href="#" class="flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-lg">
-            <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="w-5 h-5 mr-2" alt="Trust Wallet">
-            Trust Wallet
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-  
 <body class="text-gray-800 dark:text-white">
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
@@ -107,7 +186,7 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
         <span id="darkModeIcon">🌙</span>
       </button>
-      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
     </nav>
   </header>
 
@@ -142,15 +221,15 @@
           <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
           <div class="flex gap-4 justify-center">
             <div class="text-center">
-              <div class="text-2xl font-mono font-bold">07</div>
+              <div id="days" class="text-2xl font-mono font-bold">07</div>
               <div class="text-sm text-gray-500">Days</div>
             </div>
             <div class="text-center">
-              <div class="text-2xl font-mono font-bold">12</div>
+              <div id="hours" class="text-2xl font-mono font-bold">12</div>
               <div class="text-sm text-gray-500">Hours</div>
             </div>
             <div class="text-center">
-              <div class="text-2xl font-mono font-bold">45</div>
+              <div id="minutes" class="text-2xl font-mono font-bold">45</div>
               <div class="text-sm text-gray-500">Minutes</div>
             </div>
           </div>
@@ -160,26 +239,26 @@
     
     <!-- Airdrop Form -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-  <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
-  
-  <form id="airdropForm">
-    <div class="mb-4">
-      <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-      <input type="email" required class="w-full p-3 border rounded-lg">
-    </div>
-    
-    <div class="mb-4">
-      <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-      <input type="text" id="walletAddress" required 
-             placeholder="0x..." 
-             class="w-full p-3 border rounded-lg">
-    </div>
+      <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
+      
+      <form id="airdropForm">
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+          <input type="email" id="email" required class="w-full p-3 border rounded-lg">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+          <input type="text" id="walletAddress" required 
+                 placeholder="0x..." 
+                 class="w-full p-3 border rounded-lg" readonly>
+        </div>
 
-    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
-      Claim Airdrop
-    </button>
-  </form>
-</div>
+        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
+          Claim Airdrop
+        </button>
+      </form>
+    </div>
     
     <!-- Tasks Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
@@ -189,26 +268,54 @@
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
             <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
-            <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">Follow us on Twitter</label>
+            <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
+              Follow us on Twitter <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </label>
           </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+5,000 FLUFFI</span>
+          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
         </div>
         
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
             <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
-            <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">Join our Telegram</label>
+            <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
+              Follow us on Instagram <span id="instagramStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </label>
           </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+5,000 FLUFFI</span>
+          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
         </div>
         
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
             <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
-            <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">Retweet our pinned tweet</label>
+            <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
+              Like & Retweet our pinned tweet <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </label>
           </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+10,000 FLUFFI</span>
+          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
         </div>
+      </div>
+    </div>
+    
+    <!-- Developer Test Section (Hidden in production) -->
+    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden">
+      <h3 class="text-xl font-semibold mb-4">Developer Tools</h3>
+      <div class="space-y-2">
+        <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+          Simulate Twitter Follow
+        </button>
+        <button onclick="simulateInstagramFollow()" class="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded">
+          Simulate Instagram Follow
+        </button>
+        <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+          Simulate Retweet
+        </button>
+        <button onclick="resetTasks()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+          Reset Tasks
+        </button>
+        <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded">
+          Set Timer to 1 Hour
+        </button>
       </div>
     </div>
   </main>
@@ -222,220 +329,384 @@
       <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
       </a>
+      <a href="https://instagram.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Instagram" class="hover:opacity-75">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" class="w-5 h-5" width="20" height="20">
+      </a>
     </div>
   </footer>
 
- <!-- JavaScript Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <!-- Wallet Connect Modal -->
+  <div id="walletModal" class="wallet-modal">
+    <div class="wallet-modal-content dark:bg-gray-800">
+      <div class="wallet-header">
+        <h3 class="text-xl font-bold">Connect Wallet</h3>
+        <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('metamask')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span>MetaMask</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('trust')">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+        <span>Trust Wallet</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect">
+        <span>WalletConnect</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('phantom')">
+        <img src="https://phantom.app/favicon.ico" alt="Phantom">
+        <span>Phantom</span>
+      </div>
+    </div>
+  </div>
 
-<script>
-  // Wallet connection functionality
-  let walletConnectProvider = null;
-  let ethersProvider = null;
-  let userWalletAddress = null;
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
-  // Initialize when page loads
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dark mode
-    if (localStorage.getItem('darkMode') === 'true' || 
-        (localStorage.getItem('darkMode') === null && 
-        window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-      document.getElementById('darkModeIcon').textContent = '☀️';
-    }
+  <script>
+    // Global variables
+    let walletConnectProvider = null;
+    let userWalletAddress = null;
+    let tasksCompleted = {
+      twitter: false,
+      instagram: false,
+      retweet: false
+    };
     
-    // Setup form submission
-    document.getElementById('airdropForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      claimAirdrop();
+    // For development - show dev section if URL has ?dev=true
+    if (window.location.search.includes('dev=true')) {
+      document.getElementById('devSection').classList.remove('hidden');
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize dark mode
+      if (localStorage.getItem('darkMode') === 'true' || 
+          (localStorage.getItem('darkMode') === null && 
+          window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+      }
+      
+      // Setup form submission
+      document.getElementById('airdropForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        claimAirdrop();
+      });
+      
+      // Setup wallet button
+      document.getElementById('walletButton').addEventListener('click', openWalletModal);
+      
+      // Check if wallet is already connected
+      if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
+        handleWalletConnection(localStorage.getItem('walletAddress'));
+      }
+      
+      // Initialize countdown timer (7 days from now)
+      const endTime = localStorage.getItem('airdropEndTime') || (Date.now() + 7 * 24 * 60 * 60 * 1000);
+      startCountdown(endTime);
+      
+      // Load completed tasks from localStorage
+      const savedTasks = localStorage.getItem('completedTasks');
+      if (savedTasks) {
+        tasksCompleted = JSON.parse(savedTasks);
+        updateTaskUI();
+      }
     });
-    
-    // Check if wallet is already connected
-    if (window.ethereum && window.ethereum.selectedAddress) {
-      handleWalletConnection(window.ethereum.selectedAddress);
-    }
-  });
 
-  async function connectWallet() {
-    try {
-      // Check if we're on mobile
-      if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        // First try direct connection if MetaMask mobile browser
-        if (window.ethereum && window.ethereum.isMetaMask) {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          handleWalletConnection(accounts[0]);
-        } else {
-          // Show WalletConnect modal for other mobile cases
-          openWalletConnectModal();
+    // Wallet connection functions
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
+    }
+
+    async function connectWallet(walletType) {
+      try {
+        closeWalletModal();
+        
+        if (walletType === 'metamask' || walletType === 'trust') {
+          // For MetaMask and Trust Wallet (in-app browser)
+          if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            handleWalletConnection(accounts[0]);
+            
+            // Set up event listeners for account changes
+            window.ethereum.on('accountsChanged', (accounts) => {
+              if (accounts.length === 0) {
+                disconnectWallet();
+              } else {
+                handleWalletConnection(accounts[0]);
+              }
+            });
+          } else {
+            showWalletError("Please install MetaMask or Trust Wallet");
+          }
+        } else if (walletType === 'walletconnect') {
+          // Initialize WalletConnect provider
+          walletConnectProvider = new WalletConnectProvider.default({
+            rpc: {
+              1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+              56: "https://bsc-dataseed.binance.org/",
+              137: "https://polygon-rpc.com/"
+            },
+            bridge: "https://bridge.walletconnect.org",
+            qrcodeModal: true
+          });
+
+          // Enable session (triggers QR Code modal)
+          await walletConnectProvider.enable();
+          
+          // Subscribe to events
+          walletConnectProvider.on("connect", (error, payload) => {
+            if (error) throw error;
+            const { accounts } = payload.params[0];
+            handleWalletConnection(accounts[0]);
+          });
+
+          walletConnectProvider.on("disconnect", (error) => {
+            if (error) throw error;
+            disconnectWallet();
+          });
+        } else if (walletType === 'phantom') {
+          // For Phantom wallet (Solana)
+          if (window.solana && window.solana.isPhantom) {
+            const response = await window.solana.connect();
+            handleWalletConnection(response.publicKey.toString());
+          } else {
+            showWalletError("Please install Phantom Wallet");
+          }
         }
-      } 
-      // Desktop browser
-      else if (window.ethereum) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-      } else {
-        showWalletError("Please install MetaMask or another Ethereum wallet");
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        showWalletError(error.message || "Wallet connection failed");
       }
-    } catch (error) {
-      console.error("Connection error:", error);
-      showWalletError(error.message || "Connection failed");
     }
-  }
 
-  function openWalletConnectModal() {
-    initWalletConnect();
-    document.getElementById('walletConnectModal').classList.remove('hidden');
-  }
-
-  function closeWalletConnectModal() {
-    document.getElementById('walletConnectModal').classList.add('hidden');
-  }
-
-  async function initWalletConnect() {
-    try {
-      // Initialize WalletConnect provider
-      walletConnectProvider = new WalletConnectProvider.default({
-        rpc: {
-          56: "https://bsc-dataseed.binance.org/" // BSC Mainnet
-        },
-        bridge: "https://bridge.walletconnect.org",
-        qrcodeModalOptions: {
-          mobileLinks: ["metamask", "trust"]
-        }
-      });
-
-      // Subscribe to events
-      walletConnectProvider.on("connect", (error, payload) => {
-        if (error) throw error;
-      });
-
-      walletConnectProvider.on("disconnect", (error) => {
-        if (error) throw error;
-        disconnectWallet();
-      });
-
-      // Create QR code
-      await walletConnectProvider.enable();
-      const uri = walletConnectProvider.connector.uri;
+    function handleWalletConnection(address) {
+      userWalletAddress = address;
       
-      // Generate QR code
-      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
-          light: '#00000000'
-        }
-      }, (error) => {
-        if (error) console.error("QR code error:", error);
-      });
+      // Update UI
+      const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+      document.getElementById('walletButton').textContent = shortAddress;
+      document.getElementById('walletAddress').value = address;
+      
+      // Save to localStorage
+      localStorage.setItem('walletConnected', 'true');
+      localStorage.setItem('walletAddress', address);
+    }
 
-      // Set up mobile deep links
-      document.getElementById('metamaskMobileLink').href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-      document.getElementById('trustMobileLink').href = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
-
-      // Get accounts
-      const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
-        closeWalletConnectModal();
+    function disconnectWallet() {
+      if (walletConnectProvider) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
       }
-    } catch (error) {
-      console.error("WalletConnect error:", error);
-      showWalletError("WalletConnect failed: " + error.message);
+      
+      userWalletAddress = null;
+      document.getElementById('walletButton').textContent = 'Connect Wallet';
+      document.getElementById('walletAddress').value = '';
+      
+      // Remove from localStorage
+      localStorage.removeItem('walletConnected');
+      localStorage.removeItem('walletAddress');
     }
-  }
 
-  function handleWalletConnection(address) {
-    userWalletAddress = address;
-    ethersProvider = window.ethereum ? 
-      new ethers.providers.Web3Provider(window.ethereum) :
-      new ethers.providers.Web3Provider(walletConnectProvider);
-    
-    // Update UI
-    const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-    document.getElementById('walletButton').textContent = shortAddress;
-    document.getElementById('walletAddress').value = address;
-    
-    // Set up event listeners
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          handleWalletConnection(accounts[0]);
+    function showWalletError(message) {
+      alert(message); // In a real app, use a nicer toast notification
+    }
+
+    // Timer functions
+    function startCountdown(endTime) {
+      // Update every second
+      const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endTime - now;
+        
+        if (distance < 0) {
+          clearInterval(timer);
+          document.getElementById('days').textContent = '00';
+          document.getElementById('hours').textContent = '00';
+          document.getElementById('minutes').textContent = '00';
+          return;
         }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        
+        document.getElementById('days').textContent = days.toString().padStart(2, '0');
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      }, 1000);
+    }
+    
+    // For development - set custom timer
+    function setTimer(hours, minutes, seconds) {
+      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+      localStorage.setItem('airdropEndTime', endTime);
+      startCountdown(endTime);
+    }
+
+    // Task verification functions
+    function verifyTwitterFollow() {
+      // In a real app, this would call your backend which would verify with Twitter API
+      // For demo, we'll just simulate it after a delay
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const isFollowing = Math.random() > 0.3; // 70% chance of success for demo
+          if (isFollowing) {
+            tasksCompleted.twitter = true;
+            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+            updateTaskUI();
+          }
+          resolve(isFollowing);
+        }, 1500);
       });
     }
-  }
-
-  function disconnectWallet() {
-    if (walletConnectProvider) {
-      walletConnectProvider.disconnect();
-      walletConnectProvider = null;
+    
+    function verifyInstagramFollow() {
+      // Similar to Twitter verification
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const isFollowing = Math.random() > 0.3; // 70% chance of success for demo
+          if (isFollowing) {
+            tasksCompleted.instagram = true;
+            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+            updateTaskUI();
+          }
+          resolve(isFollowing);
+        }, 1500);
+      });
     }
     
-    if (window.ethereum && window.ethereum.removeListener) {
-      window.ethereum.removeListener('accountsChanged', handleWalletConnection);
+    function verifyRetweet() {
+      // Similar to Twitter verification
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const didRetweet = Math.random() > 0.3; // 70% chance of success for demo
+          if (didRetweet) {
+            tasksCompleted.retweet = true;
+            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+            updateTaskUI();
+          }
+          resolve(didRetweet);
+        }, 1500);
+      });
     }
     
-    ethersProvider = null;
-    userWalletAddress = null;
-    document.getElementById('walletButton').textContent = 'Connect Wallet';
-    document.getElementById('walletAddress').value = '';
-  }
-
-  function showWalletError(message) {
-    alert(message); // Simple alert for demo - replace with your error display
-  }
-
-  function toggleDarkMode() {
-    const html = document.documentElement;
-    html.classList.toggle('dark');
-    localStorage.setItem('darkMode', html.classList.contains('dark'));
-    
-    // Update icon
-    const darkModeIcon = document.getElementById('darkModeIcon');
-    darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  }
-
-  async function claimAirdrop() {
-    const email = document.getElementById('email').value;
-    const walletAddress = document.getElementById('walletAddress').value;
-    
-    if (!walletAddress) {
-      showWalletError("Please connect your wallet first");
-      return;
-    }
-    
-    if (!email || !walletAddress) {
-      showWalletError("Please fill in all required fields");
-      return;
-    }
-    
-    try {
-      const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    function updateTaskUI() {
+      // Update checkboxes and status text
+      document.getElementById('task1').checked = tasksCompleted.twitter;
+      document.getElementById('task2').checked = tasksCompleted.instagram;
+      document.getElementById('task3').checked = tasksCompleted.retweet;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      document.getElementById('twitterStatus').textContent = tasksCompleted.twitter ? '(Verified)' : '(Not verified)';
+      document.getElementById('twitterStatus').className = tasksCompleted.twitter ? 'text-sm task-completed' : 'text-sm task-incomplete';
       
-      // Success message
-      alert("🎉 Airdrop claimed successfully! Tokens will be distributed after verification.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-    } catch (error) {
-      console.error("Airdrop error:", error);
-      showWalletError("Airdrop claim failed: " + error.message);
-      const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Claim Airdrop';
+      document.getElementById('instagramStatus').textContent = tasksCompleted.instagram ? '(Verified)' : '(Not verified)';
+      document.getElementById('instagramStatus').className = tasksCompleted.instagram ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      
+      document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
+      document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
     }
-  }
-</script>
+    
+    // For development - simulate task completion
+    function simulateTwitterFollow() {
+      tasksCompleted.twitter = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Twitter follow simulated successfully!");
+    }
+    
+    function simulateInstagramFollow() {
+      tasksCompleted.instagram = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Instagram follow simulated successfully!");
+    }
+    
+    function simulateRetweet() {
+      tasksCompleted.retweet = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Retweet simulated successfully!");
+    }
+    
+    function resetTasks() {
+      tasksCompleted = {
+        twitter: false,
+        instagram: false,
+        retweet: false
+      };
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Tasks reset successfully!");
+    }
+
+    // Airdrop claim function
+    async function claimAirdrop() {
+      const email = document.getElementById('email').value;
+      const walletAddress = document.getElementById('walletAddress').value;
+      
+      if (!walletAddress) {
+        showWalletError("Please connect your wallet first");
+        return;
+      }
+      
+      if (!email) {
+        showWalletError("Please enter your email address");
+        return;
+      }
+      
+      // Verify tasks (in a real app, this would be done on the backend)
+      try {
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        
+        // Verify tasks
+        await verifyTwitterFollow();
+        await verifyInstagramFollow();
+        await verifyRetweet();
+        
+        // Check if at least one task is completed
+        const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.instagram || tasksCompleted.retweet;
+        
+        if (!anyTaskCompleted) {
+          throw new Error("Please complete at least one task to claim the airdrop");
+        }
+        
+        // Simulate API call to backend
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Success message
+        alert("🎉 Airdrop claimed successfully! Your tokens will be distributed after the presale ends.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      } catch (error) {
+        console.error("Airdrop error:", error);
+        showWalletError(error.message || "Airdrop claim failed");
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Claim Airdrop';
+      }
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('darkMode', html.classList.contains('dark'));
+      
+      // Update icon
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+    }
+  </script>
 </body>
 </html>
