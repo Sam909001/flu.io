@@ -184,62 +184,85 @@
     .dark .text-gray-500 {
       color: #9ca3af !important;
     }
+    
     #walletConnectModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-#walletConnectQrCode canvas {
-  display: block;
-  margin: 0 auto;
-}
-    /* Add to your existing styles */
-.dark .wallet-modal-content {
-  background-color: #1f2937;
-  color: #f0f0f0;
-}
-
-.dark .wallet-option:hover {
-  background-color: #374151;
-}
-
-.dark #walletConnectModal .bg-white {
-  background-color: #1f2937 !important;
-}
-
-.dark #walletConnectModal .text-gray-600 {
-  color: #d1d5db !important;
-}
-    /* Ensure dark mode applies to all modals */
-.dark .wallet-modal-content,
-.dark #walletConnectModal .bg-white {
-  background-color: #1f2937 !important;
-  color: #f0f0f0 !important;
-}
-
-.dark #walletConnectModal .text-gray-600 {
-  color: #d1d5db !important;
-}
-
-.dark #walletConnectModal .border-b {
-  border-color: #374151 !important;
-}
-
-/* Fix for input fields in dark mode */
-.dark input[type="text"],
-.dark input[type="email"] {
-  background-color: #374151 !important;
-  color: white !important;
-  border-color: #4B5563 !important;
-}
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    #walletConnectQrCode canvas {
+      display: block;
+      margin: 0 auto;
+    }
+    
+    .dark .wallet-modal-content {
+      background-color: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    .dark .wallet-option:hover {
+      background-color: #374151;
+    }
+    
+    .dark #walletConnectModal .bg-white {
+      background-color: #1f2937 !important;
+    }
+    
+    .dark #walletConnectModal .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark .wallet-modal-content,
+    .dark #walletConnectModal .bg-white {
+      background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
+    
+    .dark #walletConnectModal .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark #walletConnectModal .border-b {
+      border-color: #374151 !important;
+    }
+    
+    .dark input[type="text"],
+    .dark input[type="email"] {
+      background-color: #374151 !important;
+      color: white !important;
+      border-color: #4B5563 !important;
+    }
+    
+    .verify-btn {
+      background-color: #3B82F6;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    
+    .verify-btn:hover {
+      background-color: #2563EB;
+    }
+    
+    .verify-btn.completed {
+      background-color: #10B981;
+      cursor: default;
+    }
+    
+    .verify-btn.completed:hover {
+      background-color: #10B981;
+    }
   </style>
 </head>
 
@@ -346,6 +369,7 @@
             <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
               Follow us on Twitter <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
+            <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
           </div>
           <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
         </div>
@@ -356,6 +380,7 @@
             <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
               Join our Telegram <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
+            <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
           </div>
           <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
         </div>
@@ -366,6 +391,7 @@
             <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
               Like & Retweet our pinned tweet <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
+            <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
           </div>
           <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
         </div>
@@ -422,10 +448,10 @@
         <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
         <span>Trust Wallet</span>
       </div>
-     <div class="wallet-option" onclick="connectWallet('walletconnect')">
-  <img src="https://assets.website-files.com/5f973c970bea5548ad4287ef/617a8bb6025f3531e19c6b08_wallet-connect.svg" alt="WalletConnect">
-  <span>WalletConnect</span>
-</div>
+      <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <img src="https://assets.website-files.com/5f973c970bea5548ad4287ef/617a8bb6025f3531e19c6b08_wallet-connect.svg" alt="WalletConnect">
+        <span>WalletConnect</span>
+      </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <img src="https://phantom.app/favicon.ico" alt="Phantom">
         <span>Phantom</span>
@@ -454,20 +480,20 @@
       document.getElementById('devSection').classList.remove('hidden');
     }
 
-  document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  const darkMode = localStorage.getItem('darkMode');
-  const isDarkMode = darkMode === 'true' || 
-                    (darkMode === null && 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches);
-  
-  if (isDarkMode) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize dark mode
+      const darkMode = localStorage.getItem('darkMode');
+      const isDarkMode = darkMode === 'true' || 
+                        (darkMode === null && 
+                        window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('darkModeIcon').textContent = '🌙';
+      }
       
       // Setup form submission
       document.getElementById('airdropForm').addEventListener('submit', function(e) {
@@ -559,139 +585,157 @@
     }
 
     // Wallet connection functions
-function openWalletModal() {
-  document.getElementById('walletModal').classList.add('active');
-}
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
+    }
 
-function closeWalletModal() {
-  document.getElementById('walletModal').classList.remove('active');
-}
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
+    }
 
-async function connectWallet(walletType) {
-  try {
-    closeWalletModal();
-    
-    if (walletType === 'metamask') {
-      // MetaMask connection (works for both browser and mobile)
-      if (window.ethereum && window.ethereum.isMetaMask) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
+    async function connectWallet(walletType) {
+      try {
+        closeWalletModal();
         
-        // Set up event listeners for account changes
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length === 0) {
-            disconnectWallet();
-          } else {
+        if (walletType === 'metamask') {
+          // MetaMask connection (works for both browser and mobile)
+          if (window.ethereum && window.ethereum.isMetaMask) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             handleWalletConnection(accounts[0]);
+            
+            // Set up event listeners for account changes
+            window.ethereum.on('accountsChanged', (accounts) => {
+              if (accounts.length === 0) {
+                disconnectWallet();
+              } else {
+                handleWalletConnection(accounts[0]);
+              }
+            });
+          } else if (isMobile()) {
+            // Mobile fallback for MetaMask
+            window.location.href = `https://metamask.app.link/dapp/${window.location.hostname}`;
+            return;
+          } else {
+            showWalletError("Please install MetaMask");
           }
-        });
-      } else if (isMobile()) {
-        // Mobile fallback for MetaMask
-        window.location.href = `https://metamask.app.link/dapp/${window.location.hostname}`;
-        return;
-      } else {
-        showWalletError("Please install MetaMask");
-      }
-    }
-    else if (walletType === 'trust') {
-      // Trust Wallet connection
-      if (window.ethereum && window.ethereum.isTrust) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-      } else if (isMobile()) {
-        // Mobile fallback for Trust Wallet
-        window.location.href = `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}`;
-        return;
-      } else {
-        showWalletError("Please install Trust Wallet");
-      }
-    }
-    else if (walletType === 'walletconnect') {
- else if (walletType === 'walletconnect') {
-  // Initialize WalletConnect provider
-  walletConnectProvider = new WalletConnectProvider.default({
-    rpc: {
-      1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-      56: "https://bsc-dataseed.binance.org/",
-      137: "https://polygon-rpc.com/"
-    },
-    bridge: "https://bridge.walletconnect.org",
-    qrcodeModal: {
-      open: (uri, cb) => {
-        // Create modal container
-        const modal = document.createElement('div');
-        modal.id = 'walletConnectModal';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-        modal.innerHTML = `
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-            <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-              <h3 class="text-lg font-bold">Scan QR Code</h3>
-              <button id="closeWalletConnectModal" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-            <div class="p-6">
-              <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
-              <div class="text-center">
-                <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
-              </div>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Add close button event listener
-        document.getElementById('closeWalletConnectModal').addEventListener('click', () => {
-          modal.remove();
-          if (cb) cb();
-        });
-        
-        // Generate QR code
-        QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
-            light: '#00000000'
+        }
+        else if (walletType === 'trust') {
+          // Trust Wallet connection
+          if (window.ethereum && window.ethereum.isTrust) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            handleWalletConnection(accounts[0]);
+          } else if (isMobile()) {
+            // Mobile fallback for Trust Wallet
+            window.location.href = `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}`;
+            return;
+          } else {
+            showWalletError("Please install Trust Wallet");
           }
-        }, (error) => {
-          if (error) console.error("QR code error:", error);
-          if (cb) cb();
-        });
-      },
-      close: () => {
-        const modal = document.getElementById('walletConnectModal');
-        if (modal) modal.remove();
-      }
-    }
-  });
+        }
+        else if (walletType === 'walletconnect') {
+          // Initialize WalletConnect provider
+          walletConnectProvider = new WalletConnectProvider.default({
+            rpc: {
+              1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+              56: "https://bsc-dataseed.binance.org/",
+              137: "https://polygon-rpc.com/"
+            },
+            bridge: "https://bridge.walletconnect.org",
+            qrcodeModal: {
+              open: (uri, cb) => {
+                // Create modal container
+                const modal = document.createElement('div');
+                modal.id = 'walletConnectModal';
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+                modal.innerHTML = `
+                  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+                    <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+                      <h3 class="text-lg font-bold">Scan QR Code</h3>
+                      <button id="closeWalletConnectModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div class="p-6">
+                      <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
+                      <div class="text-center">
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Add close button event listener
+                document.getElementById('closeWalletConnectModal').addEventListener('click', () => {
+                  modal.remove();
+                  if (cb) cb();
+                });
+                
+                // Generate QR code
+                QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+                  width: 200,
+                  margin: 2,
+                  color: {
+                    dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+                    light: '#00000000'
+                  }
+                }, (error) => {
+                  if (error) console.error("QR code error:", error);
+                  if (cb) cb();
+                });
+              },
+              close: () => {
+                const modal = document.getElementById('walletConnectModal');
+                if (modal) modal.remove();
+              }
+            }
+          });
 
-  try {
-    // Enable session (triggers QR Code modal)
-    const accounts = await walletConnectProvider.enable();
-    if (accounts && accounts.length > 0) {
-      handleWalletConnection(accounts[0]);
+          try {
+            // Enable session (triggers QR Code modal)
+            const accounts = await walletConnectProvider.enable();
+            if (accounts && accounts.length > 0) {
+              handleWalletConnection(accounts[0]);
+            }
+            
+            // Subscribe to events
+            walletConnectProvider.on("connect", (error, payload) => {
+              if (error) throw error;
+              const { accounts } = payload.params[0];
+              handleWalletConnection(accounts[0]);
+            });
+
+            walletConnectProvider.on("disconnect", (error) => {
+              if (error) throw error;
+              disconnectWallet();
+            });
+          } catch (error) {
+            console.error("WalletConnect error:", error);
+            showWalletError("Failed to connect via WalletConnect");
+          }
+        }
+        else if (walletType === 'phantom') {
+          // Phantom wallet connection
+          if (window.phantom && window.phantom.solana) {
+            try {
+              const response = await window.phantom.solana.connect();
+              handleWalletConnection(response.publicKey.toString());
+            } catch (error) {
+              showWalletError("Failed to connect Phantom wallet");
+            }
+          } else {
+            showWalletError("Please install Phantom wallet");
+          }
+        }
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        showWalletError("Failed to connect wallet");
+      }
     }
     
-    // Subscribe to events
-    walletConnectProvider.on("connect", (error, payload) => {
-      if (error) throw error;
-      const { accounts } = payload.params[0];
-      handleWalletConnection(accounts[0]);
-    });
-
-    walletConnectProvider.on("disconnect", (error) => {
-      if (error) throw error;
-      disconnectWallet();
-    });
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    showWalletError("Failed to connect via WalletConnect");
-  }
-}
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
     
     function handleWalletConnection(address) {
       userWalletAddress = address;
@@ -727,49 +771,54 @@ function isMobile() {
 
     // Task verification functions
     function verifyTwitterFollow() {
-      // In a real app, this would call your backend which would verify with Twitter API
-      // For demo, we'll just simulate it after a delay
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const isFollowing = Math.random() > 0.3; // 70% chance of success for demo
-          if (isFollowing) {
-            tasksCompleted.twitter = true;
-            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-            updateTaskUI();
-          }
-          resolve(isFollowing);
-        }, 1500);
-      });
+      if (tasksCompleted.twitter) return;
+      
+      // Open Twitter in new tab
+      window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
+      
+      // Show verification prompt
+      const didFollow = confirm("Did you follow our Twitter account? After following, click OK to verify.");
+      if (didFollow) {
+        tasksCompleted.twitter = true;
+        localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+        updateTaskUI();
+        return true;
+      }
+      return false;
     }
     
     function verifyTelegramJoin() {
-      // Similar to Twitter verification
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const hasJoined = Math.random() > 0.3; // 70% chance of success for demo
-          if (hasJoined) {
-            tasksCompleted.telegram = true;
-            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-            updateTaskUI();
-          }
-          resolve(hasJoined);
-        }, 1500);
-      });
+      if (tasksCompleted.telegram) return;
+      
+      // Open Telegram in new tab
+      window.open('https://t.me/FLUFFISOLANALAYER2', '_blank');
+      
+      // Show verification prompt
+      const didJoin = confirm("Did you join our Telegram group? After joining, click OK to verify.");
+      if (didJoin) {
+        tasksCompleted.telegram = true;
+        localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+        updateTaskUI();
+        return true;
+      }
+      return false;
     }
     
     function verifyRetweet() {
-      // Similar to Twitter verification
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const didRetweet = Math.random() > 0.3; // 70% chance of success for demo
-          if (didRetweet) {
-            tasksCompleted.retweet = true;
-            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-            updateTaskUI();
-          }
-          resolve(didRetweet);
-        }, 1500);
-      });
+      if (tasksCompleted.retweet) return;
+      
+      // Open Twitter in new tab (replace with your pinned tweet link)
+      window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
+      
+      // Show verification prompt
+      const didRetweet = confirm("Did you like and retweet our pinned tweet? After doing so, click OK to verify.");
+      if (didRetweet) {
+        tasksCompleted.retweet = true;
+        localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+        updateTaskUI();
+        return true;
+      }
+      return false;
     }
     
     function updateTaskUI() {
@@ -786,6 +835,29 @@ function isMobile() {
       
       document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
       document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      
+      // Update verify buttons
+      const twitterBtn = document.getElementById('verifyTwitterBtn');
+      const telegramBtn = document.getElementById('verifyTelegramBtn');
+      const retweetBtn = document.getElementById('verifyRetweetBtn');
+      
+      if (tasksCompleted.twitter) {
+        twitterBtn.textContent = 'Verified';
+        twitterBtn.classList.add('completed');
+        twitterBtn.onclick = null;
+      }
+      
+      if (tasksCompleted.telegram) {
+        telegramBtn.textContent = 'Verified';
+        telegramBtn.classList.add('completed');
+        telegramBtn.onclick = null;
+      }
+      
+      if (tasksCompleted.retweet) {
+        retweetBtn.textContent = 'Verified';
+        retweetBtn.classList.add('completed');
+        retweetBtn.onclick = null;
+      }
     }
     
     // For development - simulate task completion
@@ -843,11 +915,6 @@ function isMobile() {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
         
-        // Verify tasks
-        await verifyTwitterFollow();
-        await verifyTelegramJoin();
-        await verifyRetweet();
-        
         // Check if at least one task is completed
         const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.telegram || tasksCompleted.retweet;
         
@@ -871,39 +938,39 @@ function isMobile() {
       }
     }
 
-   // Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  const isDark = !html.classList.contains('dark');
-  
-  // Set the class and localStorage
-  html.classList.toggle('dark', isDark);
-  localStorage.setItem('darkMode', isDark);
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = isDark ? '☀️' : '🌙';
-  
-  // Refresh QR code if WalletConnect modal is open
-  refreshWalletConnectQR();
-}
-
-function refreshWalletConnectQR() {
-  const modal = document.getElementById('walletConnectModal');
-  if (modal && walletConnectProvider && walletConnectProvider.connector) {
-    const uri = walletConnectProvider.connector.uri;
-    if (uri) {
-      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
-          light: '#00000000'
-        }
-      });
+    // Toggle dark mode function
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = !html.classList.contains('dark');
+      
+      // Set the class and localStorage
+      html.classList.toggle('dark', isDark);
+      localStorage.setItem('darkMode', isDark);
+      
+      // Update icon
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+      
+      // Refresh QR code if WalletConnect modal is open
+      refreshWalletConnectQR();
     }
-  }
-}
+
+    function refreshWalletConnectQR() {
+      const modal = document.getElementById('walletConnectModal');
+      if (modal && walletConnectProvider && walletConnectProvider.connector) {
+        const uri = walletConnectProvider.connector.uri;
+        if (uri) {
+          QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+            width: 200,
+            margin: 2,
+            color: {
+              dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+              light: '#00000000'
+            }
+          });
+        }
+      }
+    }
   </script>
 </body>
 </html>
