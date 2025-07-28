@@ -25,6 +25,7 @@
 
     .dark .bg-white {
       background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
     }
 
     .logo-float {
@@ -58,7 +59,7 @@
     .dark input[type="email"],
     .dark select {
       background-color: #374151;
-      color: white;
+      color: white !important;
       border-color: #4B5563;
     }
     
@@ -125,6 +126,7 @@
     
     .dark .wallet-modal-content {
       background: #1f2937;
+      color: #f0f0f0;
     }
     
     .wallet-option {
@@ -169,6 +171,18 @@
     
     .task-incomplete {
       color: #EF4444;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af !important;
     }
   </style>
 </head>
@@ -233,6 +247,11 @@
               <div class="text-sm text-gray-500">Minutes</div>
             </div>
           </div>
+          <div class="text-center mt-2">
+            <button onclick="resetTimer()" class="text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+              Reset Timer
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -244,14 +263,14 @@
       <form id="airdropForm">
         <div class="mb-4">
           <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-          <input type="email" id="email" required class="w-full p-3 border rounded-lg">
+          <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
         </div>
         
         <div class="mb-4">
           <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
           <input type="text" id="walletAddress" required 
                  placeholder="0x..." 
-                 class="w-full p-3 border rounded-lg" readonly>
+                 class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
         </div>
 
         <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
@@ -267,7 +286,7 @@
       <div class="space-y-4">
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
-            <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
+            <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
             <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
               Follow us on Twitter <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
@@ -277,9 +296,9 @@
         
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
-            <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
+            <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
             <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
-              Follow us on Telegram <span id="TelegramStatus" class="text-sm task-incomplete">(Not verified)</span>
+              Follow us on Instagram <span id="instagramStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
           </div>
           <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
@@ -287,7 +306,7 @@
         
         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div class="flex items-center">
-            <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600">
+            <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
             <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
               Like & Retweet our pinned tweet <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
@@ -375,6 +394,7 @@
       instagram: false,
       retweet: false
     };
+    let countdownInterval = null;
     
     // For development - show dev section if URL has ?dev=true
     if (window.location.search.includes('dev=true')) {
@@ -405,9 +425,8 @@
         handleWalletConnection(localStorage.getItem('walletAddress'));
       }
       
-      // Initialize countdown timer (7 days from now)
-      const endTime = localStorage.getItem('airdropEndTime') || (Date.now() + 7 * 24 * 60 * 60 * 1000);
-      startCountdown(endTime);
+      // Initialize countdown timer
+      initializeCountdown();
       
       // Load completed tasks from localStorage
       const savedTasks = localStorage.getItem('completedTasks');
@@ -416,6 +435,70 @@
         updateTaskUI();
       }
     });
+
+    // Timer functions
+    function initializeCountdown() {
+      // Check if we have a saved end time
+      let endTime = localStorage.getItem('airdropEndTime');
+      
+      // If not, set it to 7 days from now
+      if (!endTime) {
+        endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
+        localStorage.setItem('airdropEndTime', endTime);
+      }
+      
+      startCountdown(endTime);
+    }
+    
+    function startCountdown(endTime) {
+      // Clear any existing interval
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      // Update immediately
+      updateTimer(endTime);
+      
+      // Then update every second
+      countdownInterval = setInterval(() => {
+        updateTimer(endTime);
+      }, 1000);
+    }
+    
+    function updateTimer(endTime) {
+      const now = new Date().getTime();
+      const distance = endTime - now;
+      
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        document.getElementById('days').textContent = '00';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        return;
+      }
+      
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      
+      document.getElementById('days').textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+    }
+    
+    function resetTimer() {
+      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
+      localStorage.setItem('airdropEndTime', newEndTime);
+      startCountdown(newEndTime);
+      alert("Timer has been reset to 7 days");
+    }
+    
+    // For development - set custom timer
+    function setTimer(hours, minutes, seconds) {
+      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+      localStorage.setItem('airdropEndTime', endTime);
+      startCountdown(endTime);
+    }
 
     // Wallet connection functions
     function openWalletModal() {
@@ -518,38 +601,6 @@
 
     function showWalletError(message) {
       alert(message); // In a real app, use a nicer toast notification
-    }
-
-    // Timer functions
-    function startCountdown(endTime) {
-      // Update every second
-      const timer = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = endTime - now;
-        
-        if (distance < 0) {
-          clearInterval(timer);
-          document.getElementById('days').textContent = '00';
-          document.getElementById('hours').textContent = '00';
-          document.getElementById('minutes').textContent = '00';
-          return;
-        }
-        
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        
-        document.getElementById('days').textContent = days.toString().padStart(2, '0');
-        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-      }, 1000);
-    }
-    
-    // For development - set custom timer
-    function setTimer(hours, minutes, seconds) {
-      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
-      localStorage.setItem('airdropEndTime', endTime);
-      startCountdown(endTime);
     }
 
     // Task verification functions
