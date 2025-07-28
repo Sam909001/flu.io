@@ -201,6 +201,23 @@
   display: block;
   margin: 0 auto;
 }
+    /* Add to your existing styles */
+.dark .wallet-modal-content {
+  background-color: #1f2937;
+  color: #f0f0f0;
+}
+
+.dark .wallet-option:hover {
+  background-color: #374151;
+}
+
+.dark #walletConnectModal .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark #walletConnectModal .text-gray-600 {
+  color: #d1d5db !important;
+}
   </style>
 </head>
 
@@ -415,15 +432,19 @@
       document.getElementById('devSection').classList.remove('hidden');
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize dark mode
-      if (localStorage.getItem('darkMode') === 'true' || 
-          (localStorage.getItem('darkMode') === null && 
-          window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkModeIcon').textContent = '☀️';
-      }
+   // Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'true' || 
+      (darkMode === null && 
+      window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
       
       // Setup form submission
       document.getElementById('airdropForm').addEventListener('submit', function(e) {
@@ -573,29 +594,27 @@ async function connectWallet(walletType) {
     bridge: "https://bridge.walletconnect.org",
     qrcodeModal: {
       open: (uri, cb) => {
-        // Create QR code container if it doesn't exist
-        if (!document.getElementById('walletConnectQrCode')) {
-          const modal = document.createElement('div');
-          modal.id = 'walletConnectModal';
-          modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-          modal.innerHTML = `
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-              <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-                <h3 class="text-lg font-bold">Scan QR Code</h3>
-                <button onclick="document.getElementById('walletConnectModal').remove()" class="text-gray-500 hover:text-gray-700">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <div class="p-6">
-                <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
-                <div class="text-center">
-                  <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
-                </div>
+        // Create modal container
+        const modal = document.createElement('div');
+        modal.id = 'walletConnectModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+        modal.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+              <h3 class="text-lg font-bold">Scan QR Code</h3>
+              <button onclick="document.getElementById('walletConnectModal').remove()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="p-6">
+              <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
+              <div class="text-center">
+                <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
               </div>
             </div>
-          `;
-          document.body.appendChild(modal);
-        }
+          </div>
+        `;
+        document.body.appendChild(modal);
         
         // Generate QR code
         QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
@@ -607,6 +626,7 @@ async function connectWallet(walletType) {
           }
         }, (error) => {
           if (error) console.error("QR code error:", error);
+          if (cb) cb();
         });
       },
       close: () => {
@@ -618,7 +638,10 @@ async function connectWallet(walletType) {
 
   try {
     // Enable session (triggers QR Code modal)
-    await walletConnectProvider.enable();
+    const accounts = await walletConnectProvider.enable();
+    if (accounts && accounts.length > 0) {
+      handleWalletConnection(accounts[0]);
+    }
     
     // Subscribe to events
     walletConnectProvider.on("connect", (error, payload) => {
@@ -818,15 +841,33 @@ function isMobile() {
       }
     }
 
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
-      
-      // Update icon
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+    // Toggle dark mode function
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = !html.classList.contains('dark');
+  html.classList.toggle('dark', isDark);
+  localStorage.setItem('darkMode', isDark);
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+  
+  // Force re-render of QR code if WalletConnect modal is open
+  const qrModal = document.getElementById('walletConnectModal');
+  if (qrModal && walletConnectProvider && walletConnectProvider.connector) {
+    const uri = walletConnectProvider.connector.uri;
+    if (uri) {
+      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: isDark ? '#FFFFFF' : '#000000',
+          light: '#00000000'
+        }
+      });
     }
+  }
+}
   </script>
 </body>
 </html>
