@@ -218,6 +218,28 @@
 .dark #walletConnectModal .text-gray-600 {
   color: #d1d5db !important;
 }
+    /* Ensure dark mode applies to all modals */
+.dark .wallet-modal-content,
+.dark #walletConnectModal .bg-white {
+  background-color: #1f2937 !important;
+  color: #f0f0f0 !important;
+}
+
+.dark #walletConnectModal .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.dark #walletConnectModal .border-b {
+  border-color: #374151 !important;
+}
+
+/* Fix for input fields in dark mode */
+.dark input[type="text"],
+.dark input[type="email"] {
+  background-color: #374151 !important;
+  color: white !important;
+  border-color: #4B5563 !important;
+}
   </style>
 </head>
 
@@ -432,13 +454,14 @@
       document.getElementById('devSection').classList.remove('hidden');
     }
 
-   // Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
   const darkMode = localStorage.getItem('darkMode');
-  if (darkMode === 'true' || 
-      (darkMode === null && 
-      window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  const isDarkMode = darkMode === 'true' || 
+                    (darkMode === null && 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDarkMode) {
     document.documentElement.classList.add('dark');
     document.getElementById('darkModeIcon').textContent = '☀️';
   } else {
@@ -584,7 +607,8 @@ async function connectWallet(walletType) {
       }
     }
     else if (walletType === 'walletconnect') {
-  // Initialize WalletConnect provider with QR code modal
+ else if (walletType === 'walletconnect') {
+  // Initialize WalletConnect provider
   walletConnectProvider = new WalletConnectProvider.default({
     rpc: {
       1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
@@ -602,7 +626,7 @@ async function connectWallet(walletType) {
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
             <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
               <h3 class="text-lg font-bold">Scan QR Code</h3>
-              <button onclick="document.getElementById('walletConnectModal').remove()" class="text-gray-500 hover:text-gray-700">
+              <button id="closeWalletConnectModal" class="text-gray-500 hover:text-gray-700">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -615,6 +639,12 @@ async function connectWallet(walletType) {
           </div>
         `;
         document.body.appendChild(modal);
+        
+        // Add close button event listener
+        document.getElementById('closeWalletConnectModal').addEventListener('click', () => {
+          modal.remove();
+          if (cb) cb();
+        });
         
         // Generate QR code
         QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
@@ -841,10 +871,12 @@ function isMobile() {
       }
     }
 
-    // Toggle dark mode function
+   // Toggle dark mode function
 function toggleDarkMode() {
   const html = document.documentElement;
   const isDark = !html.classList.contains('dark');
+  
+  // Set the class and localStorage
   html.classList.toggle('dark', isDark);
   localStorage.setItem('darkMode', isDark);
   
@@ -852,16 +884,20 @@ function toggleDarkMode() {
   const darkModeIcon = document.getElementById('darkModeIcon');
   darkModeIcon.textContent = isDark ? '☀️' : '🌙';
   
-  // Force re-render of QR code if WalletConnect modal is open
-  const qrModal = document.getElementById('walletConnectModal');
-  if (qrModal && walletConnectProvider && walletConnectProvider.connector) {
+  // Refresh QR code if WalletConnect modal is open
+  refreshWalletConnectQR();
+}
+
+function refreshWalletConnectQR() {
+  const modal = document.getElementById('walletConnectModal');
+  if (modal && walletConnectProvider && walletConnectProvider.connector) {
     const uri = walletConnectProvider.connector.uri;
     if (uri) {
       QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
         width: 200,
         margin: 2,
         color: {
-          dark: isDark ? '#FFFFFF' : '#000000',
+          dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
           light: '#00000000'
         }
       });
