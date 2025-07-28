@@ -298,7 +298,7 @@
           <div class="flex items-center">
             <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
             <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
-              Follow us on Instagram <span id="instagramStatus" class="text-sm task-incomplete">(Not verified)</span>
+              Join our Telegram <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
             </label>
           </div>
           <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
@@ -323,8 +323,8 @@
         <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
           Simulate Twitter Follow
         </button>
-        <button onclick="simulateInstagramFollow()" class="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded">
-          Simulate Instagram Follow
+        <button onclick="simulateTelegramJoin()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+          Simulate Telegram Join
         </button>
         <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
           Simulate Retweet
@@ -348,9 +348,6 @@
       <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
       </a>
-      <a href="https://instagram.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Instagram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" class="w-5 h-5" width="20" height="20">
-      </a>
     </div>
   </footer>
 
@@ -370,7 +367,7 @@
         <span>Trust Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect">
+        <img src="https://registry.walletconnect.com/api/v1/logo/md/5a5166ca-0fa1-4a86-b195-6b914b9e23d7" alt="WalletConnect">
         <span>WalletConnect</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
@@ -391,7 +388,7 @@
     let userWalletAddress = null;
     let tasksCompleted = {
       twitter: false,
-      instagram: false,
+      telegram: false,
       retweet: false
     };
     let countdownInterval = null;
@@ -514,20 +511,40 @@
         closeWalletModal();
         
         if (walletType === 'metamask' || walletType === 'trust') {
-          // For MetaMask and Trust Wallet (in-app browser)
+          // For MetaMask and Trust Wallet
           if (window.ethereum) {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-            
-            // Set up event listeners for account changes
-            window.ethereum.on('accountsChanged', (accounts) => {
-              if (accounts.length === 0) {
-                disconnectWallet();
-              } else {
-                handleWalletConnection(accounts[0]);
+            try {
+              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+              handleWalletConnection(accounts[0]);
+              
+              // Set up event listeners for account changes
+              window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                  disconnectWallet();
+                } else {
+                  handleWalletConnection(accounts[0]);
+                }
+              });
+            } catch (error) {
+              // Handle mobile case
+              if (walletType === 'metamask' && isMobile()) {
+                window.location.href = 'https://metamask.app.link/dapp/' + window.location.hostname;
+                return;
+              } else if (walletType === 'trust' && isMobile()) {
+                window.location.href = 'https://link.trustwallet.com/open_url?url=' + encodeURIComponent(window.location.href);
+                return;
               }
-            });
+              throw error;
+            }
           } else {
+            // Handle mobile case when no ethereum provider
+            if (walletType === 'metamask' && isMobile()) {
+              window.location.href = 'https://metamask.app.link/dapp/' + window.location.hostname;
+              return;
+            } else if (walletType === 'trust' && isMobile()) {
+              window.location.href = 'https://link.trustwallet.com/open_url?url=' + encodeURIComponent(window.location.href);
+              return;
+            }
             showWalletError("Please install MetaMask or Trust Wallet");
           }
         } else if (walletType === 'walletconnect') {
@@ -561,6 +578,9 @@
           if (window.solana && window.solana.isPhantom) {
             const response = await window.solana.connect();
             handleWalletConnection(response.publicKey.toString());
+          } else if (isMobile()) {
+            // Handle Phantom mobile case
+            window.location.href = 'https://phantom.app/ul/browse/' + encodeURIComponent(window.location.href);
           } else {
             showWalletError("Please install Phantom Wallet");
           }
@@ -569,6 +589,10 @@
         console.error("Wallet connection error:", error);
         showWalletError(error.message || "Wallet connection failed");
       }
+    }
+
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
     function handleWalletConnection(address) {
@@ -620,17 +644,17 @@
       });
     }
     
-    function verifyInstagramFollow() {
+    function verifyTelegramJoin() {
       // Similar to Twitter verification
       return new Promise((resolve) => {
         setTimeout(() => {
-          const isFollowing = Math.random() > 0.3; // 70% chance of success for demo
-          if (isFollowing) {
-            tasksCompleted.instagram = true;
+          const hasJoined = Math.random() > 0.3; // 70% chance of success for demo
+          if (hasJoined) {
+            tasksCompleted.telegram = true;
             localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
             updateTaskUI();
           }
-          resolve(isFollowing);
+          resolve(hasJoined);
         }, 1500);
       });
     }
@@ -653,14 +677,14 @@
     function updateTaskUI() {
       // Update checkboxes and status text
       document.getElementById('task1').checked = tasksCompleted.twitter;
-      document.getElementById('task2').checked = tasksCompleted.instagram;
+      document.getElementById('task2').checked = tasksCompleted.telegram;
       document.getElementById('task3').checked = tasksCompleted.retweet;
       
       document.getElementById('twitterStatus').textContent = tasksCompleted.twitter ? '(Verified)' : '(Not verified)';
       document.getElementById('twitterStatus').className = tasksCompleted.twitter ? 'text-sm task-completed' : 'text-sm task-incomplete';
       
-      document.getElementById('instagramStatus').textContent = tasksCompleted.instagram ? '(Verified)' : '(Not verified)';
-      document.getElementById('instagramStatus').className = tasksCompleted.instagram ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      document.getElementById('telegramStatus').textContent = tasksCompleted.telegram ? '(Verified)' : '(Not verified)';
+      document.getElementById('telegramStatus').className = tasksCompleted.telegram ? 'text-sm task-completed' : 'text-sm task-incomplete';
       
       document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
       document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
@@ -674,11 +698,11 @@
       alert("Twitter follow simulated successfully!");
     }
     
-    function simulateInstagramFollow() {
-      tasksCompleted.instagram = true;
+    function simulateTelegramJoin() {
+      tasksCompleted.telegram = true;
       localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
       updateTaskUI();
-      alert("Instagram follow simulated successfully!");
+      alert("Telegram join simulated successfully!");
     }
     
     function simulateRetweet() {
@@ -691,7 +715,7 @@
     function resetTasks() {
       tasksCompleted = {
         twitter: false,
-        instagram: false,
+        telegram: false,
         retweet: false
       };
       localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
@@ -723,11 +747,11 @@
         
         // Verify tasks
         await verifyTwitterFollow();
-        await verifyInstagramFollow();
+        await verifyTelegramJoin();
         await verifyRetweet();
         
         // Check if at least one task is completed
-        const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.instagram || tasksCompleted.retweet;
+        const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.telegram || tasksCompleted.retweet;
         
         if (!anyTaskCompleted) {
           throw new Error("Please complete at least one task to claim the airdrop");
