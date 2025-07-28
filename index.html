@@ -12,258 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   
   <style>
-    body {
-      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
-      color: #1a1a1a;
-      min-height: 100vh;
-    }
-    
-    .dark {
-      background: #111827 !important;
-      color: #f0f0f0 !important;
-    }
-
-    .dark .bg-white {
-      background-color: #1f2937 !important;
-      color: #f0f0f0 !important;
-    }
-
-    .logo-float {
-      animation: fluffi-float 3s ease-in-out infinite;
-    }
-
-    @keyframes fluffi-float {
-      0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
-    }
-
-    .btn-primary {
-      background-color: #10B981;
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background-color: #059669;
-    }
-    
-    .btn-secondary {
-      background-color: #3B82F6;
-      color: white;
-    }
-    
-    .btn-secondary:hover {
-      background-color: #2563EB;
-    }
-    
-    .dark input[type="text"], 
-    .dark input[type="email"],
-    .dark select {
-      background-color: #374151;
-      color: white !important;
-      border-color: #4B5563;
-    }
-    
-    .wallet-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      background: #f1f1f1;
-      color: #333;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .wallet-btn:hover {
-      background: #e1e1e1;
-    }
-    
-    .wallet-btn img {
-      width: 24px;
-      height: 24px;
-    }
-    
-    .dark .wallet-btn {
-      background: #374151;
-      color: white;
-    }
-    
-    .dark .wallet-btn:hover {
-      background: #4B5563;
-    }
-    
-    .wallet-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    
-    .wallet-modal.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-    
-    .wallet-modal-content {
-      background: white;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 400px;
-      padding: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    
-    .dark .wallet-modal-content {
-      background: #1f2937;
-      color: #f0f0f0;
-    }
-    
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .wallet-option:hover {
-      background: #f5f5f5;
-    }
-    
-    .dark .wallet-option:hover {
-      background: #374151;
-    }
-    
-    .wallet-option img {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-    }
-    
-    .wallet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .wallet-close {
-      cursor: pointer;
-      font-size: 24px;
-    }
-    
-    .task-completed {
-      color: #10B981;
-    }
-    
-    .task-incomplete {
-      color: #EF4444;
-    }
-    
-    .dark .text-gray-700 {
-      color: #f0f0f0 !important;
-    }
-    
-    .dark .text-gray-600 {
-      color: #d1d5db !important;
-    }
-    
-    .dark .text-gray-500 {
-      color: #9ca3af !important;
-    }
-    
-    #walletConnectModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    
-    #walletConnectQrCode canvas {
-      display: block;
-      margin: 0 auto;
-    }
-    
-    .dark .wallet-modal-content {
-      background-color: #1f2937;
-      color: #f0f0f0;
-    }
-    
-    .dark .wallet-option:hover {
-      background-color: #374151;
-    }
-    
-    .dark #walletConnectModal .bg-white {
-      background-color: #1f2937 !important;
-    }
-    
-    .dark #walletConnectModal .text-gray-600 {
-      color: #d1d5db !important;
-    }
-    
-    .dark .wallet-modal-content,
-    .dark #walletConnectModal .bg-white {
-      background-color: #1f2937 !important;
-      color: #f0f0f0 !important;
-    }
-    
-    .dark #walletConnectModal .text-gray-600 {
-      color: #d1d5db !important;
-    }
-    
-    .dark #walletConnectModal .border-b {
-      border-color: #374151 !important;
-    }
-    
-    .dark input[type="text"],
-    .dark input[type="email"] {
-      background-color: #374151 !important;
-      color: white !important;
-      border-color: #4B5563 !important;
-    }
-    
-    .verify-btn {
-      background-color: #3B82F6;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-left: 8px;
-      cursor: pointer;
-    }
-    
-    .verify-btn:hover {
-      background-color: #2563EB;
-    }
-    
-    .verify-btn.completed {
-      background-color: #10B981;
-      cursor: default;
-    }
-    
-    .verify-btn.completed:hover {
-      background-color: #10B981;
-    }
+    /* ... (keep all your existing styles) ... */
   </style>
 </head>
 
@@ -285,104 +34,104 @@
   </header>
 
   <main class="p-6 mx-auto w-full max-w-2xl">
-  <!-- Airdrop Information -->
-  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-    <h2 class="text-2xl font-bold mb-4 text-center">🚀 $FLUFFI Airdrop</h2>
-    <p class="text-gray-700 dark:text-gray-300 mb-4">
-      Join the $FLUFFI revolution! Complete simple tasks to earn free $FLUFFI tokens.
-    </p>
-    <div class="flex items-center justify-center mb-4">
-      <div class="text-center">
-        <div class="text-3xl font-bold text-green-600" id="countdown">00:00:00</div>
-        <div class="text-gray-600 dark:text-gray-400">Until airdrop ends</div>
-      </div>
-    </div>
-    <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
-      Limited time offer. 1,000,000 $FLUFFI tokens allocated for this airdrop.
-    </p>
-  </section>
-
-  <!-- Tasks Section -->
-  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-    <h2 class="text-xl font-bold mb-4">Complete Tasks to Qualify</h2>
-    
-    <div class="space-y-4">
-      <!-- Task 1 -->
-      <div class="flex items-start">
-        <input type="checkbox" id="task1" class="mt-1 mr-3" disabled>
-        <div class="flex-1">
-          <label for="task1" class="font-medium">Follow @FLUFFIOFFICIAL on Twitter</label>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Stay updated with our latest news and announcements
-            <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
-          </p>
+    <!-- Airdrop Information -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4 text-center">🚀 $FLUFFI Airdrop</h2>
+      <p class="text-gray-700 dark:text-gray-300 mb-4">
+        Join the $FLUFFI revolution! Complete simple tasks to earn free $FLUFFI tokens.
+      </p>
+      <div class="flex items-center justify-center mb-4">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600" id="countdown">07:00:00</div>
+          <div class="text-gray-600 dark:text-gray-400">Until airdrop ends</div>
         </div>
-        <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
       </div>
-      
-      <!-- Task 2 -->
-      <div class="flex items-start">
-        <input type="checkbox" id="task2" class="mt-1 mr-3" disabled>
-        <div class="flex-1">
-          <label for="task2" class="font-medium">Join our Telegram group</label>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Be part of our growing community
-            <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
-          </p>
-        </div>
-        <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
-      </div>
-      
-      <!-- Task 3 -->
-      <div class="flex items-start">
-        <input type="checkbox" id="task3" class="mt-1 mr-3" disabled>
-        <div class="flex-1">
-          <label for="task3" class="font-medium">Like & Retweet our pinned tweet</label>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Help spread the word about $FLUFFI
-            <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
-          </p>
-        </div>
-        <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
-      </div>
-    </div>
-  </section>
+      <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+        Limited time offer. 1,000,000 $FLUFFI tokens allocated for this airdrop.
+      </p>
+    </section>
 
-  <!-- Claim Form -->
-  <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-    <h2 class="text-xl font-bold mb-4">Claim Your Airdrop</h2>
-    <form id="airdropForm" class="space-y-4">
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-        <input type="email" id="email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600">
-      </div>
+    <!-- Tasks Section -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">Complete Tasks to Qualify</h2>
       
-      <div>
-        <label for="walletAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Wallet Address</label>
-        <input type="text" id="walletAddress" readonly class="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
+      <div class="space-y-4">
+        <!-- Task 1 -->
+        <div class="flex items-start">
+          <input type="checkbox" id="task1" class="mt-1 mr-3" disabled>
+          <div class="flex-1">
+            <label for="task1" class="font-medium">Follow @FLUFFIOFFICIAL on Twitter</label>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Stay updated with our latest news and announcements
+              <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </p>
+          </div>
+          <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
+        </div>
+        
+        <!-- Task 2 -->
+        <div class="flex items-start">
+          <input type="checkbox" id="task2" class="mt-1 mr-3" disabled>
+          <div class="flex-1">
+            <label for="task2" class="font-medium">Join our Telegram group</label>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Be part of our growing community
+              <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </p>
+          </div>
+          <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
+        </div>
+        
+        <!-- Task 3 -->
+        <div class="flex items-start">
+          <input type="checkbox" id="task3" class="mt-1 mr-3" disabled>
+          <div class="flex-1">
+            <label for="task3" class="font-medium">Like & Retweet our pinned tweet</label>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Help spread the word about $FLUFFI
+              <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
+            </p>
+          </div>
+          <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
+        </div>
       </div>
-      
-      <button type="submit" class="w-full btn-primary py-3 px-4 rounded-lg font-semibold text-white transition-colors">
-        Claim Airdrop
-      </button>
-    </form>
-    
-    <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-      <p>By claiming, you agree to our Terms and Conditions.</p>
-    </div>
-  </section>
+    </section>
 
-  <!-- Hidden Dev Section -->
-  <div id="devSection" class="hidden mt-6 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-    <h3 class="font-bold mb-2">Developer Tools</h3>
-    <div class="flex flex-wrap gap-2">
-      <button onclick="simulateTwitterFollow()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Twitter</button>
-      <button onclick="simulateTelegramJoin()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Telegram</button>
-      <button onclick="simulateRetweet()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Retweet</button>
-      <button onclick="resetTasks()" class="px-3 py-1 bg-red-500 text-white rounded text-sm">Reset Tasks</button>
+    <!-- Claim Form -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-bold mb-4">Claim Your Airdrop</h2>
+      <form id="airdropForm" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+          <input type="email" id="email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        
+        <div>
+          <label for="walletAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Wallet Address</label>
+          <input type="text" id="walletAddress" readonly class="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        
+        <button type="submit" class="w-full btn-primary py-3 px-4 rounded-lg font-semibold text-white transition-colors">
+          Claim Airdrop
+        </button>
+      </form>
+      
+      <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <p>By claiming, you agree to our Terms and Conditions.</p>
+      </div>
+    </section>
+
+    <!-- Hidden Dev Section -->
+    <div id="devSection" class="hidden mt-6 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+      <h3 class="font-bold mb-2">Developer Tools</h3>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="simulateTwitterFollow()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Twitter</button>
+        <button onclick="simulateTelegramJoin()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Telegram</button>
+        <button onclick="simulateRetweet()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Simulate Retweet</button>
+        <button onclick="resetTasks()" class="px-3 py-1 bg-red-500 text-white rounded text-sm">Reset Tasks</button>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 
   <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
@@ -417,6 +166,7 @@
       retweet: false
     };
     let countdownInterval = null;
+    let endTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
     
     // For development - show dev section if URL has ?dev=true
     if (window.location.search.includes('dev=true')) {
@@ -453,7 +203,7 @@
       }
       
       // Initialize countdown timer
-      initializeCountdown();
+      startCountdown();
       
       // Load completed tasks from localStorage
       const savedTasks = localStorage.getItem('completedTasks');
@@ -463,7 +213,43 @@
       }
     });
 
-    // ... (keep all your existing timer functions) ...
+    // Timer functions
+    function startCountdown() {
+      // Clear any existing interval
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      // Update immediately
+      updateTimer();
+      
+      // Then update every second
+      countdownInterval = setInterval(updateTimer, 1000);
+    }
+    
+    function updateTimer() {
+      const now = new Date().getTime();
+      const distance = endTime - now;
+      
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        document.getElementById('countdown').textContent = "00:00:00";
+        return;
+      }
+      
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      document.getElementById('countdown').textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    function resetTimer() {
+      endTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
+      startCountdown();
+      alert("Timer has been reset to 7 days");
+    }
 
     // Wallet connection functions
     function openWalletModal() {
@@ -637,17 +423,15 @@
     }
 
     function showWalletError(message) {
-      alert(message); // In a real app, use a nicer toast notification
+      alert(message);
     }
 
     // Task verification functions
     function verifyTwitterFollow() {
       if (tasksCompleted.twitter) return;
       
-      // Open Twitter in new tab
       window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
       
-      // Show verification prompt
       const didFollow = confirm("Did you follow our Twitter account? After following, click OK to verify.");
       if (didFollow) {
         tasksCompleted.twitter = true;
@@ -661,10 +445,8 @@
     function verifyTelegramJoin() {
       if (tasksCompleted.telegram) return;
       
-      // Open Telegram in new tab
       window.open('https://t.me/FLUFFISOLANALAYER2', '_blank');
       
-      // Show verification prompt
       const didJoin = confirm("Did you join our Telegram group? After joining, click OK to verify.");
       if (didJoin) {
         tasksCompleted.telegram = true;
@@ -678,10 +460,8 @@
     function verifyRetweet() {
       if (tasksCompleted.retweet) return;
       
-      // Open Twitter in new tab (replace with your pinned tweet link)
       window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
       
-      // Show verification prompt
       const didRetweet = confirm("Did you like and retweet our pinned tweet? After doing so, click OK to verify.");
       if (didRetweet) {
         tasksCompleted.retweet = true;
@@ -693,7 +473,6 @@
     }
     
     function updateTaskUI() {
-      // Update checkboxes and status text
       document.getElementById('task1').checked = tasksCompleted.twitter;
       document.getElementById('task2').checked = tasksCompleted.telegram;
       document.getElementById('task3').checked = tasksCompleted.retweet;
@@ -707,7 +486,6 @@
       document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
       document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
       
-      // Update verify buttons
       const twitterBtn = document.getElementById('verifyTwitterBtn');
       const telegramBtn = document.getElementById('verifyTelegramBtn');
       const retweetBtn = document.getElementById('verifyRetweetBtn');
@@ -779,24 +557,20 @@
         return;
       }
       
-      // Verify tasks (in a real app, this would be done on the backend)
       try {
         const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
         
-        // Check if at least one task is completed
         const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.telegram || tasksCompleted.retweet;
         
         if (!anyTaskCompleted) {
           throw new Error("Please complete at least one task to claim the airdrop");
         }
         
-        // Simulate API call to backend
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Success message
         alert("🎉 Airdrop claimed successfully! Your tokens will be distributed after the presale ends.");
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -814,15 +588,12 @@
       const html = document.documentElement;
       const isDark = !html.classList.contains('dark');
       
-      // Set the class and localStorage
       html.classList.toggle('dark', isDark);
       localStorage.setItem('darkMode', isDark);
       
-      // Update icon
       const darkModeIcon = document.getElementById('darkModeIcon');
       darkModeIcon.textContent = isDark ? '☀️' : '🌙';
       
-      // Refresh QR code if WalletConnect modal is open
       refreshWalletConnectQR();
     }
 
