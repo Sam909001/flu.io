@@ -184,6 +184,23 @@
     .dark .text-gray-500 {
       color: #9ca3af !important;
     }
+    #walletConnectModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#walletConnectQrCode canvas {
+  display: block;
+  margin: 0 auto;
+}
   </style>
 </head>
 
@@ -366,10 +383,10 @@
         <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
         <span>Trust Wallet</span>
       </div>
-      <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <img src="https://registry.walletconnect.com/api/v1/logo/md/5a5166ca-0fa1-4a86-b195-6b914b9e23d7" alt="WalletConnect">
-        <span>WalletConnect</span>
-      </div>
+     <div class="wallet-option" onclick="connectWallet('walletconnect')">
+  <img src="https://assets.website-files.com/5f973c970bea5548ad4287ef/617a8bb6025f3531e19c6b08_wallet-connect.svg" alt="WalletConnect">
+  <span>WalletConnect</span>
+</div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <img src="https://phantom.app/favicon.ico" alt="Phantom">
         <span>Phantom</span>
@@ -546,50 +563,79 @@ async function connectWallet(walletType) {
       }
     }
     else if (walletType === 'walletconnect') {
-      // WalletConnect connection
-      walletConnectProvider = new WalletConnectProvider.default({
-        rpc: {
-          1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
-          56: "https://bsc-dataseed.binance.org/",
-          137: "https://polygon-rpc.com/"
-        },
-        bridge: "https://bridge.walletconnect.org",
-        qrcodeModal: true
-      });
-
-      // Enable session (triggers QR Code modal)
-      await walletConnectProvider.enable();
-      
-      // Subscribe to events
-      walletConnectProvider.on("connect", (error, payload) => {
-        if (error) throw error;
-        const { accounts } = payload.params[0];
-        handleWalletConnection(accounts[0]);
-      });
-
-      walletConnectProvider.on("disconnect", (error) => {
-        if (error) throw error;
-        disconnectWallet();
-      });
-    }
-    else if (walletType === 'phantom') {
-      // Phantom Wallet connection
-      if (window.solana && window.solana.isPhantom) {
-        const response = await window.solana.connect();
-        handleWalletConnection(response.publicKey.toString());
-      } else if (isMobile()) {
-        // Mobile fallback for Phantom
-        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}`;
-      } else {
-        showWalletError("Please install Phantom Wallet");
+  // Initialize WalletConnect provider with QR code modal
+  walletConnectProvider = new WalletConnectProvider.default({
+    rpc: {
+      1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+      56: "https://bsc-dataseed.binance.org/",
+      137: "https://polygon-rpc.com/"
+    },
+    bridge: "https://bridge.walletconnect.org",
+    qrcodeModal: {
+      open: (uri, cb) => {
+        // Create QR code container if it doesn't exist
+        if (!document.getElementById('walletConnectQrCode')) {
+          const modal = document.createElement('div');
+          modal.id = 'walletConnectModal';
+          modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+          modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+              <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+                <h3 class="text-lg font-bold">Scan QR Code</h3>
+                <button onclick="document.getElementById('walletConnectModal').remove()" class="text-gray-500 hover:text-gray-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="p-6">
+                <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
+                <div class="text-center">
+                  <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
+                </div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+        }
+        
+        // Generate QR code
+        QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+            light: '#00000000'
+          }
+        }, (error) => {
+          if (error) console.error("QR code error:", error);
+        });
+      },
+      close: () => {
+        const modal = document.getElementById('walletConnectModal');
+        if (modal) modal.remove();
       }
     }
+  });
+
+  try {
+    // Enable session (triggers QR Code modal)
+    await walletConnectProvider.enable();
+    
+    // Subscribe to events
+    walletConnectProvider.on("connect", (error, payload) => {
+      if (error) throw error;
+      const { accounts } = payload.params[0];
+      handleWalletConnection(accounts[0]);
+    });
+
+    walletConnectProvider.on("disconnect", (error) => {
+      if (error) throw error;
+      disconnectWallet();
+    });
   } catch (error) {
-    console.error("Wallet connection error:", error);
-    showWalletError(error.message || "Wallet connection failed");
+    console.error("WalletConnect error:", error);
+    showWalletError("Failed to connect via WalletConnect");
   }
 }
-
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
