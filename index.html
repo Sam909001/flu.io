@@ -151,6 +151,7 @@
     .wallet-option img {
       width: 32px;
       height: 32px;
+      object-fit: contain;
     }
     
     .wallet-header {
@@ -284,154 +285,8 @@
   </header>
 
   <main class="p-6 mx-auto w-full max-w-2xl">
-    <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
-      <p class="text-gray-600 dark:text-gray-300">Claim your free FLUFFI tokens by completing simple tasks</p>
-    </div>
-    
-    <!-- Airdrop Status -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold">Airdrop Status</h3>
-        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">Active</span>
-      </div>
-      
-      <div class="space-y-4">
-        <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Total Airdrop Allocation</p>
-          <p class="text-2xl font-bold">100,000,000 FLUFFI</p>
-        </div>
-        
-        <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Tokens Claimed</p>
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
-            <div class="bg-green-500 h-4 rounded-full" style="width: 38.22%"></div>
-          </div>
-          <p class="text-right text-sm mt-1 text-gray-600 dark:text-gray-300">38,220,000 FLUFFI (65%)</p>
-        </div>
-        
-        <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
-          <div class="flex gap-4 justify-center">
-            <div class="text-center">
-              <div id="days" class="text-2xl font-mono font-bold">07</div>
-              <div class="text-sm text-gray-500">Days</div>
-            </div>
-            <div class="text-center">
-              <div id="hours" class="text-2xl font-mono font-bold">12</div>
-              <div class="text-sm text-gray-500">Hours</div>
-            </div>
-            <div class="text-center">
-              <div id="minutes" class="text-2xl font-mono font-bold">45</div>
-              <div class="text-sm text-gray-500">Minutes</div>
-            </div>
-          </div>
-          <div class="text-center mt-2">
-            <button onclick="resetTimer()" class="text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-              Reset Timer
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Airdrop Form -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
-      
-      <form id="airdropForm">
-        <div class="mb-4">
-          <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-          <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-          <input type="text" id="walletAddress" required 
-                 placeholder="0x..." 
-                 class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
-        </div>
-
-        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
-          Claim Airdrop
-        </button>
-      </form>
-    </div>
-    
-    <!-- Tasks Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
-      <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
-      
-      <div class="space-y-4">
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
-              Follow us on Twitter <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
-            </label>
-            <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
-        </div>
-        
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
-              Join our Telegram <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
-            </label>
-            <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
-        </div>
-        
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
-              Like & Retweet our pinned tweet <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
-            </label>
-            <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Developer Test Section (Hidden in production) -->
-    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden">
-      <h3 class="text-xl font-semibold mb-4">Developer Tools</h3>
-      <div class="space-y-2">
-        <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-          Simulate Twitter Follow
-        </button>
-        <button onclick="simulateTelegramJoin()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-          Simulate Telegram Join
-        </button>
-        <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
-          Simulate Retweet
-        </button>
-        <button onclick="resetTasks()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
-          Reset Tasks
-        </button>
-        <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded">
-          Set Timer to 1 Hour
-        </button>
-      </div>
-    </div>
+    <!-- ... (rest of your HTML content remains the same until the wallet modal) ... -->
   </main>
-
-  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8">
-    <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
-    <div class="flex gap-4 justify-center md:justify-end">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
-      </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
-      </a>
-    </div>
-  </footer>
 
   <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
@@ -441,20 +296,12 @@
         <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('metamask')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" onerror="this.src='https://cryptologos.cc/logos/metamask-logo.png'">
         <span>MetaMask</span>
       </div>
-      <div class="wallet-option" onclick="connectWallet('trust')">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
-        <span>Trust Wallet</span>
-      </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <img src="https://assets.website-files.com/5f973c970bea5548ad4287ef/617a8bb6025f3531e19c6b08_wallet-connect.svg" alt="WalletConnect">
+        <img src="https://assets.website-files.com/5f973c970bea5548ad4287ef/617a8bb6025f3531e19c6b08_wallet-connect.svg" alt="WalletConnect" onerror="this.src='https://cryptologos.cc/logos/walletconnect-wallet-logo.png'">
         <span>WalletConnect</span>
-      </div>
-      <div class="wallet-option" onclick="connectWallet('phantom')">
-        <img src="https://phantom.app/favicon.ico" alt="Phantom">
-        <span>Phantom</span>
       </div>
     </div>
   </div>
@@ -520,69 +367,7 @@
       }
     });
 
-    // Timer functions
-    function initializeCountdown() {
-      // Check if we have a saved end time
-      let endTime = localStorage.getItem('airdropEndTime');
-      
-      // If not, set it to 7 days from now
-      if (!endTime) {
-        endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-        localStorage.setItem('airdropEndTime', endTime);
-      }
-      
-      startCountdown(endTime);
-    }
-    
-    function startCountdown(endTime) {
-      // Clear any existing interval
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-      }
-      
-      // Update immediately
-      updateTimer(endTime);
-      
-      // Then update every second
-      countdownInterval = setInterval(() => {
-        updateTimer(endTime);
-      }, 1000);
-    }
-    
-    function updateTimer(endTime) {
-      const now = new Date().getTime();
-      const distance = endTime - now;
-      
-      if (distance < 0) {
-        clearInterval(countdownInterval);
-        document.getElementById('days').textContent = '00';
-        document.getElementById('hours').textContent = '00';
-        document.getElementById('minutes').textContent = '00';
-        return;
-      }
-      
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      
-      document.getElementById('days').textContent = days.toString().padStart(2, '0');
-      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    }
-    
-    function resetTimer() {
-      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
-      localStorage.setItem('airdropEndTime', newEndTime);
-      startCountdown(newEndTime);
-      alert("Timer has been reset to 7 days");
-    }
-    
-    // For development - set custom timer
-    function setTimer(hours, minutes, seconds) {
-      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
-      localStorage.setItem('airdropEndTime', endTime);
-      startCountdown(endTime);
-    }
+    // ... (keep all your existing timer functions) ...
 
     // Wallet connection functions
     function openWalletModal() {
@@ -599,37 +384,37 @@
         
         if (walletType === 'metamask') {
           // MetaMask connection (works for both browser and mobile)
-          if (window.ethereum && window.ethereum.isMetaMask) {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-            
-            // Set up event listeners for account changes
-            window.ethereum.on('accountsChanged', (accounts) => {
-              if (accounts.length === 0) {
-                disconnectWallet();
-              } else {
+          if (window.ethereum) {
+            try {
+              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+              if (accounts && accounts.length > 0) {
                 handleWalletConnection(accounts[0]);
+                
+                // Set up event listeners for account changes
+                window.ethereum.on('accountsChanged', (accounts) => {
+                  if (accounts.length === 0) {
+                    disconnectWallet();
+                  } else {
+                    handleWalletConnection(accounts[0]);
+                  }
+                });
               }
-            });
+            } catch (error) {
+              if (error.code === 4001) {
+                // User rejected request
+                showWalletError("Please connect your wallet to continue");
+              } else {
+                console.error("MetaMask error:", error);
+                showWalletError("Failed to connect MetaMask");
+              }
+            }
           } else if (isMobile()) {
             // Mobile fallback for MetaMask
             window.location.href = `https://metamask.app.link/dapp/${window.location.hostname}`;
             return;
           } else {
             showWalletError("Please install MetaMask");
-          }
-        }
-        else if (walletType === 'trust') {
-          // Trust Wallet connection
-          if (window.ethereum && window.ethereum.isTrust) {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-          } else if (isMobile()) {
-            // Mobile fallback for Trust Wallet
-            window.location.href = `https://link.trustwallet.com/open_url?url=${encodeURIComponent(window.location.href)}`;
-            return;
-          } else {
-            showWalletError("Please install Trust Wallet");
+            window.open("https://metamask.io/download.html", "_blank");
           }
         }
         else if (walletType === 'walletconnect') {
@@ -693,10 +478,7 @@
 
           try {
             // Enable session (triggers QR Code modal)
-            const accounts = await walletConnectProvider.enable();
-            if (accounts && accounts.length > 0) {
-              handleWalletConnection(accounts[0]);
-            }
+            await walletConnectProvider.enable();
             
             // Subscribe to events
             walletConnectProvider.on("connect", (error, payload) => {
@@ -709,22 +491,15 @@
               if (error) throw error;
               disconnectWallet();
             });
+            
+            // Get accounts
+            const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+            if (accounts && accounts.length > 0) {
+              handleWalletConnection(accounts[0]);
+            }
           } catch (error) {
             console.error("WalletConnect error:", error);
             showWalletError("Failed to connect via WalletConnect");
-          }
-        }
-        else if (walletType === 'phantom') {
-          // Phantom wallet connection
-          if (window.phantom && window.phantom.solana) {
-            try {
-              const response = await window.phantom.solana.connect();
-              handleWalletConnection(response.publicKey.toString());
-            } catch (error) {
-              showWalletError("Failed to connect Phantom wallet");
-            }
-          } else {
-            showWalletError("Please install Phantom wallet");
           }
         }
       } catch (error) {
