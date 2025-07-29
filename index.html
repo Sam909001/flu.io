@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   
+
   <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
@@ -803,7 +804,11 @@
   <script>
     // Global variables
     let walletConnectProvider = null;
-    let userWalletAddress = null;
+    let currentWallet = null;
+    let provider = null;
+    let signer = null;
+    let currentAccount = null;
+    let currentChainId = null;
     let tasksCompleted = {
       twitter: false,
       telegram: false,
@@ -813,32 +818,15 @@
     let currentTaskVerification = null;
     let captchaAnswer = null;
     
-    // Wallet connection state
-    let currentWallet = null;
-    let provider = null;
-    let signer = null;
-    let currentAccount = null;
-    let currentChainId = null;
-    
     // For development - show dev section if URL has ?dev=true
     if (window.location.search.includes('dev=true')) {
       document.getElementById('devSection').classList.remove('hidden');
     }
 
+    // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize dark mode
-      const darkMode = localStorage.getItem('darkMode');
-      const isDarkMode = darkMode === 'true' || 
-                        (darkMode === null && 
-                        window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkModeIcon').textContent = '☀️';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('darkModeIcon').textContent = '🌙';
-      }
+      initDarkMode();
       
       // Setup form submission
       document.getElementById('airdropForm').addEventListener('submit', function(e) {
@@ -853,14 +841,56 @@
       initializeCountdown();
       
       // Load completed tasks from localStorage
-      const savedTasks = localStorage.getItem('completedTasks');
-      if (savedTasks) {
-        tasksCompleted = JSON.parse(savedTasks);
-        updateTaskUI();
-      }
+      loadCompletedTasks();
     });
 
-    // Wallet Integration Script
+    // Dark mode functions
+    function initDarkMode() {
+      const darkMode = localStorage.getItem('darkMode');
+      const isDarkMode = darkMode === 'true' || 
+                        (darkMode === null && 
+                        window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('darkModeIcon').textContent = '🌙';
+      }
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = !html.classList.contains('dark');
+      
+      html.classList.toggle('dark', isDark);
+      localStorage.setItem('darkMode', isDark);
+      
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+      
+      refreshWalletConnectQR();
+    }
+
+    function refreshWalletConnectQR() {
+      const modal = document.getElementById('walletConnectModal');
+      if (modal && walletConnectProvider && walletConnectProvider.connector) {
+        const uri = walletConnectProvider.connector.uri;
+        if (uri) {
+          QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+            width: 200,
+            margin: 2,
+            color: {
+              dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+              light: '#00000000'
+            }
+          });
+        }
+      }
+    }
+
+    // Wallet connection functions
     function initWalletConnection() {
       // DOM Elements
       const connectWalletBtn = document.getElementById('connectWalletBtn');
@@ -885,9 +915,8 @@
       const walletConnectQrCode = document.getElementById('walletConnectQrCode');
       const walletAddressInput = document.getElementById('walletAddress');
 
-      // Wallet Providers Data (460+ wallets)
+      // Wallet Providers Data
       const wallets = [
-        // Popular wallets
         {
           id: 'metamask',
           name: 'MetaMask',
@@ -965,8 +994,8 @@
               // Initialize WalletConnect provider
               walletConnectProvider = new WalletConnectProvider.default({
                 rpc: {
-                  1: 'https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
-                  5: 'https://goerli.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+                  1: 'https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID',
+                  5: 'https://goerli.infura.io/v3/YOUR_INFURA_PROJECT_ID',
                   137: 'https://polygon-rpc.com',
                   56: 'https://bsc-dataseed.binance.org/',
                 },
@@ -987,156 +1016,7 @@
               throw error;
             }
           }
-        },
-        // Browser wallets
-        {
-          id: 'bravewallet',
-          name: 'Brave Wallet',
-          icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg',
-          type: 'browser',
-          check: () => !!window.ethereum?.isBraveWallet,
-          connect: async () => {
-            try {
-              if (!window.ethereum) throw new Error('Brave Wallet not detected');
-              
-              provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-              await provider.send('eth_requestAccounts', []);
-              signer = provider.getSigner();
-              
-              currentWallet = 'bravewallet';
-              return true;
-            } catch (error) {
-              console.error('Brave Wallet connection error:', error);
-              throw error;
-            }
-          }
-        },
-        {
-          id: 'phantom',
-          name: 'Phantom',
-          icon: 'https://phantom.app/favicon.ico',
-          type: 'browser',
-          check: () => !!window.phantom?.ethereum,
-          connect: async () => {
-            try {
-              if (!window.phantom?.ethereum) throw new Error('Phantom not installed');
-              
-              provider = new ethers.providers.Web3Provider(window.phantom.ethereum, 'any');
-              await provider.send('eth_requestAccounts', []);
-              signer = provider.getSigner();
-              
-              currentWallet = 'phantom';
-              return true;
-            } catch (error) {
-              console.error('Phantom connection error:', error);
-              throw error;
-            }
-          }
-        },
-        // Hardware wallets
-        {
-          id: 'ledger',
-          name: 'Ledger',
-          icon: 'https://cdn-icons-png.flaticon.com/512/2593/2593308.png',
-          type: 'hardware',
-          check: () => true,
-          connect: async () => {
-            try {
-              walletConnectProvider = new WalletConnectProvider.default({
-                rpc: {
-                  1: 'https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
-                },
-                chainId: 1
-              });
-              
-              await walletConnectProvider.enable();
-              
-              provider = new ethers.providers.Web3Provider(walletConnectProvider);
-              signer = provider.getSigner();
-              
-              currentWallet = 'ledger';
-              return true;
-            } catch (error) {
-              console.error('Ledger connection error:', error);
-              throw error;
-            }
-          }
-        },
-        {
-          id: 'trezor',
-          name: 'Trezor',
-          icon: 'https://trezor.io/static/images/trezor-logo.png',
-          type: 'hardware',
-          check: () => true,
-          connect: async () => {
-            try {
-              walletConnectProvider = new WalletConnectProvider.default({
-                rpc: {
-                  1: 'https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
-                },
-                chainId: 1
-              });
-              
-              await walletConnectProvider.enable();
-              
-              provider = new ethers.providers.Web3Provider(walletConnectProvider);
-              signer = provider.getSigner();
-              
-              currentWallet = 'trezor';
-              return true;
-            } catch (error) {
-              console.error('Trezor connection error:', error);
-              throw error;
-            }
-          }
-        },
-        // Mobile wallets
-        {
-          id: 'mathwallet',
-          name: 'Math Wallet',
-          icon: 'https://mathwallet.org/images/mathwallet-logo.png',
-          type: 'mobile',
-          check: () => !!window.ethereum?.isMathWallet,
-          connect: async () => {
-            try {
-              if (!window.ethereum) throw new Error('Math Wallet not detected');
-              
-              provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-              await provider.send('eth_requestAccounts', []);
-              signer = provider.getSigner();
-              
-              currentWallet = 'mathwallet';
-              return true;
-            } catch (error) {
-              console.error('Math Wallet connection error:', error);
-              throw error;
-            }
-          }
-        },
-        {
-          id: 'tokenpocket',
-          name: 'TokenPocket',
-          icon: 'https://tokenpocket.pro/images/logo.svg',
-          type: 'mobile',
-          check: () => !!window.ethereum?.isTokenPocket,
-          connect: async () => {
-            try {
-              if (!window.ethereum) throw new Error('TokenPocket not detected');
-              
-              provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-              await provider.send('eth_requestAccounts', []);
-              signer = provider.getSigner();
-              
-              currentWallet = 'tokenpocket';
-              return true;
-            } catch (error) {
-              console.error('TokenPocket connection error:', error);
-              throw error;
-            }
-          }
-        },
-        // Additional wallets would follow the same pattern
-        // ... (add 450+ more wallets following the same pattern)
+        }
       ];
 
       // Initialize the wallet providers list
@@ -1148,14 +1028,9 @@
         const activeCategory = document.querySelector('.wallet-category.active').dataset.category;
         
         let filteredWallets = wallets.filter(wallet => {
-          // Filter by search term
           const matchesSearch = wallet.name.toLowerCase().includes(searchTerm) || 
                                wallet.id.toLowerCase().includes(searchTerm);
-          
-          // Filter by category
           const matchesCategory = activeCategory === 'all' || wallet.type === activeCategory;
-          
-          // Check if wallet is available (if it has a check function)
           const isAvailable = wallet.check ? wallet.check() : true;
           
           return matchesSearch && matchesCategory && isAvailable;
@@ -1176,24 +1051,21 @@
           
           walletElement.addEventListener('click', async () => {
             try {
-              // Show loading state
               walletElement.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Connecting...`;
               
               const connected = await wallet.connect();
               if (connected) {
-                // Successfully connected
                 closeModal();
                 await fetchWalletData();
                 walletConnectedContainer.style.display = 'block';
                 connectWalletBtn.innerHTML = '<i class="fas fa-wallet"></i> Connected';
                 
-                // Set wallet info
                 const walletInfo = wallets.find(w => w.id === currentWallet);
                 connectedWalletName.textContent = walletInfo.name;
                 connectedWalletIcon.src = walletInfo.icon;
                 
-                // Update wallet address in form
                 walletAddressInput.value = currentAccount;
+                localStorage.setItem('lastConnectedWallet', currentWallet);
               }
             } catch (error) {
               console.error('Connection error:', error);
@@ -1214,21 +1086,17 @@
         if (!provider) return;
         
         try {
-          // Get account
           const accounts = await provider.listAccounts();
           currentAccount = accounts[0];
           walletAccount.textContent = currentAccount;
           
-          // Get balance
           const balance = await provider.getBalance(currentAccount);
           walletBalance.textContent = `${ethers.utils.formatEther(balance)} ETH`;
           
-          // Get network
           const network = await provider.getNetwork();
           currentChainId = network.chainId;
           walletChainId.textContent = currentChainId;
           
-          // Map chain ID to network name
           const networkNames = {
             1: 'Ethereum Mainnet',
             5: 'Goerli Testnet',
@@ -1238,7 +1106,6 @@
           
           walletNetwork.textContent = networkNames[network.chainId] || `Chain ID: ${network.chainId}`;
           
-          // Set up event listeners for account/chain changes
           if (window.ethereum) {
             window.ethereum.on('accountsChanged', handleAccountsChanged);
             window.ethereum.on('chainChanged', handleChainChanged);
@@ -1257,10 +1124,8 @@
       // Event Handlers
       function handleAccountsChanged(accounts) {
         if (accounts.length === 0) {
-          // Wallet disconnected
           handleDisconnect();
         } else {
-          // Account changed
           currentAccount = accounts[0];
           walletAccount.textContent = currentAccount;
           document.getElementById('walletAddress').value = currentAccount;
@@ -1269,7 +1134,6 @@
       }
 
       function handleChainChanged(chainId) {
-        // Chain changed, refresh data
         currentChainId = parseInt(chainId, 16);
         fetchWalletData();
       }
@@ -1294,8 +1158,8 @@
         walletConnectedContainer.style.display = 'none';
         connectWalletBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
         document.getElementById('walletAddress').value = '';
+        localStorage.removeItem('lastConnectedWallet');
         
-        // Remove event listeners
         if (window.ethereum) {
           window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
           window.ethereum.removeListener('chainChanged', handleChainChanged);
@@ -1332,7 +1196,6 @@
       // Event Listeners
       connectWalletBtn.addEventListener('click', () => {
         if (currentWallet) {
-          // Already connected, toggle account info
           walletConnectedContainer.style.display = walletConnectedContainer.style.display === 'none' ? 'block' : 'none';
         } else {
           openModal();
@@ -1405,11 +1268,9 @@
             walletConnectedContainer.style.display = 'block';
             connectWalletBtn.innerHTML = '<i class="fas fa-wallet"></i> Connected';
             
-            // Set wallet info
             connectedWalletName.textContent = wallet.name;
             connectedWalletIcon.src = wallet.icon;
             
-            // Update wallet address in form
             document.getElementById('walletAddress').value = currentAccount;
           }
         } catch (error) {
@@ -1483,7 +1344,15 @@
       startCountdown(endTime);
     }
 
-    // Captcha functions
+    // Task verification functions
+    function loadCompletedTasks() {
+      const savedTasks = localStorage.getItem('completedTasks');
+      if (savedTasks) {
+        tasksCompleted = JSON.parse(savedTasks);
+        updateTaskUI();
+      }
+    }
+
     function generateCaptcha() {
       const num1 = Math.floor(Math.random() * 10) + 1;
       const num2 = Math.floor(Math.random() * 10) + 1;
@@ -1525,11 +1394,10 @@
       }
     }
 
-    // Task verification functions
     function verifyTwitterFollow() {
       if (tasksCompleted.twitter) return;
       
-      const twitterWindow = window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
+      window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
       
       setTimeout(() => {
         const didFollow = confirm("Please follow @FLUFFIOFFICIAL on Twitter, then click OK to verify.");
@@ -1545,7 +1413,7 @@
     function verifyTelegramJoin() {
       if (tasksCompleted.telegram) return;
       
-      const telegramWindow = window.open('https://t.me/FLUFFISOLANALAYER2', '_blank');
+      window.open('https://t.me/FLUFFISOLANALAYER2', '_blank');
       
       setTimeout(() => {
         const didJoin = confirm("Please join our Telegram group, then click OK to verify.");
@@ -1676,37 +1544,6 @@
         const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Claim Airdrop';
-      }
-    }
-
-    // Toggle dark mode function
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const isDark = !html.classList.contains('dark');
-      
-      html.classList.toggle('dark', isDark);
-      localStorage.setItem('darkMode', isDark);
-      
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
-      
-      refreshWalletConnectQR();
-    }
-
-    function refreshWalletConnectQR() {
-      const modal = document.getElementById('walletConnectModal');
-      if (modal && walletConnectProvider && walletConnectProvider.connector) {
-        const uri = walletConnectProvider.connector.uri;
-        if (uri) {
-          QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-            width: 200,
-            margin: 2,
-            color: {
-              dark: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
-              light: '#00000000'
-            }
-          });
-        }
       }
     }
   </script>
