@@ -5,6 +5,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Wallet Connector</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+    body {
+      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+    
+    .dark {
+      background: #111827 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark .bg-white {
+      background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .logo-float {
+      animation: fluffi-float 3s ease-in-out infinite;
+    }
+
+    @keyframes fluffi-float {
+      0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+    }
+
+    .btn-primary {
+      background-color: #10B981;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #059669;
+    }
+    
+    .btn-secondary {
+      background-color: #3B82F6;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #2563EB;
+    }
+    
+    .dark input[type="text"], 
+    .dark input[type="email"],
+    .dark select {
+      background-color: #374151;
+      color: white !important;
+      border-color: #4B5563;
+    }
+    
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .wallet-btn:hover {
+      background: #e1e1e1;
+    }
+    
+    .wallet-btn img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .dark .wallet-btn {
+      background: #374151;
+      color: white;
+    }
+    
+    .dark .wallet-btn:hover {
+      background: #4B5563;
+    }
+    
+    .wallet-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .dark .wallet-modal-content {
+      background: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .wallet-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .dark .wallet-option:hover {
+      background: #374151;
+    }
+    
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    
+    .wallet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .wallet-close {
+      cursor: pointer;
+      font-size: 24px;
+    }
+    
+    .task-completed {
+      color: #10B981;
+    }
+    
+    .task-incomplete {
+      color: #EF4444;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af !important;
+    }
+    
+    #walletConnectModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    #walletConnectQrCode canvas {
+      display: block;
+      margin: 0 auto;
+    }
+    
+    .dark .wallet-modal-content {
+      background-color: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    .dark .wallet-option:hover {
+      background-color: #374151;
+    }
+    
+    .dark #walletConnectModal .bg-white {
+      background-color: #1f2937 !important;
+    }
+    
+    .dark #walletConnectModal .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark .wallet-modal-content,
+    .dark #walletConnectModal .bg-white {
+      background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
+    
+    .dark #walletConnectModal .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark #walletConnectModal .border-b {
+      border-color: #374151 !important;
+    }
+    
+    .dark input[type="text"],
+    .dark input[type="email"] {
+      background-color: #374151 !important;
+      color: white !important;
+      border-color: #4B5563 !important;
+    }
+    
+    .verify-btn {
+      background-color: #3B82F6;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    
+    .verify-btn:hover {
+      background-color: #2563EB;
+    }
+    
+    .verify-btn.completed {
+      background-color: #10B981;
+      cursor: default;
+    }
+    
+    .verify-btn.completed:hover {
+      background-color: #10B981;
+    }
+
+    .timer-digit {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      min-width: 60px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .dark .timer-digit {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .captcha-container {
+      margin: 16px 0;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .dark .captcha-container {
+      background: #374151;
+      border-color: #4b5563;
+    }
+
+    .captcha-question {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .captcha-input {
+      width: 80px;
+      padding: 4px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+    }
+
+    .dark .captcha-input {
+      background: #1f2937;
+      border-color: #4b5563;
+      color: white;
+    }
+  </style>
     <style>
         :root {
             --primary-color: #3498db;
