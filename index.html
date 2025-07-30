@@ -371,6 +371,69 @@
     .dark .wallet-address-display {
       background: rgba(255,255,255,0.1);
     }
+      /* Add this new style for the WalletConnect modal */
+    .wallet-connect-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-connect-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-connect-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 320px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .dark .wallet-connect-content {
+      background: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    #walletConnectQrCode {
+      margin: 20px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .wallet-connect-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .dark .wallet-connect-close {
+      color: #aaa;
+    }
+    
+    .wallet-connect-link {
+      margin-top: 15px;
+      color: #3B82F6;
+      cursor: pointer;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -658,24 +721,17 @@
     </div>
   </div>
 
-  <!-- WalletConnect QR Code Modal -->
-  <div id="walletConnectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-      <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-        <h3 class="text-lg font-bold">Scan QR Code</h3>
-        <button id="closeWalletConnectModal" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="p-6">
-        <div id="walletConnectQrCode" class="mb-6 mx-auto" style="width: 200px; height: 200px;"></div>
-        <div class="text-center">
-          <p class="text-gray-600 dark:text-gray-300 mb-4">Scan with your mobile wallet</p>
-          <p id="walletConnectLink" class="text-sm text-blue-500 cursor-pointer hidden">Or tap here to open wallet app</p>
-        </div>
-      </div>
+ !-- New WalletConnect QR Code Modal -->
+  <div id="walletConnectModal" class="wallet-connect-modal">
+    <div class="wallet-connect-content dark:bg-gray-800">
+      <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
+      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <div id="walletConnectQrCode"></div>
+      <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
     </div>
   </div>
+
 
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
