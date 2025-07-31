@@ -886,6 +886,27 @@
       document.getElementById('walletConnectModal').classList.remove('active');
     }
 
+      if (isMobile()) {
+        linkElement.classList.remove('hidden');
+        linkElement.onclick = function() {
+          window.location.href = uri;
+        };
+      } else {
+        linkElement.classList.add('hidden');
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closeWalletConnectModal() {
+      document.getElementById('walletConnectModal').classList.remove('active');
+      
+      if (walletConnectProvider && !userWalletAddress) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+    }
+
     async function connectWallet(walletType) {
       try {
         closeWalletModal();
@@ -929,17 +950,21 @@
         }
         else if (walletType === 'trust') {
           if (isMobile()) {
+            // First try to connect directly
             if (window.ethereum && window.ethereum.isTrust) {
               try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 handleWalletConnection(accounts[0]);
               } catch (error) {
+                // If direct connection fails, open Trust Wallet app
                 window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
               }
             } else {
+              // Trust Wallet not detected, open the app
               window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
             }
           } else {
+            // Desktop - use Trust Wallet as an injected provider
             if (window.ethereum && window.ethereum.isTrust) {
               try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -953,15 +978,42 @@
           }
         }
         else if (walletType === 'walletconnect') {
-          // Simulate WalletConnect flow with QR code
-          const fakeUri = "wc:demo-connection-1234";
-          openWalletConnectModal(fakeUri);
+          // Initialize WalletConnect provider
+          walletConnectProvider = new WalletConnectProvider.default({
+            rpc: {
+              1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+              56: "https://bsc-dataseed.binance.org/",
+              137: "https://polygon-rpc.com/"
+            },
+            bridge: "https://bridge.walletconnect.org",
+            qrcode: false
+          });
 
-          // Simulate connection after 2 seconds
-          setTimeout(() => {
-            closeWalletConnectModal();
-            handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
-          }, 2000);
+          try {
+            // Subscribe to events
+            walletConnectProvider.on("display_uri", (err, payload) => {
+              const uri = payload.params[0];
+              openWalletConnectModal(uri);
+            });
+
+            walletConnectProvider.on("connect", (error, payload) => {
+              if (error) throw error;
+              const { accounts } = payload.params[0];
+              closeWalletConnectModal();
+              handleWalletConnection(accounts[0]);
+            });
+
+            walletConnectProvider.on("disconnect", (error) => {
+              if (error) throw error;
+              disconnectWallet();
+            });
+
+            // Enable session (triggers display_uri event)
+            await walletConnectProvider.enable();
+          } catch (error) {
+            console.error("WalletConnect error:", error);
+            showWalletError("Failed to connect via WalletConnect");
+          }
         }
         else if (walletType === 'phantom') {
           if (isMobile()) {
