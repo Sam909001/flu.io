@@ -688,7 +688,7 @@
     </div>
   </footer>
 
-  <!-- Wallet Connect Modal -->
+ <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
     <div class="wallet-modal-content dark:bg-gray-800">
       <div class="wallet-header">
@@ -696,64 +696,19 @@
         <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('metamask')">
-        <div class="wallet-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.9999 3L12.5529 10.3362L13.5639 5.99999H20.9999V3Z" fill="#E2761B" stroke="#E2761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 3H11.25L12.552 10.336L3 3Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M18.0001 16.5L15.7501 19.5L18.7501 20.25L20.2501 16.5H18.0001Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3.75 16.5L5.25 20.25L8.25 19.5L6 16.5H3.75Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.25 10.5L6.75 13.5L12 13.5L11.25 6.75L8.25 10.5Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15.75 10.5L12.75 6L12 13.5L17.25 13.5L15.75 10.5Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.25 16.5L10.5 15L8.25 13.5V16.5Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15.75 16.5V13.5L13.5 15L15.75 16.5Z" fill="#E4761B" stroke="#E4761B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M13.5 15L15.75 13.5L13.5 13.5V15Z" fill="#D7C1B3" stroke="#D7C1B3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.25 13.5L10.5 15V13.5H8.25Z" fill="#D7C1B3" stroke="#D7C1B3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 16.5L5.25 20.25L3 16.5H6Z" fill="#233447" stroke="#233447" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M18 16.5H20.25L18.75 20.25L18 16.5Z" fill="#233447" stroke="#233447" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 13.5L13.5 15V10.5L12 6.75V13.5Z" fill="#CD6116" stroke="#CD6116" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 6.75L10.5 10.5V15L12 13.5V6.75Z" fill="#CD6116" stroke="#CD6116" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15.75 13.5L17.25 10.5L15.75 10.5V13.5Z" fill="#E4751F" stroke="#E4751F" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.25 13.5V10.5L6.75 10.5L8.25 13.5Z" fill="#E4751F" stroke="#E4751F" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6.75 10.5L8.25 13.5L6.75 13.5L5.25 10.5L6.75 10.5Z" fill="#F6851B" stroke="#F6851B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M17.25 10.5L18.75 13.5L17.25 13.5L15.75 10.5H17.25Z" fill="#F6851B" stroke="#F6851B" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10.5 15L8.25 16.5V13.5L10.5 15Z" fill="#C0AD9E" stroke="#C0AD9E" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M13.5 15L15.75 13.5V16.5L13.5 15Z" fill="#C0AD9E" stroke="#C0AD9E" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M13.5 15L15.75 16.5L13.5 17.25V15Z" fill="#161616" stroke="#161616" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10.5 15V17.25L8.25 16.5L10.5 15Z" fill="#161616" stroke="#161616" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15.75 10.5L12.75 6.75L15.75 3H20.25L18.75 10.5H15.75Z" fill="#763D16" stroke="#763D16" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 3H8.25L6.75 6.75L3.75 10.5H6.75L5.25 3H3Z" fill="#763D16" stroke="#763D16" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
         <span>MetaMask</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('trust')">
-        <div class="wallet-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#3375BB"/>
-            <path d="M12 6.75C8.2725 6.75 5.25 9.7725 5.25 13.5C5.25 17.2275 8.2725 20.25 12 20.25C15.7275 20.25 18.75 17.2275 18.75 13.5C18.75 9.7725 15.7275 6.75 12 6.75ZM12 18.75C9.105 18.75 6.75 16.395 6.75 13.5C6.75 10.605 9.105 8.25 12 8.25C14.895 8.25 17.25 10.605 17.25 13.5C17.25 16.395 14.895 18.75 12 18.75Z" fill="white"/>
-            <path d="M12 10.5C10.755 10.5 9.75 11.505 9.75 12.75C9.75 13.995 10.755 15 12 15C13.245 15 14.25 13.995 14.25 12.75C14.25 11.505 13.245 10.5 12 10.5ZM12 13.5C11.5875 13.5 11.25 13.1625 11.25 12.75C11.25 12.3375 11.5875 12 12 12C12.4125 12 12.75 12.3375 12.75 12.75C12.75 13.1625 12.4125 13.5 12 13.5Z" fill="white"/>
-          </svg>
-        </div>
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
         <span>Trust Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <div class="wallet-icon">
-          <svg width="24" height="24" viewBox="0 0 132 132" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="66" cy="66" r="66" fill="#3B99FC"/>
-            <path d="M46.5 50.5C60.5 36.5 71.5 26 85.5 26C92.1667 30.5 94 33 97 40.5C88.5 45 83 49 75 57.5C82.5 65.5 88.5 72 97 80.5C94.5 87.5 92.1667 90.5 85.5 95C71.5 95 60.5 84.5 46.5 70.5C52.5 64 57.9 58.5 46.5 50.5Z" fill="white"/>
-          </svg>
-        </div>
+        <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/wallet-connect-logo.png" alt="WalletConnect">
         <span>WalletConnect</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
-        <div class="wallet-icon">
-          <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M33.75 25H22.5V35H33.75V25Z" fill="#AB9FF2"/>
-            <path d="M6.25 12.5H33.75V25H6.25V12.5Z" fill="#AB9FF2"/>
-            <path d="M6.25 25H15V35H6.25V25Z" fill="#AB9FF2"/>
-            <path d="M33.75 8.75H6.25C4.86929 8.75 3.75 9.86929 3.75 11.25V33.75C3.75 35.1307 4.86929 36.25 6.25 36.25H15V40H21.25V36.25H25V40H31.25V36.25H33.75C35.1307 36.25 36.25 35.1307 36.25 33.75V11.25C36.25 9.86929 35.1307 8.75 33.75 8.75Z" fill="#4E45DE"/>
-          </svg>
-        </div>
+        <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom">
         <span>Phantom</span>
       </div>
     </div>
