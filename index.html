@@ -12,7 +12,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   
   <style>
+    /* Increased font sizes for better readability */
     body {
+      font-size: 16px;
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
       color: #1a1a1a;
       min-height: 100vh;
@@ -74,6 +76,7 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
+      font-size: 16px; /* Increased font size */
     }
     
     .wallet-btn:hover {
@@ -122,6 +125,7 @@
       max-width: 400px;
       padding: 24px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      font-size: 16px; /* Increased font size */
     }
     
     .dark .wallet-modal-content {
@@ -138,6 +142,7 @@
       margin-bottom: 12px;
       cursor: pointer;
       transition: background 0.2s;
+      font-size: 16px; /* Increased font size */
     }
     
     .wallet-option:hover {
@@ -159,6 +164,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      font-size: 18px; /* Increased font size */
     }
     
     .wallet-close {
@@ -215,6 +221,7 @@
       padding: 24px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       text-align: center;
+      font-size: 16px; /* Increased font size */
     }
     
     .dark .wallet-connect-content {
@@ -246,13 +253,14 @@
       margin-top: 15px;
       color: #3B82F6;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 16px; /* Increased font size */
     }
     
     .referral-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 16px;
+      font-size: 16px; /* Increased font size */
     }
     
     .referral-table th, 
@@ -281,7 +289,7 @@
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 14px;
       margin-left: 8px;
       cursor: pointer;
       border: none;
@@ -303,7 +311,7 @@
       background: rgba(0,0,0,0.05);
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 16px; /* Increased font size */
     }
     
     .dark .wallet-address-display {
@@ -316,6 +324,7 @@
       border: 1px solid #d1d5db;
       border-radius: 4px;
       width: 120px;
+      font-size: 16px; /* Increased font size */
     }
     
     .dark .username-input {
@@ -329,7 +338,7 @@
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 14px;
       margin-left: 8px;
       cursor: pointer;
       border: none;
@@ -356,10 +365,41 @@
       min-width: 60px;
       text-align: center;
       backdrop-filter: blur(10px);
+      font-size: 16px; /* Increased font size */
     }
 
     .dark .timer-digit {
       background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .timer-reset-btn {
+      margin-top: 10px;
+      padding: 4px 10px;
+      background: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .dark .timer-reset-btn {
+      background: #2563EB;
+    }
+    
+    /* Reordered sections container */
+    .sections-container {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Ensure tasks come before airdrop form */
+    .tasks-section {
+      order: 1;
+    }
+    
+    .airdrop-section {
+      order: 2;
     }
   </style>
 </head>
@@ -429,6 +469,11 @@
               <div id="seconds" class="text-2xl font-mono font-bold">30</div>
               <div class="text-sm text-gray-500">Seconds</div>
             </div>
+          </div>
+          <div class="text-center mt-2">
+            <button onclick="resetTimer()" class="timer-reset-btn">
+              Reset Timer
+            </button>
           </div>
         </div>
       </div>
@@ -511,71 +556,74 @@
       </table>
     </div>
     
-    <!-- Airdrop Form -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
-      
-      <form id="airdropForm">
-        <div class="mb-4">
-          <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-          <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
-        </div>
+    <!-- Reordered sections container -->
+    <div class="sections-container">
+      <!-- Tasks Section - Moved BEFORE Airdrop Form -->
+      <div class="tasks-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
         
-        <div class="mb-4">
-          <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-          <input type="text" id="walletAddress" required 
-                 placeholder="0x..." 
-                 class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
+                Follow us on Twitter
+              </label>
+              <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
+              <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
+              <span id="twitterStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
+                Join our Telegram
+              </label>
+              <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
+              <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
+              <span id="telegramStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
+                Like & Retweet our pinned tweet
+              </label>
+              <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
+              <span id="retweetStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
+          </div>
         </div>
+      </div>
+      
+      <!-- Airdrop Form -->
+      <div class="airdrop-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
+        
+        <form id="airdropForm">
+          <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+            <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+            <input type="text" id="walletAddress" required 
+                  placeholder="0x..." 
+                  class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
+          </div>
 
-        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
-          Claim Airdrop
-        </button>
-      </form>
-    </div>
-    
-    <!-- Tasks Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
-      <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
-      
-      <div class="space-y-4">
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
-              Follow us on Twitter
-            </label>
-            <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
-            <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
-            <span id="twitterStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
-        </div>
-        
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
-              Join our Telegram
-            </label>
-            <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
-            <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
-            <span id="telegramStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
-        </div>
-        
-        <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-          <div class="flex items-center">
-            <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-            <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
-              Like & Retweet our pinned tweet
-            </label>
-            <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
-            <span id="retweetStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
-          </div>
-          <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
-        </div>
+          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
+            Claim Airdrop
+          </button>
+        </form>
       </div>
     </div>
     
@@ -626,19 +674,19 @@
         <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('metamask')">
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI0Y2ODUxQiIvPgo8cGF0aCBkPSJNMjQgMTJMMTYgNkw4IDEyTDE2IDIwTDI0IDEyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+" alt="MetaMask">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
         <span>MetaMask</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('trust')">
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzMzNzVCQiIvPgo8cGF0aCBkPSJNMTYgOEwxMiAxMkwxNiAxNkwyMCAxMkwxNiA4WiIgZmlsbD0id2hpdGUiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9zdmc+" alt="Trust Wallet">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
         <span>Trust Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzM5OEVGNyIvPgo8cGF0aCBkPSJNMTAuNSAxMkMxMy41IDkgMTguNSA5IDIxLjUgMTJMMjIgMTIuNUMxOS41IDEwIDEyLjUgMTAgMTAgMTIuNUwxMC41IDEyWk0xNiAxOEMxNS41IDE4IDE1IDE3LjUgMTUgMTdDMTUgMTYuNSAxNS41IDE2IDE2IDE2QzE2LjUgMTYgMTcgMTYuNSAxNyAxN0MxNyAxNy41IDE2LjUgMTggMTYgMThaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=" alt="WalletConnect">
+        <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/wallet-connect-logo.png" alt="WalletConnect">
         <span>WalletConnect</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzQyNDVEMCIvPgo8cGF0aCBkPSJNMTYgOEw4IDEyTDE2IDIwTDI0IDEyTDE2IDhaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=" alt="Phantom">
+        <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom">
         <span>Phantom</span>
       </div>
     </div>
@@ -764,6 +812,13 @@
       document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
     }
     
+    function resetTimer() {
+      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
+      localStorage.setItem('airdropEndTime', newEndTime.toString());
+      startCountdown(newEndTime);
+      alert("Timer has been reset to 7 days");
+    }
+    
     // For development - set custom timer
     function setTimer(hours, minutes, seconds) {
       const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
@@ -859,28 +914,35 @@
         }
         else if (walletType === 'trust') {
           if (isMobile()) {
+            // First try to connect directly
             if (window.ethereum && window.ethereum.isTrust) {
               try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 handleWalletConnection(accounts[0]);
               } catch (error) {
-                const encodedUrl = encodeURIComponent(window.location.href);
-                window.location.href = `https://link.trustwallet.com/open_url?url=${encodedUrl}`;
+                // If direct connection fails, open Trust Wallet app
+                window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
               }
             } else {
-              const encodedUrl = encodeURIComponent(window.location.href);
-              window.location.href = `https://link.trustwallet.com/open_url?url=${encodedUrl}`;
+              // Trust Wallet not detected, open the app
+              window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
             }
           } else {
+            // Desktop - use Trust Wallet as an injected provider
             if (window.ethereum && window.ethereum.isTrust) {
-              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-              handleWalletConnection(accounts[0]);
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+              } catch (error) {
+                showWalletError("Failed to connect Trust Wallet");
+              }
             } else {
-              showWalletError("Please install Trust Wallet");
+              showWalletError("Please install Trust Wallet extension");
             }
           }
         }
         else if (walletType === 'walletconnect') {
+          // Initialize WalletConnect provider
           walletConnectProvider = new WalletConnectProvider.default({
             rpc: {
               1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
@@ -892,6 +954,7 @@
           });
 
           try {
+            // Subscribe to events
             walletConnectProvider.on("display_uri", (err, payload) => {
               const uri = payload.params[0];
               openWalletConnectModal(uri);
@@ -909,6 +972,7 @@
               disconnectWallet();
             });
 
+            // Enable session (triggers display_uri event)
             await walletConnectProvider.enable();
           } catch (error) {
             console.error("WalletConnect error:", error);
