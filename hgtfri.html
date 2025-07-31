@@ -37,13 +37,20 @@
       color: #f0f0f0 !important;
     }
 
-    .logo-float {
+     /* Logo animation */
+    img[src*='fluffi.jpg'] {
       animation: fluffi-float 3s ease-in-out infinite;
+      max-width: 100%;
+      height: auto;
     }
 
     @keyframes fluffi-float {
-      0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+      0%, 100% { 
+        transform: translateY(0) scale(1) rotate(0deg); 
+      }
+      50% { 
+        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+      }
     }
 
     .btn-primary {
