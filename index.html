@@ -1,1 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$FLUFFI Airdrop</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  
+  <!-- CSS Libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  
+  <style>
+    /* Increased font sizes for better readability */
+    body {
+      font-size: 16px;
+      background: linear-gradient(to bottom, #fff0f5, #fff9e6);
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+    
+    .dark {
+      background: #111827 !important;
+      color: #f0f0f0 !important;
+    }
 
+    .dark .bg-white {
+      background-color: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .logo-float {
+      animation: fluffi-float 3s ease-in-out infinite;
+    }
+
+    @keyframes fluffi-float {
+      0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+    }
+
+    .btn-primary {
+      background-color: #10B981;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #059669;
+    }
+    
+    .btn-secondary {
+      background-color: #3B82F6;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #2563EB;
+    }
+    
+    .dark input[type="text"], 
+    .dark input[type="email"],
+    .dark select {
+      background-color: #374151;
+      color: white !important;
+      border-color: #4B5563;
+    }
+    
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .wallet-btn:hover {
+      background: #e1e1e1;
+    }
+    
+    .wallet-btn img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .dark .wallet-btn {
+      background: #374151;
+      color: white;
+    }
+    
+    .dark .wallet-btn:hover {
+      background: #4B5563;
+    }
+    
+    .wallet-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .dark .wallet-modal-content {
+      background: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .wallet-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .dark .wallet-option:hover {
+      background: #374151;
+    }
+    
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    
+    .wallet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 18px; /* Increased font size */
+    }
+    
+    .wallet-close {
+      cursor: pointer;
+      font-size: 24px;
+    }
+    
+    .task-completed {
+      color: #10B981;
+    }
+    
+    .task-incomplete {
+      color: #EF4444;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af !important;
+    }
+    
+    .wallet-connect-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-connect-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-connect-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 320px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .dark .wallet-connect-content {
+      background: #1f2937;
+      color: #f0f0f0;
+    }
+    
+    #walletConnectQrCode {
+      margin: 20px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .wallet-connect-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .dark .wallet-connect-close {
+      color: #aaa;
+    }
+    
+    .wallet-connect-link {
+      margin-top: 15px;
+      color: #3B82F6;
+      cursor: pointer;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .referral-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .referral-table th, 
+    .referral-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .dark .referral-table th,
+    .dark .referral-table td {
+      border-bottom-color: #4b5563;
+    }
+    
+    .referral-table th {
+      font-weight: 600;
+    }
+    
+    .referral-rank {
+      font-weight: bold;
+      color: #10B981;
+    }
+    
+    .disconnect-btn {
+      background-color: #EF4444;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-left: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    
+    .disconnect-btn:hover {
+      background-color: #DC2626;
+    }
+    
+    .wallet-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .wallet-address-display {
+      font-family: monospace;
+      background: rgba(0,0,0,0.05);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .dark .wallet-address-display {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .username-input {
+      margin-left: 12px;
+      padding: 4px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      width: 120px;
+      font-size: 16px; /* Increased font size */
+    }
+    
+    .dark .username-input {
+      background: #1f2937;
+      border-color: #4b5563;
+      color: white;
+    }
+    
+    .verify-btn {
+      background-color: #3B82F6;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-left: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    
+    .verify-btn:hover {
+      background-color: #2563EB;
+    }
+    
+    .verify-btn.completed {
+      background-color: #10B981;
+      cursor: default;
+    }
+    
+    .verify-btn.completed:hover {
+      background-color: #10B981;
+    }
+    
+    .timer-digit {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      min-width: 60px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      font-size: 16px; /* Increased font size */
+    }
+
+    .dark .timer-digit {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .timer-reset-btn {
+      margin-top: 10px;
+      padding: 4px 10px;
+      background: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .dark .timer-reset-btn {
+      background: #2563EB;
+    }
+    
+    /* Reordered sections container */
+    .sections-container {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Ensure tasks come before airdrop form */
+    .tasks-section {
+      order: 1;
+    }
+    
+    .airdrop-section {
+      order: 2;
+    }
+  </style>
+</head>
+
+<body class="text-gray-800 dark:text-white">
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10 logo-float" width="40" height="40">
+      <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
+        $FLUFFI Airdrop
+      </h1>
+    </div>
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
+        <span id="darkModeIcon">🌙</span>
+      </button>
+      <div class="wallet-buttons" id="walletButtons">
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="p-6 mx-auto w-full max-w-2xl">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
+      <p class="text-gray-800 dark:text-gray-500">Claim your free FLUFFI tokens by completing simple tasks</p>
+    </div>
+    
+    <!-- Airdrop Status -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Airdrop Status</h3>
+        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <p class="text-gray-600 dark:text-gray-300 mb-1">Total Airdrop Allocation</p>
+          <p class="text-2xl font-bold">100,000,000 FLUFFI</p>
+        </div>
+        
+        <div>
+          <p class="text-gray-600 dark:text-gray-300 mb-1">Tokens Claimed</p>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+            <div class="bg-green-500 h-4 rounded-full" style="width: 38.22%"></div>
+          </div>
+          <p class="text-right text-sm mt-1 text-gray-600 dark:text-gray-300">38,220,000 FLUFFI (38.22%)</p>
+        </div>
+        
+        <div>
+          <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
+          <div class="flex gap-4 justify-center">
+            <div class="timer-digit">
+              <div id="days" class="text-2xl font-mono font-bold">07</div>
+              <div class="text-sm text-gray-500">Days</div>
+            </div>
+            <div class="timer-digit">
+              <div id="hours" class="text-2xl font-mono font-bold">12</div>
+              <div class="text-sm text-gray-500">Hours</div>
+            </div>
+            <div class="timer-digit">
+              <div id="minutes" class="text-2xl font-mono font-bold">45</div>
+              <div class="text-sm text-gray-500">Minutes</div>
+            </div>
+            <div class="timer-digit">
+              <div id="seconds" class="text-2xl font-mono font-bold">30</div>
+              <div class="text-sm text-gray-500">Seconds</div>
+            </div>
+          </div>
+          <div class="text-center mt-2">
+            <button onclick="resetTimer()" class="timer-reset-btn">
+              Reset Timer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Top Referrals Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <h3 class="text-xl font-semibold mb-4">Top Referrals</h3>
+      <table class="referral-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Wallet Address</th>
+            <th>Referrals</th>
+            <th>Bonus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="referral-rank">1</td>
+            <td>0x8a4...3f2d</td>
+            <td>248</td>
+            <td>24,800 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">2</td>
+            <td>0x7b2...9e1c</td>
+            <td>187</td>
+            <td>18,700 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">3</td>
+            <td>0x5f9...4a3b</td>
+            <td>156</td>
+            <td>15,600 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">4</td>
+            <td>0x3c7...8d5a</td>
+            <td>132</td>
+            <td>13,200 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">5</td>
+            <td>0x2e6...7c49</td>
+            <td>98</td>
+            <td>9,800 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">6</td>
+            <td>0x1d5...6b38</td>
+            <td>76</td>
+            <td>7,600 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">7</td>
+            <td>0x9f4...5a27</td>
+            <td>65</td>
+            <td>6,500 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">8</td>
+            <td>0x8e3...4916</td>
+            <td>54</td>
+            <td>5,400 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">9</td>
+            <td>0x7d2...3805</td>
+            <td>43</td>
+            <td>4,300 FLUFFI</td>
+          </tr>
+          <tr>
+            <td class="referral-rank">10</td>
+            <td>0x6c1...2f94</td>
+            <td>32</td>
+            <td>3,200 FLUFFI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Reordered sections container -->
+    <div class="sections-container">
+      <!-- Tasks Section - Moved BEFORE Airdrop Form -->
+      <div class="tasks-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
+                Follow us on Twitter
+              </label>
+              <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
+              <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
+              <span id="twitterStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
+                Join our Telegram
+              </label>
+              <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
+              <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
+              <span id="telegramStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex items-center">
+              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
+              <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
+                Like & Retweet our pinned tweet
+              </label>
+              <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
+              <span id="retweetStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+            </div>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Airdrop Form -->
+      <div class="airdrop-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
+        
+        <form id="airdropForm">
+          <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+            <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+            <input type="text" id="walletAddress" required 
+                  placeholder="0x..." 
+                  class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
+          </div>
+
+          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
+            Claim Airdrop
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Developer Test Section (Hidden in production) -->
+    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden">
+      <h3 class="text-xl font-semibold mb-4">Developer Tools</h3>
+      <div class="space-y-2">
+        <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+          Simulate Twitter Follow
+        </button>
+        <button onclick="simulateTelegramJoin()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+          Simulate Telegram Join
+        </button>
+        <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+          Simulate Retweet
+        </button>
+        <button onclick="resetTasks()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+          Reset Tasks
+        </button>
+        <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded">
+          Set Timer to 1 Hour
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8">
+    <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
+    <div class="flex gap-4 justify-center md:justify-end">
+      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+      </a>
+      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Wallet Connect Modal -->
+  <div id="walletModal" class="wallet-modal">
+    <div class="wallet-modal-content dark:bg-gray-800">
+      <div class="wallet-header">
+        <h3 class="text-xl font-bold">Connect Wallet</h3>
+        <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('metamask')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span>MetaMask</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('trust')">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+        <span>Trust Wallet</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/wallet-connect-logo.png" alt="WalletConnect">
+        <span>WalletConnect</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('phantom')">
+        <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom">
+        <span>Phantom</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WalletConnect QR Code Modal -->
+  <div id="walletConnectModal" class="wallet-connect-modal">
+    <div class="wallet-connect-content dark:bg-gray-800">
+      <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
+      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <div id="walletConnectQrCode"></div>
+      <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <script>
+    // Global variables
+    let walletConnectProvider = null;
+    let userWalletAddress = null;
+    let tasksCompleted = {
+      twitter: false,
+      telegram: false,
+      retweet: false
+    };
+    let countdownInterval = null;
+    
+    // For development - show dev section if URL has ?dev=true
+    if (window.location.search.includes('dev=true')) {
+      document.getElementById('devSection').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize dark mode
+      const darkMode = localStorage.getItem('darkMode');
+      const isDarkMode = darkMode === 'true' || 
+                        (darkMode === null && 
+                        window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('darkModeIcon').textContent = '🌙';
+      }
+      
+      // Setup form submission
+      document.getElementById('airdropForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        claimAirdrop();
+      });
+      
+      // Setup wallet button
+      document.getElementById('walletButton').addEventListener('click', openWalletModal);
+      
+      // Check if wallet is already connected
+      if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
+        handleWalletConnection(localStorage.getItem('walletAddress'));
+      }
+      
+      // Initialize countdown timer
+      initializeCountdown();
+      
+      // Load completed tasks from localStorage
+      const savedTasks = localStorage.getItem('completedTasks');
+      if (savedTasks) {
+        tasksCompleted = JSON.parse(savedTasks);
+        updateTaskUI();
+      }
+    });
+
+    // Timer functions
+    function initializeCountdown() {
+      let endTime = localStorage.getItem('airdropEndTime');
+      
+      if (!endTime) {
+        endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
+        localStorage.setItem('airdropEndTime', endTime);
+      }
+      
+      startCountdown(parseInt(endTime));
+    }
+    
+    function startCountdown(endTime) {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      updateTimer(endTime);
+      
+      countdownInterval = setInterval(() => {
+        updateTimer(endTime);
+      }, 1000);
+    }
+    
+    function updateTimer(endTime) {
+      const now = Date.now();
+      const distance = endTime - now;
+      
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        document.getElementById('days').textContent = '00';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
+        return;
+      }
+      
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      document.getElementById('days').textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }
+    
+    function resetTimer() {
+      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
+      localStorage.setItem('airdropEndTime', newEndTime.toString());
+      startCountdown(newEndTime);
+      alert("Timer has been reset to 7 days");
+    }
+    
+    // For development - set custom timer
+    function setTimer(hours, minutes, seconds) {
+      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+      localStorage.setItem('airdropEndTime', endTime.toString());
+      startCountdown(endTime);
+    }
+
+    // Wallet connection functions
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
+    }
+    
+    function openWalletConnectModal(uri) {
+      const modal = document.getElementById('walletConnectModal');
+      const linkElement = document.getElementById('walletConnectLink');
+      
+      document.getElementById('walletConnectQrCode').innerHTML = '';
+      
+      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: document.documentElement.classList.contains('dark') ? '#000000' : '#000000',
+          light: '#00000000'
+        }
+      });
+      
+      if (isMobile()) {
+        linkElement.classList.remove('hidden');
+        linkElement.onclick = function() {
+          window.location.href = uri;
+        };
+      } else {
+        linkElement.classList.add('hidden');
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closeWalletConnectModal() {
+      document.getElementById('walletConnectModal').classList.remove('active');
+      
+      if (walletConnectProvider && !userWalletAddress) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+    }
+
+    async function connectWallet(walletType) {
+      try {
+        closeWalletModal();
+        
+        if (walletType === 'metamask') {
+          if (isMobile()) {
+            if (window.ethereum && window.ethereum.isMetaMask) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+                
+                window.ethereum.on('accountsChanged', (accounts) => {
+                  if (accounts.length === 0) {
+                    disconnectWallet();
+                  } else {
+                    handleWalletConnection(accounts[0]);
+                  }
+                });
+              } catch (error) {
+                window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+              }
+            } else {
+              window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+            }
+          } else {
+            if (window.ethereum && window.ethereum.isMetaMask) {
+              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+              handleWalletConnection(accounts[0]);
+              
+              window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                  disconnectWallet();
+                } else {
+                  handleWalletConnection(accounts[0]);
+                }
+              });
+            } else {
+              showWalletError("Please install MetaMask extension");
+            }
+          }
+        }
+        else if (walletType === 'trust') {
+          if (isMobile()) {
+            // First try to connect directly
+            if (window.ethereum && window.ethereum.isTrust) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+              } catch (error) {
+                // If direct connection fails, open Trust Wallet app
+                window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+              }
+            } else {
+              // Trust Wallet not detected, open the app
+              window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+            }
+          } else {
+            // Desktop - use Trust Wallet as an injected provider
+            if (window.ethereum && window.ethereum.isTrust) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+              } catch (error) {
+                showWalletError("Failed to connect Trust Wallet");
+              }
+            } else {
+              showWalletError("Please install Trust Wallet extension");
+            }
+          }
+        }
+        else if (walletType === 'walletconnect') {
+          // Initialize WalletConnect provider
+          walletConnectProvider = new WalletConnectProvider.default({
+            rpc: {
+              1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+              56: "https://bsc-dataseed.binance.org/",
+              137: "https://polygon-rpc.com/"
+            },
+            bridge: "https://bridge.walletconnect.org",
+            qrcode: false
+          });
+
+          try {
+            // Subscribe to events
+            walletConnectProvider.on("display_uri", (err, payload) => {
+              const uri = payload.params[0];
+              openWalletConnectModal(uri);
+            });
+
+            walletConnectProvider.on("connect", (error, payload) => {
+              if (error) throw error;
+              const { accounts } = payload.params[0];
+              closeWalletConnectModal();
+              handleWalletConnection(accounts[0]);
+            });
+
+            walletConnectProvider.on("disconnect", (error) => {
+              if (error) throw error;
+              disconnectWallet();
+            });
+
+            // Enable session (triggers display_uri event)
+            await walletConnectProvider.enable();
+          } catch (error) {
+            console.error("WalletConnect error:", error);
+            showWalletError("Failed to connect via WalletConnect");
+          }
+        }
+        else if (walletType === 'phantom') {
+          if (isMobile()) {
+            if (window.phantom && window.phantom.solana) {
+              try {
+                const response = await window.phantom.solana.connect();
+                handleWalletConnection(response.publicKey.toString());
+              } catch (error) {
+                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+              }
+            } else {
+              window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+            }
+          } else {
+            if (window.phantom && window.phantom.solana) {
+              try {
+                const response = await window.phantom.solana.connect();
+                handleWalletConnection(response.publicKey.toString());
+              } catch (error) {
+                showWalletError("Failed to connect Phantom wallet");
+              }
+            } else {
+              showWalletError("Please install Phantom wallet");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        showWalletError("Failed to connect wallet");
+      }
+    }
+    
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    function handleWalletConnection(address) {
+      userWalletAddress = address;
+      
+      const walletButtons = document.getElementById('walletButtons');
+      const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+      
+      walletButtons.innerHTML = `
+        <span class="wallet-address-display">${shortAddress}</span>
+        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+      `;
+      
+      document.getElementById('walletAddress').value = address;
+      
+      localStorage.setItem('walletConnected', 'true');
+      localStorage.setItem('walletAddress', address);
+    }
+
+    function disconnectWallet() {
+      if (walletConnectProvider) {
+        walletConnectProvider.disconnect();
+        walletConnectProvider = null;
+      }
+      
+      userWalletAddress = null;
+      
+      const walletButtons = document.getElementById('walletButtons');
+      walletButtons.innerHTML = `
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      `;
+      
+      document.getElementById('walletButton').addEventListener('click', openWalletModal);
+      
+      document.getElementById('walletAddress').value = '';
+      
+      localStorage.removeItem('walletConnected');
+      localStorage.removeItem('walletAddress');
+    }
+
+    function showWalletError(message) {
+      alert(message);
+    }
+
+    // Task verification functions
+    async function verifyTwitterFollow() {
+      if (tasksCompleted.twitter) return;
+      
+      const username = document.getElementById('twitterUsername').value.trim();
+      if (!username) {
+        showWalletError("Please enter your Twitter username");
+        return;
+      }
+      
+      // In a real implementation, you would call your backend API to verify the follow
+      // This is a simulation that would be replaced with actual API calls
+      try {
+        // Show loading state
+        const button = document.getElementById('verifyTwitterBtn');
+        button.disabled = true;
+        button.textContent = 'Verifying...';
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // For demo purposes, we'll assume verification succeeded
+        // In production, you would check the API response
+        const verificationSuccess = true; // Replace with actual verification
+        
+        if (verificationSuccess) {
+          tasksCompleted.twitter = true;
+          localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+          updateTaskUI();
+          alert(`Twitter follow verified successfully for @${username}! +1,000 FLUFFI tokens earned.`);
+        } else {
+          showWalletError("Could not verify Twitter follow. Please make sure you're following @FLUFFIOFFICIAL.");
+        }
+      } catch (error) {
+        console.error("Twitter verification error:", error);
+        showWalletError("Failed to verify Twitter follow");
+      } finally {
+        const button = document.getElementById('verifyTwitterBtn');
+        button.disabled = false;
+        button.textContent = 'Verify';
+      }
+    }
+    
+    async function verifyTelegramJoin() {
+      if (tasksCompleted.telegram) return;
+      
+      const username = document.getElementById('telegramUsername').value.trim();
+      if (!username) {
+        showWalletError("Please enter your Telegram username");
+        return;
+      }
+      
+      try {
+        const button = document.getElementById('verifyTelegramBtn');
+        button.disabled = true;
+        button.textContent = 'Verifying...';
+        
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const verificationSuccess = true; // Replace with actual verification
+        
+        if (verificationSuccess) {
+          tasksCompleted.telegram = true;
+          localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+          updateTaskUI();
+          alert(`Telegram join verified successfully for @${username}! +1,000 FLUFFI tokens earned.`);
+        } else {
+          showWalletError("Could not verify Telegram membership. Please join our Telegram group first.");
+        }
+      } catch (error) {
+        console.error("Telegram verification error:", error);
+        showWalletError("Failed to verify Telegram join");
+      } finally {
+        const button = document.getElementById('verifyTelegramBtn');
+        button.disabled = false;
+        button.textContent = 'Verify';
+      }
+    }
+    
+    async function verifyRetweet() {
+      if (tasksCompleted.retweet) return;
+      
+      try {
+        const button = document.getElementById('verifyRetweetBtn');
+        button.disabled = true;
+        button.textContent = 'Verifying...';
+        
+        // Open the tweet in a new tab
+        window.open('https://twitter.com/FLUFFIOFFICIAL/status/1234567890', '_blank');
+        
+        // Wait for user to potentially retweet
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const confirmed = confirm("Please confirm you've liked and retweeted our pinned tweet.");
+        if (confirmed) {
+          // Simulate verification
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const verificationSuccess = true; // Replace with actual verification
+          
+          if (verificationSuccess) {
+            tasksCompleted.retweet = true;
+            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+            updateTaskUI();
+            alert("Retweet verified successfully! +3,000 FLUFFI tokens earned.");
+          } else {
+            showWalletError("Could not verify retweet. Please make sure you've liked and retweeted our pinned tweet.");
+          }
+        }
+      } catch (error) {
+        console.error("Retweet verification error:", error);
+        showWalletError("Failed to verify retweet");
+      } finally {
+        const button = document.getElementById('verifyRetweetBtn');
+        button.disabled = false;
+        button.textContent = 'Verify';
+      }
+    }
+    
+    function updateTaskUI() {
+      document.getElementById('task1').checked = tasksCompleted.twitter;
+      document.getElementById('task2').checked = tasksCompleted.telegram;
+      document.getElementById('task3').checked = tasksCompleted.retweet;
+      
+      document.getElementById('twitterStatus').textContent = tasksCompleted.twitter ? '(Verified)' : '(Not verified)';
+      document.getElementById('twitterStatus').className = tasksCompleted.twitter ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      
+      document.getElementById('telegramStatus').textContent = tasksCompleted.telegram ? '(Verified)' : '(Not verified)';
+      document.getElementById('telegramStatus').className = tasksCompleted.telegram ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      
+      document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
+      document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
+      
+      const twitterBtn = document.getElementById('verifyTwitterBtn');
+      const telegramBtn = document.getElementById('verifyTelegramBtn');
+      const retweetBtn = document.getElementById('verifyRetweetBtn');
+      
+      if (tasksCompleted.twitter) {
+        twitterBtn.textContent = 'Verified';
+        twitterBtn.classList.add('completed');
+        twitterBtn.onclick = null;
+        document.getElementById('twitterUsername').disabled = true;
+      }
+      
+      if (tasksCompleted.telegram) {
+        telegramBtn.textContent = 'Verified';
+        telegramBtn.classList.add('completed');
+        telegramBtn.onclick = null;
+        document.getElementById('telegramUsername').disabled = true;
+      }
+      
+      if (tasksCompleted.retweet) {
+        retweetBtn.textContent = 'Verified';
+        retweetBtn.classList.add('completed');
+        retweetBtn.onclick = null;
+      }
+    }
+    
+    // For development - simulate task completion
+    function simulateTwitterFollow() {
+      document.getElementById('twitterUsername').value = 'testuser';
+      tasksCompleted.twitter = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Twitter follow simulated successfully!");
+    }
+    
+    function simulateTelegramJoin() {
+      document.getElementById('telegramUsername').value = 'testuser';
+      tasksCompleted.telegram = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Telegram join simulated successfully!");
+    }
+    
+    function simulateRetweet() {
+      tasksCompleted.retweet = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert("Retweet simulated successfully!");
+    }
+    
+    function resetTasks() {
+      tasksCompleted = {
+        twitter: false,
+        telegram: false,
+        retweet: false
+      };
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      document.getElementById('twitterUsername').value = '';
+      document.getElementById('telegramUsername').value = '';
+      document.getElementById('twitterUsername').disabled = false;
+      document.getElementById('telegramUsername').disabled = false;
+      updateTaskUI();
+      alert("Tasks reset successfully!");
+    }
+
+    // Airdrop claim function
+    async function claimAirdrop() {
+      const email = document.getElementById('email').value;
+      const walletAddress = document.getElementById('walletAddress').value;
+      
+      if (!walletAddress) {
+        showWalletError("Please connect your wallet first");
+        return;
+      }
+      
+      if (!email) {
+        showWalletError("Please enter your email address");
+        return;
+      }
+      
+      try {
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        
+        const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.telegram || tasksCompleted.retweet;
+        
+        if (!anyTaskCompleted) {
+          throw new Error("Please complete at least one task to claim the airdrop");
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        let bonusTokens = 0;
+        if (tasksCompleted.twitter) bonusTokens += 1000;
+        if (tasksCompleted.telegram) bonusTokens += 1000;
+        if (tasksCompleted.retweet) bonusTokens += 3000;
+        
+        alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      } catch (error) {
+        console.error("Airdrop error:", error);
+        showWalletError(error.message || "Airdrop claim failed");
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Claim Airdrop';
+      }
+    }
+
+    // Toggle dark mode function
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = !html.classList.contains('dark');
+      
+      html.classList.toggle('dark', isDark);
+      localStorage.setItem('darkMode', isDark);
+      
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+    }
+  </script>
+</body>
+</html>
