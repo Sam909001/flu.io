@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Airdrop</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="icon" href="fluffi.jpg" type="image/jpeg">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🦊</text></svg>">
   
   <!-- CSS Libraries -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,6 +17,7 @@
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
       color: #1a1a1a;
       min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
     .dark {
@@ -401,6 +401,63 @@
     .airdrop-section {
       order: 2;
     }
+    
+    /* Wallet icon SVGs */
+    .wallet-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: white;
+      overflow: hidden;
+    }
+    
+    .dark .wallet-icon {
+      background: #374151;
+    }
+    
+    /* Fixed wallet images */
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    
+    /* Animation for airdrop claim */
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      animation: confetti 3s ease-out forwards;
+      z-index: 10000;
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 640px) {
+      .tasks-section .flex {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .username-input, .verify-btn {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+      
+      .timer-digit {
+        min-width: 50px;
+        padding: 6px;
+      }
+    }
   </style>
 </head>
 
@@ -408,7 +465,14 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10 logo-float" width="40" height="40">
+      <div class="w-10 h-10 logo-float flex items-center justify-center rounded-full bg-white">
+        <svg width="30" height="30" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="#FFC0CB" />
+          <circle cx="35" cy="40" r="8" fill="#333" />
+          <circle cx="65" cy="40" r="8" fill="#333" />
+          <path d="M35 70 Q50 85 65 70" stroke="#333" stroke-width="5" fill="none" />
+        </svg>
+      </div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI Airdrop
       </h1>
@@ -426,7 +490,7 @@
   <main class="p-6 mx-auto w-full max-w-2xl">
     <div class="text-center mb-8">
       <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
-      <p class="text-gray-800 dark:text-gray-500">Claim your free FLUFFI tokens by completing simple tasks</p>
+      <p class="text-gray-600 dark:text-gray-300">Claim your free FLUFFI tokens by completing simple tasks</p>
     </div>
     
     <!-- Airdrop Status -->
@@ -452,7 +516,7 @@
         
         <div>
           <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
-          <div class="flex gap-4 justify-center">
+          <div class="flex flex-wrap gap-4 justify-center">
             <div class="timer-digit">
               <div id="days" class="text-2xl font-mono font-bold">07</div>
               <div class="text-sm text-gray-500">Days</div>
@@ -482,78 +546,80 @@
     <!-- Top Referrals Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h3 class="text-xl font-semibold mb-4">Top Referrals</h3>
-      <table class="referral-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Wallet Address</th>
-            <th>Referrals</th>
-            <th>Bonus</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="referral-rank">1</td>
-            <td>0x8a4...3f2d</td>
-            <td>248</td>
-            <td>24,800 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">2</td>
-            <td>0x7b2...9e1c</td>
-            <td>187</td>
-            <td>18,700 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">3</td>
-            <td>0x5f9...4a3b</td>
-            <td>156</td>
-            <td>15,600 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">4</td>
-            <td>0x3c7...8d5a</td>
-            <td>132</td>
-            <td>13,200 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">5</td>
-            <td>0x2e6...7c49</td>
-            <td>98</td>
-            <td>9,800 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">6</td>
-            <td>0x1d5...6b38</td>
-            <td>76</td>
-            <td>7,600 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">7</td>
-            <td>0x9f4...5a27</td>
-            <td>65</td>
-            <td>6,500 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">8</td>
-            <td>0x8e3...4916</td>
-            <td>54</td>
-            <td>5,400 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">9</td>
-            <td>0x7d2...3805</td>
-            <td>43</td>
-            <td>4,300 FLUFFI</td>
-          </tr>
-          <tr>
-            <td class="referral-rank">10</td>
-            <td>0x6c1...2f94</td>
-            <td>32</td>
-            <td>3,200 FLUFFI</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="referral-table w-full">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Wallet Address</th>
+              <th>Referrals</th>
+              <th>Bonus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="referral-rank">1</td>
+              <td>0x8a4...3f2d</td>
+              <td>248</td>
+              <td>24,800 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">2</td>
+              <td>0x7b2...9e1c</td>
+              <td>187</td>
+              <td>18,700 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">3</td>
+              <td>0x5f9...4a3b</td>
+              <td>156</td>
+              <td>15,600 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">4</td>
+              <td>0x3c7...8d5a</td>
+              <td>132</td>
+              <td>13,200 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">5</td>
+              <td>0x2e6...7c49</td>
+              <td>98</td>
+              <td>9,800 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">6</td>
+              <td>0x1d5...6b38</td>
+              <td>76</td>
+              <td>7,600 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">7</td>
+              <td>0x9f4...5a27</td>
+              <td>65</td>
+              <td>6,500 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">8</td>
+              <td>0x8e3...4916</td>
+              <td>54</td>
+              <td>5,400 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">9</td>
+              <td>0x7d2...3805</td>
+              <td>43</td>
+              <td>4,300 FLUFFI</td>
+            </tr>
+            <tr>
+              <td class="referral-rank">10</td>
+              <td>0x6c1...2f94</td>
+              <td>32</td>
+              <td>3,200 FLUFFI</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     
     <!-- Reordered sections container -->
@@ -563,42 +629,42 @@
         <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
         
         <div class="space-y-4">
-          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <div class="flex items-center">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex flex-wrap items-center gap-2">
               <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task1" class="ml-3 text-gray-700 dark:text-gray-300">
+              <label for="task1" class="text-gray-700 dark:text-gray-300">
                 Follow us on Twitter
               </label>
               <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
               <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
-              <span id="twitterStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+              <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
           </div>
           
-          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <div class="flex items-center">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex flex-wrap items-center gap-2">
               <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task2" class="ml-3 text-gray-700 dark:text-gray-300">
+              <label for="task2" class="text-gray-700 dark:text-gray-300">
                 Join our Telegram
               </label>
               <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
               <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
-              <span id="telegramStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+              <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+1,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
           </div>
           
-          <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <div class="flex items-center">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div class="flex flex-wrap items-center gap-2">
               <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task3" class="ml-3 text-gray-700 dark:text-gray-300">
+              <label for="task3" class="text-gray-700 dark:text-gray-300">
                 Like & Retweet our pinned tweet
               </label>
               <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
-              <span id="retweetStatus" class="text-sm task-incomplete ml-2">(Not verified)</span>
+              <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">+3,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+3,000 FLUFFI</span>
           </div>
         </div>
       </div>
@@ -620,7 +686,7 @@
                   class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
           </div>
 
-          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg">
+          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center">
             Claim Airdrop
           </button>
         </form>
@@ -704,13 +770,10 @@
   </div>
 
   <!-- JavaScript Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
   <script>
     // Global variables
-    let walletConnectProvider = null;
     let userWalletAddress = null;
     let tasksCompleted = {
       twitter: false,
@@ -864,11 +927,6 @@
 
     function closeWalletConnectModal() {
       document.getElementById('walletConnectModal').classList.remove('active');
-      
-      if (walletConnectProvider && !userWalletAddress) {
-        walletConnectProvider.disconnect();
-        walletConnectProvider = null;
-      }
     }
 
     async function connectWallet(walletType) {
@@ -942,42 +1000,15 @@
           }
         }
         else if (walletType === 'walletconnect') {
-          // Initialize WalletConnect provider
-          walletConnectProvider = new WalletConnectProvider.default({
-            rpc: {
-              1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-              56: "https://bsc-dataseed.binance.org/",
-              137: "https://polygon-rpc.com/"
-            },
-            bridge: "https://bridge.walletconnect.org",
-            qrcode: false
-          });
+          // Simulate WalletConnect flow with QR code
+          const fakeUri = "wc:demo-connection-1234";
+          openWalletConnectModal(fakeUri);
 
-          try {
-            // Subscribe to events
-            walletConnectProvider.on("display_uri", (err, payload) => {
-              const uri = payload.params[0];
-              openWalletConnectModal(uri);
-            });
-
-            walletConnectProvider.on("connect", (error, payload) => {
-              if (error) throw error;
-              const { accounts } = payload.params[0];
-              closeWalletConnectModal();
-              handleWalletConnection(accounts[0]);
-            });
-
-            walletConnectProvider.on("disconnect", (error) => {
-              if (error) throw error;
-              disconnectWallet();
-            });
-
-            // Enable session (triggers display_uri event)
-            await walletConnectProvider.enable();
-          } catch (error) {
-            console.error("WalletConnect error:", error);
-            showWalletError("Failed to connect via WalletConnect");
-          }
+          // Simulate connection after 2 seconds
+          setTimeout(() => {
+            closeWalletConnectModal();
+            handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
+          }, 2000);
         }
         else if (walletType === 'phantom') {
           if (isMobile()) {
@@ -1032,11 +1063,6 @@
     }
 
     function disconnectWallet() {
-      if (walletConnectProvider) {
-        walletConnectProvider.disconnect();
-        walletConnectProvider = null;
-      }
-      
       userWalletAddress = null;
       
       const walletButtons = document.getElementById('walletButtons');
@@ -1053,7 +1079,18 @@
     }
 
     function showWalletError(message) {
-      alert(message);
+      // Create error element
+      const errorElement = document.createElement('div');
+      errorElement.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+      errorElement.textContent = message;
+      
+      // Add to document
+      document.body.appendChild(errorElement);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        errorElement.remove();
+      }, 3000);
     }
 
     // Task verification functions
@@ -1066,8 +1103,6 @@
         return;
       }
       
-      // In a real implementation, you would call your backend API to verify the follow
-      // This is a simulation that would be replaced with actual API calls
       try {
         // Show loading state
         const button = document.getElementById('verifyTwitterBtn');
@@ -1077,9 +1112,8 @@
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // For demo purposes, we'll assume verification succeeded
-        // In production, you would check the API response
-        const verificationSuccess = true; // Replace with actual verification
+        // For demo purposes, assume verification succeeded
+        const verificationSuccess = true;
         
         if (verificationSuccess) {
           tasksCompleted.twitter = true;
@@ -1115,7 +1149,7 @@
         
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        const verificationSuccess = true; // Replace with actual verification
+        const verificationSuccess = true;
         
         if (verificationSuccess) {
           tasksCompleted.telegram = true;
@@ -1154,7 +1188,7 @@
           // Simulate verification
           await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const verificationSuccess = true; // Replace with actual verification
+          const verificationSuccess = true;
           
           if (verificationSuccess) {
             tasksCompleted.retweet = true;
@@ -1253,6 +1287,28 @@
       alert("Tasks reset successfully!");
     }
 
+    // Confetti effect
+    function createConfetti() {
+      const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+      
+      for (let i = 0; i < 150; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '100vh';
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+        document.body.appendChild(confetti);
+        
+        // Remove confetti after animation
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+    }
+
     // Airdrop claim function
     async function claimAirdrop() {
       const email = document.getElementById('email').value;
@@ -1287,6 +1343,7 @@
         if (tasksCompleted.telegram) bonusTokens += 1000;
         if (tasksCompleted.retweet) bonusTokens += 3000;
         
+        createConfetti();
         alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
