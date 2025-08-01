@@ -704,6 +704,24 @@
       animation: confetti 3s ease-out forwards;
       z-index: 10000;
     }
+     /* ADDED FIXES */
+    .dark .guide-section {
+      background: #1f2937 !important;
+      color: #f0f0f0 !important;
+      border: 1px solid #374151;
+    }
+    
+    .dark .guide-section h2,
+    .dark .guide-section h3,
+    .dark .guide-section li {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark .wallet-modal-content,
+    .dark .help-modal-content {
+      background: #1f2937 !important;
+      color: #f0f0f0 !important;
+    }
   </style>
 </head>
 
@@ -711,7 +729,9 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 logo-float flex items-center justify-center rounded-full bg-white">
+      <div class="w-10 h-10 logo-float flex items-center justify-center rounded-full bg-white dark:bg-gray-700">
+        <img src="https://i.imgur.com/xyz123.jpg" alt="FLUFFI Logo" class="w-8 h-8 rounded-full">
+        </div>
         <svg width="30" height="30" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="45" fill="#FFC0CB" />
           <circle cx="35" cy="40" r="8" fill="#333" />
@@ -1008,9 +1028,9 @@
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
       </div>
-      <div class="wallet-option" onclick="connectWallet('phantom')">
+     <div class="wallet-option" onclick="connectWallet('phantom')">
         <div class="flex items-center w-full">
-          <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom">
+          <img src="https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/62f5d1d6a8d5a56f5d1f3d0a_phantom-icon-blue.png" alt="Phantom">
           <span class="ml-3">Phantom</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
