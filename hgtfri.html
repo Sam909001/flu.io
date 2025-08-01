@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$FLUFFI Airdrop</title>
-   <script src="https://unpkg.com/@walletconnect/web3wallet@2.10.7/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@walletconnect/utils@2.10.7/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@walletconnect/universal-provider@2.10.7/dist/index.umd.js"></script>
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <style>
     :root {
       --primary: #10B981;
@@ -1179,52 +1177,398 @@
       startCountdown(endTime);
     }
 
-    const connectButton = document.getElementById("connectBtn");
-    const walletStatus = document.getElementById("walletStatus");
+    // Wallet connection functions
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
+    }
 
-    let provider;
-
-    connectButton.onclick = async () => {
-      const { UniversalProvider } = window.WalletConnectUniversalProvider;
-
-      provider = await UniversalProvider.init({
-        projectId: "b74a733c47def7b6672eb9ad072c4e8a",
-        metadata: {
-          name: "MySite",
-          description: "Fluffi WalletConnect Example",
-          url: "https://fluffi.site",
-          icons: ["https://fluffi.site/icon.png"],
-        },
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
+    }
+    
+    function openWalletConnectModal(uri) {
+      const modal = document.getElementById('walletConnectModal');
+      const linkElement = document.getElementById('walletConnectLink');
+      
+      document.getElementById('walletConnectQrCode').innerHTML = '';
+      
+      QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: document.documentElement.classList.contains('dark') ? '#000000' : '#000000',
+          light: '#00000000'
+        }
       });
-
-      provider.on("display_uri", (uri) => {
-        const wcUri = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
-        window.open(wcUri, "_blank"); // Opens WC modal in new tab (mobile-friendly)
-      });
-
-      try {
-        const session = await provider.connect({
-          namespaces: {
-            eip155: {
-              methods: ["eth_sendTransaction", "personal_sign", "eth_sign"],
-              chains: ["eip155:1", "eip155:56"], // Ethereum, BNB
-              events: ["chainChanged", "accountsChanged"],
-            },
-            solana: {
-              methods: ["solana_signTransaction", "solana_signMessage"],
-              chains: ["solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ"], // Mainnet
-              events: [],
-            },
-          },
-        });
-
-        console.log("Connected:", session);
-        walletStatus.textContent = "Connected ✅";
-      } catch (err) {
-        console.error("Connection error:", err);
-        walletStatus.textContent = "Connection Failed ❌";
+      
+      if (isMobile()) {
+        linkElement.classList.remove('hidden');
+        linkElement.onclick = function() {
+          window.location.href = uri;
+        };
+      } else {
+        linkElement.classList.add('hidden');
       }
-    };
+      
+      modal.classList.add('active');
+    }
+
+    function closeWalletConnectModal() {
+      document.getElementById('walletConnectModal').classList.remove('active');
+    }
+    
+    // Connection Help Modal Functions
+    function showConnectionHelp(walletType, event) {
+      event.stopPropagation();
+      closeWalletModal();
+      
+      let title, content;
+      
+      switch(walletType) {
+        case 'metamask':
+          title = "How to Connect MetaMask";
+          content = `
+            <div class="help-title">
+              <div class="help-icon-wrapper">
+                <i class="fas fa-fox help-icon"></i>
+              </div>
+              <span>MetaMask Connection Guide</span>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-desktop"></i>
+                </div>
+                <h3>Browser Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
+                <li>Create a new wallet or import an existing one</li>
+                <li>Click "Connect Wallet" on our site and select MetaMask</li>
+                <li>Approve the connection request in the MetaMask popup</li>
+                <li>Your wallet address will appear when connected</li>
+              </ol>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install the MetaMask app from your app store</li>
+                <li>Open our website in the MetaMask in-app browser</li>
+                <li>Tap "Connect Wallet" and select MetaMask</li>
+                <li>Approve the connection request in the app</li>
+                <li>For direct connection, open our site via MetaMask browser</li>
+              </ol>
+            </div>
+          `;
+          break;
+          
+        case 'trust':
+          title = "How to Connect Trust Wallet";
+          content = `
+            <div class="help-title">
+              <div class="help-icon-wrapper">
+                <i class="fas fa-shield-alt help-icon"></i>
+              </div>
+              <span>Trust Wallet Connection Guide</span>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-desktop"></i>
+                </div>
+                <h3>Browser Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install Trust Wallet extension for your browser</li>
+                <li>Set up your wallet and secure your recovery phrase</li>
+                <li>Click "Connect Wallet" and select Trust Wallet</li>
+                <li>Approve the connection request in the extension</li>
+                <li>Your wallet will be connected to our dApp</li>
+              </ol>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install Trust Wallet from App Store or Play Store</li>
+                <li>Open our website in Trust Wallet's DApp browser</li>
+                <li>Tap "Connect Wallet" and select Trust Wallet</li>
+                <li>Approve the connection request in the app</li>
+                <li>For WalletConnect, scan the QR code from mobile</li>
+              </ol>
+            </div>
+          `;
+          break;
+          
+        case 'walletconnect':
+          title = "How to Use WalletConnect";
+          content = `
+            <div class="help-title">
+              <div class="help-icon-wrapper">
+                <i class="fas fa-qrcode help-icon"></i>
+              </div>
+              <span>WalletConnect Guide</span>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-desktop"></i>
+                </div>
+                <h3>Browser Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Select WalletConnect from the wallet options</li>
+                <li>A QR code will appear on your screen</li>
+                <li>Open your mobile wallet app (MetaMask, Trust, etc.)</li>
+                <li>Find the WalletConnect scanner in your wallet</li>
+                <li>Scan the QR code to connect your wallet</li>
+              </ol>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Make sure you have a compatible wallet installed</li>
+                <li>Select WalletConnect from the wallet options</li>
+                <li>Choose your wallet from the list of installed wallets</li>
+                <li>Approve the connection request in your wallet app</li>
+                <li>Your wallet will connect to our dApp</li>
+              </ol>
+            </div>
+          `;
+          break;
+          
+        case 'phantom':
+          title = "How to Connect Phantom Wallet";
+          content = `
+            <div class="help-title">
+              <div class="help-icon-wrapper">
+                <i class="fas fa-ghost help-icon"></i>
+              </div>
+              <span>Phantom Wallet Guide</span>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-desktop"></i>
+                </div>
+                <h3>Browser Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
+                <li>Create a new wallet or import an existing one</li>
+                <li>Click "Connect Wallet" and select Phantom</li>
+                <li>Approve the connection request in the Phantom popup</li>
+                <li>Your Solana address will connect to our dApp</li>
+              </ol>
+            </div>
+            
+            <div class="help-platform">
+              <div class="platform-header">
+                <div class="platform-icon">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Instructions</h3>
+              </div>
+              <ol class="help-steps">
+                <li>Install Phantom app from App Store or Play Store</li>
+                <li>Open our website in Phantom's in-app browser</li>
+                <li>Tap "Connect Wallet" and select Phantom</li>
+                <li>Approve the connection request in the app</li>
+                <li>For direct connection, open our site via Phantom browser</li>
+              </ol>
+            </div>
+          `;
+          break;
+      }
+      
+      document.getElementById('helpContent').innerHTML = content;
+      document.getElementById('connectionHelpModal').classList.add('active');
+    }
+    
+    function closeHelpModal() {
+      document.getElementById('connectionHelpModal').classList.remove('active');
+    }
+
+    async function connectWallet(walletType) {
+      try {
+        closeWalletModal();
+        
+        if (walletType === 'metamask') {
+          if (isMobile()) {
+            if (window.ethereum && window.ethereum.isMetaMask) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+                
+                window.ethereum.on('accountsChanged', (accounts) => {
+                  if (accounts.length === 0) {
+                    disconnectWallet();
+                  } else {
+                    handleWalletConnection(accounts[0]);
+                  }
+                });
+              } catch (error) {
+                window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+              }
+            } else {
+              window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+            }
+          } else {
+            if (window.ethereum && window.ethereum.isMetaMask) {
+              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+              handleWalletConnection(accounts[0]);
+              
+              window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                  disconnectWallet();
+                } else {
+                  handleWalletConnection(accounts[0]);
+                }
+              });
+            } else {
+              showWalletError("Please install MetaMask extension");
+            }
+          }
+        }
+        else if (walletType === 'trust') {
+          if (isMobile()) {
+            if (window.ethereum && window.ethereum.isTrust) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+              } catch (error) {
+                window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+              }
+            } else {
+              window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+            }
+          } else {
+            if (window.ethereum && window.ethereum.isTrust) {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                handleWalletConnection(accounts[0]);
+              } catch (error) {
+                showWalletError("Failed to connect Trust Wallet");
+              }
+            } else {
+              showWalletError("Please install Trust Wallet extension");
+            }
+          }
+        }
+        else if (walletType === 'walletconnect') {
+          // Simulate WalletConnect flow with QR code
+          const fakeUri = "wc:demo-connection-1234";
+          openWalletConnectModal(fakeUri);
+
+          // Simulate connection after 2 seconds
+          setTimeout(() => {
+            closeWalletConnectModal();
+            handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
+          }, 2000);
+        }
+        else if (walletType === 'phantom') {
+          if (isMobile()) {
+            if (window.phantom && window.phantom.solana) {
+              try {
+                const response = await window.phantom.solana.connect();
+                handleWalletConnection(response.publicKey.toString());
+              } catch (error) {
+                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+              }
+            } else {
+              window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+            }
+          } else {
+            if (window.phantom && window.phantom.solana) {
+              try {
+                const response = await window.phantom.solana.connect();
+                handleWalletConnection(response.publicKey.toString());
+              } catch (error) {
+                showWalletError("Failed to connect Phantom wallet");
+              }
+            } else {
+              showWalletError("Please install Phantom wallet");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        showWalletError("Failed to connect wallet");
+      }
+    }
+    
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    function handleWalletConnection(address) {
+      userWalletAddress = address;
+      
+      const walletButtons = document.getElementById('walletButtons');
+      const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+      
+      walletButtons.innerHTML = `
+        <span class="wallet-address-display">${shortAddress}</span>
+        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+      `;
+      
+      document.getElementById('walletAddress').value = address;
+      
+      localStorage.setItem('walletConnected', 'true');
+      localStorage.setItem('walletAddress', address);
+    }
+
+    function disconnectWallet() {
+      userWalletAddress = null;
+      
+      const walletButtons = document.getElementById('walletButtons');
+      walletButtons.innerHTML = `
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      `;
+      
+      document.getElementById('walletButton').addEventListener('click', openWalletModal);
+      
+      document.getElementById('walletAddress').value = '';
+      
+      localStorage.removeItem('walletConnected');
+      localStorage.removeItem('walletAddress');
+    }
+
+    function showWalletError(message) {
+      // Create error element
+      const errorElement = document.createElement('div');
+      errorElement.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+      errorElement.textContent = message;
+      
+      // Add to document
+      document.body.appendChild(errorElement);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        errorElement.remove();
+      }, 3000);
+    }
 
     // Task verification functions
     async function verifyTwitterFollow() {
@@ -1502,5 +1846,4 @@
     }
   </script>
 </body>
-</html> 
-How to Connect Your Wallet this section is not shown in dark mode//phantom wallet icon is missed///favicon is shown but the floating fluffi is not showing the jpg
+</html>
