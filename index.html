@@ -134,13 +134,20 @@
       color: #d1d5db !important;
     }
 
-      .logo-float {
+    /* Logo animation */
+    img[src*='fluffi.jpg'] {
       animation: fluffi-float 3s ease-in-out infinite;
+      max-width: 100%;
+      height: auto;
     }
 
     @keyframes fluffi-float {
-      0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+      0%, 100% { 
+        transform: translateY(0) scale(1) rotate(0deg); 
+      }
+      50% { 
+        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+      }
     }
 
     /* Progress bar styling */
@@ -518,8 +525,7 @@
         $FLUFFI
       </h1>
     </div>
-      <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
-      <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
       <a href="#presale" class="text-white hover:underline">Presale</a>
       <a href="#staking" class="text-white hover:underline">Staking</a>
       <a href="#faq" class="text-white hover:underline">FAQ</a>
@@ -531,7 +537,7 @@
       <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
         <span id="darkModeIcon">🌙</span>
       </button>
-     <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
   </header>
@@ -836,7 +842,7 @@ function resetTimer() {
         <h2>Our Team</h2>
         <div class="team-grid">
           <div class="team-member">
-            <h3>Adem Ulukaya</h3>
+            <h3>James Chen</h3>
             <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
           </div>
           <div class="team-member">
@@ -870,13 +876,11 @@ function resetTimer() {
       </button>
     </div>
     
-    <div class="wallet-option" onclick="connectWallet('walletconnect')">
-  <div class="flex items-center w-full">
-    <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect">
-    <span class="ml-3">WalletConnect</span>
-  </div>
-  <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
-</div>
+    <div id="walletConnectSection">
+      <div class="wallet-option" onclick="connectWalletConnect()">
+        <img src="https://docs.walletconnect.com/img/walletconnect-logo.svg" class="wallet-icon">
+        <span>WalletConnect</span>
+      </div>
       
       <div class="wallet-option" onclick="connectMetaMask()">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
@@ -1297,40 +1301,14 @@ async function connectBinanceWallet() {
         </div>
       `;
       // Show QR code + mobile buttons
-   openWalletConnectModal(wcURI);
-
-      // Simulate connection
-      setTimeout(() => {
-        closeWalletConnectModal();
-        handleWalletConnection("0x" + Math.random().toString(36).substr(2, 20));
-      }, 2000);
-    }
-                      function openWalletConnectModal(uri) {
-    const modal = document.getElementById('walletConnectModal');
-    const linkElement = document.getElementById('walletConnectLink');
-    
-    // Clear previous QR code
-    document.getElementById('walletConnectQrCode').innerHTML = '';
-    
-    // Generate proper QR code with dark/light mode support
-    const qrColor = document.documentElement.classList.contains('dark') ? 
-      { dark: "#FFFFFF", light: "#00000000" } : 
-      { dark: "#000000", light: "#00000000" };
-    
-    QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-      width: 200,
-      margin: 2,
-      color: qrColor
     });
-    
-    // Make link functional
-    linkElement.classList.remove('hidden');
-    linkElement.onclick = function() {
-      window.location.href = uri;
-    };
-    
-    modal.classList.add('active');
+
+    await walletProvider.enable();
+    // Handle connection...
+  } catch (error) {
+    console.error("Connection error:", error);
   }
+}
   </script>
     <script>
     // ===== PRESALE FUNCTIONS =====
