@@ -870,11 +870,13 @@ function resetTimer() {
       </button>
     </div>
     
-    <div id="walletConnectSection">
-      <div class="wallet-option" onclick="connectWalletConnect()">
-        <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/logo/walletconnect-logo.png" class="wallet-icon">
-        <span>WalletConnect</span>
-      </div>
+    <div class="wallet-option" onclick="connectWallet('walletconnect')">
+  <div class="flex items-center w-full">
+    <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect">
+    <span class="ml-3">WalletConnect</span>
+  </div>
+  <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
+</div>
       
       <div class="wallet-option" onclick="connectMetaMask()">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
@@ -1295,14 +1297,40 @@ async function connectBinanceWallet() {
         </div>
       `;
       // Show QR code + mobile buttons
-    });
+   openWalletConnectModal(wcURI);
 
-    await walletProvider.enable();
-    // Handle connection...
-  } catch (error) {
-    console.error("Connection error:", error);
+      // Simulate connection
+      setTimeout(() => {
+        closeWalletConnectModal();
+        handleWalletConnection("0x" + Math.random().toString(36).substr(2, 20));
+      }, 2000);
+    }
+                      function openWalletConnectModal(uri) {
+    const modal = document.getElementById('walletConnectModal');
+    const linkElement = document.getElementById('walletConnectLink');
+    
+    // Clear previous QR code
+    document.getElementById('walletConnectQrCode').innerHTML = '';
+    
+    // Generate proper QR code with dark/light mode support
+    const qrColor = document.documentElement.classList.contains('dark') ? 
+      { dark: "#FFFFFF", light: "#00000000" } : 
+      { dark: "#000000", light: "#00000000" };
+    
+    QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+      width: 200,
+      margin: 2,
+      color: qrColor
+    });
+    
+    // Make link functional
+    linkElement.classList.remove('hidden');
+    linkElement.onclick = function() {
+      window.location.href = uri;
+    };
+    
+    modal.classList.add('active');
   }
-}
   </script>
     <script>
     // ===== PRESALE FUNCTIONS =====
