@@ -1,6 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Logo Animation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .instructions h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            color: #ffd166;
+        }
+        
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        /* Floating animation */
+        .logo-float {
+            animation: fluffi-float 3s ease-in-out infinite;
+        }
+
+        @keyframes fluffi-float {
+            0%, 100% { 
+                transform: translateY(0) scale(1) rotate(0deg); 
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.05) rotate(5deg); 
+                box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            }
+        }
+        
+        .logo-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .logo-box img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .note {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-left: 4px solid #10b981;
+        }
+        
+        .note-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+            color: #10b981;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-feather-alt"></i> $FLUFFI Floating Logo Animation</h1>
+        
+        <div class="logo-container">
+            <div class="logo-box logo-float">
+                <img src="https://images.unsplash.com/photo-1614026488755-84b8b8b8b8b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" 
+                     alt="FLUFFI Logo">
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2><i class="fas fa-code"></i> How to Add to Your Page</h2>
+            
+            <ol>
+                <li><strong>Add the CSS</strong> - Copy the animation styles below to your CSS file</li>
+                <li><strong>Add the HTML structure</strong> - Use the logo container HTML with your image</li>
+                <li><strong>Customize</strong> - Adjust sizes and colors to match your design</li>
+            </ol>
+            
+            <div class="code-block">
+/* Floating animation */
+.logo-float {
+    animation: fluffi-float 3s ease-in-out infinite;
+}
+
+@keyframes fluffi-float {
+    0%, 100% { 
+        transform: translateY(0) scale(1) rotate(0deg); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    50% { 
+        transform: translateY(-20px) scale(1.05) rotate(5deg); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.logo-box {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.logo-box img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+            </div>
+            
+            <div class="code-block">
+&lt;!-- HTML Structure --&gt;
+&lt;div class="logo-container"&gt;
+    &lt;div class="logo-box logo-float"&gt;
+        &lt;img src="fluffi.jpg" alt="FLUFFI Logo"&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+            </div>
+        </div>
+        
+        <div class="note">
+            <div class="note-header">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Customization Tips</h3>
+            </div>
+            <p>Adjust the <code>translateY(-20px)</code> value to control how high the logo floats. Change <code>rotate(5deg)</code> to adjust the rotation amount. Modify the shadow values to match your design aesthetic.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo of the animation principles
+        document.addEventListener('DOMContentLoaded', function() {
+            const logo = document.querySelector('.logo-box');
+            
+            // Add interactivity
+            logo.addEventListener('mouseenter', () => {
+                logo.style.animationPlayState = 'paused';
+            });
+            
+            logo.addEventListener('mouseleave', () => {
+                logo.style.animationPlayState = 'running';
+            });
+        });
+    </script>
+</body>
+</html> this is the working floating animation that you extract it from my html and i want you to implent it in the html i will send after ///<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards.">
@@ -1792,4 +2032,4 @@ function toggleDarkMode() {
     }
   </script>
 </body>
-</html>
+</html> now i want to implent it here in the floating animation place..what to replace and what do delete
