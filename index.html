@@ -133,50 +133,54 @@
       color: #d1d5db !important;
     }
 
-    /* Floating animation */
-    .logo-float {
-      animation: fluffi-float 3s ease-in-out infinite;
-    }
+  /* Floating animation */
+.logo-float {
+  animation: fluffi-float 3s ease-in-out infinite;
+}
 
-    @keyframes fluffi-float {
-      0%, 100% { 
-        transform: translateY(0) scale(1) rotate(0deg); 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      }
-      50% { 
-        transform: translateY(-20px) scale(1.05) rotate(5deg); 
-        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-      }
-    }
+@keyframes fluffi-float {
+  0%, 100% { 
+    transform: translateY(0) scale(1) rotate(0deg); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.05) rotate(3deg); 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  }
+}
 
-    .logo-container {
-      display: flex;
-      justify-content: center;
-      margin: 2rem 0;
-    }
+/* Center container */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
 
-    .logo-box {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+/* Logo background box */
+.logo-box {
+  width: 48px;   /* smaller size like original */
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
 
-    .logo-box img {
-      width: 12px;
-      height: 12px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
+/* Logo image */
+.logo-box img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+}
 
-    .dark .logo-box {
-      background: #1f2937;
-    }
+/* Dark mode support */
+.dark .logo-box {
+  background: #1f2937;
+}
 
     /* Progress bar styling */
     .progress-bar {
