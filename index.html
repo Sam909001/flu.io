@@ -134,20 +134,49 @@
       color: #d1d5db !important;
     }
 
-    /* Logo animation */
-    img[src*='fluffi.jpg'] {
+    /* Floating animation */
+    .logo-float {
       animation: fluffi-float 3s ease-in-out infinite;
-      max-width: 100%;
-      height: auto;
     }
 
     @keyframes fluffi-float {
       0%, 100% { 
         transform: translateY(0) scale(1) rotate(0deg); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       }
       50% { 
-        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+        transform: translateY(-20px) scale(1.05) rotate(5deg); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
       }
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .logo-box {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .logo-box img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .dark .logo-box {
+      background: #1f2937;
     }
 
     /* Progress bar styling */
@@ -568,19 +597,13 @@
   </div>
 </div>
 
-    <script>
-    /* Testing function - remove in production */
-function resetTimer() {
-  localStorage.removeItem('presaleStartTime');
-  location.reload();
-}
-</script>
+    <!-- Floating Logo Animation -->
+    <div class="logo-container">
+      <div class="logo-box logo-float">
+        <img src="fluffi.jpg" alt="FLUFFI Logo">
+      </div>
+    </div>
 
-<!-- Testing button - remove in production -->
-<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
-  Reset Timer (For Testing)
-</button>
-    
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
