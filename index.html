@@ -548,9 +548,15 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
-       <div class="animate-bounce mt-2 flex justify-center">
-      <img src="fluffi.jpg" alt="Fluffi Mascot" class="w-10 h-10">
+       <!-- Floating Logo Animation -->
+    <div class="logo-container">
+      <div class="logo-box logo-float">
+        <img src="fluffi.jpg" alt="FLUFFI Logo">
+      </div>
     </div>
+      <div class="animate-bounce mt-2 flex justify-center">
+  <img src="fluffi.jpg" alt="Fluffi Mascot" class="w-16 h-16">
+</div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
       </h1>
@@ -597,13 +603,6 @@
     </div>
   </div>
 </div>
-
-    <!-- Floating Logo Animation -->
-    <div class="logo-container">
-      <div class="logo-box logo-float">
-        <img src="fluffi.jpg" alt="FLUFFI Logo">
-      </div>
-    </div>
 
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
