@@ -136,31 +136,20 @@
 
     /* Logo animation */
     img[src*='fluffi.jpg'] {
-     /* Floating animation */
-    .logo-float {
       animation: fluffi-float 3s ease-in-out infinite;
-      border-radius: 50%;
+      max-width: 100%;
+      height: auto;
     }
 
     @keyframes fluffi-float {
       0%, 100% { 
         transform: translateY(0) scale(1) rotate(0deg); 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      }
-      25% { 
-        transform: translateY(-10px) scale(1.05) rotate(5deg); 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       }
       50% { 
-        transform: translateY(0) scale(1.1) rotate(0deg); 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      }
-      75% { 
-        transform: translateY(-10px) scale(1.05) rotate(-5deg); 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        transform: translateY(-15px) scale(1.05) rotate(2deg); 
       }
     }
-  
+
     /* Progress bar styling */
     .progress-bar {
       width: 100%;
@@ -528,14 +517,10 @@
 </head>
   
 <body class="text-gray-800 dark:text-white">
-  <!-- Header with floating logo -->
+  <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
     <div class="flex items-center gap-3">
-      <img src="https://images.unsplash.com/photo-1614026488755-84b8b8b8b8b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" 
-           alt="$FLUFFI Logo" 
-           class="w-12 h-12 rounded-full logo-float border-4 border-white" 
-           width="48" 
-           height="48">
+      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10" width="40" height="40">
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
       </h1>
@@ -870,14 +855,14 @@ function resetTimer() {
     </div>
   </main>
 
-  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8">
+  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
     <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
     <div class="flex gap-4 justify-center md:justify-end">
       <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
-        <i class="fab fa-telegram text-2xl"></i>
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
       </a>
       <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
-        <i class="fab fa-twitter text-2xl"></i>
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
       </a>
     </div>
   </footer>
