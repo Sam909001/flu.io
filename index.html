@@ -891,32 +891,58 @@
     </div>
   </footer>
 
-  <!-- Wallet Modal -->
-  <div id="walletModalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+ <!-- Wallet Modal -->
+  <div id="walletModalOverlay" class="wallet-modal-overlay hidden"></div>
+  
   <div id="walletModal" class="wallet-modal hidden">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Connect Wallet</h2>
-      <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
+    <button class="close-btn" onclick="closeWalletModal()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <h2><i class="fas fa-wallet"></i> Connect Wallet</h2>
     
     <div id="walletConnectSection">
       <div class="wallet-option" onclick="connectWalletConnect()">
-        <img src="https://docs.walletconnect.com/img/walletconnect-logo.svg" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg" width="24" height="24" alt="WalletConnect">
+        </div>
         <span>WalletConnect</span>
       </div>
       
       <div class="wallet-option" onclick="connectMetaMask()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="24" height="24" alt="MetaMask">
+        </div>
         <span>MetaMask</span>
-        <span id="metamaskInstalledBadge" class="installed-badge hidden">INSTALLED</span>
+        <span id="metamaskInstalledBadge" class="installed-badge">INSTALLED</span>
       </div>
     
       <div class="wallet-option" onclick="connectTrustWallet()">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" width="24" height="24" alt="Trust Wallet">
+        </div>
         <span>Trust Wallet</span>
       </div>
+    </div>
+    
+    <div id="qrCodeContainer" class="qr-container hidden">
+      <button class="back-btn" onclick="showWalletOptions()">
+        <i class="fas fa-arrow-left"></i> Back to wallets
+      </button>
+      <h3>Scan with your wallet</h3>
+      <div id="qrCodeImage" class="my-4"></div>
+      <p class="mb-4">Scan this QR code with your mobile wallet app to connect</p>
+      
+      <div class="mobile-buttons">
+        <button onclick="openMetaMask()">
+          <i class="fab fa-chrome"></i> MetaMask
+        </button>
+        <button onclick="openTrustWallet()">
+          <i class="fas fa-mobile-alt"></i> Trust Wallet
+        </button>
+      </div>
+    </div>
+  </div>
 
       <div class="wallet-option" onclick="connectBinanceWallet()">
         <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" class="wallet-icon">
@@ -929,8 +955,13 @@
       </div>
     </div>
     
-    <div id="qrCodeContainer" class="qr-container hidden"></div>
-  </div>
+      <div id="qrCodeContainer" class="qr-container hidden">
+      <button class="back-btn" onclick="showWalletOptions()">
+        <i class="fas fa-arrow-left"></i> Back to wallets
+      </button>
+      <h3>Scan with your wallet</h3>
+      <div id="qrCodeImage" class="my-4"></div>
+      <p class="mb-4">Scan this QR code with your mobile wallet app to connect</p>
 
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
@@ -1814,6 +1845,179 @@ function toggleDarkMode() {
       const link = document.getElementById('referralLinkInput').value;
       window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
     }
+  </script>
+  <script>
+    // Global state
+    let walletProvider = null;
+    let userWalletAddress = null;
+    
+    // DOM Elements
+    const walletModal = document.getElementById('walletModal');
+    const walletModalOverlay = document.getElementById('walletModalOverlay');
+    const walletConnectSection = document.getElementById('walletConnectSection');
+    const qrCodeContainer = document.getElementById('qrCodeContainer');
+    const qrCodeImage = document.getElementById('qrCodeImage');
+    const walletStatus = document.getElementById('walletStatus');
+    const connectedAddress = document.getElementById('connectedAddress');
+    
+    // Configuration
+    const WALLETCONNECT_CONFIG = {
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+      chains: [1],
+      showQrModal: false,
+      metadata: {
+        name: "WalletConnect Demo",
+        description: "Connect to WalletConnect Demo",
+        url: window.location.href,
+        icons: ["https://example.com/logo.png"]
+      }
+    };
+    
+    // Open wallet modal
+    function openWalletModal() {
+      walletModalOverlay.classList.remove('hidden');
+      walletModal.classList.remove('hidden');
+      showWalletOptions();
+    }
+    
+    // Close wallet modal
+    function closeWalletModal() {
+      walletModalOverlay.classList.add('hidden');
+      walletModal.classList.add('hidden');
+    }
+    
+    // Show wallet options
+    function showWalletOptions() {
+      walletConnectSection.classList.remove('hidden');
+      qrCodeContainer.classList.add('hidden');
+    }
+    
+    // Show QR code
+    function showQRCode(uri) {
+      walletConnectSection.classList.add('hidden');
+      qrCodeContainer.classList.remove('hidden');
+      
+      // Generate QR code
+      qrCodeImage.innerHTML = `
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}" 
+             width="200" height="200" alt="WalletConnect QR Code">
+      `;
+    }
+    
+    // Connect with WalletConnect
+    async function connectWalletConnect() {
+      try {
+        // Initialize WalletConnect provider
+        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js');
+        
+        walletProvider = new WalletConnectProvider({
+          ...WALLETCONNECT_CONFIG,
+          qrcode: false
+        });
+        
+        // Subscribe to events
+        walletProvider.on("display_uri", (err, payload) => {
+          if (err) throw err;
+          const { uri } = payload.params[0];
+          showQRCode(uri);
+        });
+        
+        // Enable session
+        await walletProvider.enable();
+        
+        // Get accounts
+        const accounts = await walletProvider.request({ method: 'eth_accounts' });
+        userWalletAddress = accounts[0];
+        
+        // Update UI
+        updateWalletUI();
+        closeWalletModal();
+        
+        console.log("WalletConnect connection successful!", userWalletAddress);
+      } catch (error) {
+        console.error("WalletConnect error:", error);
+        alert(`WalletConnect connection failed: ${error.message}`);
+      }
+    }
+    
+    // Connect with MetaMask
+    async function connectMetaMask() {
+      try {
+        if (window.ethereum) {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          updateWalletUI();
+          closeWalletModal();
+        } else {
+          alert("MetaMask is not installed. Please install it first.");
+        }
+      } catch (error) {
+        console.error("MetaMask error:", error);
+        alert(`MetaMask connection failed: ${error.message}`);
+      }
+    }
+    
+    // Connect with Trust Wallet
+    async function connectTrustWallet() {
+      try {
+        if (window.ethereum?.isTrust) {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          updateWalletUI();
+          closeWalletModal();
+        } else {
+          alert("Trust Wallet not detected. Make sure you're using the mobile app.");
+        }
+      } catch (error) {
+        console.error("Trust Wallet error:", error);
+        alert(`Trust Wallet connection failed: ${error.message}`);
+      }
+    }
+    
+    // Open MetaMask deeplink
+    function openMetaMask() {
+      alert("Opening MetaMask app...");
+    }
+    
+    // Open Trust Wallet deeplink
+    function openTrustWallet() {
+      alert("Opening Trust Wallet app...");
+    }
+    
+    // Disconnect wallet
+    function disconnectWallet() {
+      if (walletProvider) {
+        walletProvider.disconnect();
+        walletProvider = null;
+      }
+      userWalletAddress = null;
+      walletStatus.classList.add('hidden');
+      alert("Wallet disconnected successfully!");
+    }
+    
+    // Update wallet UI
+    function updateWalletUI() {
+      if (userWalletAddress) {
+        walletStatus.classList.remove('hidden');
+        connectedAddress.textContent = userWalletAddress;
+      }
+    }
+    
+    // Demo functions
+    function demoQR() {
+      openWalletModal();
+      showQRCode("wc:8a5e5bdc-a0e4-47...@2?relay-protocol=irn&symKey=51e...");
+    }
+    
+    function showSecurityInfo() {
+      alert("WalletConnect uses state-of-the-art encryption to secure your connection. All communications are end-to-end encrypted using session keys negotiated between your wallet and the application.");
+    }
+    
+    // Close modal when clicking outside
+    walletModalOverlay.addEventListener('click', closeWalletModal);
+    
+    // Prevent modal from closing when clicking inside
+    walletModal.addEventListener('click', e => e.stopPropagation());
   </script>
 </body>
 </html>
