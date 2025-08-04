@@ -136,20 +136,31 @@
 
     /* Logo animation */
     img[src*='fluffi.jpg'] {
+     /* Floating animation */
+    .logo-float {
       animation: fluffi-float 3s ease-in-out infinite;
-      max-width: 100%;
-      height: auto;
+      border-radius: 50%;
     }
 
     @keyframes fluffi-float {
       0%, 100% { 
         transform: translateY(0) scale(1) rotate(0deg); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      25% { 
+        transform: translateY(-10px) scale(1.05) rotate(5deg); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       }
       50% { 
-        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+        transform: translateY(0) scale(1.1) rotate(0deg); 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+      75% { 
+        transform: translateY(-10px) scale(1.05) rotate(-5deg); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       }
     }
-
+  
     /* Progress bar styling */
     .progress-bar {
       width: 100%;
