@@ -136,19 +136,19 @@
 
    /* Floating animation */
     .logo-float {
-      animation: fluffi-float 15s ease-in-out infinite;
+      animation: fluffi-float 8s ease-in-out infinite;
     }
 
-    @keyframes fluffi-float {
-      0%, 100% { 
-        transform: translateY(0) scale(1) rotate(0deg); 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      }
-      50% { 
-        transform: translateY(-20px) scale(1.05) rotate(5deg); 
-        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-      }
-    }
+   @keyframes fluffi-float {
+  0%, 100% { 
+    transform: translateY(0) scale(1) rotate(0deg); 
+    box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+  }
+  50% { 
+    transform: translateY(-8px) scale(1.02) rotate(1deg); 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+}
         /* Logo styling */
     .logo-container {
       display: flex;
