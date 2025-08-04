@@ -134,20 +134,49 @@
       color: #d1d5db !important;
     }
 
-    /* Logo animation */
-    img[src*='fluffi.jpg'] {
+   /* Floating animation */
+    .logo-float {
       animation: fluffi-float 3s ease-in-out infinite;
-      max-width: 100%;
-      height: auto;
     }
 
     @keyframes fluffi-float {
       0%, 100% { 
         transform: translateY(0) scale(1) rotate(0deg); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       }
       50% { 
-        transform: translateY(-15px) scale(1.05) rotate(2deg); 
+        transform: translateY(-20px) scale(1.05) rotate(5deg); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
       }
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .logo-box {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .logo-box img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .dark .logo-box {
+      background: #1f2937;
     }
 
     /* Progress bar styling */
@@ -517,10 +546,11 @@
 </head>
   
 <body class="text-gray-800 dark:text-white">
-  <!-- Header -->
+   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-      <img src="fluffi.jpg" alt="$FLUFFI Logo" class="w-10 h-10" width="40" height="40">
+    <div class="animate-bounce mt-2 flex justify-center">
+  <img src="fluffi.jpg" alt="Fluffi Mascot" class="w-12 h-12">
+</div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
       </h1>
