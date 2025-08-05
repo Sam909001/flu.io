@@ -66,6 +66,11 @@
   width: 32px;
   height: 32px;
   margin-right: 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .installed-badge {
   background: #10B981;
@@ -347,11 +352,21 @@
 
     .team-grid {
       display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 30px;
     }
 
     .team-member {
       text-align: center;
+      background: rgba(249, 249, 249, 0.9);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .dark .team-member {
+      background: rgba(39, 39, 42, 0.8);
     }
 
     .team-member img {
@@ -360,6 +375,7 @@
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #28a745;
+      margin: 0 auto;
       filter: grayscale(0%) contrast(110%);
     }
 
@@ -386,6 +402,11 @@
       font-size: 1rem;
       line-height: 1.5;
       margin-bottom: 10px;
+      color: #555;
+    }
+    
+    .dark .team-member p {
+      color: #d1d5db;
     }
 
     .team-member a i {
@@ -397,7 +418,8 @@
       transition: transform 0.3s;
     }
     .team-member:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
     .about-content {
@@ -491,6 +513,10 @@
         margin: 1rem;
         max-width: calc(100% - 2rem);
       }
+      
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
     }
     
     /* Accessibility improvements */
@@ -535,6 +561,15 @@
 #walletModalOverlay {
   transition: opacity 0.3s;
 }
+
+/* QR code container */
+.qr-wrapper {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
   </style>
 
 </head>
@@ -544,9 +579,9 @@
  <header class="bg-green-600 shadow sticky top-0 z-10 px-4 py-3">
   <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between">
     <div class="flex items-center gap-3">
-      <!-- Logo + Title -->
-      <div class="animate-bounce">
-        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-11 h-11 rounded-full">
+      <!-- Logo + Title with improved floating animation -->
+      <div class="logo-container logo-float">
+        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-10 h-10 rounded-full">
       </div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
@@ -568,7 +603,8 @@
       <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
       <span id="walletAddress" class="hidden"></span>
     </nav>
-  </header>
+  </div>
+</header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
    <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
@@ -865,17 +901,33 @@ function resetTimer() {
         </div>
       </section>
 
-      <!-- Team Section -->
+      <!-- Team Section with two new members -->
       <section id="team">
         <h2>Our Team</h2>
         <div class="team-grid">
           <div class="team-member">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" alt="James Chen">
             <h3>James Chen</h3>
             <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
           </div>
           <div class="team-member">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" alt="Priya Patel">
             <h3>Priya Patel</h3>
             <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+          </div>
+          
+          <!-- New team member 1: Former AVAX Developer -->
+          <div class="team-member">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" alt="Marcus Johnson">
+            <h3>Marcus Johnson</h3>
+            <p>Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
+          </div>
+          
+          <!-- New team member 2: Marketing Specialist -->
+          <div class="team-member">
+            <img src="https://images.unsplash.com/photo-1548142813-c348350df52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" alt="Sophia Williams">
+            <h3>Sophia Williams</h3>
+            <p>Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
           </div>
         </div>
       </section>
@@ -905,34 +957,75 @@ function resetTimer() {
     </div>
     
     <div id="walletConnectSection">
+      <!-- Fixed WalletConnect icon -->
       <div class="wallet-option" onclick="connectWalletConnect()">
-        <img src="https://docs.walletconnect.com/img/walletconnect-logo.svg" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg" width="24" height="24" alt="WalletConnect">
+        </div>
         <span>WalletConnect</span>
       </div>
       
       <div class="wallet-option" onclick="connectMetaMask()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="24" height="24" alt="MetaMask">
+        </div>
         <span>MetaMask</span>
         <span id="metamaskInstalledBadge" class="installed-badge hidden">INSTALLED</span>
       </div>
     
       <div class="wallet-option" onclick="connectTrustWallet()">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" width="24" height="24" alt="Trust Wallet">
+        </div>
         <span>Trust Wallet</span>
       </div>
 
+      <!-- Fixed Phantom Wallet logo -->
+      <div class="wallet-option" onclick="connectPhantom()">
+        <div class="wallet-icon">
+          <img src="https://phantom.app/img/phantom-logo-purple.png" width="24" height="24" alt="Phantom Wallet">
+        </div>
+        <span>Phantom Wallet</span>
+      </div>
+
       <div class="wallet-option" onclick="connectBinanceWallet()">
-        <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" width="24" height="24" alt="Binance Wallet">
+        </div>
         <span>Binance Wallet</span>
       </div>
 
       <div class="wallet-option" onclick="connectCoinbaseWallet()">
-        <img src="https://coinbase.com/favicon.ico" class="wallet-icon">
+        <div class="wallet-icon">
+          <img src="https://coinbase.com/favicon.ico" width="24" height="24" alt="Coinbase Wallet">
+        </div>
         <span>Coinbase Wallet</span>
       </div>
     </div>
     
-    <div id="qrCodeContainer" class="qr-container hidden"></div>
+    <div id="qrCodeContainer" class="qr-container hidden">
+      <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
+        ← Back to wallets
+      </button>
+      <h3 class="mb-4">Scan with your wallet</h3>
+      <div class="qr-wrapper">
+        <img id="qrImage" width="200" height="200" class="mx-auto">
+      </div>
+      
+      <div class="mt-4">
+        <p class="mb-2">Or open directly in:</p>
+        <div class="flex justify-center gap-3">
+          <button onclick="window.location.href='https://metamask.app.link/wc?uri=' + encodeURIComponent(currentWCUri)" 
+                  class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded">
+            MetaMask
+          </button>
+          <button onclick="window.location.href='https://link.trustwallet.com/wc?uri=' + encodeURIComponent(currentWCUri)" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+            Trust Wallet
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- JavaScript Libraries -->
@@ -984,6 +1077,7 @@ function resetTimer() {
     let ethersProvider = null;
     let userWalletAddress = null;
     let tokenChart = null;
+    let currentWCUri = ''; // Store WalletConnect URI
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
@@ -1052,60 +1146,47 @@ function resetTimer() {
   }
 }
     
+    // Fixed WalletConnect function
     async function connectWalletConnect() {
-  try {
-    walletProvider = new WalletConnectProvider.default(WALLETCONNECT_CONFIG);
-    
-    walletProvider.on("display_uri", (uri) => {
-      document.getElementById('walletConnectSection').classList.add('hidden');
-      document.getElementById('qrCodeContainer').classList.remove('hidden');
-      
-      // Enhanced QR code display with mobile deep links
-      const qrContent = `
-        <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
-          ← Back to wallets
-        </button>
-        <h3 class="mb-4">Scan with your wallet</h3>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}" 
-             width="200" height="200" class="mx-auto mb-4">
+      try {
+        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
         
-        <div class="mt-4">
-          <p class="mb-2">Or open directly in:</p>
-          <div class="flex justify-center gap-3">
-            <button onclick="window.location.href='https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}'" 
-                    class="bg-orange-500 text-white px-3 py-1 rounded">
-              MetaMask
-            </button>
-            <button onclick="window.location.href='https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}'" 
-                    class="bg-blue-500 text-white px-3 py-1 rounded">
-              Trust Wallet
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.getElementById('qrCodeContainer').innerHTML = qrContent;
-    });
-    
-    await walletProvider.enable();
-    const accounts = await walletProvider.request({ method: 'eth_accounts' });
-    userWalletAddress = accounts[0];
-    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-    
-    updateWalletUI();
-    closeWalletModal();
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    showWalletError("Connection failed: " + error.message);
-  }
-}
+        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
+        
+        // Subscribe to events
+        walletProvider.on("display_uri", (err, payload) => {
+          const { uri } = payload.params[0];
+          currentWCUri = uri;
+          
+          document.getElementById('walletConnectSection').classList.add('hidden');
+          document.getElementById('qrCodeContainer').classList.remove('hidden');
+          
+          // Generate QR code
+          document.getElementById('qrImage').src = 
+            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+        });
+        
+        // Enable session
+        await walletProvider.enable();
+        
+        // Get accounts
+        const accounts = await walletProvider.request({ method: 'eth_accounts' });
+        userWalletAddress = accounts[0];
+        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+        
+        // Update UI
+        updateWalletUI();
+        closeWalletModal();
+      } catch (error) {
+        console.error("WalletConnect error:", error);
+        showWalletError("Connection failed: " + error.message);
+      }
+    }
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
       document.getElementById('qrCodeContainer').classList.add('hidden');
     }
-
-    // Other wallet connection functions (Trust, Binance, Coinbase) would follow similar patterns
 
     function updateWalletUI() {
       const walletButton = document.getElementById('walletButton');
@@ -1126,7 +1207,10 @@ function resetTimer() {
     }
 
     function disconnectWallet() {
-      walletProvider = null;
+      if (walletProvider) {
+        walletProvider.disconnect();
+        walletProvider = null;
+      }
       ethersProvider = null;
       userWalletAddress = null;
       updateWalletUI();
@@ -1137,6 +1221,35 @@ function resetTimer() {
       errorElement.textContent = message;
       errorElement.classList.remove('hidden');
       setTimeout(() => errorElement.classList.add('hidden'), 5000);
+    }
+
+    // Fixed Phantom Wallet connection
+    async function connectPhantom() {
+      try {
+        if (window.phantom?.ethereum) {
+          const provider = window.phantom.ethereum;
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(provider);
+          updateWalletUI();
+          closeWalletModal();
+        } else if (window.ethereum?.isPhantom) {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+          updateWalletUI();
+          closeWalletModal();
+        } else {
+          if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+            window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}`;
+          } else {
+            window.open('https://phantom.app/', '_blank');
+          }
+        }
+      } catch (error) {
+        console.error("Phantom Wallet error:", error);
+        showWalletError("Phantom connection failed: " + error.message);
+      }
     }
 
 async function connectTrustWallet() {
@@ -1286,55 +1399,6 @@ async function connectBinanceWallet() {
     if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
       setTimeout(() => connectWalletConnect(), 1000);
     }
-  }
-}
-    
-    async function connectMobileWallet() {
-  try {
-    walletProvider = new WalletConnectProvider.default({
-      ...WALLETCONNECT_CONFIG,
-      qrModalOptions: {
-        themeMode: 'dark',
-        mobileWallets: [
-          {
-            id: 'metamask',
-            name: 'MetaMask',
-            links: {
-              native: 'metamask://wc?uri={wcUri}',
-              universal: 'https://metamask.app.link/wc?uri={wcUri}'
-            }
-          },
-          {
-            id: 'trust',
-            name: 'Trust Wallet',
-            links: {
-              native: 'trust://wc?uri={wcUri}',
-              universal: 'https://link.trustwallet.com/wc?uri={wcUri}'
-            }
-          }
-        ]
-      }
-    });
-
-    walletProvider.on("display_uri", (uri) => {
-      const encodedUri = encodeURIComponent(uri);
-      const mobileLinks = `
-        <div class="mobile-wallet-buttons">
-          <a href="metamask://wc?uri=${encodedUri}" class="metamask-button">
-            Open in MetaMask
-          </a>
-          <a href="trust://wc?uri=${encodedUri}" class="trust-button">
-            Open in Trust Wallet
-          </a>
-        </div>
-      `;
-      // Show QR code + mobile buttons
-    });
-
-    await walletProvider.enable();
-    // Handle connection...
-  } catch (error) {
-    console.error("Connection error:", error);
   }
 }
   </script>
