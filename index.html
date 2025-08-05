@@ -1087,7 +1087,36 @@ function resetTimer() {
       if (window.ethereum?.isMetaMask) {
         document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
       }
+// Add this global variable at the top of your script
+let tokenChart = null;
 
+function initTokenChart() {
+  const ctx = document.getElementById('tokenChart').getContext('2d');
+  
+  // Destroy existing chart before creating new one
+  if (tokenChart) {
+    tokenChart.destroy();
+  }
+  
+  tokenChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      // Your chart data
+    },
+    options: {
+      // Your chart options
+    }
+  });
+}
+
+// Call this whenever you need to update the chart
+function updateChartData(newData) {
+  tokenChart.data.datasets[0].data = newData;
+  tokenChart.update();
+}
+
+// Initialize chart on page load
+document.addEventListener('DOMContentLoaded', initTokenChart);
       // Initialize token chart
       initTokenChart();
 
@@ -1143,41 +1172,27 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
+   async function connectWalletConnect() {
+  try {
+    const provider = new WalletConnectProvider({
+      infuraId: "YOUR_INFURA_PROJECT_ID", // Get from infura.io
+      qrcodeModalOptions: {
+        mobileLinks: ["metamask", "trust", "rainbow"]
       }
-    }
+    });
+    
+    await provider.enable();
+    
+    // Continue with wallet connection logic
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    console.log("Connected account:", accounts[0]);
+    
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    showErrorMessage("WalletConnect failed: " + error.message);
+  }
+}
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
@@ -1221,33 +1236,41 @@ function resetTimer() {
 
     // Fixed Phantom Wallet connection
     async function connectPhantom() {
-      try {
-        if (window.phantom?.ethereum) {
-          const provider = window.phantom.ethereum;
-          const accounts = await provider.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          ethersProvider = new ethers.providers.Web3Provider(provider);
-          updateWalletUI();
-          closeWalletModal();
-        } else if (window.ethereum?.isPhantom) {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userWalletAddress = accounts[0];
-          ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-          updateWalletUI();
-          closeWalletModal();
-        } else {
-          if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-            window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}`;
-          } else {
-            window.open('https://phantom.app/', '_blank');
-          }
-        }
-      } catch (error) {
-        console.error("Phantom Wallet error:", error);
-        showWalletError("Phantom connection failed: " + error.message);
-      }
+  try {
+    if (!window.phantom?.ethereum) {
+      throw new Error("Phantom wallet not detected");
     }
 
+    const accounts = await window.phantom.ethereum.request({ 
+      method: "eth_requestAccounts" 
+    });
+    
+    console.log("Connected account:", accounts[0]);
+    
+  } catch (error) {
+    let message = "Phantom connection error";
+    
+    if (error.message.includes("rejected")) {
+      message = "Connection rejected - please approve in Phantom wallet";
+    } else if (error.message.includes("detected")) {
+      message = "Phantom wallet not found - please install it first";
+    }
+    
+    console.error("Phantom error:", error);
+    showErrorMessage(message);
+  }
+}
+
+// UI function to show errors
+function showErrorMessage(text) {
+  const errorEl = document.getElementById('wallet-error');
+  errorEl.textContent = text;
+  errorEl.style.display = 'block';
+  
+  setTimeout(() => {
+    errorEl.style.display = 'none';
+  }, 5000);
+}
 async function connectTrustWallet() {
   try {
     if (window.ethereum?.isTrust) {
