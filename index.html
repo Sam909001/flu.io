@@ -997,15 +997,6 @@ function resetTimer() {
         <span>Coinbase Wallet</span>
       </div>
     </div>
-    
-    <div id="qrCodeContainer" class="qr-container hidden">
-      <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
-        ← Back to wallets
-      </button>
-      <h3 class="mb-4">Scan with your wallet</h3>
-      <div class="qr-wrapper">
-        <img id="qrImage" width="200" height="200" class="mx-auto">
-      </div>
       
       <div class="mt-4">
         <p class="mb-2">Or open directly in:</p>
@@ -1024,8 +1015,9 @@ function resetTimer() {
   </div>
 
   <!-- JavaScript Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.8.0/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1035,12 +1027,17 @@ function resetTimer() {
     // Configuration
     const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
     const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-   const WALLETCONNECT_CONFIG = {
-  projectId: '847bc5b9b1e3b0dfd4a102b191bb0f7d',
+const WALLETCONNECT_CONFIG = {
+  projectId: 'b74a733c47def7b6672eb9ad072c4e8a', // Register at walletconnect.com
   chains: [56], // BSC Mainnet
-  showQrModal: false,
+  showQrModal: true, // This enables the built-in modal
   qrModalOptions: {
     themeMode: 'dark',
+    explorerRecommendedWalletIds: [
+      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+      '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0' // Trust Wallet
+    ],
+    explorerExcludedWalletIds: 'ALL',
     mobileWallets: [
       {
         id: 'metamask',
@@ -1059,7 +1056,8 @@ function resetTimer() {
         }
       }
     ]
-  },
+  }
+};
   metadata: {
     name: "FLUFFI Presale",
     description: "Connect to participate in FLUFFI presale",
@@ -1142,41 +1140,36 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
-      }
-    }
+async function connectWalletConnect() {
+  try {
+    // Import the provider dynamically
+    const { EthereumProvider } = await import('@walletconnect/ethereum-provider');
+    
+    // Initialize the provider
+    walletProvider = await EthereumProvider.init({
+      projectId: WALLETCONNECT_CONFIG.projectId,
+      chains: WALLETCONNECT_CONFIG.chains,
+      showQrModal: WALLETCONNECT_CONFIG.showQrModal,
+      qrModalOptions: WALLETCONNECT_CONFIG.qrModalOptions
+    });
+    
+    // Enable session (triggers QR modal)
+    await walletProvider.enable();
+    
+    // Get accounts
+    const accounts = await walletProvider.request({ method: 'eth_accounts' });
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+    
+    // Update UI
+    updateWalletUI();
+    closeWalletModal();
+    
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    showWalletError("Connection failed: " + error.message);
+  }
+}
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
@@ -1426,7 +1419,7 @@ async function connectBinanceWallet() {
 
     else if (walletType === 'walletconnect') {
   const provider = new WalletConnectProvider.default({
-    projectId: "847bc5b9b1e3b0dfd4a102b191bb0f7d",
+    projectId: "b74a733c47def7b6672eb9ad072c4e8a",
     chains: [56],
     showQrModal: true,
     rpcMap: {
