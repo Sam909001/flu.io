@@ -1424,26 +1424,26 @@ async function connectBinanceWallet() {
         alert('Phantom wallet not found');
       }
 
-    } else if (walletType === 'walletconnect') {
-      const provider = new WalletConnectProvider.default({
-        projectId: "b74a733c47def7b6672eb9ad072c4e8a",
-        showQrModal: true,
-        rpcMap: {
-          56: "https://bsc-dataseed.binance.org"
-        },
-      });
+    else if (walletType === 'walletconnect') {
+  const provider = new WalletConnectProvider.default({
+    projectId: "b74a733c47def7b6672eb9ad072c4e8a",
+    chains: [56],
+    showQrModal: true,
+    rpcMap: {
+      56: "https://bsc-dataseed.binance.org"
+    },
+  });
 
-      try {
-        await provider.enable();
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        const address = await signer.getAddress();
-        console.log('WalletConnect connected:', address);
-      } catch (error) {
-        console.error('WalletConnect connection error:', error);
-      }
-    }
+  try {
+    await provider.enable();
+    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    const signer = ethersProvider.getSigner();
+    const address = await signer.getAddress();
+    console.log('WalletConnect connected:', address);
+  } catch (error) {
+    console.error('WalletConnect error:', error);
   }
+}
 </script>
     <script>
     // ===== PRESALE FUNCTIONS =====
