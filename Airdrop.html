@@ -1051,15 +1051,27 @@
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
       </div>
-     <div class="wallet-option" onclick="connectWallet('phantom')">
-        <div class="flex items-center w-full">
-          <img src="https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/62f5d1d6a8d5a56f5d1f3d0a_phantom-icon-blue.png" alt="Phantom">
-          <span class="ml-3">Phantom</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
-      </div>
-    </div>
+
+      <div class="wallet-option" onclick="connectPhantom()">
+  <div class="wallet-icon">
+    <!-- Official Phantom Wallet SVG Logo -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="24" height="24" rx="6" fill="url(#phantom-gradient)"/>
+      <path d="M13.5684 8.00024H15.9999V15.0002H13.7999V13.0002C13.1999 14.0002 12.2999 14.5002 11.0999 14.5002C9.69994 14.5002 8.59994 14.0002 7.79994 13.0002C6.99994 12.0002 6.59994 10.7002 6.59994 9.10024C6.59994 7.50024 6.99994 6.20024 7.79994 5.20024C8.59994 4.20024 9.69994 3.70024 11.0999 3.70024C12.2999 3.70024 13.1999 4.20024 13.7999 5.20024V5.40024H15.9999V8.00024H13.5684ZM11.1999 12.3002C11.9999 12.3002 12.5999 12.0002 12.9999 11.4002C13.3999 10.8002 13.5999 10.0002 13.5999 9.00024C13.5999 8.00024 13.3999 7.20024 12.9999 6.60024C12.5999 6.00024 11.9999 5.70024 11.1999 5.70024C10.3999 5.70024 9.79994 6.00024 9.39994 6.60024C8.99994 7.20024 8.79994 8.00024 8.79994 9.00024C8.79994 10.00024 8.99994 10.80024 9.39994 11.40024C9.79994 12.00024 10.3999 12.3002 11.1999 12.3002Z" fill="white"/>
+      <defs>
+        <linearGradient id="phantom-gradient" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#534BB1"/>
+          <stop offset="1" stop-color="#551BF9"/>
+        </linearGradient>
+      </defs>
+    </svg>
   </div>
+  <div class="flex-1">
+    <div class="font-semibold text-gray-900 dark:text-white">Phantom</div>
+    <div class="text-sm text-gray-500 dark:text-gray-400">Multi-chain wallet</div>
+  </div>
+  <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
+</div>
 
   <!-- WalletConnect QR Code Modal -->
   <div id="walletConnectModal" class="wallet-connect-modal">
