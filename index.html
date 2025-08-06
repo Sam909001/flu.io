@@ -1435,15 +1435,16 @@ async function connectBinanceWallet() {
   });
 
   try {
-    await provider.enable();
-    const ethersProvider = new ethers.providers.Web3Provider(provider);
-    const signer = ethersProvider.getSigner();
-    const address = await signer.getAddress();
-    console.log('WalletConnect connected:', address);
-  } catch (error) {
-    console.error('WalletConnect error:', error);
+      await provider.enable();
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const signer = ethersProvider.getSigner();
+        const address = await signer.getAddress();
+        console.log('WalletConnect connected:', address);
+      } catch (error) {
+        console.error('WalletConnect error:', error);
+      }
+    }
   }
-}
 </script>
     <script>
     // ===== PRESALE FUNCTIONS =====
