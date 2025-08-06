@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <style>
     body {
       background: linear-gradient(to bottom, #fff0f5, #fff9e6);
@@ -1140,84 +1140,55 @@ function resetTimer() {
     showWalletError("MetaMask connection failed: " + error.message);
   }
 }
-    
+  </script>
     // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
-      }
-    }
-
-    function showWalletOptions() {
-      document.getElementById('walletConnectSection').classList.remove('hidden');
-      document.getElementById('qrCodeContainer').classList.add('hidden');
-    }
-
-    function updateWalletUI() {
-      const walletButton = document.getElementById('walletButton');
-      const walletStatus = document.getElementById('walletStatus');
-      const connectedAddress = document.getElementById('connectedAddress');
-      
-      if (userWalletAddress) {
-        const shortAddress = `${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}`;
-        walletButton.textContent = shortAddress;
-        walletButton.classList.add('connected');
-        walletStatus.classList.remove('hidden');
-        connectedAddress.textContent = shortAddress;
+ <script>
+  async function connectWallet(walletType) {
+    if (walletType === 'metamask') {
+      if (window.ethereum && window.ethereum.isMetaMask) {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await ethereum.request({ method: 'eth_accounts' });
+          console.log('Connected:', accounts[0]);
+        } catch (err) {
+          console.error('MetaMask connection error:', err);
+        }
       } else {
-        walletButton.textContent = 'Connect Wallet';
-        walletButton.classList.remove('connected');
-        walletStatus.classList.add('hidden');
+        alert('MetaMask not found');
+      }
+
+    } else if (walletType === 'phantom') {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          console.log('Phantom Connected:', resp.publicKey.toString());
+        } catch (err) {
+          console.error('Phantom connection error:', err);
+        }
+      } else {
+        alert('Phantom wallet not found');
+      }
+
+    } else if (walletType === 'trust' || walletType === 'walletconnect') {
+      const provider = new WalletConnectProvider.default({
+        rpc: {
+          56: "https://bsc-dataseed.binance.org/"  // BSC mainnet
+        },
+        chainId: 56
+      });
+
+      try {
+        await provider.enable(); // Opens QR modal
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        console.log('WalletConnect connected:', accounts[0]);
+      } catch (error) {
+        console.error('WalletConnect error:', error);
       }
     }
-
-    function disconnectWallet() {
-      if (walletProvider) {
-        walletProvider.disconnect();
-        walletProvider = null;
-      }
-      ethersProvider = null;
-      userWalletAddress = null;
-      updateWalletUI();
-    }
-
-    function showWalletError(message) {
-      const errorElement = document.getElementById('walletError');
-      errorElement.textContent = message;
-      errorElement.classList.remove('hidden');
-      setTimeout(() => errorElement.classList.add('hidden'), 5000);
-    }
-
+  }
+</script>
+  <script>
     // Fixed Phantom Wallet connection
     async function connectPhantom() {
       try {
