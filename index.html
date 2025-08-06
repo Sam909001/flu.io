@@ -1115,9 +1115,50 @@ function resetTimer() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
     }
 
-    async function connectWallet() {
-      openWalletModal();
+  async function connectWallet(walletType) {
+    if (walletType === 'metamask') {
+      if (window.ethereum && window.ethereum.isMetaMask) {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await ethereum.request({ method: 'eth_accounts' });
+          console.log('Connected:', accounts[0]);
+        } catch (err) {
+          console.error('MetaMask connection error:', err);
+        }
+      } else {
+        alert('MetaMask not found');
+      }
+
+    } else if (walletType === 'phantom') {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          console.log('Phantom Connected:', resp.publicKey.toString());
+        } catch (err) {
+          console.error('Phantom connection error:', err);
+        }
+      } else {
+        alert('Phantom wallet not found');
+      }
+
+    } else if (walletType === 'trust' || walletType === 'walletconnect') {
+      const provider = new WalletConnectProvider.default({
+        rpc: {
+          56: "https://bsc-dataseed.binance.org/"  // BSC mainnet
+        },
+        chainId: 56
+      });
+
+      try {
+        await provider.enable(); // Opens QR modal
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        console.log('WalletConnect connected:', accounts[0]);
+      } catch (error) {
+        console.error('WalletConnect error:', error);
+      }
     }
+  }
 
     async function connectMetaMask() {
   try {
@@ -1187,8 +1228,6 @@ function resetTimer() {
       }
     }
   }
-</script>
-  <script>
     // Fixed Phantom Wallet connection
     async function connectPhantom() {
       try {
