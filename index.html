@@ -1142,17 +1142,24 @@ const WALLETCONNECT_CONFIG = {
     // Fixed WalletConnect function
 async function connectWalletConnect() {
   try {
-    // Import the provider dynamically
-    const { EthereumProvider } = await import('@walletconnect/ethereum-provider');
+    // Close the custom modal first
+    closeWalletModal();
     
-    // Initialize the provider
-    walletProvider = await EthereumProvider.init({
-      projectId: WALLETCONNECT_CONFIG.projectId,
-      chains: WALLETCONNECT_CONFIG.chains,
-      showQrModal: WALLETCONNECT_CONFIG.showQrModal,
-      qrModalOptions: WALLETCONNECT_CONFIG.qrModalOptions
+    // Initialize WalletConnect Provider
+    const WalletConnectProvider = window.WalletConnectProvider.default;
+    walletProvider = new WalletConnectProvider({
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a', // Your WalletConnect Project ID
+      chains: [56], // BSC chain ID
+      showQrModal: true, // Use WalletConnect's built-in modal
+      qrModalOptions: {
+        themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+        explorerRecommendedWalletIds: [
+          'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+          '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0' // Trust Wallet
+        ]
+      }
     });
-    
+
     // Enable session (triggers QR modal)
     await walletProvider.enable();
     
@@ -1163,11 +1170,17 @@ async function connectWalletConnect() {
     
     // Update UI
     updateWalletUI();
-    closeWalletModal();
-    
+
+    // Handle disconnection
+    walletProvider.on("disconnect", () => {
+      disconnectWallet();
+    });
+
   } catch (error) {
     console.error("WalletConnect error:", error);
-    showWalletError("Connection failed: " + error.message);
+    showWalletError("Connection failed: " + (error.message || error.toString()));
+    // Re-open the wallet modal if connection fails
+    openWalletModal();
   }
 }
 
