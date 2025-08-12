@@ -549,34 +549,52 @@
     });
 
     // ===== WALLET FUNCTIONS =====
-    async function initializeWalletConnect() {
-        try {
-            wcProvider = await window.WalletConnectEthereum.EthereumProvider.init({
-                projectId: WALLETCONNECT_PROJECT_ID,
-                chains: [56], // BSC Mainnet
-                showQrModal: false,
-                metadata: {
-                    name: "$FLUFFI Presale",
-                    description: "Connect to participate in the $FLUFFI presale",
-                    url: window.location.host,
-                    icons: [window.location.origin + '/fluffi.jpg']
-                }
-            });
-            wcProvider.on("display_uri", (uri) => {
-                displayQrCode(uri);
-            });
-            wcProvider.on("connect", (payload) => {
-                handleConnection(wcProvider);
-            });
-            wcProvider.on("disconnect", () => {
-                disconnectWallet();
-            });
-        } catch (e) {
-            console.error("Could not initialize WalletConnect provider", e);
-            showWalletError("Could not initialize WalletConnect. Please refresh.");
+   // Replace the initializeWalletConnect function with this:
+async function initializeWalletConnect() {
+    try {
+        const { EthereumProvider } = window.WalletConnectEthereumProvider || {};
+        if (!EthereumProvider) {
+            console.warn("WalletConnect provider not available");
+            return;
         }
-    }
+        
+        wcProvider = new EthereumProvider({
+            projectId: WALLETCONNECT_PROJECT_ID,
+            chains: [56], // BSC Mainnet
+            showQrModal: false,
+            metadata: {
+                name: "$FLUFFI Presale",
+                description: "Connect to participate in the $FLUFFI presale",
+                url: window.location.host,
+                icons: [window.location.origin + '/fluffi.jpg']
+            }
+        });
 
+        wcProvider.on("display_uri", (err, payload) => {
+            if (err) {
+                console.error("WalletConnect URI error:", err);
+                return;
+            }
+            displayQrCode(payload.params[0]);
+        });
+
+        wcProvider.on("connect", () => {
+            handleConnection(wcProvider);
+        });
+
+        wcProvider.on("disconnect", () => {
+            disconnectWallet();
+        });
+
+        // Handle existing session
+        if (wcProvider.connected) {
+            await handleConnection(wcProvider);
+        }
+    } catch (e) {
+        console.error("Could not initialize WalletConnect provider", e);
+        showWalletError("Could not initialize WalletConnect. Please refresh.");
+    }
+}
     function openWalletModal() {
       document.getElementById('walletModalOverlay').classList.remove('hidden');
       document.getElementById('walletModal').classList.remove('hidden');
@@ -591,59 +609,144 @@
     }
 
     async function handleConnection(provider) {
-        ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        userWalletAddress = await signer.getAddress();
+    try {
+        // Handle both EIP-1193 providers and WalletConnect
+        let effectiveProvider = provider;
+        if (provider?.wc) {
+            // This is a WalletConnect provider
+            effectiveProvider = provider;
+        } else if (window.ethereum) {
+            // Standard EIP-1193 provider
+            effectiveProvider = window.ethereum;
+        }
+
+        ethersProvider = new ethers.providers.Web3Provider(effectiveProvider);
+        const accounts = await ethersProvider.listAccounts();
+        
+        if (accounts.length === 0) {
+            throw new Error("No accounts found");
+        }
+        
+        userWalletAddress = accounts[0];
         updateWalletUI();
         updateUserBalances();
         closeWalletModal();
+    } catch (error) {
+        console.error("Connection handling failed:", error);
+        showWalletError(error.message || "Failed to connect wallet");
     }
-
+}
     async function connectMetaMask() {
-        if (typeof window.ethereum === 'undefined') {
-            return window.open('https://metamask.io/download.html', '_blank');
-        }
-        try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleConnection(window.ethereum);
-        } catch (error) {
-            console.error("MetaMask connection failed:", error);
-            showWalletError(error.message);
-        }
+    if (typeof window.ethereum === 'undefined') {
+        window.open('https://metamask.io/download.html', '_blank');
+        showWalletError("MetaMask not detected - please install it first");
+        return;
     }
+    
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userWalletAddress = accounts[0];
+        handleConnection(window.ethereum);
+    } catch (error) {
+        handleWalletError(error);
+    }
+}
 
+async function connectTrustWallet() {
+    if (window.ethereum?.isTrust) {
+        return connectMetaMask(); // Trust uses MetaMask provider
+    }
+    showWalletError("Trust Wallet not detected - please install it first");
+}
+
+async function connectPhantom() {
+    if (window.phantom?.ethereum) {
+        try {
+            const provider = window.phantom.ethereum;
+            const accounts = await provider.request({ method: 'eth_requestAccounts' });
+            userWalletAddress = accounts[0];
+            handleConnection(provider);
+        } catch (error) {
+            handleWalletError(error);
+        }
+    } else {
+        showWalletError("Phantom Wallet not detected - please install it first");
+    }
+}
+
+async function connectBinanceWallet() {
+    if (window.BinanceChain) {
+        try {
+            const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+            userWalletAddress = accounts[0];
+            handleConnection(window.BinanceChain);
+        } catch (error) {
+            handleWalletError(error);
+        }
+    } else {
+        showWalletError("Binance Wallet not detected - please install it first");
+    }
+}
+
+async function connectCoinbaseWallet() {
+    if (window.ethereum?.isCoinbaseWallet) {
+        return connectMetaMask(); // Coinbase uses MetaMask provider
+    }
+    showWalletError("Coinbase Wallet not detected - please install it first");
+}
     async function connectWalletConnect() {
-        if (!wcProvider) {
-            showWalletError("WalletConnect is not ready. Please wait a moment and try again.");
+    if (!wcProvider) {
+        try {
+            await initializeWalletConnect();
+        } catch (e) {
+            showWalletError("WalletConnect initialization failed. Please try again.");
             return;
         }
-        try {
-            await wcProvider.connect();
-        } catch (error) {
-            console.error("WalletConnect connection failed:", error);
-            showWalletError("Could not connect with WalletConnect.");
-        }
     }
+
+    try {
+        await wcProvider.enable();
+    } catch (error) {
+        console.error("WalletConnect connection failed:", error);
+        showWalletError(error.message || "Could not connect with WalletConnect.");
+    }
+}
 
     // Connect functions for other wallets can leverage MetaMask's provider if injected
-    const connectTrustWallet = () => connectMetaMask();
-    const connectPhantom = () => connectMetaMask();
-    const connectBinanceWallet = () => connectMetaMask();
-    const connectCoinbaseWallet = () => connectMetaMask();
+     const connectMetaMask = () => connectMetaMask(); 
+    const connectTrustWallet = () => connectTrustWallet();
+    const connectPhantom = () => connectPhantom();
+    const connectBinanceWallet = () => connectBinanceWallet();
+    const connectCoinbaseWallet = () => connectCoinbaseWallet();
 
     function displayQrCode(uri) {
-      document.getElementById('walletConnectSection').classList.add('hidden');
-      document.getElementById('qrCodeContainer').classList.remove('hidden');
-      const qrCode = new QRCodeStyling({
-          width: 200, height: 200, data: uri,
-          image: "fluffi.jpg", dotsOptions: { color: "#28a745", type: "rounded" },
-          backgroundOptions: { color: "#ffffff" }, imageOptions: { crossOrigin: "anonymous", margin: 4 }
-      });
-      const wrapper = document.getElementById('qrImageWrapper');
-      wrapper.innerHTML = '';
-      qrCode.append(wrapper);
-    }
-
+    document.getElementById('walletConnectSection').classList.add('hidden');
+    document.getElementById('qrCodeContainer').classList.remove('hidden');
+    
+    const wrapper = document.getElementById('qrImageWrapper');
+    wrapper.innerHTML = '';
+    
+    // Use a more reliable QR code library
+    const qrCode = new QRCodeStyling({
+        width: 200,
+        height: 200,
+        data: uri,
+        image: "fluffi.jpg",
+        dotsOptions: {
+            color: "#28a745",
+            type: "rounded"
+        },
+        backgroundOptions: {
+            color: "#ffffff"
+        },
+        imageOptions: {
+            crossOrigin: "anonymous",
+            margin: 4
+        }
+    });
+    
+    qrCode.append(wrapper);
+}
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
       document.getElementById('qrCodeContainer').classList.add('hidden');
@@ -674,7 +777,46 @@
         connectedAddress.textContent = '';
       }
     }
-
+    function checkInstalledWallets() {
+    // Check MetaMask
+    if (window.ethereum?.isMetaMask) {
+        document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+    }
+    
+    // Check other wallets
+    const walletChecks = {
+        'trust': window.ethereum?.isTrust,
+        'binance': window.BinanceChain,
+        'coinbase': window.ethereum?.isCoinbaseWallet,
+        'phantom': window.phantom?.ethereum
+    };
+    
+    // You can add UI indicators for other wallets if needed
+}
+function handleWalletError(error) {
+    console.error("Wallet error:", error);
+    
+    let message = "Wallet error occurred";
+    if (error.code) {
+        switch (error.code) {
+            case 4001:
+                message = "Connection rejected by user";
+                break;
+            case -32002:
+                message = "Request already pending - check your wallet";
+                break;
+            case "UNSUPPORTED_OPERATION":
+                message = "Operation not supported by your wallet";
+                break;
+            default:
+                message = error.message || `Error code: ${error.code}`;
+        }
+    } else {
+        message = error.message || "Unknown wallet error";
+    }
+    
+    showWalletError(message);
+}
     // ===== CORE DAPP FUNCTIONS =====
     async function buyFluffi() {
         if (!userWalletAddress) {
