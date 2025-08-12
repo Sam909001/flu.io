@@ -571,7 +571,6 @@
   margin-bottom: 15px;
 }
   </style>
-
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -999,29 +998,27 @@ function resetTimer() {
     </div>
     
     <div id="qrCodeContainer" class="qr-container hidden">
-      <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
-        ← Back to wallets
-      </button>
+  <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
+    ← Back to wallets
+  </button>>
       <h3 class="mb-4">Scan with your wallet</h3>
       <div class="qr-wrapper">
         <img id="qrImage" width="200" height="200" class="mx-auto">
       </div>
       
       <div class="mt-4">
-        <p class="mb-2">Or open directly in:</p>
-        <div class="flex justify-center gap-3">
-          <button onclick="window.location.href='https://metamask.app.link/wc?uri=' + encodeURIComponent(currentWCUri)" 
-                  class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded">
-            MetaMask
-          </button>
-          <button onclick="window.location.href='https://link.trustwallet.com/wc?uri=' + encodeURIComponent(currentWCUri)" 
-                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
-            Trust Wallet
-          </button>
-        </div>
-      </div>
-    </div>
+  <p class="mb-2">Or open directly in:</p>
+  <div class="flex justify-center gap-3">
+    <button onclick="window.location.href='https://metamask.app.link/wc?uri=' + encodeURIComponent(currentWCUri)" 
+            class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded">
+      MetaMask
+    </button>
+    <button onclick="window.location.href='https://link.trustwallet.com/wc?uri=' + encodeURIComponent(currentWCUri)" 
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+      Trust Wallet
+    </button>
   </div>
+</div>
 
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
@@ -1029,37 +1026,17 @@ function resetTimer() {
   <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
 
   <!-- Main Application Script -->
   <script>
     // Configuration
     const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
     const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-   const WALLETCONNECT_CONFIG = {
-  projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+    const WALLETCONNECT_CONFIG = {
+    projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
   chains: [56], // BSC Mainnet
   showQrModal: false,
-  qrModalOptions: {
-    themeMode: 'dark',
-    mobileWallets: [
-      {
-        id: 'metamask',
-        name: 'MetaMask',
-        links: {
-          native: 'metamask://',
-          universal: 'https://metamask.app.link'
-        }
-      },
-      {
-        id: 'trust',
-        name: 'Trust Wallet',
-        links: {
-          native: 'trust://',
-          universal: 'https://link.trustwallet.com'
-        }
-      }
-    ]
-  },
   metadata: {
     name: "FLUFFI Presale",
     description: "Connect to participate in FLUFFI presale",
@@ -1067,116 +1044,73 @@ function resetTimer() {
     icons: ["https://fluffi.site/logo.png"]
   }
 };
-    // Global variables
-    let walletProvider = null;
-    let ethersProvider = null;
-    let userWalletAddress = null;
-    let tokenChart = null;
-    let currentWCUri = ''; // Store WalletConnect URI
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize dark mode
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkModeIcon').textContent = '☀️';
-      }
+// Global variable for WalletConnect provider
+let walletConnectProvider = null;
 
-      // Check if MetaMask is installed
-      if (window.ethereum?.isMetaMask) {
-        document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-      }
-
-      // Initialize token chart
-      initTokenChart();
-
-      // Initialize timers
-      updateTimers();
-      updateNextIncreaseTime();
-      setInterval(() => {
-        updateTimers();
-        updateNextIncreaseTime();
-      }, 1000);
-
-      // Check for referral parameter
-      checkReferral();
+// Fixed WalletConnect function
+async function connectWalletConnect() {
+  try {
+    // Initialize WalletConnect provider
+    walletConnectProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
+    
+    // Subscribe to events
+    walletConnectProvider.on("display_uri", (err, payload) => {
+      const { uri } = payload.params[0];
+      currentWCUri = uri;
+      
+      // Show QR code
+      document.getElementById('walletConnectSection').classList.add('hidden');
+      document.getElementById('qrCodeContainer').classList.remove('hidden');
+      
+      // Generate QR code
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+      document.getElementById('qrImage').src = qrCodeUrl;
     });
 
-    // ===== WALLET FUNCTIONS =====
-    function openWalletModal() {
-      document.getElementById('walletModalOverlay').classList.remove('hidden');
-      document.getElementById('walletModal').classList.remove('hidden');
+    // Enable session
+    await walletConnectProvider.enable();
+    
+    // Get accounts
+    const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
+    if (accounts.length === 0) {
+      throw new Error("No accounts found");
     }
-
-    function closeWalletModal() {
-      document.getElementById('walletModalOverlay').classList.add('hidden');
-      document.getElementById('walletModal').classList.add('hidden');
-      document.getElementById('qrCodeContainer').classList.add('hidden');
-      document.getElementById('walletConnectSection').classList.remove('hidden');
-    }
-
-    async function connectWallet() {
-      openWalletModal();
-    }
-
-    async function connectMetaMask() {
-  try {
-    if (window.ethereum) {
-      // Try regular connection first
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userWalletAddress = accounts[0];
-      ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-      updateWalletUI();
-      closeWalletModal();
-    } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Mobile deep link
-      window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}`;
-    } else {
-      // Desktop fallback
-      window.open('https://metamask.io/download.html', '_blank');
-    }
+    
+    userWalletAddress = accounts[0];
+    ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
+    
+    // Update UI
+    updateWalletUI();
+    closeWalletModal();
+    
   } catch (error) {
-    console.error("MetaMask error:", error);
-    showWalletError("MetaMask connection failed: " + error.message);
+    console.error("WalletConnect error:", error);
+    showWalletError("Connection failed: " + (error.message || error.toString()));
+    
+    // Reset provider if error occurs
+    if (walletConnectProvider) {
+      await walletConnectProvider.disconnect();
+      walletConnectProvider = null;
+    }
   }
 }
-    
-    // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
-      }
-    }
+
+// Add this to your disconnect function
+function disconnectWallet() {
+  if (walletConnectProvider) {
+    walletConnectProvider.disconnect();
+    walletConnectProvider = null;
+  }
+  
+  if (window.ethereum && window.ethereum.disconnect) {
+    window.ethereum.disconnect();
+  }
+  
+  ethersProvider = null;
+  userWalletAddress = null;
+  updateWalletUI();
+}
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
