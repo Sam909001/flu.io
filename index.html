@@ -385,6 +385,94 @@ function resetTimer() {
       </a>
     </div>
   </footer>
+
+    <!-- Wallet Modal -->
+  <div id="walletModalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+  <div id="walletModal" class="wallet-modal hidden">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Connect Wallet</h2>
+      <button onclick="closeWalletModal()" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div id="walletConnectSection">
+      <!-- Fixed WalletConnect icon -->
+      <div class="wallet-option" onclick="connectWalletConnect()">
+        <div class="wallet-icon">
+          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
+        </div>
+        <span>WalletConnect</span>
+      </div>
+      
+      <div class="wallet-option" onclick="connectMetaMask()">
+        <div class="wallet-icon">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="24" height="24" alt="MetaMask">
+        </div>
+        <span>MetaMask</span>
+        <span id="metamaskInstalledBadge" class="installed-badge hidden">INSTALLED</span>
+      </div>
+    
+      <div class="wallet-option" onclick="connectTrustWallet()">
+        <div class="wallet-icon">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" width="24" height="24" alt="Trust Wallet">
+        </div>
+        <span>Trust Wallet</span>
+      </div>
+
+      <div class="wallet-option" onclick="connectPhantom()">
+        <div class="wallet-icon">
+          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
+        </div>
+        <span>Phantom Wallet</span>
+      </div>
+
+      <div class="wallet-option" onclick="connectBinanceWallet()">
+        <div class="wallet-icon">
+          <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" width="24" height="24" alt="Binance Wallet">
+        </div>
+        <span>Binance Wallet</span>
+      </div>
+
+      <div class="wallet-option" onclick="connectCoinbaseWallet()">
+        <div class="wallet-icon">
+          <img src="https://coinbase.com/favicon.ico" width="24" height="24" alt="Coinbase Wallet">
+        </div>
+        <span>Coinbase Wallet</span>
+      </div>
+    </div>
+    
+    <div id="qrCodeContainer" class="qr-container hidden">
+      <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
+        ← Back to wallets
+      </button>
+      <h3 class="mb-4">Scan with your wallet</h3>
+      <div class="qr-wrapper">
+        <img id="qrImage" width="200" height="200" class="mx-auto">
+      </div>
+      
+      <div class="mt-4">
+        <p class="mb-2">Or open directly in:</p>
+        <div class="flex justify-center gap-3">
+          <button onclick="window.location.href='https://metamask.app.link/wc?uri=' + encodeURIComponent(currentWCUri)" 
+                  class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded">
+            MetaMask
+          </button>
+          <button onclick="window.location.href='https://link.trustwallet.com/wc?uri=' + encodeURIComponent(currentWCUri)" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+            Trust Wallet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="main.js"></script>
   <script type="module" src="main.js"></script>
 </body>
