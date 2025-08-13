@@ -31,31 +31,87 @@
       font-weight: 700;
       margin-bottom: 1rem;
     }
+     .wallet-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 16px;
+    }
     
-    /* Wallet Modal Styles */
+    .wallet-btn:hover {
+      background: #e1e1e1;
+    }
+    
+    .wallet-btn img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .dark .wallet-btn {
+      background: #374151;
+      color: white;
+    }
+    
+    .dark .wallet-btn:hover {
+      background: #4B5563;
+    }
+    
     .wallet-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .wallet-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .wallet-modal-content {
       background: white;
       border-radius: 16px;
-      width: 360px;
-      padding: 20px;
-      font-family: 'Arial', sans-serif;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      font-size: 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .dark .wallet-modal-content {
+      background: #1f2937;
+      color: #f0f0f0;
     }
     
     .wallet-option {
       display: flex;
       align-items: center;
+      gap: 12px;
       padding: 12px;
-      margin: 8px 0;
-      border-radius: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
       cursor: pointer;
       transition: background 0.2s;
-      border: 1px solid #e5e7eb;
+      font-size: 16px;
+      position: relative;
     }
     
     .wallet-option:hover {
@@ -66,29 +122,24 @@
       background: #374151;
     }
     
-    .wallet-icon {
+    .wallet-option img {
       width: 32px;
       height: 32px;
-      margin-right: 12px;
       border-radius: 8px;
-      background: rgba(0,0,0,0.05);
+      object-fit: contain;
+    }
+    
+    .wallet-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 18px;
     }
     
-    .installed-badge {
-      background: #10B981;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-left: auto;
-    }
-    
-    .qr-container {
-      text-align: center;
-      padding: 20px;
+    .wallet-close {
+      cursor: pointer;
+      font-size: 24px;
     }
     
     /* Dark mode styles */
@@ -518,24 +569,11 @@
         width: 100%;
       }
       
-      .wallet-buttons-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .mobile-wallet-modal-content {
-        margin: 1rem;
-        max-width: calc(100% - 2rem);
-      }
       
       .team-grid {
         grid-template-columns: 1fr;
       }
       
-      .wallet-modal {
-        width: 90%;
-      }
-    }
-    
     /* Accessibility improvements */
     a:focus, button:focus, input:focus, select:focus {
       outline: 2px solid #3b82f6;
@@ -561,73 +599,6 @@
       0% { opacity: 1; }
       50% { opacity: 0.7; }
       100% { opacity: 1; }
-    }
-    
-    .dark .wallet-modal {
-      background: #1f2937;
-      color: white;
-      border: 1px solid #374151;
-    }
-    
-    .dark .wallet-option {
-      border-color: #4b5563;
-    }
-    
-    .dark .wallet-option:hover {
-      background: #374151;
-    }
-    
-    #walletModalOverlay {
-      transition: opacity 0.3s;
-    }
-    
-    /* QR code container */
-    .qr-wrapper {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
-    
-    /* WalletConnect QR styling */
-    .walletconnect-qr {
-      max-width: 100%;
-      height: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px;
-      background: white;
-    }
-    
-    .wallet-error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      padding: 1rem;
-      border-radius: .5rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    
-    .wallet-success {
-      background-color: #d1fae5;
-      color: #065f46;
-      border: 1px solid #6ee7b7;
-      padding: 1rem;
-      border-radius: .5rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    
-    .wallet-info {
-      background-color: #dbeafe;
-      color: #1e40af;
-      border: 1px solid #93c5fd;
-      padding: 1rem;
-      border-radius: .5rem;
-      margin-bottom: 1rem;
-      text-align: center;
     }
   </style>
 </head>
