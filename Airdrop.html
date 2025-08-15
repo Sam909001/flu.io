@@ -686,6 +686,42 @@
       object-fit: cover;
       border-radius: 50%;
     }
+    
+    /* Status indicators */
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    
+    .status-connected {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: #10B981;
+    }
+    
+    .status-disconnected {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: #EF4444;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    .status-connected .status-indicator {
+      background-color: #10B981;
+    }
+    
+    .status-disconnected .status-indicator {
+      background-color: #EF4444;
+    }
   </style>
 </head>
 
@@ -747,6 +783,12 @@
           </ul>
         </div>
       </div>
+    </div>
+    
+    <!-- Wallet Connection Status -->
+    <div id="connectionStatus" class="connection-status status-disconnected">
+      <span class="status-indicator"></span>
+      <span>Wallet not connected</span>
     </div>
     
     <!-- Airdrop Status -->
@@ -915,9 +957,9 @@
           <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center">
             Claim Airdrop
           </button>
-<p class="mt-3 text-sm text-red-600 font-medium text-center max-w-md mx-auto">
-  🚨 Please make sure you have Followed on Twitter, Retweeted the pinned post, and Joined our Telegram group. Manual verification will be conducted before airdrop distribution.
-</p>
+          <p class="mt-3 text-sm text-red-600 font-medium text-center max-w-md mx-auto">
+            🚨 Please make sure you have Followed on Twitter, Retweeted the pinned post, and Joined our Telegram group. Manual verification will be conducted before airdrop distribution.
+          </p>
         </form>
       </div>
     </div>
@@ -995,16 +1037,17 @@
                 <button class="modal-close-btn">&times;</button>
             </div>
             <div id="wc-qr-code">
-                </div>
+                <!-- QR code will be generated here -->
+            </div>
         </div>
     </div>
 
- <!-- JavaScript Libraries -->
+  <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>   
   <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
- <script>
+  <script>
     // --- Global State Variables ---
     let ethersProvider;
     let signer;
@@ -1026,6 +1069,7 @@
     const walletAddressInput = document.getElementById('walletAddress');
     const airdropForm = document.getElementById('airdropForm');
     const darkModeIcon = document.getElementById('darkModeIcon');
+    const connectionStatus = document.getElementById('connectionStatus');
 
     // --- Initialize Timer ---
     function startTimer(days, hours, minutes, seconds) {
@@ -1062,18 +1106,18 @@
       try {
         wcProvider = new WalletConnectProvider.default({
           projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-          chains: [1],
+          chains: [56], // Binance Smart Chain
           showQrModal: false,
           metadata: {
             name: "FLUFFI Airdrop",
             description: "FLUFFI Wallet Connection",
             url: window.location.href,
-            icons: ["https://example.com/logo.png"]
+            icons: ["https://example.com/logo.png"] // Replace with your icon
           }
         });
 
-        wcProvider.on("display_uri", (err, payload) => {
-          openQrCodeModal(payload.params[0]);
+        wcProvider.on("display_uri", (uri) => {
+          openQrCodeModal(uri);
         });
 
         wcProvider.on("connect", () => {
@@ -1081,11 +1125,17 @@
           onConnect(wcProvider);
         });
 
-        wcProvider.on("disconnect", onDisconnect);
+        wcProvider.on("disconnect", (code, reason) => {
+          console.log("WalletConnect disconnected", code, reason);
+          onDisconnect();
+        });
 
       } catch (e) {
         console.error("WalletConnect initialization error:", e);
-        showWalletError("Could not initialize WalletConnect");
+        showWalletError("Could not initialize WalletConnect: " + e.message);
+        // Reset wcProvider so we try again next time
+        wcProvider = null;
+        throw e;
       }
     }
 
@@ -1106,9 +1156,9 @@
           await window.ethereum.request({ method: 'eth_requestAccounts' });
           onConnect(window.ethereum);
         }
-      } catch (error) {
-        console.error("Wallet connection error:", error);
-        showWalletError(error.message || "Failed to connect wallet");
+      } catch (e) {
+        console.error("Wallet connection error:", e);
+        showWalletError(e.message || "Failed to connect wallet");
       }
     }
 
@@ -1121,6 +1171,10 @@
         // Update UI
         connectWalletBtn.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
         walletAddressInput.value = userAddress;
+        
+        // Update connection status
+        connectionStatus.className = 'connection-status status-connected';
+        connectionStatus.innerHTML = '<span class="status-indicator"></span> Wallet connected';
         
         // Add disconnect button
         const disconnectBtn = document.createElement('button');
@@ -1159,6 +1213,9 @@
       
       connectWalletBtn.textContent = 'Connect Wallet';
       walletAddressInput.value = '';
+      
+      connectionStatus.className = 'connection-status status-disconnected';
+      connectionStatus.innerHTML = '<span class="status-indicator"></span> Wallet not connected';
       
       const disconnectBtn = document.querySelector('.disconnect-btn');
       if (disconnectBtn) disconnectBtn.remove();
@@ -1378,282 +1435,6 @@
         }
       });
     });
-  </script>
-  <script>
-    // Task verification functions
-    async function verifyTwitterFollow() {
-      if (tasksCompleted.twitter) return;
-      
-      const username = document.getElementById('twitterUsername').value.trim();
-      if (!username) {
-        showWalletError("Please enter your Twitter username");
-        return;
-      }
-      
-      try {
-        // Show loading state
-        const button = document.getElementById('verifyTwitterBtn');
-        button.disabled = true;
-        button.textContent = 'Verifying...';
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // For demo purposes, assume verification succeeded
-        const verificationSuccess = true;
-        
-        if (verificationSuccess) {
-          tasksCompleted.twitter = true;
-          localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-          updateTaskUI();
-          alert(`Twitter follow verified successfully for @${username}! +1,000 FLUFFI tokens earned.`);
-        } else {
-          showWalletError("Could not verify Twitter follow. Please make sure you're following @FLUFFIOFFICIAL.");
-        }
-      } catch (error) {
-        console.error("Twitter verification error:", error);
-        showWalletError("Failed to verify Twitter follow");
-      } finally {
-        const button = document.getElementById('verifyTwitterBtn');
-        button.disabled = false;
-        button.textContent = 'Verify';
-      }
-    }
-    
-    async function verifyTelegramJoin() {
-      if (tasksCompleted.telegram) return;
-      
-      const username = document.getElementById('telegramUsername').value.trim();
-      if (!username) {
-        showWalletError("Please enter your Telegram username");
-        return;
-      }
-      
-      try {
-        const button = document.getElementById('verifyTelegramBtn');
-        button.disabled = true;
-        button.textContent = 'Verifying...';
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const verificationSuccess = true;
-        
-        if (verificationSuccess) {
-          tasksCompleted.telegram = true;
-          localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-          updateTaskUI();
-          alert(`Telegram join verified successfully for @${username}! +1,000 FLUFFI tokens earned.`);
-        } else {
-          showWalletError("Could not verify Telegram membership. Please join our Telegram group first.");
-        }
-      } catch (error) {
-        console.error("Telegram verification error:", error);
-        showWalletError("Failed to verify Telegram join");
-      } finally {
-        const button = document.getElementById('verifyTelegramBtn');
-        button.disabled = false;
-        button.textContent = 'Verify';
-      }
-    }
-    
-    async function verifyRetweet() {
-      if (tasksCompleted.retweet) return;
-      
-      try {
-        const button = document.getElementById('verifyRetweetBtn');
-        button.disabled = true;
-        button.textContent = 'Verifying...';
-        
-        // Open the tweet in a new tab
-        window.open('https://twitter.com/FLUFFIOFFICIAL/status/1234567890', '_blank');
-        
-        // Wait for user to potentially retweet
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const confirmed = confirm("Please confirm you've liked and retweeted our pinned tweet.");
-        if (confirmed) {
-          // Simulate verification
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          const verificationSuccess = true;
-          
-          if (verificationSuccess) {
-            tasksCompleted.retweet = true;
-            localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-            updateTaskUI();
-            alert("Retweet verified successfully! +3,000 FLUFFI tokens earned.");
-          } else {
-            showWalletError("Could not verify retweet. Please make sure you've liked and retweeted our pinned tweet.");
-          }
-        }
-      } catch (error) {
-        console.error("Retweet verification error:", error);
-        showWalletError("Failed to verify retweet");
-      } finally {
-        const button = document.getElementById('verifyRetweetBtn');
-        button.disabled = false;
-        button.textContent = 'Verify';
-      }
-    }
-    
-    function updateTaskUI() {
-      document.getElementById('task1').checked = tasksCompleted.twitter;
-      document.getElementById('task2').checked = tasksCompleted.telegram;
-      document.getElementById('task3').checked = tasksCompleted.retweet;
-      
-      document.getElementById('twitterStatus').textContent = tasksCompleted.twitter ? '(Verified)' : '(Not verified)';
-      document.getElementById('twitterStatus').className = tasksCompleted.twitter ? 'text-sm task-completed' : 'text-sm task-incomplete';
-      
-      document.getElementById('telegramStatus').textContent = tasksCompleted.telegram ? '(Verified)' : '(Not verified)';
-      document.getElementById('telegramStatus').className = tasksCompleted.telegram ? 'text-sm task-completed' : 'text-sm task-incomplete';
-      
-      document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
-      document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
-      
-      const twitterBtn = document.getElementById('verifyTwitterBtn');
-      const telegramBtn = document.getElementById('verifyTelegramBtn');
-      const retweetBtn = document.getElementById('verifyRetweetBtn');
-      
-      if (tasksCompleted.twitter) {
-        twitterBtn.textContent = 'Verified';
-        twitterBtn.classList.add('completed');
-        twitterBtn.onclick = null;
-        document.getElementById('twitterUsername').disabled = true;
-      }
-      
-      if (tasksCompleted.telegram) {
-        telegramBtn.textContent = 'Verified';
-        telegramBtn.classList.add('completed');
-        telegramBtn.onclick = null;
-        document.getElementById('telegramUsername').disabled = true;
-      }
-      
-      if (tasksCompleted.retweet) {
-        retweetBtn.textContent = 'Verified';
-        retweetBtn.classList.add('completed');
-        retweetBtn.onclick = null;
-      }
-    }
-    
-    // For development - simulate task completion
-    function simulateTwitterFollow() {
-      document.getElementById('twitterUsername').value = 'testuser';
-      tasksCompleted.twitter = true;
-      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-      updateTaskUI();
-      alert("Twitter follow simulated successfully!");
-    }
-    
-    function simulateTelegramJoin() {
-      document.getElementById('telegramUsername').value = 'testuser';
-      tasksCompleted.telegram = true;
-      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-      updateTaskUI();
-      alert("Telegram join simulated successfully!");
-    }
-    
-    function simulateRetweet() {
-      tasksCompleted.retweet = true;
-      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-      updateTaskUI();
-      alert("Retweet simulated successfully!");
-    }
-    
-    function resetTasks() {
-      tasksCompleted = {
-        twitter: false,
-        telegram: false,
-        retweet: false
-      };
-      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
-      document.getElementById('twitterUsername').value = '';
-      document.getElementById('telegramUsername').value = '';
-      document.getElementById('twitterUsername').disabled = false;
-      document.getElementById('telegramUsername').disabled = false;
-      updateTaskUI();
-      alert("Tasks reset successfully!");
-    }
-
-    // Confetti effect
-    function createConfetti() {
-      const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
-      
-      for (let i = 0; i < 150; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.top = '100vh';
-        confetti.style.width = Math.random() * 10 + 5 + 'px';
-        confetti.style.height = Math.random() * 10 + 5 + 'px';
-        confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
-        document.body.appendChild(confetti);
-        
-        // Remove confetti after animation
-        setTimeout(() => {
-          confetti.remove();
-        }, 5000);
-      }
-    }
-
-    // Airdrop claim function
-    async function claimAirdrop() {
-      const email = document.getElementById('email').value;
-      const walletAddress = document.getElementById('walletAddress').value;
-      
-      if (!walletAddress) {
-        showWalletError("Please connect your wallet first");
-        return;
-      }
-      
-      if (!email) {
-        showWalletError("Please enter your email address");
-        return;
-      }
-      
-      try {
-        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-        
-        const anyTaskCompleted = tasksCompleted.twitter || tasksCompleted.telegram || tasksCompleted.retweet;
-        
-        if (!anyTaskCompleted) {
-          throw new Error("Please complete at least one task to claim the airdrop");
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        let bonusTokens = 0;
-        if (tasksCompleted.twitter) bonusTokens += 1000;
-        if (tasksCompleted.telegram) bonusTokens += 1000;
-        if (tasksCompleted.retweet) bonusTokens += 3000;
-        
-        createConfetti();
-        alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      } catch (error) {
-        console.error("Airdrop error:", error);
-        showWalletError(error.message || "Airdrop claim failed");
-        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Claim Airdrop';
-      }
-    }
-
-    // Toggle dark mode function
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const isDark = !html.classList.contains('dark');
-      
-      html.classList.toggle('dark', isDark);
-      localStorage.setItem('darkMode', isDark);
-      
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
-    }
   </script>
 </body>
 </html>
