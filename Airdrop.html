@@ -1026,43 +1026,33 @@
          * Initializes the WalletConnect provider and sets up event listeners.
          * This function is called once when the page loads.
          */
-        async function initializeWalletConnect() {
-            try {
-                wcProvider = await WalletConnectEthereum.EthereumProvider.init({
-                    projectId: WALLETCONNECT_PROJECT_ID,
-                    chains: [56], // BNB Smart Chain Mainnet
-                    showQrModal: false, // We will use our own modal
-                    metadata: {
-                        name: "My Awesome DApp",
-                        description: "Connecting to my awesome DApp",
-                        url: window.location.host,
-                        icons: ['https://walletconnect.com/walletconnect-logo.png']
-                    }
-                });
-
-                // --- Event Listeners for WalletConnect ---
-                wcProvider.on("display_uri", (uri) => {
-                    // When a QR code is ready, open our custom modal
-                    openQrCodeModal(uri);
-                });
-
-                wcProvider.on("connect", () => {
-                    // When the connection is successful
-                    closeQrCodeModal();
-                    onConnect(wcProvider);
-                });
-                
-                wcProvider.on("disconnect", () => {
-                    // When the user disconnects
-                    onDisconnect();
-                });
-
-            } catch (e) {
-                console.error("Could not initialize WalletConnect.", e);
-                alert("Error: Could not initialize WalletConnect. Please check your Project ID.");
+       async function initializeWalletConnect() {
+    try {
+        wcProvider = await EthereumProvider.init({
+            projectId: WALLETCONNECT_PROJECT_ID, // from dashboard.reown.com
+            relayUrl: "wss://relay.walletconnect.com", // avoid blocked domain
+            chains: [56], // BNB Smart Chain Mainnet
+            showQrModal: false, // We use our own modal
+            metadata: {
+                name: "FLUFFI Airdrop",
+                description: "FLUFFI Wallet Connection",
+                url: window.location.origin,
+                icons: ["https://walletconnect.com/walletconnect-logo.png"]
             }
-        }
+        });
 
+        wcProvider.on("display_uri", (uri) => openQrCodeModal(uri));
+        wcProvider.on("connect", () => {
+            closeQrCodeModal();
+            onConnect(wcProvider);
+        });
+        wcProvider.on("disconnect", onDisconnect);
+
+    } catch (e) {
+        console.error("Could not initialize WalletConnect.", e);
+        alert("Error: Could not initialize WalletConnect. Please check your Project ID.");
+    }
+}
         
         /**
          * Main function to handle the wallet connection logic based on user's choice.
