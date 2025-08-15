@@ -999,234 +999,386 @@
         </div>
     </div>
 
-  <!-- JavaScript Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>   
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.10.5/dist/umd/index.min.js"></script>   
-<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+ <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>   
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
-  <script>
-  const WALLETCONNECT_PROJECT_ID = 'b74a733c47def7b6672eb9ad072c4e8a';
+ <script>
+    // --- Global State Variables ---
+    let ethersProvider;
+    let signer;
+    let userAddress;
+    let wcProvider;
+    let tasksCompleted = {
+      twitter: false,
+      telegram: false,
+      retweet: false
+    };
+    let timerInterval;
 
+    // --- DOM Element References ---
+    const connectWalletBtn = document.getElementById('walletButton');
+    const walletModal = document.getElementById('wallet-modal');
+    const wcModal = document.getElementById('wc-modal');
+    const walletOptionsContainer = document.querySelector('.wallet-options');
+    const closeButtons = document.querySelectorAll('.modal-close-btn');
+    const walletAddressInput = document.getElementById('walletAddress');
+    const airdropForm = document.getElementById('airdropForm');
+    const darkModeIcon = document.getElementById('darkModeIcon');
 
-        // --- Global State Variables ---
-        let ethersProvider;
-        let signer;
-        let userAddress;
-        let wcProvider;
-
-        // --- DOM Element References ---
-        const connectWalletBtn = document.getElementById('walletButton');
-        const walletModal = document.getElementById('wallet-modal');
-        const wcModal = document.getElementById('wc-modal');
-        const walletOptionsContainer = document.querySelector('.wallet-options');
-        const closeButtons = document.querySelectorAll('.modal-close-btn');
-
+    // --- Initialize Timer ---
+    function startTimer(days, hours, minutes, seconds) {
+      clearInterval(timerInterval);
+      
+      let totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds;
+      
+      timerInterval = setInterval(() => {
+        if (totalSeconds <= 0) {
+          clearInterval(timerInterval);
+          return;
+        }
         
-        /**
-         * Initializes the WalletConnect provider and sets up event listeners.
-         * This function is called once when the page loads.
-         */
-       async function initializeWalletConnect() {
-    try {
-        wcProvider = await window.WalletConnectEthereumProvider.init({
-            projectId: WALLETCONNECT_PROJECT_ID,
-            relayUrl: "wss://relay.walletconnect.com", // avoid blocked domain
-            chains: [56],
-            showQrModal: false,
-            metadata: {
-                name: "FLUFFI Airdrop",
-                description: "FLUFFI Wallet Connection",
-                url: window.location.origin,
-                icons: ["https://walletconnect.com/walletconnect-logo.png"]
-            }
+        totalSeconds--;
+        
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+      }, 1000);
+    }
+
+    function resetTimer() {
+      startTimer(7, 12, 45, 30);
+    }
+
+    // --- Wallet Connection Functions ---
+    async function initializeWalletConnect() {
+      try {
+        wcProvider = new WalletConnectProvider.default({
+          projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+          chains: [1],
+          showQrModal: false,
+          metadata: {
+            name: "FLUFFI Airdrop",
+            description: "FLUFFI Wallet Connection",
+            url: window.location.href,
+            icons: ["https://example.com/logo.png"]
+          }
         });
 
-        wcProvider.on("display_uri", (uri) => openQrCodeModal(uri));
-        wcProvider.on("connect", () => {
-            closeQrCodeModal();
-            onConnect(wcProvider);
+        wcProvider.on("display_uri", (err, payload) => {
+          openQrCodeModal(payload.params[0]);
         });
+
+        wcProvider.on("connect", () => {
+          closeQrCodeModal();
+          onConnect(wcProvider);
+        });
+
         wcProvider.on("disconnect", onDisconnect);
 
-    } catch (e) {
-        console.error("Could not initialize WalletConnect.", e);
-        alert("Error: Could not initialize WalletConnect. Please check your Project ID.");
+      } catch (e) {
+        console.error("WalletConnect initialization error:", e);
+        showWalletError("Could not initialize WalletConnect");
+      }
     }
-}
-        
-        /**
-         * Main function to handle the wallet connection logic based on user's choice.
-         * @param {string} walletId - The identifier for the chosen wallet (e.g., 'metamask').
-         */
-        async function connectWallet(walletId) {
-            closeWalletModal();
-            let provider;
-            
-            try {
-                switch (walletId) {
-                    case 'metamask':
-                    case 'binance':
-                    case 'trustwallet':
-                        // For browser extension wallets
-                        if (typeof window.ethereum === 'undefined') {
-                            return alert('Please install a wallet extension like MetaMask.');
-                        }
-                        provider = window.ethereum;
-                        // Request account access
-                        await provider.request({ method: 'eth_requestAccounts' });
-                        break;
-                    
-                    case 'walletconnect':
-                        // For mobile wallets via QR code
-                        if (!wcProvider) {
-                           return alert('WalletConnect is not initialized.');
-                        }
-                        // This will trigger the "display_uri" event
-                        await wcProvider.connect();
-                        provider = wcProvider;
-                        break;
-                }
-                
-                if (provider) {
-                    onConnect(provider);
-                }
-            } catch (error) {
-                console.error("Failed to connect wallet:", error);
-                alert("Failed to connect wallet. The request may have been rejected by the user.");
-            }
+
+    async function connectWallet(walletId) {
+      closeWalletModal();
+      
+      try {
+        if (walletId === 'walletconnect') {
+          if (!wcProvider) {
+            await initializeWalletConnect();
+          }
+          await wcProvider.enable();
+        } else {
+          if (typeof window.ethereum === 'undefined') {
+            throw new Error("Please install a wallet extension like MetaMask");
+          }
+          
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          onConnect(window.ethereum);
         }
+      } catch (error) {
+        console.error("Wallet connection error:", error);
+        showWalletError(error.message || "Failed to connect wallet");
+      }
+    }
 
+    async function onConnect(provider) {
+      try {
+        ethersProvider = new ethers.providers.Web3Provider(provider);
+        signer = ethersProvider.getSigner();
+        userAddress = await signer.getAddress();
         
-        /**
-         * Function executed after a successful connection to any provider.
-         * @param {object} provider - The connected wallet provider (e.g., window.ethereum or wcProvider).
-         */
-        async function onConnect(provider) {
-            // Wrap the provider with ethers.js
-            ethersProvider = new ethers.providers.Web3Provider(provider);
-            signer = ethersProvider.getSigner();
-            userAddress = await signer.getAddress();
-            
-            // Update the UI to show the connected state
-            updateUI(true);
-            
-            // Listen for account changes
-            provider.on("accountsChanged", (accounts) => {
-                if (accounts.length > 0) {
-                    userAddress = accounts[0];
-                    updateUI(true);
-                } else {
-                    onDisconnect();
-                }
-            });
-        }
-
+        // Update UI
+        connectWalletBtn.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+        walletAddressInput.value = userAddress;
         
-        /**
-         * Function to handle disconnection.
-         */
-        async function onDisconnect() {
-             // Disconnect WalletConnect session if it exists
-            if (wcProvider?.connected) {
-                await wcProvider.disconnect();
-            }
-            // Reset global state
-            ethersProvider = null;
-            signer = null;
-            userAddress = null;
-
-            // Update UI to disconnected state
-            updateUI(false);
-        }
-
+        // Add disconnect button
+        const disconnectBtn = document.createElement('button');
+        disconnectBtn.className = 'disconnect-btn';
+        disconnectBtn.textContent = 'Disconnect';
+        disconnectBtn.onclick = onDisconnect;
         
-        /**
-         * Updates the UI based on the connection status.
-         * @param {boolean} isConnected - True if a wallet is connected, false otherwise.
-         */
-        function updateUI(isConnected) {
-            if (isConnected) {
-                const shortAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-                connectWalletBtn.textContent = shortAddress;
+        // Remove existing disconnect button if any
+        const existingBtn = document.querySelector('.disconnect-btn');
+        if (existingBtn) existingBtn.remove();
+        
+        document.querySelector('.wallet-buttons').appendChild(disconnectBtn);
+
+        // Listen for account changes
+        if (provider.on) {
+          provider.on('accountsChanged', (accounts) => {
+            if (accounts.length > 0) {
+              userAddress = accounts[0];
+              connectWalletBtn.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+              walletAddressInput.value = userAddress;
             } else {
-                connectWalletBtn.textContent = 'Connect Wallet';
+              onDisconnect();
             }
+          });
         }
+      } catch (error) {
+        console.error("Connection handler error:", error);
+        showWalletError("Failed to complete connection");
+      }
+    }
 
-        
-        // --- Modal Control Functions ---
-        function openWalletModal() {
-            walletModal.classList.add('active');
+    function onDisconnect() {
+      ethersProvider = null;
+      signer = null;
+      userAddress = null;
+      
+      connectWalletBtn.textContent = 'Connect Wallet';
+      walletAddressInput.value = '';
+      
+      const disconnectBtn = document.querySelector('.disconnect-btn');
+      if (disconnectBtn) disconnectBtn.remove();
+    }
+
+    // --- Modal Functions ---
+    function openWalletModal() {
+      walletModal.classList.add('active');
+    }
+
+    function closeWalletModal() {
+      walletModal.classList.remove('active');
+    }
+
+    function openQrCodeModal(uri) {
+      const qrContainer = document.getElementById('wc-qr-code');
+      qrContainer.innerHTML = '';
+      
+      const typeNumber = 4;
+      const errorCorrectionLevel = 'L';
+      const qr = qrcode(typeNumber, errorCorrectionLevel);
+      qr.addData(uri);
+      qr.make();
+      qrContainer.innerHTML = qr.createImgTag(6);
+      
+      wcModal.classList.add('active');
+    }
+    
+    function closeQrCodeModal() {
+      wcModal.classList.remove('active');
+    }
+
+    function showWalletError(message) {
+      alert(`Error: ${message}`);
+    }
+
+    // --- Task Verification Functions ---
+    function verifyTwitterFollow() {
+      const username = document.getElementById('twitterUsername').value.trim();
+      if (!username) {
+        showWalletError("Please enter your Twitter username");
+        return;
+      }
+      
+      tasksCompleted.twitter = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert(`Twitter follow verified for @${username}! +1,000 FLUFFI tokens earned.`);
+    }
+    
+    function verifyTelegramJoin() {
+      const username = document.getElementById('telegramUsername').value.trim();
+      if (!username) {
+        showWalletError("Please enter your Telegram username");
+        return;
+      }
+      
+      tasksCompleted.telegram = true;
+      localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+      updateTaskUI();
+      alert(`Telegram join verified for @${username}! +1,000 FLUFFI tokens earned.`);
+    }
+    
+    function verifyRetweet() {
+      window.open('https://twitter.com/FLUFFIOFFICIAL', '_blank');
+      
+      setTimeout(() => {
+        if (confirm("Please confirm you've liked and retweeted our pinned tweet")) {
+          tasksCompleted.retweet = true;
+          localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+          updateTaskUI();
+          alert("Retweet verified! +3,000 FLUFFI tokens earned.");
         }
+      }, 1000);
+    }
 
-        function closeWalletModal() {
-            walletModal.classList.remove('active');
+    function updateTaskUI() {
+      document.getElementById('task1').checked = tasksCompleted.twitter;
+      document.getElementById('task2').checked = tasksCompleted.telegram;
+      document.getElementById('task3').checked = tasksCompleted.retweet;
+      
+      const twitterBtn = document.getElementById('verifyTwitterBtn');
+      const telegramBtn = document.getElementById('verifyTelegramBtn');
+      const retweetBtn = document.getElementById('verifyRetweetBtn');
+      
+      if (tasksCompleted.twitter) {
+        twitterBtn.textContent = 'Verified';
+        twitterBtn.classList.add('completed');
+        twitterBtn.onclick = null;
+      }
+      
+      if (tasksCompleted.telegram) {
+        telegramBtn.textContent = 'Verified';
+        telegramBtn.classList.add('completed');
+        telegramBtn.onclick = null;
+      }
+      
+      if (tasksCompleted.retweet) {
+        retweetBtn.textContent = 'Verified';
+        retweetBtn.classList.add('completed');
+        retweetBtn.onclick = null;
+      }
+    }
+
+    // --- Airdrop Claim Function ---
+    function claimAirdrop(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      
+      if (!userAddress) {
+        showWalletError("Please connect your wallet first");
+        return;
+      }
+      
+      if (!email) {
+        showWalletError("Please enter your email address");
+        return;
+      }
+      
+      const anyTaskCompleted = tasksCompleted.twitter || 
+                              tasksCompleted.telegram || 
+                              tasksCompleted.retweet;
+      
+      if (!anyTaskCompleted) {
+        showWalletError("Please complete at least one task to claim the airdrop");
+        return;
+      }
+      
+      let bonusTokens = 0;
+      if (tasksCompleted.twitter) bonusTokens += 1000;
+      if (tasksCompleted.telegram) bonusTokens += 1000;
+      if (tasksCompleted.retweet) bonusTokens += 3000;
+      
+      // Show success message
+      alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens.`);
+      
+      // Reset form
+      airdropForm.reset();
+    }
+
+    // --- Dark Mode Functions ---
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = !html.classList.contains('dark');
+      
+      html.classList.toggle('dark', isDark);
+      localStorage.setItem('darkMode', isDark);
+      
+      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function initDarkMode() {
+      const savedMode = localStorage.getItem('darkMode');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      const isDark = savedMode ? JSON.parse(savedMode) : prefersDark;
+      document.documentElement.classList.toggle('dark', isDark);
+      darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize dark mode
+      initDarkMode();
+      
+      // Start timer
+      resetTimer();
+      
+      // Load completed tasks
+      const savedTasks = localStorage.getItem('completedTasks');
+      if (savedTasks) {
+        tasksCompleted = JSON.parse(savedTasks);
+        updateTaskUI();
+      }
+      
+      // Set up wallet connection
+      connectWalletBtn.addEventListener('click', () => {
+        if (!userAddress) {
+          openWalletModal();
         }
-
-        function openQrCodeModal(uri) {
-            const qrContainer = document.getElementById('wc-qr-code');
-            qrContainer.innerHTML = ''; // Clear previous QR code
-            
-            // Use qrcode-generator library to create the QR code
-            const typeNumber = 4;
-            const errorCorrectionLevel = 'L';
-            const qr = qrcode(typeNumber, errorCorrectionLevel);
-            qr.addData(uri);
-            qr.make();
-            qrContainer.innerHTML = qr.createImgTag(6); // size 6
-
-            // Open the QR code modal
-            closeWalletModal();
-            wcModal.classList.add('active');
+      });
+      
+      // Wallet option handlers
+      walletOptionsContainer.addEventListener('click', (e) => {
+        const walletOption = e.target.closest('.wallet-option');
+        if (walletOption) {
+          const walletId = walletOption.dataset.wallet;
+          connectWallet(walletId);
         }
-        
-        function closeQrCodeModal() {
-            wcModal.classList.remove('active');
-        }
-        
-
-        // --- Initial Setup and Event Listeners ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeWalletConnect();
-
-            // Connect button toggles between connecting and disconnecting
-            connectWalletBtn.addEventListener('click', () => {
-                if (userAddress) {
-                    onDisconnect();
-                } else {
-                    openWalletModal();
-                }
-            });
-
-            // Handle clicks on wallet options
-            walletOptionsContainer.addEventListener('click', (event) => {
-                const option = event.target.closest('.wallet-option');
-                if (option) {
-                    const walletId = option.getAttribute('data-wallet');
-                    connectWallet(walletId);
-                }
-            });
-            
-            // Handle clicks on all close buttons
-            closeButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    closeWalletModal();
-                    closeQrCodeModal();
-                });
-            });
-            
-            // Close modals if the overlay is clicked
-            [walletModal, wcModal].forEach(modal => {
-                modal.addEventListener('click', (event) => {
-                    if (event.target === modal) {
-                        closeWalletModal();
-                        closeQrCodeModal();
-                    }
-                });
-            });
+      });
+      
+      // Close modal handlers
+      closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          closeWalletModal();
+          closeQrCodeModal();
         });
-
-    </script>
+      });
+      
+      // Overlay click handlers
+      walletModal.addEventListener('click', (e) => {
+        if (e.target === walletModal) closeWalletModal();
+      });
+      
+      wcModal.addEventListener('click', (e) => {
+        if (e.target === wcModal) closeQrCodeModal();
+      });
+      
+      // Form submission handler
+      airdropForm.addEventListener('submit', claimAirdrop);
+      
+      // Developer section toggle (for testing)
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'd') {
+          document.getElementById('devSection').classList.toggle('hidden');
+        }
+      });
+    });
+  </script>
   <script>
     // Task verification functions
     async function verifyTwitterFollow() {
