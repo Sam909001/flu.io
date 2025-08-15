@@ -1015,7 +1015,7 @@
         let wcProvider;
 
         // --- DOM Element References ---
-        const connectWalletBtn = document.getElementById('connect-wallet-btn');
+        const connectWalletBtn = document.getElementById('walletButton');
         const walletModal = document.getElementById('wallet-modal');
         const wcModal = document.getElementById('wc-modal');
         const walletOptionsContainer = document.querySelector('.wallet-options');
@@ -1028,11 +1028,11 @@
          */
        async function initializeWalletConnect() {
     try {
-        wcProvider = await EthereumProvider.init({
-            projectId: WALLETCONNECT_PROJECT_ID, // from dashboard.reown.com
+        wcProvider = await window.WalletConnectEthereumProvider.init({
+            projectId: WALLETCONNECT_PROJECT_ID,
             relayUrl: "wss://relay.walletconnect.com", // avoid blocked domain
-            chains: [56], // BNB Smart Chain Mainnet
-            showQrModal: false, // We use our own modal
+            chains: [56],
+            showQrModal: false,
             metadata: {
                 name: "FLUFFI Airdrop",
                 description: "FLUFFI Wallet Connection",
