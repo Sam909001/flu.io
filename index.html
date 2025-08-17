@@ -586,7 +586,7 @@ function resetTimer() {
 async function connectWalletConnect() {
     try {
       // 🔑 IMPORTANT: the global is `window.EthereumProvider`
-      walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
+      walletProvider = await window.WalletConnectEthereumProvider.init(WALLETCONNECT_CONFIG);
 
       // Listen for QR URI
       walletProvider.on("display_uri", (uri) => {
