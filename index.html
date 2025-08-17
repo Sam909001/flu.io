@@ -588,8 +588,6 @@ function resetTimer() {
     // Fixed WalletConnect function
     async function connectWalletConnect() {
       try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
         walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
         
         // Subscribe to events
