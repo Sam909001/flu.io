@@ -14,13 +14,199 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <link rel="stylesheet" href="style.css">
-
-    <!-- JavaScript Libraries -->
-<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.9.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <style>
+    /* Existing styles remain the same */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .dark .logo-container {
+      background: #374151;
+    }
+    
+    .logo-container img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    /* Wallet modal styles */
+    .wallet-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      z-index: 50;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .dark .wallet-modal {
+      background: #1f2937;
+    }
+    
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .dark .wallet-option {
+      border-color: #4b5563;
+    }
+    
+    .wallet-option:hover {
+      background: #f3f4f6;
+      transform: translateY(-2px);
+    }
+    
+    .dark .wallet-option:hover {
+      background: #374151;
+    }
+    
+    .wallet-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+    }
+    
+    .wallet-icon img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .installed-badge {
+      margin-left: auto;
+      background: #10b981;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    
+    .wallet-error {
+      background: #fef2f2;
+      color: #b91c1c;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    
+    .dark .wallet-error {
+      background: #7f1d1d;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* New WalletConnect UI styles */
+    #walletConnectSection {
+      transition: all 0.3s;
+    }
+    
+    #qrCodeContainer {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    #qrImage {
+      max-width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px;
+      background: white;
+    }
+    
+    .dark #qrImage {
+      border-color: #4b5563;
+      background: #1f2937;
+    }
+    
+    .wallet-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .wallet-action-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    /* Price tooltip */
+    .price-tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 8px;
+    }
+    
+    .price-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 240px;
+      background-color: #1f2937;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    .price-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Add animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+  </style>
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -401,15 +587,16 @@ function resetTimer() {
       </button>
     </div>
     
-    <div id="Section">
-      <!-- Fixed WalletConnect icon -->
+    <div id="walletConnectSection">
+      <!-- WalletConnect option -->
       <div class="wallet-option" onclick="connectWalletConnect()">
         <div class="wallet-icon">
-          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
+          <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/wallet-connect-logo.png" alt="WalletConnect" class="w-6 h-6">
         </div>
         <span>WalletConnect</span>
       </div>
       
+      <!-- Other wallet options -->
       <div class="wallet-option" onclick="connectMetaMask()">
         <div class="wallet-icon">
           <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="24" height="24" alt="MetaMask">
@@ -427,71 +614,71 @@ function resetTimer() {
 
       <div class="wallet-option" onclick="connectPhantom()">
         <div class="wallet-icon">
-          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
+          <img src="https://phantom.app/static/phantom-app-icon.png" alt="Phantom" class="w-6 h-6">
         </div>
         <span>Phantom Wallet</span>
       </div>
 
       <div class="wallet-option" onclick="connectBinanceWallet()">
         <div class="wallet-icon">
-          <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" width="24" height="24" alt="Binance Wallet">
+          <img src="https://seeklogo.com/images/B/binance-coin-bnb-logo-CD94CC6D31-seeklogo.com.png" width="24" height="24" alt="Binance Wallet">
         </div>
         <span>Binance Wallet</span>
       </div>
 
       <div class="wallet-option" onclick="connectCoinbaseWallet()">
         <div class="wallet-icon">
-          <img src="https://coinbase.com/favicon.ico" width="24" height="24" alt="Coinbase Wallet">
+          <img src="https://images.ctfassets.net/c5bd0wqjc7v0/3dFdYq2Fv3lGkSVzUeW7wU/5d8a0f9d3a7a3c1e0b0b0b0b0b0b0b0b/coinbase-wallet-app-icon.png" width="24" height="24" alt="Coinbase Wallet">
         </div>
         <span>Coinbase Wallet</span>
       </div>
     </div>
     
     <div id="qrCodeContainer" class="hidden">
-  <img id="qrImage" alt="WalletConnect QR" />
-  <p>Or open directly in your wallet app:</p>
-  <a id="metaMaskBtn" target="_blank">Open in MetaMask</a><br>
-  <a id="trustWalletBtn" target="_blank">Open in Trust Wallet</a><br>
-  <a id="coinbaseBtn" target="_blank">Open in Coinbase Wallet</a>
-</div>
-      
-  <!-- Main Application Script -->
+      <h3 class="mb-4">Scan with WalletConnect</h3>
+      <img id="qrImage" alt="WalletConnect QR" />
+      <div class="wallet-actions">
+        <a id="metaMaskBtn" target="_blank" class="wallet-action-btn bg-orange-500 hover:bg-orange-600 text-white">
+          MetaMask
+        </a>
+        <a id="trustWalletBtn" target="_blank" class="wallet-action-btn bg-blue-500 hover:bg-blue-600 text-white">
+          Trust Wallet
+        </a>
+        <a id="coinbaseBtn" target="_blank" class="wallet-action-btn bg-blue-600 hover:bg-blue-700 text-white">
+          Coinbase
+        </a>
+      </div>
+      <button onclick="showWalletOptions()" class="mt-4 w-full py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+        <i class="fas fa-arrow-left mr-2"></i> Back to wallet options
+      </button>
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>   
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
   <script>
     // Configuration
     const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
     const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-   const WALLETCONNECT_CONFIG = {
-  projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [56], // BSC Mainnet
-  showQrModal: false,
-  qrModalOptions: {
-    themeMode: 'dark',
-    mobileWallets: [
-      {
-        id: 'metamask',
-        name: 'MetaMask',
-        links: {
-          native: 'metamask://',
-          universal: 'https://metamask.app.link'
-        }
+    const WALLETCONNECT_CONFIG = {
+      projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+      chains: [56], // BSC Mainnet
+      showQrModal: false,
+      rpc: {
+        56: "https://bsc-dataseed.binance.org/" // BSC RPC endpoint
       },
-      {
-        id: 'trust',
-        name: 'Trust Wallet',
-        links: {
-          native: 'trust://',
-          universal: 'https://link.trustwallet.com'
-        }
+      metadata: {
+        name: "FLUFFI Presale",
+        description: "Connect to participate in FLUFFI presale",
+        url: window.location.href,
+        icons: ["https://fluffi.site/logo.png"]
       }
-    ]
-  },
-  metadata: {
-    name: "FLUFFI Presale",
-    description: "Connect to participate in FLUFFI presale",
-    url: window.location.href,
-    icons: ["https://fluffi.site/logo.png"]
-  }
-};
+    };
+    
     // Global variables
     let walletProvider;
     let ethersProvider;
@@ -545,61 +732,75 @@ function resetTimer() {
     }
 
     async function connectMetaMask() {
-  try {
-    if (window.ethereum) {
-      // Try regular connection first
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userWalletAddress = accounts[0];
-      ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-      updateWalletUI();
-      closeWalletModal();
-    } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Mobile deep link
-      window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}`;
-    } else {
-      // Desktop fallback
-      window.open('https://metamask.io/download.html', '_blank');
+      try {
+        if (window.ethereum) {
+          // Try regular connection first
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
+          updateWalletUI();
+          closeWalletModal();
+        } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          // Mobile deep link
+          window.location.href = `https://metamask.app.link/dapp/${encodeURIComponent(window.location.hostname)}`;
+        } else {
+          // Desktop fallback
+          window.open('https://metamask.io/download.html', '_blank');
+        }
+      } catch (error) {
+        console.error("MetaMask error:", error);
+        showWalletError("MetaMask connection failed: " + error.message);
+      }
     }
-  } catch (error) {
-    console.error("MetaMask error:", error);
-    showWalletError("MetaMask connection failed: " + error.message);
-  }
-}
     
     // Fixed WalletConnect function
-async function connectWalletConnect() {
-    try {
-      // 🔑 IMPORTANT: the global is `window.EthereumProvider`
-      walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
+    async function connectWalletConnect() {
+      try {
+        // Initialize WalletConnect provider
+        walletProvider = new WalletConnectProvider.default(WALLETCONNECT_CONFIG);
+        
+        // Subscribe to events
+        walletProvider.on("display_uri", (err, payload) => {
+          const uri = payload.params[0];
+          currentWCUri = uri;
+          
+          // Show QR code
+          document.getElementById('walletConnectSection').classList.add('hidden');
+          document.getElementById('qrCodeContainer').classList.remove('hidden');
+          
+          // Generate QR code
+          const qrContainer = document.getElementById('qrImage');
+          qrContainer.innerHTML = '';
+          
+          const typeNumber = 4;
+          const errorCorrectionLevel = 'L';
+          const qr = qrcode(typeNumber, errorCorrectionLevel);
+          qr.addData(uri);
+          qr.make();
+          qrContainer.innerHTML = qr.createImgTag(6);
+          
+          // Set up deep links
+          document.getElementById('metaMaskBtn').href = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
+          document.getElementById('trustWalletBtn').href = `https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}`;
+          document.getElementById('coinbaseBtn').href = `https://go.cb-w.com/wc?uri=${encodeURIComponent(uri)}`;
+        });
 
-      // Listen for QR URI
-      walletProvider.on("display_uri", (uri) => {
-        currentWCUri = uri;
-
-        // Show QR
-        document.getElementById("qrCodeContainer").classList.remove("hidden");
-        document.getElementById("qrImage").src =
-          `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-
-        // Mobile deep links
-        document.getElementById("metaMaskBtn").href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
-        document.getElementById("trustWalletBtn").href = `trust://wc?uri=${encodeURIComponent(uri)}`;
-        document.getElementById("coinbaseBtn").href = `coinbase://wc?uri=${encodeURIComponent(uri)}`;
-      });
-
-      // Request accounts
-      await walletProvider.enable();
-      const accounts = await walletProvider.request({ method: "eth_accounts" });
-      userWalletAddress = accounts[0];
-
-      ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-
-      updateWalletUI();
-    } catch (error) {
-      console.error("WalletConnect error:", error);
-      alert("Connection failed: " + (error.message || error));
+        // Enable session
+        await walletProvider.enable();
+        
+        // Get accounts
+        const accounts = await walletProvider.request({ method: 'eth_accounts' });
+        userWalletAddress = accounts[0];
+        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+        
+        // Update UI
+        updateWalletUI();
+        closeWalletModal();
+      } catch (error) {
+        console.error("WalletConnect error:", error);
+        showWalletError("Connection failed: " + error.message);
+      }
     }
-  }
     
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
@@ -670,228 +871,135 @@ async function connectWalletConnect() {
       }
     }
 
-async function connectTrustWallet() {
-  try {
-    if (window.ethereum?.isTrust) {
-      return connectMetaMask(); // Trust Wallet uses same API as MetaMask
-    } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Mobile deep link
-      window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
-    } else {
-      return connectWalletConnect(); // Desktop fallback
-    }
-  } catch (error) {
-    console.error("Trust Wallet error:", error);
-    showWalletError("Trust Wallet connection failed: " + error.message);
-  }
-}
-    
-async function connectBinanceWallet() {
-  try {
-    // Show connecting status
-    showWalletError("Connecting to Binance Wallet...", 'info');
-    
-    // 1. First try direct connection if Binance Chain is available
-    if (window.BinanceChain) {
-      const accounts = await window.BinanceChain.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      
-      userWalletAddress = accounts[0];
-      ethersProvider = new ethers.providers.Web3Provider(window.BinanceChain);
-      
-      // Verify the connection
-      const chainId = await window.BinanceChain.request({ method: 'eth_chainId' });
-      if (!chainId) throw new Error("Connection failed");
-      
-      updateWalletUI();
-      closeWalletModal();
-      showWalletError("Binance Wallet connected!", 'success');
-      return;
-    }
-
-    // 2. Mobile handling
-    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Create hidden iframe for better deeplinking
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = `bnb://wallet/dapp?url=${encodeURIComponent(window.location.href)}`;
-      document.body.appendChild(iframe);
-      
-      // Set timeout for fallback
-      setTimeout(() => {
-        if (!userWalletAddress) {
-          window.location.href = `https://bnb.mobi/wallet/dapp?url=${encodeURIComponent(window.location.href)}`;
+    async function connectTrustWallet() {
+      try {
+        if (window.ethereum?.isTrust) {
+          return connectMetaMask(); // Trust Wallet uses same API as MetaMask
+        } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          // Mobile deep link
+          window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+        } else {
+          return connectWalletConnect(); // Desktop fallback
         }
-      }, 500);
-      
-      return;
-    }
-
-    // 3. Desktop fallback
-    const newWindow = window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
-    if (!newWindow || newWindow.closed) {
-      showWalletError("Pop-up blocked. Please allow pop-ups for this site.");
+      } catch (error) {
+        console.error("Trust Wallet error:", error);
+        showWalletError("Trust Wallet connection failed: " + error.message);
+      }
     }
     
-  } catch (error) {
-    console.error("Binance Wallet error:", error);
-    
-    let errorMessage = "Binance Wallet connection failed";
-    if (error.code === 4001) {
-      errorMessage = "Connection rejected by user";
-    } else {
-      errorMessage += ": " + (error.message || error.toString());
+    async function connectBinanceWallet() {
+      try {
+        if (window.BinanceChain) {
+          const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(window.BinanceChain);
+          updateWalletUI();
+          closeWalletModal();
+        } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          // Mobile deep link
+          window.location.href = `bnb://wallet/dapp?url=${encodeURIComponent(window.location.href)}`;
+        } else {
+          // Desktop fallback
+          window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
+        }
+      } catch (error) {
+        console.error("Binance Wallet error:", error);
+        showWalletError("Binance Wallet connection failed: " + error.message);
+      }
     }
-    
-    showWalletError(errorMessage);
-    
-    // Fallback to WalletConnect if mobile
-    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      setTimeout(() => connectWalletConnect(), 1000);
-    }
-  }
-}
 
     async function connectCoinbaseWallet() {
-  try {
-    // Show connecting status
-    showWalletError("Connecting to Coinbase Wallet...", 'info');
-    
-    // 1. First try direct connection if Coinbase Wallet is available
-    if (window.coinbaseWalletExtension) {
-      const accounts = await window.coinbaseWalletExtension.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      
-      userWalletAddress = accounts[0];
-      ethersProvider = new ethers.providers.Web3Provider(window.coinbaseWalletExtension);
-      
-      // Verify the connection
-      const chainId = await window.coinbaseWalletExtension.request({ method: 'eth_chainId' });
-      if (!chainId) throw new Error("Connection failed");
-      
-      updateWalletUI();
-      closeWalletModal();
-      showWalletError("Coinbase Wallet connected!", 'success');
-      return;
-    }
-
-    // 2. Mobile handling
-    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      // Create hidden iframe for better deeplinking
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`;
-      document.body.appendChild(iframe);
-      
-      // Set timeout for fallback
-      setTimeout(() => {
-        if (!userWalletAddress) {
+      try {
+        if (window.coinbaseWalletExtension) {
+          const accounts = await window.coinbaseWalletExtension.request({ method: 'eth_requestAccounts' });
+          userWalletAddress = accounts[0];
+          ethersProvider = new ethers.providers.Web3Provider(window.coinbaseWalletExtension);
+          updateWalletUI();
+          closeWalletModal();
+        } else if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          // Mobile deep link
           window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`;
+        } else {
+          // Desktop fallback
+          window.open('https://www.coinbase.com/wallet', '_blank');
         }
-      }, 500);
-      
-      return;
+      } catch (error) {
+        console.error("Coinbase Wallet error:", error);
+        showWalletError("Coinbase Wallet connection failed: " + error.message);
+      }
     }
 
-    // 3. Desktop fallback
-    const newWindow = window.open('https://www.coinbase.com/wallet', '_blank');
-    if (!newWindow || newWindow.closed) {
-      showWalletError("Pop-up blocked. Please allow pop-ups for this site.");
-    }
-    
-  } catch (error) {
-    console.error("Coinbase Wallet error:", error);
-    
-    let errorMessage = "Coinbase Wallet connection failed";
-    if (error.code === 4001) {
-      errorMessage = "Connection rejected by user";
-    } else {
-      errorMessage += ": " + (error.message || error.toString());
-    }
-    
-    showWalletError(errorMessage);
-    
-    // Fallback to WalletConnect if mobile
-    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-      setTimeout(() => connectWalletConnect(), 1000);
-    }
-  }
-}
-  </script>
-    <script>
     // ===== PRESALE FUNCTIONS =====
     async function buyFluffi() {
-  const amount = document.getElementById('amountInput').value;
-  const currency = document.getElementById('currencySelect').value;
-  const ref = document.getElementById('refInput').value;
-  
-  if (!userWalletAddress) {
-    showWalletError('Please connect your wallet first.');
-    openWalletModal();
-    return;
-  }
-  
-  if (!amount || isNaN(amount) || Number(amount) <= 0) {
-    showWalletError('Please enter a valid amount.');
-    return;
-  }
-  
-  try {
-    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-    const prevText = buyBtn.textContent;
-    buyBtn.textContent = '⏳ Processing...';
-    buyBtn.disabled = true;
-    
-    let ethValue;
-    if (currency === 'USD') {
-      const usdToEth = 3000; // Example rate
-      ethValue = (Number(amount) / usdToEth).toFixed(6);
-    } else {
-      ethValue = Number(amount).toFixed(6);
-    }
-    
-    let referralAddress = ethers.constants.AddressZero;
-    if (ref) {
-      if (!ethers.utils.isAddress(ref)) {
-        throw new Error("Invalid referral address");
+      const amount = document.getElementById('amountInput').value;
+      const currency = document.getElementById('currencySelect').value;
+      const ref = document.getElementById('refInput').value;
+      
+      if (!userWalletAddress) {
+        showWalletError('Please connect your wallet first.');
+        openWalletModal();
+        return;
       }
-      referralAddress = ref;
+      
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        showWalletError('Please enter a valid amount.');
+        return;
+      }
+      
+      try {
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+        const prevText = buyBtn.textContent;
+        buyBtn.textContent = '⏳ Processing...';
+        buyBtn.disabled = true;
+        
+        let ethValue;
+        if (currency === 'USD') {
+          const usdToEth = 3000; // Example rate
+          ethValue = (Number(amount) / usdToEth).toFixed(6);
+        } else {
+          ethValue = Number(amount).toFixed(6);
+        }
+        
+        let referralAddress = ethers.constants.AddressZero;
+        if (ref) {
+          if (!ethers.utils.isAddress(ref)) {
+            throw new Error("Invalid referral address");
+          }
+          referralAddress = ref;
+        }
+        
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+        
+        // Estimate gas first
+        const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+          value: ethers.utils.parseEther(ethValue.toString())
+        });
+        
+        const tx = await contract.contribute(referralAddress, { 
+          value: ethers.utils.parseEther(ethValue.toString()),
+          gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+        });
+        
+        await tx.wait();
+        
+        buyBtn.textContent = prevText;
+        buyBtn.disabled = false;
+        alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+        
+        // Update displayed balances
+        await updateUserBalances();
+      } catch (err) {
+        console.error("Buy error:", err);
+        const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+        if (buyBtn) {
+          buyBtn.textContent = '🚀 Buy Now';
+          buyBtn.disabled = false;
+        }
+        showWalletError(err.message || "Transaction failed");
+      }
     }
-    
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
-    
-    // Estimate gas first
-    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-      value: ethers.utils.parseEther(ethValue.toString())
-    });
-    
-    const tx = await contract.contribute(referralAddress, { 
-      value: ethers.utils.parseEther(ethValue.toString()),
-      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-    });
-    
-    await tx.wait();
-    
-    buyBtn.textContent = prevText;
-    buyBtn.disabled = false;
-    alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
-    
-    // Update displayed balances
-    await updateUserBalances();
-  } catch (err) {
-    console.error("Buy error:", err);
-    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-    if (buyBtn) {
-      buyBtn.textContent = '🚀 Buy Now';
-      buyBtn.disabled = false;
-    }
-    showWalletError(err.message || "Transaction failed");
-  }
-}
 
     // ===== STAKING FUNCTIONS =====
     async function stakeFluffi() {
@@ -953,61 +1061,61 @@ async function connectBinanceWallet() {
 
     // ===== CLAIM FUNCTIONS =====
     async function claimTokens() {
-  try {
-    if (!userWalletAddress) {
-      throw new Error("Please connect your wallet first");
-    }
-    
-    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const fluffiContract = new ethers.Contract(
-      FLUFFI_CONTRACT_ADDRESS,
-      FLUFFI_CONTRACT_ABI,
-      signer
-    );
-    
-    // Check if presale has ended
-    const presaleEnded = await fluffiContract.presaleEnded();
-    if (!presaleEnded) {
-      throw new Error("Presale has not ended yet");
-    }
-    
-    // Check claimable amount
-    const claimable = await fluffiContract.getClaimableAmount(userWalletAddress);
-    if (claimable.lte(0)) {
-      throw new Error("No tokens available to claim");
-    }
+      try {
+        if (!userWalletAddress) {
+          throw new Error("Please connect your wallet first");
+        }
+        
+        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const fluffiContract = new ethers.Contract(
+          FLUFFI_CONTRACT_ADDRESS,
+          FLUFFI_CONTRACT_ABI,
+          signer
+        );
+        
+        // Check if presale has ended
+        const presaleEnded = await fluffiContract.presaleEnded();
+        if (!presaleEnded) {
+          throw new Error("Presale has not ended yet");
+        }
+        
+        // Check claimable amount
+        const claimable = await fluffiContract.getClaimableAmount(userWalletAddress);
+        if (claimable.lte(0)) {
+          throw new Error("No tokens available to claim");
+        }
 
-    const claimBtn = document.querySelector('#claim button');
-    const originalText = claimBtn.textContent;
-    claimBtn.disabled = true;
-    claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
+        const claimBtn = document.querySelector('#claim button');
+        const originalText = claimBtn.textContent;
+        claimBtn.disabled = true;
+        claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
 
-    // Estimate gas first
-    const gasEstimate = await fluffiContract.estimateGas.claim();
-    
-    const tx = await fluffiContract.claim({
-      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-    });
-    
-    await tx.wait();
-    
-    claimBtn.disabled = false;
-    claimBtn.textContent = originalText;
-    await updateUserBalances();
-    
-    alert("Tokens claimed successfully!");
-  } catch (error) {
-    console.error("Claim error:", error);
-    showWalletError(error.message || "Claim failed");
-    
-    const claimBtn = document.querySelector('#claim button');
-    if (claimBtn) {
-      claimBtn.disabled = false;
-      claimBtn.textContent = 'Claim Tokens';
+        // Estimate gas first
+        const gasEstimate = await fluffiContract.estimateGas.claim();
+        
+        const tx = await fluffiContract.claim({
+          gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+        });
+        
+        await tx.wait();
+        
+        claimBtn.disabled = false;
+        claimBtn.textContent = originalText;
+        await updateUserBalances();
+        
+        alert("Tokens claimed successfully!");
+      } catch (error) {
+        console.error("Claim error:", error);
+        showWalletError(error.message || "Claim failed");
+        
+        const claimBtn = document.querySelector('#claim button');
+        if (claimBtn) {
+          claimBtn.disabled = false;
+          claimBtn.textContent = 'Claim Tokens';
+        }
+      }
     }
-  }
-}
 
     // ===== UTILITY FUNCTIONS =====
     async function updateUserBalances() {
@@ -1052,186 +1160,171 @@ async function connectBinanceWallet() {
         tokenChart.update();
       }
     }
-function initTokenChart() {
-  const ctx = document.getElementById('tokenChart');
-  if (!ctx) return;
-  
-  const isDark = document.documentElement.classList.contains('dark');
-  
-  tokenChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
-        ],
-        borderWidth: 2,
-        borderColor: isDark ? '#1F2937' : '#FFFFFF'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: window.innerWidth < 768 ? 'bottom' : 'right',
-          labels: {
-            color: isDark ? '#FFFFFF' : '#111827',
-            font: {
-              size: window.innerWidth < 768 ? 12 : 14
-            },
-            padding: 20,
-          }
+
+    function initTokenChart() {
+      const ctx = document.getElementById('tokenChart');
+      if (!ctx) return;
+      
+      const isDark = document.documentElement.classList.contains('dark');
+      
+      tokenChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+          datasets: [{
+            data: [40, 30, 20, 5, 5],
+            backgroundColor: [
+              '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
+            ],
+            borderWidth: 2,
+            borderColor: isDark ? '#1F2937' : '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: window.innerWidth < 768 ? 'bottom' : 'right',
+              labels: {
+                color: isDark ? '#FFFFFF' : '#111827',
+                font: {
+                  size: window.innerWidth < 768 ? 12 : 14
+                },
+                padding: 20,
+              }
+            }
+          },
+          cutout: '65%'
         }
-      },
-      cutout: '65%'
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        if (tokenChart) {
+          tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
+          tokenChart.update();
+        }
+      });
     }
-  });
-
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (tokenChart) {
-      tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
-      tokenChart.update();
+    
+    // ===== TIMER FUNCTIONS =====
+    function getPresaleStartTime() {
+      let startTime = localStorage.getItem('presaleStartTime');
+      if (!startTime) {
+        // Set initial start time to now (for testing)
+        startTime = Date.now();
+        // For production, you might want to set a fixed start time:
+        // startTime = new Date('2025-07-28T00:00:00Z').getTime();
+        localStorage.setItem('presaleStartTime', startTime);
+      }
+      return parseInt(startTime);
     }
-  });
-}
-// ===== TIMER FUNCTIONS =====
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // Set initial start time to now (for testing)
-    startTime = Date.now();
-    // For production, you might want to set a fixed start time:
-    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
-    localStorage.setItem('presaleStartTime', startTime);
-  }
-  return parseInt(startTime);
-}
 
-function formatTime(ms) {
-  const days = Math.floor(ms / (24 * 3600 * 1000));
-  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
-  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-  
-  return {
-    days: days.toString().padStart(2, '0'),
-    hours: hours.toString().padStart(2, '0'),
-    minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0'),
-    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-  };
-}
+    function formatTime(ms) {
+      const days = Math.floor(ms / (24 * 3600 * 1000));
+      const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
+      const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+      
+      return {
+        days: days.toString().padStart(2, '0'),
+        hours: hours.toString().padStart(2, '0'),
+        minutes: minutes.toString().padStart(2, '0'),
+        seconds: seconds.toString().padStart(2, '0'),
+        full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+      };
+    }
 
-function updateNextIncreaseTime() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
-  const timeLeft = nextStageTime - now;
-  
-  const formatted = formatTime(timeLeft);
-  document.getElementById('nextIncreaseTime').textContent = formatted.full;
-}
+    function updateNextIncreaseTime() {
+      const now = Date.now();
+      const startTime = getPresaleStartTime();
+      const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
+      const timeLeft = nextStageTime - now;
+      
+      const formatted = formatTime(timeLeft);
+      document.getElementById('nextIncreaseTime').textContent = formatted.full;
+    }
 
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
-  const timeLeft = endTime - now;
+    function updateTimers() {
+      const now = Date.now();
+      const startTime = getPresaleStartTime();
+      const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
+      const timeLeft = endTime - now;
 
-  // Calculate stage progress
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / (48 * 3600 * 1000)),
-    14 // Max stage index
-  );
-  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
-  const stageTimeLeft = stageEndTime - now;
-  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
+      // Calculate stage progress
+      const currentStage = Math.min(
+        Math.floor((now - startTime) / (48 * 3600 * 1000)),
+        14 // Max stage index
+      );
+      const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
+      const stageTimeLeft = stageEndTime - now;
+      const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
 
-  // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
+      // Update displays
+      document.getElementById('current-stage').textContent = currentStage + 1;
+      document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
 
-  // Update price
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
+      // Update price
+      const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+      document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
 
-  // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
-  } else {
-    const formattedTotal = formatTime(timeLeft);
-    const formattedStage = formatTime(stageTimeLeft);
-    
-    document.getElementById('presale-days').textContent = formattedTotal.days;
-    document.getElementById('presale-hours').textContent = formattedTotal.hours;
-    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
-    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
-    
-    document.getElementById('stage-time-left').textContent = formattedStage.full;
-  }
-}
+      // Update timers
+      if (timeLeft <= 0) {
+        document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+        document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
+      } else {
+        const formattedTotal = formatTime(timeLeft);
+        const formattedStage = formatTime(stageTimeLeft);
+        
+        document.getElementById('presale-days').textContent = formattedTotal.days;
+        document.getElementById('presale-hours').textContent = formattedTotal.hours;
+        document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
+        document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
+        
+        document.getElementById('stage-time-left').textContent = formattedStage.full;
+      }
+    }
 
-// Initialize the timer
-function initTimer() {
-  updateTimers();
-  updateNextIncreaseTime();
-  // Update every second
-  setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
-}
+    // Initialize the timer
+    function initTimer() {
+      updateTimers();
+      updateNextIncreaseTime();
+      // Update every second
+      setInterval(() => {
+        updateTimers();
+        updateNextIncreaseTime();
+      }, 1000);
+    }
 
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize dark mode
+      if (localStorage.getItem('darkMode') === 'true' || 
+          (localStorage.getItem('darkMode') === null && 
+           window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('darkModeIcon').textContent = '🌙';
+      }
 
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-  }
+      // Check if MetaMask is installed
+      if (window.ethereum?.isMetaMask) {
+        document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+      }
 
-  // Initialize token chart
-  initTokenChart();
+      // Initialize token chart
+      initTokenChart();
 
-  // Initialize timers
-  initTimer();
+      // Initialize timers
+      initTimer();
 
-  // Check for referral parameter
-  checkReferral();
-});
+      // Check for referral parameter
+      checkReferral();
+    });
 
-// Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  }
-}
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
       const urlParams = new URLSearchParams(window.location.search);
