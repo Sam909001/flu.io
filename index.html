@@ -442,14 +442,13 @@ function resetTimer() {
       </div>
     </div>
     
-    <div id="qrCodeContainer" class="qr-container hidden">
-      <button onclick="showWalletOptions()" class="mb-4 text-blue-500">
-        ← Back to wallets
-      </button>
-      <h3 class="mb-4">Scan with your wallet</h3>
-      <div class="qr-wrapper">
-        <img id="qrImage" width="200" height="200" class="mx-auto">
-      </div>
+    <div id="qrCodeContainer" class="hidden">
+  <img id="qrImage" alt="WalletConnect QR" />
+  <p>Or open directly in your wallet app:</p>
+  <a id="metaMaskBtn" target="_blank">Open in MetaMask</a><br>
+  <a id="trustWalletBtn" target="_blank">Open in Trust Wallet</a><br>
+  <a id="coinbaseBtn" target="_blank">Open in Coinbase Wallet</a>
+</div>
       
       <div class="mt-4">
         <p class="mb-2">Or open directly in:</p>
@@ -584,23 +583,27 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-      async function connectWalletConnect() {
+       async function connectWalletConnect() {
     try {
-      // Init provider
       walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
 
-      // Listen for QR code URI
+      // 🔹 QR code event
       walletProvider.on("display_uri", (uri) => {
         currentWCUri = uri;
 
+        // Show QR for desktop
         document.getElementById("walletConnectSection").classList.add("hidden");
         document.getElementById("qrCodeContainer").classList.remove("hidden");
-
         document.getElementById("qrImage").src =
           `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+
+        // 🔹 Set deep links for mobile wallets
+        document.getElementById("metaMaskBtn").href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
+        document.getElementById("trustWalletBtn").href = `trust://wc?uri=${encodeURIComponent(uri)}`;
+        document.getElementById("coinbaseBtn").href = `coinbase://wc?uri=${encodeURIComponent(uri)}`;
       });
 
-      // Enable session
+      // Enable session (wait for user connection)
       await walletProvider.enable();
 
       // Get accounts
