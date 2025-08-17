@@ -396,7 +396,7 @@ function resetTimer() {
       </button>
     </div>
     
-    <div id="walletConnectSection">
+    <div id="Section">
       <!-- Fixed WalletConnect icon -->
       <div class="wallet-option" onclick="connectWalletConnect()">
         <div class="wallet-icon">
@@ -468,11 +468,9 @@ function resetTimer() {
   </div>
 
   <!-- JavaScript Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.9.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Main Application Script -->
   <script>
@@ -586,41 +584,39 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        const { default: WalletConnectProvider } = await import('https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js');
-        
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
-      }
+     async function connectWalletConnect() {
+    try {
+      walletProvider = await window.WalletConnectProviderEthereumProvider.init(WALLETCONNECT_CONFIG);
+
+      // Listen for QR code URI
+      walletProvider.on("display_uri", (uri) => {
+        currentWCUri = uri;
+
+        document.getElementById("walletConnectSection").classList.add("hidden");
+        document.getElementById("qrCodeContainer").classList.remove("hidden");
+
+        document.getElementById("qrImage").src =
+          `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+      });
+
+      // Enable session
+      await walletProvider.enable();
+
+      // Get accounts
+      const accounts = await walletProvider.request({ method: "eth_accounts" });
+      userWalletAddress = accounts[0];
+
+      // Wrap in ethers.js provider
+      ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+
+      // Update UI
+      updateWalletUI();
+      closeWalletModal();
+    } catch (error) {
+      console.error("WalletConnect error:", error);
+      showWalletError("Connection failed: " + (error.message || error));
     }
+  }
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
