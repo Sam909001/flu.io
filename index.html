@@ -509,8 +509,8 @@ function resetTimer() {
   }
 };
     // Global variables
-    let walletProvider = null;
-    let ethersProvider = null;
+    let walletProvider;
+    let ethersProvider;
     let userWalletAddress = null;
     let tokenChart = null;
     let currentWCUri = ''; // Store WalletConnect URI
@@ -583,44 +583,40 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-       async function connectWalletConnect() {
+async function connectWalletConnect() {
     try {
+      // 🔑 IMPORTANT: the global is `window.EthereumProvider`
       walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
 
-      // 🔹 QR code event
+      // Listen for QR URI
       walletProvider.on("display_uri", (uri) => {
         currentWCUri = uri;
 
-        // Show QR for desktop
-        document.getElementById("walletConnectSection").classList.add("hidden");
+        // Show QR
         document.getElementById("qrCodeContainer").classList.remove("hidden");
         document.getElementById("qrImage").src =
           `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
 
-        // 🔹 Set deep links for mobile wallets
+        // Mobile deep links
         document.getElementById("metaMaskBtn").href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
         document.getElementById("trustWalletBtn").href = `trust://wc?uri=${encodeURIComponent(uri)}`;
         document.getElementById("coinbaseBtn").href = `coinbase://wc?uri=${encodeURIComponent(uri)}`;
       });
 
-      // Enable session (wait for user connection)
+      // Request accounts
       await walletProvider.enable();
-
-      // Get accounts
       const accounts = await walletProvider.request({ method: "eth_accounts" });
       userWalletAddress = accounts[0];
 
-      // Wrap with ethers.js
       ethersProvider = new ethers.providers.Web3Provider(walletProvider);
 
-      // Update UI
       updateWalletUI();
-      closeWalletModal();
     } catch (error) {
       console.error("WalletConnect error:", error);
-      showWalletError("Connection failed: " + (error.message || error));
+      alert("Connection failed: " + (error.message || error));
     }
   }
+    
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
       document.getElementById('qrCodeContainer').classList.add('hidden');
