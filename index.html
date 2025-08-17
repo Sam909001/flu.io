@@ -584,9 +584,10 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-     async function connectWalletConnect() {
+      async function connectWalletConnect() {
     try {
-      walletProvider = await window.WalletConnectProviderEthereumProvider.init(WALLETCONNECT_CONFIG);
+      // Init provider
+      walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
 
       // Listen for QR code URI
       walletProvider.on("display_uri", (uri) => {
@@ -606,7 +607,7 @@ function resetTimer() {
       const accounts = await walletProvider.request({ method: "eth_accounts" });
       userWalletAddress = accounts[0];
 
-      // Wrap in ethers.js provider
+      // Wrap with ethers.js
       ethersProvider = new ethers.providers.Web3Provider(walletProvider);
 
       // Update UI
@@ -617,7 +618,6 @@ function resetTimer() {
       showWalletError("Connection failed: " + (error.message || error));
     }
   }
-
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
       document.getElementById('qrCodeContainer').classList.add('hidden');
