@@ -468,7 +468,13 @@ function resetTimer() {
   </div>
 
   <!-- JavaScript Libraries -->
-  <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.9.0"></script>
+  <script type="module">
+  import WalletConnectEthereumProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.9.0/dist/index.min.js";
+
+  window.WalletConnectEthereumProvider = WalletConnectEthereumProvider;
+
+  console.log("Loaded provider:", window.WalletConnectEthereumProvider);
+</script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
