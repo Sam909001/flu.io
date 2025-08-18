@@ -1443,6 +1443,15 @@
     </div>
   </div>
 
+  <!-- Ethers.js -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<!-- WalletConnect Ethereum Provider v2 -->
+<script type="module">
+  import WalletConnectProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.9.0/dist/index.min.js";
+  window.WalletConnectProvider = WalletConnectProvider;
+</script>
+
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -1503,42 +1512,46 @@
     });
 
     // Initialize WalletConnect
-    function initWalletConnect() {
-      try {
-        walletConnectConnector = new WalletConnect.default.WalletConnect({
-          bridge: "https://bridge.walletconnect.org", // WalletConnect bridge URL
-          qrcodeModal: {
-            open: (uri) => {
-              openWalletConnectModal(uri);
-            },
-            close: () => {
-              closeWalletConnectModal();
-            }
-          }
-        });
-        
-        // Check if connection is already established
-        if (walletConnectConnector.connected) {
-          const { accounts } = walletConnectConnector;
-          handleWalletConnection(accounts[0]);
-        }
-        
-        // Subscribe to events
-        walletConnectConnector.on("connect", (error, payload) => {
-          if (error) throw error;
-          const { accounts } = payload.params[0];
-          handleWalletConnection(accounts[0]);
-          closeWalletConnectModal();
-        });
-        
-        walletConnectConnector.on("disconnect", (error) => {
-          if (error) throw error;
-          disconnectWallet();
-        });
-      } catch (error) {
-        console.error("WalletConnect initialization error:", error);
-      }
+   async function initWalletConnect() {
+  try {
+    const WALLETCONNECT_CONFIG = {
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // from cloud.walletconnect.com
+      chains: [56], // BSC Mainnet (use 97 for BSC Testnet)
+      showQrModal: false, // we use our custom modal
+      metadata: {
+        name: "Fluffi Airdrop",
+        description: "Fluffi Token Airdrop",
+        url: window.location.origin,
+        icons: ["https://fluffi.site/logo.png"],
+      },
+    };
+
+    walletConnectConnector = await window.WalletConnectProvider.init(WALLETCONNECT_CONFIG);
+
+    // Show QR when WC asks
+    walletConnectConnector.on("display_uri", (uri) => {
+      openWalletConnectModal(uri);
+    });
+
+    // Already connected?
+    const accounts = await walletConnectConnector.request({ method: "eth_accounts" });
+    if (accounts.length > 0) {
+      handleWalletConnection(accounts[0]);
     }
+
+    // Listen to account changes
+    walletConnectConnector.on("accountsChanged", (accounts) => {
+      if (accounts.length > 0) {
+        handleWalletConnection(accounts[0]);
+      } else {
+        disconnectWallet();
+      }
+    });
+
+  } catch (error) {
+    console.error("WalletConnect initialization error:", error);
+  }
+}
 
     // Timer functions
     function initializeCountdown() {
@@ -1908,11 +1921,20 @@
             }
           }
         }
-        else if (walletType === 'walletconnect') {
-          if (!walletConnectConnector.connected) {
-            walletConnectConnector.createSession();
-          }
-        }
+       else if (walletType === 'walletconnect') {
+  try {
+    await walletConnectConnector.enable();
+    const accounts = await walletConnectConnector.request({ method: "eth_accounts" });
+    if (accounts.length > 0) {
+      handleWalletConnection(accounts[0]);
+    }
+    closeWalletConnectModal();
+  } catch (error) {
+    showNotification("Failed to connect via WalletConnect", "error");
+    console.error("WalletConnect error:", error);
+  }
+}
+
         else if (walletType === 'phantom') {
           if (isMobile()) {
             if (window.phantom && window.phantom.solana) {
@@ -1998,9 +2020,9 @@
       localStorage.removeItem('walletAddress');
       
       // Disconnect WalletConnect if connected
-      if (walletConnectConnector && walletConnectConnector.connected) {
-        walletConnectConnector.killSession();
-      }
+      if (walletConnectConnector) {
+  walletConnectConnector.disconnect();
+}
       
       showNotification("Wallet disconnected", "success");
     }
