@@ -468,9 +468,7 @@ function resetTimer() {
   </div>
 
   <!-- JavaScript Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.4.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@2.8.0/dist/umd/index.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/qrcode-modal@2.7.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.9.0/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -588,7 +586,7 @@ function resetTimer() {
     // Fixed WalletConnect function
     async function connectWalletConnect() {
       try {
-        walletProvider = new WalletConnectProvider(WALLETCONNECT_CONFIG);
+        walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
         
         // Subscribe to events
         walletProvider.on("display_uri", (err, payload) => {
