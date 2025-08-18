@@ -1082,10 +1082,15 @@
   </div>
 
   <!-- JavaScript Libraries -->
-  <script type="module">
+  <!-- Load ethers first -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<!-- Load WalletConnect v2 provider -->
+<script type="module">
   import WalletConnectEthereumProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.9.0/dist/index.min.js";
   window.WalletConnectEthereumProvider = WalletConnectEthereumProvider;
 </script>
+
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -1505,14 +1510,13 @@
         
  else if (walletType === 'walletconnect') {
   try {
-    // ✅ initialize WalletConnect v2 provider
     const WALLETCONNECT_CONFIG = {
-      projectId: "YOUR_PROJECT_ID", // get from cloud.walletconnect.com
-      chains: [56], // BSC mainnet (or 97 for testnet)
-      showQrModal: false, // we handle QR manually
+      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // from cloud.walletconnect.com
+      chains: [56], // BSC mainnet, use 97 for BSC testnet
+      showQrModal: false,
       metadata: {
-        name: "Fluffi Presale",
-        description: "Fluffi Token Presale",
+        name: "Fluffi Airdrop",
+        description: "Fluffi Token Airdrop",
         url: window.location.origin,
         icons: ["https://fluffi.site/logo.png"],
       },
@@ -1520,15 +1524,13 @@
 
     const provider = await window.WalletConnectEthereumProvider.init(WALLETCONNECT_CONFIG);
 
-    // Show QR code when WC fires "display_uri"
+    // Show QR when WC asks
     provider.on("display_uri", (uri) => {
       openWalletConnectModal(uri);
     });
 
-    // Enable session (opens QR code if mobile wallet)
     await provider.enable();
 
-    // Request accounts
     const accounts = await provider.request({ method: "eth_accounts" });
 
     if (accounts && accounts.length > 0) {
@@ -1537,7 +1539,6 @@
       showWalletError("No account returned from WalletConnect");
     }
 
-    // Optional: listen for account changes
     provider.on("accountsChanged", (accounts) => {
       if (accounts.length > 0) {
         handleWalletConnection(accounts[0]);
@@ -1551,7 +1552,6 @@
     showWalletError("Failed to connect via WalletConnect");
   }
 }
-
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
