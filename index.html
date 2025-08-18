@@ -584,39 +584,40 @@ function resetTimer() {
 }
     
     // Fixed WalletConnect function
-    async function connectWalletConnect() {
-      try {
-        walletProvider = await window.EthereumProvider.init(WALLETCONNECT_CONFIG);
-        
-        // Subscribe to events
-        walletProvider.on("display_uri", (err, payload) => {
-          const { uri } = payload.params[0];
-          currentWCUri = uri;
-          
-          document.getElementById('walletConnectSection').classList.add('hidden');
-          document.getElementById('qrCodeContainer').classList.remove('hidden');
-          
-          // Generate QR code
-          document.getElementById('qrImage').src = 
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
-        });
-        
-        // Enable session
-        await walletProvider.enable();
-        
-        // Get accounts
-        const accounts = await walletProvider.request({ method: 'eth_accounts' });
-        userWalletAddress = accounts[0];
-        ethersProvider = new ethers.providers.Web3Provider(walletProvider);
-        
-        // Update UI
-        updateWalletUI();
-        closeWalletModal();
-      } catch (error) {
-        console.error("WalletConnect error:", error);
-        showWalletError("Connection failed: " + error.message);
-      }
-    }
+   async function connectWalletConnect() {
+  try {
+    // ✅ Correct global object
+    walletProvider = await window.WalletConnectEthereumProvider.init(WALLETCONNECT_CONFIG);
+
+    // QR event
+    walletProvider.on("display_uri", (uri) => {
+      currentWCUri = uri;
+      document.getElementById("qrCodeContainer").classList.remove("hidden");
+      document.getElementById("qrImage").src =
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(uri)}`;
+
+      // Deep links
+      document.getElementById("metaMaskBtn").href = `metamask://wc?uri=${encodeURIComponent(uri)}`;
+      document.getElementById("trustWalletBtn").href = `trust://wc?uri=${encodeURIComponent(uri)}`;
+      document.getElementById("coinbaseBtn").href = `coinbase://wc?uri=${encodeURIComponent(uri)}`;
+    });
+
+    // Enable
+    await walletProvider.enable();
+
+    // Accounts
+    const accounts = await walletProvider.request({ method: "eth_accounts" });
+    userWalletAddress = accounts[0];
+
+    // Wrap with ethers
+    ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+
+    updateWalletUI();
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    alert("Connection failed: " + (err.message || err));
+  }
+}
 
     function showWalletOptions() {
       document.getElementById('walletConnectSection').classList.remove('hidden');
