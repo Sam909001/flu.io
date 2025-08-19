@@ -304,11 +304,6 @@
       border-bottom: 1px solid #e5e7eb;
     }
     
-    .dark .referral-table th,
-    .dark .referral-table td {
-      border-bottom-color: #4b5563;
-    }
-    
     .referral-table th {
       font-weight: 600;
     }
@@ -830,9 +825,6 @@
   transition: all 0.3s ease;
 }
     
-    .dark .referral-section {
-      background: #1f2937;
-    }
     
     .referral-box {
       background: linear-gradient(135deg, #8B5CF6, #3B82F6);
@@ -846,14 +838,6 @@
     .referral-input-group {
       display: flex;
       margin-top: 12px;
-    }
-    
-    .referral-input {
-      flex-grow: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px 0 0 8px;
-      font-size: 16px;
     }
     
     .referral-btn {
@@ -970,10 +954,6 @@
       to { transform: rotate(360deg); }
     }
 
-.dark .referral-box {
-  background: linear-gradient(135deg, #6B46C1, #1E40AF) !important;
-}
-
 .dark .wallet-address-display {
   color: #f0f0f0 !important;
 }
@@ -1023,11 +1003,6 @@
   color: inherit !important;
 }
 
-.dark .referral-section p,
-.dark .referral-section h3 {
-  color: #f0f0f0 !important;
-}
-
 /* Ensure all text in these sections is visible */
 .dark .tasks-section,
 .dark .airdrop-section,
@@ -1071,6 +1046,50 @@
 
 .dark .border-gray-700 {
   border-color: #4B5563 !important;
+}
+    .referral-input {
+  flex-grow: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  font-size: 16px;
+  color: #000000 !important; /* Add this line */
+}
+
+.dark .referral-input {
+  color: #ffffff !important; /* Ensure it stays white in dark mode */
+}
+
+/* Also fix the placeholder color */
+.referral-input::placeholder {
+  color: #666666 !important;
+}
+
+.dark .referral-input::placeholder {
+  color: #cccccc !important;
+}
+    .referral-box {
+  background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+  border-radius: 12px;
+  padding: 20px;
+  color: white; /* Keep text white */
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* If you want to change the text color instead of keeping white */
+.referral-box h3 {
+  color: white !important; /* Force white text on gradient */
+}
+
+.referral-input {
+  color: #000000 !important; /* Black text for input */
+  background: white !important; /* White background for input */
+}
+
+.dark .referral-input {
+  color: #ffffff !important; /* White text in dark mode */
+  background: #374151 !important; /* Dark background in dark mode */
 }
   </style>
 </head>
