@@ -1555,6 +1555,7 @@
 <!-- WalletConnect Ethereum Provider v2 -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@1.7.8/dist/umd/index.min.js"></script>
+  
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -1564,8 +1565,8 @@
       retweet: false
     };
     let countdownInterval = null;
-    let walletConnectConnector = null;
-    
+    let walletConnectProvider = null;
+
     // For development - show dev section if URL has ?dev=true
     if (window.location.search.includes('dev=true')) {
       document.getElementById('devSection').classList.remove('hidden');
@@ -1609,95 +1610,92 @@
         tasksCompleted = JSON.parse(savedTasks);
         updateTaskUI();
       }
-      
-     // Global variable for WalletConnect
-let walletConnect = null;
-
-// Initialize WalletConnect
-async function initWalletConnect() {
-  try {
-    if (typeof WalletConnectProvider === 'undefined') {
-      showNotification("WalletConnect not loaded properly", "error");
-      return;
-    }
-
-    // Create WalletConnect Provider
-    walletConnect = new WalletConnectProvider.default({
-      infuraId: "9aa3d95b3bc440fa88ea12eaa4456161", // Free public Infura ID
-      chainId: 1, // Ethereum Mainnet
-      qrcodeModal: QRCodeModal.default,
     });
+    
+    // Initialize WalletConnect
+    async function initWalletConnect() {
+      try {
+        if (typeof WalletConnectProvider === 'undefined') {
+          showNotification("WalletConnect not loaded properly", "error");
+          return;
+        }
 
-    // Check if already connected
-    if (walletConnect.connected) {
-      const accounts = walletConnect.accounts;
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
+        // Create WalletConnect Provider
+        walletConnectProvider = new WalletConnectProvider.default({
+          infuraId: "9aa3d95b3bc440fa88ea12eaa4456161",
+          chainId: 1,
+          qrcodeModal: QRCodeModal.default,
+        });
+
+        // Check if already connected
+        if (walletConnectProvider.wc.connected) {
+          const accounts = walletConnectProvider.accounts;
+          if (accounts.length > 0) {
+            handleWalletConnection(accounts[0]);
+          }
+        }
+
+        // Subscribe to accounts change
+        walletConnectProvider.wc.on("accountsChanged", (accounts) => {
+          if (accounts.length > 0) {
+            handleWalletConnection(accounts[0]);
+          } else {
+            disconnectWallet();
+          }
+        });
+
+        // Subscribe to chain change
+        walletConnectProvider.wc.on("chainChanged", (chainId) => {
+          console.log("Chain changed:", chainId);
+        });
+
+        // Subscribe to session disconnect
+        walletConnectProvider.wc.on("disconnect", (error) => {
+          console.log("WalletConnect disconnected", error);
+          disconnectWallet();
+        });
+
+      } catch (error) {
+        console.error("WalletConnect init error:", error);
       }
     }
 
-    // Subscribe to accounts change
-    walletConnect.on("accountsChanged", (accounts) => {
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
-      } else {
-        disconnectWallet();
-      }
-    });
+    // WalletConnect connection function
+    async function connectWalletConnect() {
+      try {
+        if (!walletConnectProvider) {
+          await initWalletConnect();
+        }
 
-    // Subscribe to chain change
-    walletConnect.on("chainChanged", (chainId) => {
-      console.log("Chain changed:", chainId);
-    });
+        if (walletConnectProvider.wc.connected) {
+          const accounts = walletConnectProvider.accounts;
+          if (accounts.length > 0) {
+            handleWalletConnection(accounts[0]);
+            return;
+          }
+        }
 
-    // Subscribe to session disconnect
-    walletConnect.on("disconnect", (error) => {
-      console.log("WalletConnect disconnected", error);
-      disconnectWallet();
-    });
+        // Enable session (triggers QR Code modal)
+        await walletConnectProvider.enable();
+        const accounts = walletConnectProvider.accounts;
+        
+        if (accounts && accounts.length > 0) {
+          handleWalletConnection(accounts[0]);
+        } else {
+          showNotification("No accounts found", "error");
+        }
 
-  } catch (error) {
-    console.error("WalletConnect init error:", error);
-  }
-}
-
-// WalletConnect connection function
-async function connectWalletConnect() {
-  try {
-    if (!walletConnect) {
-      await initWalletConnect();
-    }
-
-    if (walletConnect.connected) {
-      const accounts = walletConnect.accounts;
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
-        return;
+      } catch (error) {
+        console.error("WalletConnect connection error:", error);
+        
+        if (error.message && error.message.includes("User closed modal")) {
+          showNotification("Connection cancelled", "error");
+        } else {
+          showNotification("Failed to connect with WalletConnect", "error");
+        }
       }
     }
 
-    // Enable session (triggers QR Code modal)
-    const accounts = await walletConnect.enable();
-    
-    if (accounts && accounts.length > 0) {
-      handleWalletConnection(accounts[0]);
-    } else {
-      showNotification("No accounts found", "error");
-    }
-
-  } catch (error) {
-    console.error("WalletConnect connection error:", error);
-    
-    if (error.message.includes("User closed modal")) {
-      showNotification("Connection cancelled", "error");
-    } else {
-      showNotification("Failed to connect with WalletConnect", "error");
-    }
-    
-    // Reset on error
-    walletConnect = null;
-  }
-}
     // Timer functions
     function initializeCountdown() {
       let endTime = localStorage.getItem('airdropEndTime');
@@ -1771,37 +1769,38 @@ async function connectWalletConnect() {
     }
     
     function openWalletConnectModal(uri) {
-  try {
-    const modal = document.getElementById('walletConnectModal');
-    const linkElement = document.getElementById('walletConnectLink');
-    
-    document.getElementById('walletConnectQrCode').innerHTML = '';
-    
-    // Generate QR code
-    QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-      width: 200,
-      margin: 2,
-      color: {
-        dark: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
-        light: '#00000000'
+      try {
+        const modal = document.getElementById('walletConnectModal');
+        const linkElement = document.getElementById('walletConnectLink');
+        
+        document.getElementById('walletConnectQrCode').innerHTML = '';
+        
+        // Generate QR code
+        QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
+            light: '#00000000'
+          }
+        });
+        
+        if (isMobile()) {
+          linkElement.classList.remove('hidden');
+          linkElement.onclick = function() {
+            window.location.href = uri;
+          };
+        } else {
+          linkElement.classList.add('hidden');
+        }
+        
+        modal.classList.add('active');
+      } catch (error) {
+        console.error("Error opening WalletConnect modal:", error);
+        showNotification("Failed to generate QR code", "error");
       }
-    });
-    
-    if (isMobile()) {
-      linkElement.classList.remove('hidden');
-      linkElement.onclick = function() {
-        window.location.href = uri;
-      };
-    } else {
-      linkElement.classList.add('hidden');
     }
     
-    modal.classList.add('active');
-  } catch (error) {
-    console.error("Error opening WalletConnect modal:", error);
-    showNotification("Failed to generate QR code", "error");
-  }
-}
     function closeWalletConnectModal() {
       document.getElementById('walletConnectModal').classList.remove('active');
     }
@@ -2071,30 +2070,29 @@ async function connectWalletConnect() {
             }
           }
         }
-else if (walletType === 'walletconnect') {
-  // Show loading state
-  const walletButton = document.getElementById('walletButton');
-  const originalText = walletButton.innerHTML;
-  walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
-  walletButton.disabled = true;
-  
-  try {
-    await connectWalletConnect();
-    closeWalletModal();
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    showNotification("Failed to connect via WalletConnect", "error");
-  } finally {
-    // Reset button state
-    setTimeout(() => {
-      if (document.getElementById('walletButton')) {
-        document.getElementById('walletButton').innerHTML = originalText;
-        document.getElementById('walletButton').disabled = false;
-      }
-    }, 2000);
-  }
-}
-
+        else if (walletType === 'walletconnect') {
+          // Show loading state
+          const walletButton = document.getElementById('walletButton');
+          const originalText = walletButton.innerHTML;
+          walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
+          walletButton.disabled = true;
+          
+          try {
+            await connectWalletConnect();
+            closeWalletModal();
+          } catch (error) {
+            console.error("WalletConnect error:", error);
+            showNotification("Failed to connect via WalletConnect", "error");
+          } finally {
+            // Reset button state
+            setTimeout(() => {
+              if (document.getElementById('walletButton')) {
+                document.getElementById('walletButton').innerHTML = originalText;
+                document.getElementById('walletButton').disabled = false;
+              }
+            }, 2000);
+          }
+        }
         else if (walletType === 'phantom') {
           if (isMobile()) {
             if (window.phantom && window.phantom.solana) {
@@ -2162,34 +2160,35 @@ else if (walletType === 'walletconnect') {
       showNotification("Wallet connected successfully!", "success");
     }
 
-function disconnectWallet() {
-  userWalletAddress = null;
-  
-  const walletButtons = document.getElementById('walletButtons');
-  walletButtons.innerHTML = `
-    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
-      <i class="fas fa-wallet mr-2"></i>Connect Wallet
-    </button>
-  `;
-  
-  document.getElementById('walletButton').addEventListener('click', openWalletModal);
-  document.getElementById('walletAddress').value = '';
-  
-  localStorage.removeItem('walletConnected');
-  localStorage.removeItem('walletAddress');
-  
-  // Disconnect WalletConnect if connected
-  if (walletConnect && walletConnect.connected) {
-    try {
-      walletConnect.disconnect();
-    } catch (error) {
-      console.error("Error disconnecting WalletConnect:", error);
+    function disconnectWallet() {
+      userWalletAddress = null;
+      
+      const walletButtons = document.getElementById('walletButtons');
+      walletButtons.innerHTML = `
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+          <i class="fas fa-wallet mr-2"></i>Connect Wallet
+        </button>
+      `;
+      
+      document.getElementById('walletButton').addEventListener('click', openWalletModal);
+      document.getElementById('walletAddress').value = '';
+      
+      localStorage.removeItem('walletConnected');
+      localStorage.removeItem('walletAddress');
+      
+      // Disconnect WalletConnect if connected
+      if (walletConnectProvider && walletConnectProvider.wc.connected) {
+        try {
+          walletConnectProvider.disconnect();
+        } catch (error) {
+          console.error("Error disconnecting WalletConnect:", error);
+        }
+        walletConnectProvider = null;
+      }
+      
+      showNotification("Wallet disconnected", "success");
     }
-    walletConnect = null;
-  }
-  
-  showNotification("Wallet disconnected", "success");
-}
+    
     function showNotification(message, type) {
       const notification = document.getElementById('notification');
       const content = document.getElementById('notificationContent');
