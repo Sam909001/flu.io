@@ -267,6 +267,8 @@
       padding: 10px;
       background: white;
       border-radius: 8px;
+      display: flex;
+      justify-content: center;
     }
     
     .wallet-connect-close {
@@ -1054,11 +1056,12 @@
       border: none;
       border-radius: 8px 0 0 8px;
       font-size: 16px;
-      color: #000000 !important; /* Add this line */
+      color: #000000 !important;
     }
 
     .dark .referral-input {
-      color: #ffffff !important; /* Ensure it stays white in dark mode */
+      color: #ffffff !important;
+      background: #374151 !important;
     }
 
     /* Also fix the placeholder color */
@@ -1074,24 +1077,36 @@
       background: linear-gradient(135deg, #8B5CF6, #3B82F6);
       border-radius: 12px;
       padding: 20px;
-      color: white; /* Keep text white */
+      color: white;
       text-align: center;
       margin-top: 16px;
     }
 
-    /* If you want to change the text color instead of keeping white */
     .referral-box h3 {
-      color: white !important; /* Force white text on gradient */
+      color: white !important;
     }
 
-    .referral-input {
-      color: #000000 !important; /* Black text for input */
-      background: white !important; /* White background for input */
+    .faq-item {
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 16px;
     }
 
-    .dark .referral-input {
-      color: #ffffff !important; /* White text in dark mode */
-      background: #374151 !important; /* Dark background in dark mode */
+    .dark .faq-item {
+      border-color: #374151;
+    }
+
+    .faq-question {
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-answer {
+      margin-top: 8px;
+      display: none;
     }
   </style>
 </head>
@@ -1104,8 +1119,9 @@
 
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
+    <div class="flex items-center">
       <!-- Floating logo -->
-      <div class="logo-container logo-float">
+      <div class="logo-container logo-float mr-4">
          <img src="fluffi.jpg" alt="FLUFFI Logo">
       </div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
@@ -1127,7 +1143,7 @@
   <main class="p-6 mx-auto w-full max-w-4xl">
     <div class="text-center mb-8">
       <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
-      <p class="text-gray-900 dark:text-gray-600">Claim your free FLUFFI tokens by completing simple tasks</p>
+      <p class="text-gray-900 dark:text-gray-300">Claim your free FLUFFI tokens by completing simple tasks</p>
       
       <!-- Social proof counters -->
       <div class="social-proof">
@@ -1638,7 +1654,7 @@
         }
 
         // Subscribe to accounts change
-        walletConnectProvider.wc.on("accountsChanged", (accounts) => {
+        walletConnectProvider.on("accountsChanged", (accounts) => {
           if (accounts.length > 0) {
             handleWalletConnection(accounts[0]);
           } else {
@@ -1647,12 +1663,12 @@
         });
 
         // Subscribe to chain change
-        walletConnectProvider.wc.on("chainChanged", (chainId) => {
+        walletConnectProvider.on("chainChanged", (chainId) => {
           console.log("Chain changed:", chainId);
         });
 
         // Subscribe to session disconnect
-        walletConnectProvider.wc.on("disconnect", (error) => {
+        walletConnectProvider.on("disconnect", (error) => {
           console.log("WalletConnect disconnected", error);
           disconnectWallet();
         });
