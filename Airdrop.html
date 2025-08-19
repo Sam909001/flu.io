@@ -822,13 +822,13 @@
     }
     
     .referral-section {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      padding: 24px;
-      margin-bottom: 24px;
-      transition: all 0.3s ease;
-    }
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
     
     .dark .referral-section {
       background: #1f2937;
@@ -878,39 +878,6 @@
       padding: 24px;
       margin-bottom: 24px;
       transition: all 0.3s ease;
-    }
-    
-    .dark .faq-section {
-      background: #1f2937;
-    }
-    
-    .faq-item {
-      margin-bottom: 16px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 16px;
-    }
-    
-    .dark .faq-item {
-      border-bottom-color: #4b5563;
-    }
-    
-    .faq-question {
-      font-weight: bold;
-      margin-bottom: 8px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .faq-answer {
-      display: none;
-      padding-top: 8px;
-      color: #6b7280;
-    }
-    
-    .dark .faq-answer {
-      color: #d1d5db;
     }
     
     .progress-bar {
@@ -1002,9 +969,6 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    .dark .faq-question {
-  color: #f0f0f0 !important;
-}
 
 .dark .referral-box {
   background: linear-gradient(135deg, #6B46C1, #1E40AF) !important;
@@ -1016,6 +980,97 @@
 
 .dark .username-input::placeholder {
   color: #9ca3af !important;
+}
+    /* Fix FAQ section in dark mode */
+.dark .faq-section {
+  background: #1f2937 !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #374151;
+}
+
+.dark .faq-question {
+  color: #f0f0f0 !important;
+}
+
+.dark .faq-answer {
+  color: #d1d5db !important;
+}
+
+/* Fix Airdrop form section in dark mode */
+.dark .airdrop-section {
+  background: #1f2937 !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #374151;
+}
+
+.dark .airdrop-section label {
+  color: #f0f0f0 !important;
+}
+
+.dark .airdrop-section input {
+  background: #374151 !important;
+  color: white !important;
+  border-color: #4B5563 !important;
+}
+
+.dark .airdrop-section input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Fix text colors in referral section for both modes */
+.referral-section p,
+.referral-section h3 {
+  color: inherit !important;
+}
+
+.dark .referral-section p,
+.dark .referral-section h3 {
+  color: #f0f0f0 !important;
+}
+
+/* Ensure all text in these sections is visible */
+.dark .tasks-section,
+.dark .airdrop-section,
+.dark .faq-section,
+.dark .referral-section,
+.dark .tokenomics-section,
+.dark .guide-section {
+  color: #f0f0f0 !important;
+}
+
+.dark .tasks-section label,
+.dark .tasks-section span {
+  color: #f0f0f0 !important;
+}
+    /* Make sure all section backgrounds are properly set for both modes */
+.bg-white {
+  background: white !important;
+}
+
+.dark .bg-white {
+  background: #1f2937 !important;
+}
+
+/* Fix text colors in all sections */
+.dark .text-gray-800 {
+  color: #f0f0f0 !important;
+}
+
+.dark .text-gray-900 {
+  color: #f0f0f0 !important;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+/* Fix border colors in dark mode */
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-700 {
+  border-color: #4B5563 !important;
 }
   </style>
 </head>
