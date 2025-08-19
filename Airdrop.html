@@ -6,7 +6,6 @@
   <title>$FLUFFI Airdrop</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/walletconnect@1.7.1/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <style>
     :root {
@@ -1554,11 +1553,8 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <!-- WalletConnect Ethereum Provider v2 -->
-<script type="module">
-  import WalletConnectProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.9.0/dist/index.min.js";
-  window.WalletConnectProvider = WalletConnectProvider;
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@1.7.8/dist/umd/index.min.js"></script>
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -1614,47 +1610,34 @@
         updateTaskUI();
       }
       
-      // Initialize WalletConnect
-      initWalletConnect();
-    });
+     // Global variable for WalletConnect
+let walletConnect = null;
 
-    // Initialize WalletConnect
-  // Initialize WalletConnect
+// Initialize WalletConnect
 async function initWalletConnect() {
   try {
-    // Check if WalletConnect is already available
     if (typeof WalletConnectProvider === 'undefined') {
-      console.error("WalletConnectProvider not loaded");
+      showNotification("WalletConnect not loaded properly", "error");
       return;
     }
 
-    const WALLETCONNECT_CONFIG = {
-      projectId: "b74a733c47def7b6672eb9ad072c4e8a", // Your project ID from cloud.walletconnect.com
-      chains: [1], // Ethereum Mainnet (use 56 for BSC, 137 for Polygon)
-      showQrModal: false, // We use our custom modal
-      metadata: {
-        name: "Fluffi Airdrop",
-        description: "Fluffi Token Airdrop",
-        url: window.location.origin,
-        icons: ["https://fluffi.io/logo.png"],
-      },
-    };
-
-    walletConnectConnector = await WalletConnectProvider.init(WALLETCONNECT_CONFIG);
-
-    // Show QR when WC asks
-    walletConnectConnector.on("display_uri", (uri) => {
-      openWalletConnectModal(uri);
+    // Create WalletConnect Provider
+    walletConnect = new WalletConnectProvider.default({
+      infuraId: "9aa3d95b3bc440fa88ea12eaa4456161", // Free public Infura ID
+      chainId: 1, // Ethereum Mainnet
+      qrcodeModal: QRCodeModal.default,
     });
 
-    // Already connected?
-    const accounts = await walletConnectConnector.enable();
-    if (accounts && accounts.length > 0) {
-      handleWalletConnection(accounts[0]);
+    // Check if already connected
+    if (walletConnect.connected) {
+      const accounts = walletConnect.accounts;
+      if (accounts.length > 0) {
+        handleWalletConnection(accounts[0]);
+      }
     }
 
-    // Listen to account changes
-    walletConnectConnector.on("accountsChanged", (accounts) => {
+    // Subscribe to accounts change
+    walletConnect.on("accountsChanged", (accounts) => {
       if (accounts.length > 0) {
         handleWalletConnection(accounts[0]);
       } else {
@@ -1662,13 +1645,57 @@ async function initWalletConnect() {
       }
     });
 
-    // Listen to disconnect events
-    walletConnectConnector.on("disconnect", () => {
+    // Subscribe to chain change
+    walletConnect.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", chainId);
+    });
+
+    // Subscribe to session disconnect
+    walletConnect.on("disconnect", (error) => {
+      console.log("WalletConnect disconnected", error);
       disconnectWallet();
     });
 
   } catch (error) {
-    console.error("WalletConnect initialization error:", error);
+    console.error("WalletConnect init error:", error);
+  }
+}
+
+// WalletConnect connection function
+async function connectWalletConnect() {
+  try {
+    if (!walletConnect) {
+      await initWalletConnect();
+    }
+
+    if (walletConnect.connected) {
+      const accounts = walletConnect.accounts;
+      if (accounts.length > 0) {
+        handleWalletConnection(accounts[0]);
+        return;
+      }
+    }
+
+    // Enable session (triggers QR Code modal)
+    const accounts = await walletConnect.enable();
+    
+    if (accounts && accounts.length > 0) {
+      handleWalletConnection(accounts[0]);
+    } else {
+      showNotification("No accounts found", "error");
+    }
+
+  } catch (error) {
+    console.error("WalletConnect connection error:", error);
+    
+    if (error.message.includes("User closed modal")) {
+      showNotification("Connection cancelled", "error");
+    } else {
+      showNotification("Failed to connect with WalletConnect", "error");
+    }
+    
+    // Reset on error
+    walletConnect = null;
   }
 }
     // Timer functions
@@ -2044,27 +2071,27 @@ async function initWalletConnect() {
             }
           }
         }
- else if (walletType === 'walletconnect') {
+else if (walletType === 'walletconnect') {
+  // Show loading state
+  const walletButton = document.getElementById('walletButton');
+  const originalText = walletButton.innerHTML;
+  walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
+  walletButton.disabled = true;
+  
   try {
-    if (!walletConnectConnector) {
-      await initWalletConnect();
-    }
-    
-    // Enable connection
-    const accounts = await walletConnectConnector.enable();
-    
-    if (accounts && accounts.length > 0) {
-      handleWalletConnection(accounts[0]);
-      closeWalletConnectModal();
-    } else {
-      showNotification("No accounts found in WalletConnect", "error");
-    }
+    await connectWalletConnect();
+    closeWalletModal();
   } catch (error) {
     console.error("WalletConnect error:", error);
-    showNotification("Failed to connect via WalletConnect. Please try again.", "error");
-    
-    // Reset WalletConnect connector on error
-    walletConnectConnector = null;
+    showNotification("Failed to connect via WalletConnect", "error");
+  } finally {
+    // Reset button state
+    setTimeout(() => {
+      if (document.getElementById('walletButton')) {
+        document.getElementById('walletButton').innerHTML = originalText;
+        document.getElementById('walletButton').disabled = false;
+      }
+    }, 2000);
   }
 }
 
@@ -2152,13 +2179,13 @@ function disconnectWallet() {
   localStorage.removeItem('walletAddress');
   
   // Disconnect WalletConnect if connected
-  if (walletConnectConnector) {
+  if (walletConnect && walletConnect.connected) {
     try {
-      walletConnectConnector.disconnect();
+      walletConnect.disconnect();
     } catch (error) {
       console.error("Error disconnecting WalletConnect:", error);
     }
-    walletConnectConnector = null;
+    walletConnect = null;
   }
   
   showNotification("Wallet disconnected", "success");
