@@ -47,13 +47,10 @@
     <span id="darkModeIcon">🌙</span>
   </button>
   
-  <!-- Wallet connection section - simplified -->
-  <div class="wallet-buttons" id="walletButtons">
-    <button id="walletButton" class="wallet-button" onclick="openWalletModal()">
-      <i class="fas fa-wallet"></i>Connect Wallet
-    </button>
+   <button onclick="connectWallet()" id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+      <span id="walletAddress" class="hidden"></span>
+    </nav>
   </div>
-</nav>
 </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
