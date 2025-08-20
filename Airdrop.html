@@ -1682,21 +1682,30 @@ async function initWalletConnect() {
 }
 
 // Connect function
+let walletConnectProvider = null;
+
 async function connectWalletConnect() {
   try {
-    if (!walletConnectProvider) {
-      await initWalletConnect();
-    }
+    walletConnectProvider = new WalletConnectProvider.default({
+      rpc: {
+        1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+        56: "https://bsc-dataseed.binance.org/",
+        137: "https://polygon-rpc.com/"
+      },
+      chainId: 1
+    });
 
-    // Enable session (QR Code will show)
+    // Enable session (this automatically shows QR Code)
     await walletConnectProvider.enable();
 
-    const accounts = walletConnectProvider.accounts;
-    if (accounts && accounts.length > 0) {
-      handleWalletConnection(accounts[0]);
-    } else {
-      showNotification("No accounts found", "error");
-    }
+    // Create ethers provider
+    const web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
+
+    // Get accounts
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+
+    handleWalletConnection(address);
 
   } catch (error) {
     console.error("WalletConnect connection error:", error);
@@ -1708,6 +1717,7 @@ async function connectWalletConnect() {
     }
   }
 }
+
 
     // Timer functions
     function initializeCountdown() {
