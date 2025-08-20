@@ -1109,6 +1109,17 @@
       margin-top: 8px;
       display: none;
     }
+      /* Fix for Referral Section text in dark mode */
+  .dark .referral-section,
+  .dark .referral-section p,
+  .dark .referral-section h2,
+  .dark .referral-section h3 {
+    color: #f0f0f0 !important;
+  }
+  
+  .dark .referral-section p.text-gray-600 {
+    color: #d1d5db !important;
+  }
   </style>
 </head>
 
@@ -1185,7 +1196,7 @@
             <li>Install your wallet app if you haven't already</li>
             <li>Tap the "Connect Wallet" button</li>
             <li>Select your wallet and approve the connection</li>
-            <li>For WalletConnect, scan the QR code</li>
+            <li>For WalletConnect, scan the QR code or choose your wallet from wallet section and click connect wallet</li>
           </ul>
         </div>
       </div>
