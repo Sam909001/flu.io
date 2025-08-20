@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+<!-- Web3Modal v2 (WalletConnect v2) -->
+<script src="https://unpkg.com/@walletconnect/web3modal@2.7.1/dist/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  
   <style>
     :root {
       --primary: #10B981;
@@ -1568,12 +1573,6 @@
     </div>
   </div>
 
-  <!-- Ethers.js -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-<!-- WalletConnect v1 (compatible with the code) -->
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@1.7.8/dist/umd/index.min.js"></script>
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -1682,40 +1681,54 @@ async function initWalletConnect() {
 }
 
 // Connect function
-async function connectWalletConnect() {
+// WalletConnect v2 / Web3Modal setup
+const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // from WalletConnect Cloud
+
+const chains = [
+  {
+    id: 1,
+    name: "Ethereum",
+    rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f"
+  },
+  {
+    id: 56,
+    name: "Binance Smart Chain",
+    rpcUrl: "https://bsc-dataseed.binance.org/"
+  },
+  {
+    id: 137,
+    name: "Polygon",
+    rpcUrl: "https://polygon-rpc.com/"
+  }
+];
+
+// Create Web3Modal instance
+const web3Modal = new window.Web3Modal.default({
+  projectId,
+  chains,
+  themeMode: "dark" // or "light"
+});
+
+let provider, signer;
+
+// New connection function
+async function connectWallet() {
   try {
-    walletConnectProvider = new WalletConnectProvider.default({
-      rpc: {
-        1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-        56: "https://bsc-dataseed.binance.org/",
-        137: "https://polygon-rpc.com/"
-      },
-      chainId: 1
-    });
+    provider = await web3Modal.connect();
 
-    // Enable session (this automatically shows QR Code)
-    await walletConnectProvider.enable();
+    // Wrap with ethers.js
+    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    signer = ethersProvider.getSigner();
 
-    // Create ethers provider
-    const web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
-
-    // Get accounts
-    const signer = web3Provider.getSigner();
     const address = await signer.getAddress();
+    console.log("Connected wallet:", address);
 
-    handleWalletConnection(address);
-
-  } catch (error) {
-    console.error("WalletConnect connection error:", error);
-
-    if (error.message && error.message.includes("User closed modal")) {
-      showNotification("Connection cancelled", "error");
-    } else {
-      showNotification("Failed to connect with WalletConnect", "error");
-    }
+    handleWalletConnection(address); // your existing function
+  } catch (err) {
+    console.error("Wallet connection error:", err);
+    showNotification("Failed to connect wallet", "error");
   }
 }
-
 
     // Timer functions
     function initializeCountdown() {
@@ -2535,5 +2548,56 @@ async function connectWalletConnect() {
       showNotification(`Dark mode ${isDark ? 'enabled' : 'disabled'}`, "success");
     }
   </script>
+  <script>
+const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
+
+// Define supported chains (Ethereum Mainnet, BSC, Polygon, etc.)
+const chains = [
+  {
+    id: 1,
+    name: "Ethereum",
+    rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f"
+  },
+  {
+    id: 56,
+    name: "Binance Smart Chain",
+    rpcUrl: "https://bsc-dataseed.binance.org/"
+  },
+  {
+    id: 137,
+    name: "Polygon",
+    rpcUrl: "https://polygon-rpc.com/"
+  }
+];
+
+// Create Web3Modal instance
+const web3Modal = new window.Web3Modal.default({
+  projectId,
+  themeMode: "light", // or "dark"
+  chains
+});
+
+let provider, signer;
+
+// Function to connect wallet
+async function connectWallet() {
+  try {
+    // Open modal and get provider
+    provider = await web3Modal.connect();
+
+    // Wrap provider with ethers.js
+    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    signer = ethersProvider.getSigner();
+
+    const address = await signer.getAddress();
+    console.log("Connected wallet:", address);
+
+    handleWalletConnection(address); // <- your function from current script
+  } catch (err) {
+    console.error("Wallet connection error:", err);
+    showNotification("Failed to connect wallet", "error");
+  }
+}
+</script>
 </body>
 </html>
