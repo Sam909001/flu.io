@@ -2199,9 +2199,10 @@ async function connectWallet() {
       
       const walletButtons = document.getElementById('walletButtons');
       walletButtons.innerHTML = `
-        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
-          <i class="fas fa-wallet mr-2"></i>Connect Wallet
-        </button>
+        <button onclick="connectWallet()" 
+        class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+  <i class="fas fa-wallet mr-2"></i>Connect Wallet
+</button>
       `;
       
       document.getElementById('walletButton').addEventListener('click', openWalletModal);
