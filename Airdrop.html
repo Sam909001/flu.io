@@ -1680,8 +1680,7 @@ async function initWalletConnect() {
   }
 }
 
-// Connect function
-// WalletConnect v2 / Web3Modal setup
+// ✅ FIXED WalletConnect v2 / Web3Modal setup
 const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // from WalletConnect Cloud
 
 const chains = [
@@ -1702,18 +1701,18 @@ const chains = [
   }
 ];
 
-// Create Web3Modal instance
-const web3Modal = new window.Web3Modal.default({
+// ❌ Don't use .default — just Web3Modal
+const web3Modal = new window.Web3Modal({
   projectId,
   chains,
-  themeMode: "dark" // or "light"
+  themeMode: "dark"
 });
 
 let provider, signer;
 
-// New connection function
 async function connectWallet() {
   try {
+    // Open modal and get provider
     provider = await web3Modal.connect();
 
     // Wrap with ethers.js
@@ -1723,10 +1722,10 @@ async function connectWallet() {
     const address = await signer.getAddress();
     console.log("Connected wallet:", address);
 
-    handleWalletConnection(address); // your existing function
+    handleWalletConnection(address);
   } catch (err) {
     console.error("Wallet connection error:", err);
-    showNotification("Failed to connect wallet", "error");
+    showNotification("WalletConnect error: " + err.message, "error");
   }
 }
 
