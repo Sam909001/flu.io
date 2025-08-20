@@ -553,4 +553,56 @@
   display: inline-block;
   margin-bottom: 15px;
 }
+/* Fix for wallet button styling */
+  .wallet-button {
+    background-color: #059669 !important; /* green-700 */
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    transition: background-color 0.2s !important;
+  }
+  
+  .wallet-button:hover {
+    background-color: #065f46 !important; /* green-800 */
+  }
+  
+  /* Hide wallet icons from nav, show only in modal */
+  nav .wallet-icon {
+    display: none !important;
+  }
+  
+  /* Style for wallet address display */
+  .wallet-address-display {
+    font-family: monospace;
+    background: rgba(0,0,0,0.05);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .dark .wallet-address-display {
+    background: rgba(255,255,255,0.1);
+    color: #f0f0f0;
+  }
+  
+  /* Disconnect button styling */
+  .disconnect-btn {
+    background-color: #EF4444;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+  }
+  
+  .disconnect-btn:hover {
+    background-color: #DC2626;
+  }
   </style>
