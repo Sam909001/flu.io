@@ -32,6 +32,7 @@
       </h1>
     </div>
    
+<!-- Replace your current navigation with this -->
 <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
   <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
   <a href="#presale" class="text-white hover:underline">Presale</a>
@@ -45,6 +46,14 @@
   <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
     <span id="darkModeIcon">🌙</span>
   </button>
+  
+  <!-- Wallet connection section - simplified -->
+  <div class="wallet-buttons" id="walletButtons">
+    <button id="walletButton" class="wallet-button" onclick="openWalletModal()">
+      <i class="fas fa-wallet"></i>Connect Wallet
+    </button>
+  </div>
+</nav>
 </header>
 
   <main class="p-6 mx-auto w-full max-w-6xl">
