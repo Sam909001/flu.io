@@ -1574,7 +1574,7 @@
   </div>
 
   <script>
-   // Global variables
+  // Global variables
 let userWalletAddress = null;
 let tasksCompleted = {
   twitter: false,
@@ -1637,41 +1637,29 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize Web3Modal
 function initWeb3Modal() {
   try {
+    // Check if Web3Modal is loaded
+    if (typeof window.Web3Modal === 'undefined') {
+      console.error("Web3Modal not loaded");
+      return;
+    }
+
     const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
     
-    const chains = [
-      {
-        id: 1,
-        name: "Ethereum",
-        rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f"
-      },
-      {
-        id: 56, 
-        name: "Binance Smart Chain",
-        rpcUrl: "https://bsc-dataseed.binance.org/"
-      },
-      {
-        id: 137,
-        name: "Polygon", 
-        rpcUrl: "https://polygon-rpc.com/"
-      }
-    ];
-
-    web3Modal = new window.Web3Modal.Web3Modal({
-      projectId,
-      chains,
-      themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    });
-
-    // Listen for modal events
-    web3Modal.subscribeModal((state) => {
-      if (state.open) {
-        closeWalletModal();
+    // Create Web3Modal instance
+    web3Modal = new window.Web3Modal({
+      projectId: projectId,
+      themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+      themeVariables: {
+        '--w3m-font-family': 'system-ui, sans-serif',
+        '--w3m-accent-color': '#10b981'
       }
     });
+
+    console.log("Web3Modal initialized successfully");
 
   } catch (error) {
     console.error("Web3Modal initialization error:", error);
+    showNotification("Failed to initialize wallet connection", "error");
   }
 }
 
@@ -2048,11 +2036,15 @@ async function connectTrustWallet() {
 async function connectWalletConnect() {
   try {
     if (!web3Modal) {
-      initWeb3Modal();
+      throw new Error("Web3Modal not initialized. Please refresh the page and try again.");
     }
     
     // Open modal and get provider
-    provider = await web3Modal.openModal();
+    provider = await web3Modal.open();
+    
+    if (!provider) {
+      throw new Error("No provider returned from Web3Modal");
+    }
     
     // Wrap with ethers.js
     const ethersProvider = new ethers.providers.Web3Provider(provider);
