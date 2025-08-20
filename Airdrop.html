@@ -1574,668 +1574,618 @@
   </div>
 
   <script>
-    // Global variables
-    let userWalletAddress = null;
-    let tasksCompleted = {
-      twitter: false,
-      telegram: false,
-      retweet: false
-    };
-    let countdownInterval = null;
-    let walletConnectProvider = null;
+   // Global variables
+let userWalletAddress = null;
+let tasksCompleted = {
+  twitter: false,
+  telegram: false,
+  retweet: false
+};
+let countdownInterval = null;
+let web3Modal = null;
+let provider = null;
+let signer = null;
 
-    // For development - show dev section if URL has ?dev=true
-    if (window.location.search.includes('dev=true')) {
-      document.getElementById('devSection').classList.remove('hidden');
-    }
+// For development - show dev section if URL has ?dev=true
+if (window.location.search.includes('dev=true')) {
+  document.getElementById('devSection').classList.remove('hidden');
+}
 
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize dark mode
-      const darkMode = localStorage.getItem('darkMode');
-      const isDarkMode = darkMode === 'true' || 
-                        (darkMode === null && 
-                        window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkModeIcon').textContent = '☀️';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('darkModeIcon').textContent = '🌙';
-      }
-      
-      // Setup form submission
-      document.getElementById('airdropForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        claimAirdrop();
-      });
-      
-      // Setup wallet button
-      document.getElementById('walletButton').addEventListener('click', openWalletModal);
-      
-      // Check if wallet is already connected
-      if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
-        handleWalletConnection(localStorage.getItem('walletAddress'));
-      }
-      
-      // Initialize countdown timer
-      initializeCountdown();
-      
-      // Load completed tasks from localStorage
-      const savedTasks = localStorage.getItem('completedTasks');
-      if (savedTasks) {
-        tasksCompleted = JSON.parse(savedTasks);
-        updateTaskUI();
-      }
-    });
-    
-// Initialize WalletConnect properly
-async function initWalletConnect() {
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  const darkMode = localStorage.getItem('darkMode');
+  const isDarkMode = darkMode === 'true' || 
+                    (darkMode === null && 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+  
+  // Setup form submission
+  document.getElementById('airdropForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    claimAirdrop();
+  });
+  
+  // Setup wallet button
+  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  
+  // Initialize Web3Modal
+  initWeb3Modal();
+  
+  // Check if wallet is already connected
+  if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
+    handleWalletConnection(localStorage.getItem('walletAddress'));
+  }
+  
+  // Initialize countdown timer
+  initializeCountdown();
+  
+  // Load completed tasks from localStorage
+  const savedTasks = localStorage.getItem('completedTasks');
+  if (savedTasks) {
+    tasksCompleted = JSON.parse(savedTasks);
+    updateTaskUI();
+  }
+});
+
+// Initialize Web3Modal
+function initWeb3Modal() {
   try {
-    if (typeof WalletConnectProvider === "undefined") {
-      showNotification("WalletConnect not loaded properly", "error");
-      return;
-    }
-
-    // ✅ FIXED: Added proper RPC mapping instead of empty infuraId
-    walletConnectProvider = new WalletConnectProvider.default({
-      rpc: {
-        1: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",  // Ethereum mainnet
-        56: "https://bsc-dataseed.binance.org/",                   // Binance Smart Chain
-        137: "https://polygon-rpc.com/"                            // Polygon
+    const projectId = "b74a733c47def7b6672eb9ad072c4e8a";
+    
+    const chains = [
+      {
+        id: 1,
+        name: "Ethereum",
+        rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f"
       },
-      chainId: 1, // default to Ethereum Mainnet
-      qrcodeModal: QRCodeModal.default,
-    });
-
-    // If already connected
-    if (walletConnectProvider.wc.connected) {
-      const accounts = walletConnectProvider.accounts;
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
+      {
+        id: 56, 
+        name: "Binance Smart Chain",
+        rpcUrl: "https://bsc-dataseed.binance.org/"
+      },
+      {
+        id: 137,
+        name: "Polygon", 
+        rpcUrl: "https://polygon-rpc.com/"
       }
-    }
+    ];
 
-    // Listen for events
-    walletConnectProvider.on("accountsChanged", (accounts) => {
-      if (accounts.length > 0) {
-        handleWalletConnection(accounts[0]);
-      } else {
-        disconnectWallet();
+    web3Modal = new window.Web3Modal.Web3Modal({
+      projectId,
+      chains,
+      themeMode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    });
+
+    // Listen for modal events
+    web3Modal.subscribeModal((state) => {
+      if (state.open) {
+        closeWalletModal();
       }
-    });
-
-    walletConnectProvider.on("chainChanged", (chainId) => {
-      console.log("Chain changed:", chainId);
-    });
-
-    walletConnectProvider.on("disconnect", (error) => {
-      console.log("WalletConnect disconnected", error);
-      disconnectWallet();
     });
 
   } catch (error) {
-    console.error("WalletConnect init error:", error);
-    showNotification("WalletConnect initialization failed", "error");
+    console.error("Web3Modal initialization error:", error);
   }
 }
 
-// ✅ FIXED WalletConnect v2 / Web3Modal setup
-const projectId = "b74a733c47def7b6672eb9ad072c4e8a"; // from WalletConnect Cloud
-
-const chains = [
-  {
-    id: 1,
-    name: "Ethereum",
-    rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f"
-  },
-  {
-    id: 56,
-    name: "Binance Smart Chain",
-    rpcUrl: "https://bsc-dataseed.binance.org/"
-  },
-  {
-    id: 137,
-    name: "Polygon",
-    rpcUrl: "https://polygon-rpc.com/"
+// Timer functions
+function initializeCountdown() {
+  let endTime = localStorage.getItem('airdropEndTime');
+  
+  if (!endTime) {
+    endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('airdropEndTime', endTime);
   }
-];
+  
+  startCountdown(parseInt(endTime));
+}
 
-// ❌ Don't use .default — just Web3Modal
-const web3Modal = new window.Web3Modal({
-  projectId,
-  chains,
-  themeMode: "dark"
-});
+function startCountdown(endTime) {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+  
+  updateTimer(endTime);
+  
+  countdownInterval = setInterval(() => {
+    updateTimer(endTime);
+  }, 1000);
+}
 
-let provider, signer;
+function updateTimer(endTime) {
+  const now = Date.now();
+  const distance = endTime - now;
+  
+  if (distance < 0) {
+    clearInterval(countdownInterval);
+    document.getElementById('days').textContent = '00';
+    document.getElementById('hours').textContent = '00';
+    document.getElementById('minutes').textContent = '00';
+    document.getElementById('seconds').textContent = '00';
+    return;
+  }
+  
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+  document.getElementById('days').textContent = days.toString().padStart(2, '0');
+  document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+  document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+  document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+}
 
-async function connectWallet() {
+function resetTimer() {
+  const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
+  localStorage.setItem('airdropEndTime', newEndTime.toString());
+  startCountdown(newEndTime);
+  showNotification("Timer has been reset to 7 days", "success");
+}
+
+// For development - set custom timer
+function setTimer(hours, minutes, seconds) {
+  const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+  localStorage.setItem('airdropEndTime', endTime.toString());
+  startCountdown(endTime);
+  showNotification(`Timer set to ${hours} hours, ${minutes} minutes, ${seconds} seconds`, "success");
+}
+
+// Wallet connection functions
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('active');
+}
+
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('active');
+}
+
+// Connection Help Modal Functions
+function showConnectionHelp(walletType, event) {
+  event.stopPropagation();
+  closeWalletModal();
+  
+  let title, content;
+  
+  switch(walletType) {
+    case 'metamask':
+      title = "How to Connect MetaMask";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-fox help-icon"></i>
+          </div>
+          <span>MetaMask Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" on our site and select MetaMask</li>
+            <li>Approve the connection request in the MetaMask popup</li>
+            <li>Your wallet address will appear when connected</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask app from your app store</li>
+            <li>Open our website in the MetaMask in-app browser</li>
+            <li>Tap "Connect Wallet" and select MetaMask</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via MetaMask browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'trust':
+      title = "How to Connect Trust Wallet";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-shield-alt help-icon"></i>
+          </div>
+          <span>Trust Wallet Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet extension for your browser</li>
+            <li>Set up your wallet and secure your recovery phrase</li>
+            <li>Click "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the extension</li>
+            <li>Your wallet will be connected to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet from App Store or Play Store</li>
+            <li>Open our website in Trust Wallet's DApp browser</li>
+            <li>Tap "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the app</li>
+            <li>For WalletConnect, scan the QR code from mobile</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'walletconnect':
+      title = "How to Use WalletConnect";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-qrcode help-icon"></i>
+          </div>
+          <span>WalletConnect Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Select WalletConnect from the wallet options</li>
+            <li>A QR code will appear on your screen</li>
+            <li>Open your mobile wallet app (MetaMask, Trust, etc.)</li>
+            <li>Find the WalletConnect scanner in your wallet</li>
+            <li>Scan the QR code to connect your wallet</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Make sure you have a compatible wallet installed</li>
+            <li>Select WalletConnect from the wallet options</li>
+            <li>Choose your wallet from the list of installed wallets</li>
+            <li>Approve the connection request in your wallet app</li>
+            <li>Your wallet will connect to our dApp</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'phantom':
+      title = "How to Connect Phantom Wallet";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-ghost help-icon"></i>
+          </div>
+          <span>Phantom Wallet Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the Phantom popup</li>
+            <li>Your Solana address will connect to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom app from App Store or Play Store</li>
+            <li>Open our website in Phantom's in-app browser</li>
+            <li>Tap "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via Phantom browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+  }
+  
+  document.getElementById('helpContent').innerHTML = content;
+  document.getElementById('connectionHelpModal').classList.add('active');
+}
+
+function closeHelpModal() {
+  document.getElementById('connectionHelpModal').classList.remove('active');
+}
+
+// Main wallet connection function
+async function connectWallet(walletType) {
   try {
-    // Open modal and get provider
-    provider = await web3Modal.connect();
+    closeWalletModal();
+    
+    // Update wallet button to show loading
+    const walletButton = document.getElementById('walletButton');
+    const originalText = walletButton.innerHTML;
+    walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
+    walletButton.disabled = true;
+    
+    if (walletType === 'metamask') {
+      await connectMetaMask();
+    }
+    else if (walletType === 'trust') {
+      await connectTrustWallet();
+    }
+    else if (walletType === 'walletconnect') {
+      await connectWalletConnect();
+    }
+    else if (walletType === 'phantom') {
+      await connectPhantom();
+    }
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+    showNotification("Failed to connect wallet: " + error.message, "error");
+  } finally {
+    // Reset wallet button state
+    setTimeout(() => {
+      const walletButton = document.getElementById('walletButton');
+      if (walletButton && !userWalletAddress) {
+        walletButton.innerHTML = '<i class="fas fa-wallet mr-2"></i>Connect Wallet';
+        walletButton.disabled = false;
+      }
+    }, 2000);
+  }
+}
 
+// MetaMask connection
+async function connectMetaMask() {
+  if (isMobile()) {
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+        
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            handleWalletConnection(accounts[0]);
+          }
+        });
+      } catch (error) {
+        window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+      }
+    } else {
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+    }
+  } else {
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          handleWalletConnection(accounts[0]);
+        }
+      });
+    } else {
+      throw new Error("Please install MetaMask extension");
+    }
+  }
+}
+
+// Trust Wallet connection
+async function connectTrustWallet() {
+  if (isMobile()) {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+      }
+    } else {
+      window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+    }
+  } else {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        throw new Error("Failed to connect Trust Wallet");
+      }
+    } else {
+      throw new Error("Please install Trust Wallet extension");
+    }
+  }
+}
+
+// WalletConnect connection using Web3Modal v2
+async function connectWalletConnect() {
+  try {
+    if (!web3Modal) {
+      initWeb3Modal();
+    }
+    
+    // Open modal and get provider
+    provider = await web3Modal.openModal();
+    
     // Wrap with ethers.js
     const ethersProvider = new ethers.providers.Web3Provider(provider);
     signer = ethersProvider.getSigner();
-
+    
     const address = await signer.getAddress();
     console.log("Connected wallet:", address);
-
+    
     handleWalletConnection(address);
-  } catch (err) {
-    console.error("Wallet connection error:", err);
-    showNotification("WalletConnect error: " + err.message, "error");
+    
+    // Listen for provider events
+    provider.on("accountsChanged", (accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else {
+        handleWalletConnection(accounts[0]);
+      }
+    });
+    
+    provider.on("chainChanged", (chainId) => {
+      console.log("Chain changed:", chainId);
+    });
+    
+    provider.on("disconnect", (error) => {
+      console.log("Provider disconnected", error);
+      disconnectWallet();
+    });
+    
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    throw new Error("WalletConnect connection failed: " + error.message);
   }
 }
 
-    // Timer functions
-    function initializeCountdown() {
-      let endTime = localStorage.getItem('airdropEndTime');
-      
-      if (!endTime) {
-        endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-        localStorage.setItem('airdropEndTime', endTime);
-      }
-      
-      startCountdown(parseInt(endTime));
-    }
-    
-    function startCountdown(endTime) {
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-      }
-      
-      updateTimer(endTime);
-      
-      countdownInterval = setInterval(() => {
-        updateTimer(endTime);
-      }, 1000);
-    }
-    
-    function updateTimer(endTime) {
-      const now = Date.now();
-      const distance = endTime - now;
-      
-      if (distance < 0) {
-        clearInterval(countdownInterval);
-        document.getElementById('days').textContent = '00';
-        document.getElementById('hours').textContent = '00';
-        document.getElementById('minutes').textContent = '00';
-        document.getElementById('seconds').textContent = '00';
-        return;
-      }
-      
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      
-      document.getElementById('days').textContent = days.toString().padStart(2, '0');
-      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-    }
-    
-    function resetTimer() {
-      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
-      localStorage.setItem('airdropEndTime', newEndTime.toString());
-      startCountdown(newEndTime);
-      showNotification("Timer has been reset to 7 days", "success");
-    }
-    
-    // For development - set custom timer
-    function setTimer(hours, minutes, seconds) {
-      const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
-      localStorage.setItem('airdropEndTime', endTime.toString());
-      startCountdown(endTime);
-      showNotification(`Timer set to ${hours} hours, ${minutes} minutes, ${seconds} seconds`, "success");
-    }
-
-    // Wallet connection functions
-    function openWalletModal() {
-      document.getElementById('walletModal').classList.add('active');
-    }
-
-    function closeWalletModal() {
-      document.getElementById('walletModal').classList.remove('active');
-    }
-    
-    function openWalletConnectModal(uri) {
+// Phantom connection
+async function connectPhantom() {
+  if (isMobile()) {
+    if (window.phantom && window.phantom.solana) {
       try {
-        const modal = document.getElementById('walletConnectModal');
-        const linkElement = document.getElementById('walletConnectLink');
-        
-        document.getElementById('walletConnectQrCode').innerHTML = '';
-        
-        // Generate QR code
-        QRCode.toCanvas(document.getElementById('walletConnectQrCode'), uri, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
-            light: '#00000000'
-          }
-        });
-        
-        if (isMobile()) {
-          linkElement.classList.remove('hidden');
-          linkElement.onclick = function() {
-            window.location.href = uri;
-          };
-        } else {
-          linkElement.classList.add('hidden');
-        }
-        
-        modal.classList.add('active');
+        const response = await window.phantom.solana.connect();
+        handleWalletConnection(response.publicKey.toString());
       } catch (error) {
-        console.error("Error opening WalletConnect modal:", error);
-        showNotification("Failed to generate QR code", "error");
+        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
       }
+    } else {
+      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
     }
-    
-    function closeWalletConnectModal() {
-      document.getElementById('walletConnectModal').classList.remove('active');
-    }
-    
-    // Connection Help Modal Functions
-    function showConnectionHelp(walletType, event) {
-      event.stopPropagation();
-      closeWalletModal();
-      
-      let title, content;
-      
-      switch(walletType) {
-        case 'metamask':
-          title = "How to Connect MetaMask";
-          content = `
-            <div class="help-title">
-              <div class="help-icon-wrapper">
-                <i class="fas fa-fox help-icon"></i>
-              </div>
-              <span>MetaMask Connection Guide</span>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-desktop"></i>
-                </div>
-                <h3>Browser Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
-                <li>Create a new wallet or import an existing one</li>
-                <li>Click "Connect Wallet" on our site and select MetaMask</li>
-                <li>Approve the connection request in the MetaMask popup</li>
-                <li>Your wallet address will appear when connected</li>
-              </ol>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install the MetaMask app from your app store</li>
-                <li>Open our website in the MetaMask in-app browser</li>
-                <li>Tap "Connect Wallet" and select MetaMask</li>
-                <li>Approve the connection request in the app</li>
-                <li>For direct connection, open our site via MetaMask browser</li>
-              </ol>
-            </div>
-          `;
-          break;
-          
-        case 'trust':
-          title = "How to Connect Trust Wallet";
-          content = `
-            <div class="help-title">
-              <div class="help-icon-wrapper">
-                <i class="fas fa-shield-alt help-icon"></i>
-              </div>
-              <span>Trust Wallet Connection Guide</span>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-desktop"></i>
-                </div>
-                <h3>Browser Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install Trust Wallet extension for your browser</li>
-                <li>Set up your wallet and secure your recovery phrase</li>
-                <li>Click "Connect Wallet" and select Trust Wallet</li>
-                <li>Approve the connection request in the extension</li>
-                <li>Your wallet will be connected to our dApp</li>
-              </ol>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install Trust Wallet from App Store or Play Store</li>
-                <li>Open our website in Trust Wallet's DApp browser</li>
-                <li>Tap "Connect Wallet" and select Trust Wallet</li>
-                <li>Approve the connection request in the app</li>
-                <li>For WalletConnect, scan the QR code from mobile</li>
-              </ol>
-            </div>
-          `;
-          break;
-          
-        case 'walletconnect':
-          title = "How to Use WalletConnect";
-          content = `
-            <div class="help-title">
-              <div class="help-icon-wrapper">
-                <i class="fas fa-qrcode help-icon"></i>
-              </div>
-              <span>WalletConnect Guide</span>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-desktop"></i>
-                </div>
-                <h3>Browser Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Select WalletConnect from the wallet options</li>
-                <li>A QR code will appear on your screen</li>
-                <li>Open your mobile wallet app (MetaMask, Trust, etc.)</li>
-                <li>Find the WalletConnect scanner in your wallet</li>
-                <li>Scan the QR code to connect your wallet</li>
-              </ol>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Make sure you have a compatible wallet installed</li>
-                <li>Select WalletConnect from the wallet options</li>
-                <li>Choose your wallet from the list of installed wallets</li>
-                <li>Approve the connection request in your wallet app</li>
-                <li>Your wallet will connect to our dApp</li>
-              </ol>
-            </div>
-          `;
-          break;
-          
-        case 'phantom':
-          title = "How to Connect Phantom Wallet";
-          content = `
-            <div class="help-title">
-              <div class="help-icon-wrapper">
-                <i class="fas fa-ghost help-icon"></i>
-              </div>
-              <span>Phantom Wallet Guide</span>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-desktop"></i>
-                </div>
-                <h3>Browser Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
-                <li>Create a new wallet or import an existing one</li>
-                <li>Click "Connect Wallet" and select Phantom</li>
-                <li>Approve the connection request in the Phantom popup</li>
-                <li>Your Solana address will connect to our dApp</li>
-              </ol>
-            </div>
-            
-            <div class="help-platform">
-              <div class="platform-header">
-                <div class="platform-icon">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile Instructions</h3>
-              </div>
-              <ol class="help-steps">
-                <li>Install Phantom app from App Store or Play Store</li>
-                <li>Open our website in Phantom's in-app browser</li>
-                <li>Tap "Connect Wallet" and select Phantom</li>
-                <li>Approve the connection request in the app</li>
-                <li>For direct connection, open our site via Phantom browser</li>
-              </ol>
-            </div>
-          `;
-          break;
-      }
-      
-      document.getElementById('helpContent').innerHTML = content;
-      document.getElementById('connectionHelpModal').classList.add('active');
-    }
-    
-    function closeHelpModal() {
-      document.getElementById('connectionHelpModal').classList.remove('active');
-    }
-
-    async function connectWallet(walletType) {
+  } else {
+    if (window.phantom && window.phantom.solana) {
       try {
-        closeWalletModal();
-        
-        // Update wallet button to show loading
-        const walletButton = document.getElementById('walletButton');
-        const originalText = walletButton.innerHTML;
-        walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
-        walletButton.disabled = true;
-        
-        if (walletType === 'metamask') {
-          if (isMobile()) {
-            if (window.ethereum && window.ethereum.isMetaMask) {
-              try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                handleWalletConnection(accounts[0]);
-                
-                window.ethereum.on('accountsChanged', (accounts) => {
-                  if (accounts.length === 0) {
-                    disconnectWallet();
-                  } else {
-                    handleWalletConnection(accounts[0]);
-                  }
-                });
-              } catch (error) {
-                window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-              }
-            } else {
-              window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-            }
-          } else {
-            if (window.ethereum && window.ethereum.isMetaMask) {
-              const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-              handleWalletConnection(accounts[0]);
-              
-              window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                  disconnectWallet();
-                } else {
-                  handleWalletConnection(accounts[0]);
-                }
-              });
-            } else {
-              showNotification("Please install MetaMask extension", "error");
-            }
-          }
-        }
-        else if (walletType === 'trust') {
-          if (isMobile()) {
-            if (window.ethereum && window.ethereum.isTrust) {
-              try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                handleWalletConnection(accounts[0]);
-              } catch (error) {
-                window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-              }
-            } else {
-              window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-            }
-          } else {
-            if (window.ethereum && window.ethereum.isTrust) {
-              try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                handleWalletConnection(accounts[0]);
-              } catch (error) {
-                showNotification("Failed to connect Trust Wallet", "error");
-              }
-            } else {
-              showNotification("Please install Trust Wallet extension", "error");
-            }
-          }
-        }
-        else if (walletType === 'walletconnect') {
-          // Show loading state
-          const walletButton = document.getElementById('walletButton');
-          const originalText = walletButton.innerHTML;
-          walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
-          walletButton.disabled = true;
-          
-          try {
-            await connectWalletConnect();
-            closeWalletModal();
-          } catch (error) {
-            console.error("WalletConnect error:", error);
-            showNotification("Failed to connect via WalletConnect", "error");
-          } finally {
-            // Reset button state
-            setTimeout(() => {
-              if (document.getElementById('walletButton')) {
-                document.getElementById('walletButton').innerHTML = originalText;
-                document.getElementById('walletButton').disabled = false;
-              }
-            }, 2000);
-          }
-        }
-        else if (walletType === 'phantom') {
-          if (isMobile()) {
-            if (window.phantom && window.phantom.solana) {
-              try {
-                const response = await window.phantom.solana.connect();
-                handleWalletConnection(response.publicKey.toString());
-              } catch (error) {
-                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-              }
-            } else {
-              window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-            }
-          } else {
-            if (window.phantom && window.phantom.solana) {
-              try {
-                const response = await window.phantom.solana.connect();
-                handleWalletConnection(response.publicKey.toString());
-              } catch (error) {
-                showNotification("Failed to connect Phantom wallet", "error");
-              }
-            } else {
-              showNotification("Please install Phantom wallet", "error");
-            }
-          }
-        }
+        const response = await window.phantom.solana.connect();
+        handleWalletConnection(response.publicKey.toString());
       } catch (error) {
-        console.error("Wallet connection error:", error);
-        showNotification("Failed to connect wallet", "error");
-      } finally {
-        // Reset wallet button state if connection fails
-        setTimeout(() => {
-          const walletButton = document.getElementById('walletButton');
-          if (walletButton) {
-            walletButton.innerHTML = originalText;
-            walletButton.disabled = false;
-          }
-        }, 2000);
+        throw new Error("Failed to connect Phantom wallet");
       }
+    } else {
+      throw new Error("Please install Phantom wallet");
     }
-    
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    
-    function handleWalletConnection(address) {
-      userWalletAddress = address;
-      
-      const walletButtons = document.getElementById('walletButtons');
-      const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-      
-      walletButtons.innerHTML = `
-        <span class="wallet-address-display">${shortAddress}</span>
-        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
-      `;
-      
-      document.getElementById('walletAddress').value = address;
-      
-      // Generate referral link
-      const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
-      document.getElementById('referralLink').value = referralLink;
-      
-      localStorage.setItem('walletConnected', 'true');
-      localStorage.setItem('walletAddress', address);
-      
-      showNotification("Wallet connected successfully!", "success");
-    }
+  }
+}
 
-    function disconnectWallet() {
-      userWalletAddress = null;
-      
-      const walletButtons = document.getElementById('walletButtons');
-      walletButtons.innerHTML = `
-        <button onclick="connectWalletConnect()" 
-        class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
-  <i class="fas fa-wallet mr-2"></i>Connect Wallet
-</button>
-      `;
-      
-      document.getElementById('walletButton').addEventListener('click', openWalletModal);
-      document.getElementById('walletAddress').value = '';
-      
-      localStorage.removeItem('walletConnected');
-      localStorage.removeItem('walletAddress');
-      
-      // Disconnect WalletConnect if connected
-      if (walletConnectProvider && walletConnectProvider.wc.connected) {
-        try {
-          walletConnectProvider.disconnect();
-        } catch (error) {
-          console.error("Error disconnecting WalletConnect:", error);
-        }
-        walletConnectProvider = null;
-      }
-      
-      showNotification("Wallet disconnected", "success");
-    }
-    
-    function showNotification(message, type) {
-      const notification = document.getElementById('notification');
-      const content = document.getElementById('notificationContent');
-      
-      content.innerHTML = message;
-      notification.className = `floating-notification ${type === 'success' ? 'notification-success' : 'notification-error'}`;
-      notification.classList.add('active');
-      
-      setTimeout(() => {
-        notification.classList.remove('active');
-      }, 3000);
-    }
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
+function handleWalletConnection(address) {
+  userWalletAddress = address;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+  
+  walletButtons.innerHTML = `
+    <span class="wallet-address-display">${shortAddress}</span>
+    <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+  `;
+  
+  document.getElementById('walletAddress').value = address;
+  
+  // Generate referral link
+  const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
+  document.getElementById('referralLink').value = referralLink;
+  
+  localStorage.setItem('walletConnected', 'true');
+  localStorage.setItem('walletAddress', address);
+  
+  showNotification("Wallet connected successfully!", "success");
+}
+
+async function disconnectWallet() {
+  userWalletAddress = null;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  walletButtons.innerHTML = `
+    <button id="walletButton" onclick="openWalletModal()" 
+    class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+      <i class="fas fa-wallet mr-2"></i>Connect Wallet
+    </button>
+  `;
+  
+  document.getElementById('walletAddress').value = '';
+  
+  localStorage.removeItem('walletConnected');
+  localStorage.removeItem('walletAddress');
+  
+  // Disconnect Web3Modal
+  if (web3Modal) {
+    try {
+      await web3Modal.disconnect();
+    } catch (error) {
+      console.error("Error disconnecting Web3Modal:", error);
+    }
+  }
+  
+  // Reset provider
+  provider = null;
+  signer = null;
+  
+  showNotification("Wallet disconnected", "success");
+}
+
+function showNotification(message, type) {
+  const notification = document.getElementById('notification');
+  const content = document.getElementById('notificationContent');
+  
+  content.innerHTML = message;
+  notification.className = `floating-notification ${type === 'success' ? 'notification-success' : 'notification-error'}`;
+  notification.classList.add('active');
+  
+  setTimeout(() => {
+    notification.classList.remove('active');
+  }, 3000);
+}
+    
     // Task verification functions
     async function verifyTwitterFollow() {
       if (tasksCompleted.twitter) return;
