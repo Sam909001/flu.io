@@ -623,7 +623,19 @@
       cursor: pointer;
       font-size: 16px;
     }
- .disconnect-btn:hover {
+ .disconnect-btn {
+      background-color: #EF4444;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-left: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    
+    .disconnect-btn:hover {
       background-color: #DC2626;
     }
     
