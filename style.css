@@ -917,4 +917,11 @@
 .wallet-button:hover {
   background-color: #047857 !important; /* darker green */
 }
+#tokenChart {
+  display: block !important;
+  width: 100% !important;
+  max-width: 600px;
+  height: 400px !important;
+  margin: auto;
+}
   </style>
