@@ -454,9 +454,41 @@ function resetTimer() {
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   
   <script>
-     // Configuration
+// Configuration
     const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
     const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+   const WALLETCONNECT_CONFIG = {
+  projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+  chains: [56], // BSC Mainnet
+  showQrModal: false,
+  qrModalOptions: {
+    themeMode: 'dark',
+    mobileWallets: [
+      {
+        id: 'metamask',
+        name: 'MetaMask',
+        links: {
+          native: 'metamask://',
+          universal: 'https://metamask.app.link'
+        }
+      },
+      {
+        id: 'trust',
+        name: 'Trust Wallet',
+        links: {
+          native: 'trust://',
+          universal: 'https://link.trustwallet.com'
+        }
+      }
+    ]
+  },
+  metadata: {
+    name: "FLUFFI Presale",
+    description: "Connect to participate in FLUFFI presale",
+    url: window.location.href,
+    icons: ["https://fluffi.site/logo.png"]
+  }
+};
   // Global variables
 let userWalletAddress = null;
 let tasksCompleted = {
