@@ -888,4 +888,21 @@
         .detail-item:last-child {
             border-bottom: none;
         }
+.wallet-button {
+  background-color: #059669 !important; /* green */
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.375rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: background-color 0.2s !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.wallet-button:hover {
+  background-color: #047857 !important; /* darker green */
+}
   </style>
