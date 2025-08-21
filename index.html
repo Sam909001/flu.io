@@ -564,14 +564,6 @@ function resetTimer() {
   showNotification("Timer has been reset to 7 days", "success");
 }
 
-// For development - set custom timer
-function setTimer(hours, minutes, seconds) {
-  const endTime = Date.now() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
-  localStorage.setItem('airdropEndTime', endTime.toString());
-  startCountdown(endTime);
-  showNotification(`Timer set to ${hours} hours, ${minutes} minutes, ${seconds} seconds`, "success");
-}
-
 // Wallet connection functions
 function openWalletModal() {
   document.getElementById('walletModal').classList.add('active');
