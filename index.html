@@ -603,7 +603,9 @@ function resetTimer() {
   startCountdown(newEndTime);
   showNotification("Timer has been reset to 7 days", "success");
 }
-
+setInterval(updateTimer, 1000);
+updateTimer();
+updateStageProgress();
 // Wallet connection functions
 function openWalletModal() {
   document.getElementById('walletModal').classList.add('active');
