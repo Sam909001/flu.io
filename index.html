@@ -1450,52 +1450,46 @@ function showNotification(message, type) {
         tokenChart.update();
       }
     }
-function initTokenChart() {
-  const ctx = document.getElementById('tokenChart');
-  if (!ctx) return;
-  
-  const isDark = document.documentElement.classList.contains('dark');
-  
-  tokenChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
-        ],
-        borderWidth: 2,
-        borderColor: isDark ? '#1F2937' : '#FFFFFF'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: window.innerWidth < 768 ? 'bottom' : 'right',
-          labels: {
-            color: isDark ? '#FFFFFF' : '#111827',
-            font: {
-              size: window.innerWidth < 768 ? 12 : 14
-            },
-            padding: 20,
-          }
-        }
+// Initialize token chart
+  function initTokenChart() {
+    const ctx = document.getElementById('tokenChart');
+    if (!ctx) return;
+    
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#FFFFFF' : '#111827';
+    
+    tokenChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+        datasets: [{
+          data: [40, 30, 20, 5, 5],
+          backgroundColor: [
+            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
+          ],
+          borderWidth: 2,
+          borderColor: isDark ? '#1F2937' : '#FFFFFF'
+        }]
       },
-      cutout: '65%'
-    }
-  });
-
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (tokenChart) {
-      tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
-      tokenChart.update();
-    }
-  });
-}
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: textColor,
+              font: {
+                size: 12
+              },
+              padding: 15
+            }
+          }
+        },
+        cutout: '65%'
+      }
+    });
+  }
 // ===== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
