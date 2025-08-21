@@ -556,6 +556,11 @@ function updateTimer(endTime) {
   document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
   document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
 }
+    // Start the countdown timer (updates every second)
+setInterval(updateTimer, 1000);
+
+// Render initial stage progress bar
+updateStageProgress();
 
 function resetTimer() {
   const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
