@@ -14,188 +14,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
+  <link rel="stylesheet" href="style.css">
 
-  <style>
-    /* Custom styles */
-    .logo-float {
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-    
-    .section-title {
-      font-size: 1.875rem;
-      font-weight: bold;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      color: #059669; /* Green-600 */
-    }
-    
-    .price-tooltip {
-      position: relative;
-      display: inline-block;
-      margin-left: 0.5rem;
-      cursor: pointer;
-    }
-    
-    .price-tooltip .tooltip-text {
-      visibility: hidden;
-      width: 200px;
-      background-color: #1F2937;
-      color: white;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.875rem;
-    }
-    
-    .price-tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-    
-    .wallet-button {
-      background-color: #059669; /* Green-700 */
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.375rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: background-color 0.2s;
-    }
-    
-    .wallet-button:hover {
-      background-color: #047857; /* Green-800 */
-    }
-    
-    /* Modal styles */
-    .wallet-modal, .wallet-connect-modal, .help-modal {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    
-    .wallet-modal.active, .wallet-connect-modal.active, .help-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .wallet-modal-content, .wallet-connect-content, .help-modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 12px;
-      position: relative;
-    }
-    
-    .wallet-close, .wallet-connect-close, .help-close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      margin: 10px 0;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    
-    .wallet-option:hover {
-      background-color: #f3f4f6;
-    }
-    
-    .wallet-help-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-color: #d1d5db;
-      color: #4b5563;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .wallet-address-display {
-      background-color: #e5e7eb;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-family: monospace;
-      margin-right: 10px;
-    }
-    
-    .disconnect-btn {
-      background-color: #ef4444;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    
-    .disconnect-btn:hover {
-      background-color: #dc2626;
-    }
-    
-    /* Dark mode styles */
-    .dark .wallet-modal-content,
-    .dark .wallet-connect-content,
-    .dark .help-modal-content {
-      background-color: #1f2937;
-      color: white;
-      border-color: #4b5563;
-    }
-    
-    .dark .wallet-option {
-      border-color: #4b5563;
-    }
-    
-    .dark .wallet-option:hover {
-      background-color: #374151;
-    }
-    
-    .dark .wallet-address-display {
-      background-color: #374151;
-      color: white;
-    }
-  </style>
 </head>
   
-<body class="text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-900">
+<body class="text-gray-800 dark:text-white">
    <!-- Header -->
  <header class="bg-green-600 shadow sticky top-0 z-10 px-4 py-3">
   <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between">
@@ -256,18 +79,32 @@
   </div>
 </div>
 
+    <script>
+    /* Testing function - remove in production */
+function resetTimer() {
+  localStorage.removeItem('presaleStartTime');
+  location.reload();
+}
+</script>
+
+<!-- Testing button - remove in production -->
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+  Reset Timer (For Testing)
+</button>
+    
     <!-- Presale Section -->
     <section id="presale" class="mb-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 class="section-title">🚀 Presale is Live!</h2>
 
-        <div id="walletError" class="hidden p-3 mb-4 bg-red-100 text-red-700 rounded-lg"></div>
+        <div id="walletError" class="wallet-error hidden"></div>
         
-        <div id="walletStatus" class="hidden p-3 mb-4 bg-green-100 text-green-700 rounded-lg">
+        <div id="walletStatus" class="wallet-address hidden">
           <strong>Connected:</strong> <span id="connectedAddress"></span>
           <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
             Disconnect
           </button>
         </div>
+      </div>
 
       <div class="fluio-status-container">
         <div class="fluio-price mt-2">
@@ -285,6 +122,7 @@
                Next increase: <span id="nextIncreaseTime">00:00:00</span>
                </span>
               </span>
+            </span>
           </div>
           <div class="price-change text-sm text-gray-500">+0.00%</div>
         </div>
@@ -496,42 +334,48 @@
       </details>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">Why Fluffi Coin?</h2>
-      <div class="about-content">
-        <p class="mb-4">Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
-        <ul class="list-disc list-inside ml-4 space-y-2 mb-4">
-          <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 - Stake Fluffi NFTs to earn exclusive rewards</li>
-          <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
-          <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
-        </ul>
-        <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
-      </div>
-    </section>
+    <div class="split-sections">
+      <!-- About Section -->
+      <section id="about">
+        <h2>Why Fluffi Coin?</h2>
+        <div class="about-content">
+          <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
+          <ul>
+            <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 - Stake Fluffi NFTs to earn exclusive rewards</li>
+            <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
+            <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
+          </ul>
+          <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
+        </div>
+      </section>
 
-    <!-- Team Section -->
-    <section id="team" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">Our Team</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="team-member p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">James Chen</h3>
-          <p class="text-gray-600 dark:text-gray-300">Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+      <!-- Team Section with two new members -->
+      <section id="team">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+          <div class="team-member">
+            <h3>James Chen</h3>
+            <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+          </div>
+          <div class="team-member">
+            <h3>Priya Patel</h3>
+            <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+          </div>
+          
+          <!-- New team member 1: Former AVAX Developer -->
+          <div class="team-member">
+            <h3>Marcus Johnson</h3>
+            <p>Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
+          </div>
+          
+          <!-- New team member 2: Marketing Specialist -->
+          <div class="team-member">
+            <h3>Sophia Williams</h3>
+            <p>Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
+          </div>
         </div>
-        <div class="team-member p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Priya Patel</h3>
-          <p class="text-gray-600 dark:text-gray-300">Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
-        </div>
-        <div class="team-member p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Marcus Johnson</h3>
-          <p class="text-gray-600 dark:text-gray-300">Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
-        </div>
-        <div class="team-member p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Sophia Williams</h3>
-          <p class="text-gray-600 dark:text-gray-300">Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
@@ -555,21 +399,21 @@
       </div>
       <div class="wallet-option" onclick="connectWallet('metamask')">
         <div class="flex items-center w-full">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-6 h-6">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
           <span class="ml-3">MetaMask</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
       </div>
       <div class="wallet-option" onclick="connectWallet('trust')">
         <div class="flex items-center w-full">
-          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="w-6 h-6">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
           <span class="ml-3">Trust Wallet</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
         <div class="flex items-center w-full">
-          <img src="https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg" alt="WalletConnect" class="w-6 h-6">
+          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
           <span class="ml-3">WalletConnect</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
@@ -577,7 +421,7 @@
 
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <div class="flex items-center w-full">
-          <img src="https://phantom.app/img/phantom_logo.png" alt="Phantom" class="w-6 h-6">
+          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
           <span class="ml-3">Phantom</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
@@ -585,6 +429,17 @@
     </div>
   </div>
 
+  <!-- WalletConnect QR Code Modal -->
+  <div id="walletConnectModal" class="wallet-connect-modal">
+    <div class="wallet-connect-content dark:bg-gray-800">
+      <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
+      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <div id="walletConnectQrCode"></div>
+      <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
+    </div>
+  </div>
+  
   <!-- Connection Help Modal -->
   <div id="connectionHelpModal" class="help-modal">
     <div class="help-modal-content dark:bg-gray-800">
@@ -1218,7 +1073,6 @@ function showNotification(message, type) {
 }
   </script>
     <script>
-   <script>
     // ===== PRESALE FUNCTIONS =====
     async function buyFluffi() {
   const amount = document.getElementById('amountInput').value;
@@ -1450,46 +1304,52 @@ function showNotification(message, type) {
         tokenChart.update();
       }
     }
-// Initialize token chart
-  function initTokenChart() {
-    const ctx = document.getElementById('tokenChart');
-    if (!ctx) return;
-    
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#FFFFFF' : '#111827';
-    
-    tokenChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-        datasets: [{
-          data: [40, 30, 20, 5, 5],
-          backgroundColor: [
-            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
-          ],
-          borderWidth: 2,
-          borderColor: isDark ? '#1F2937' : '#FFFFFF'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              color: textColor,
-              font: {
-                size: 12
-              },
-              padding: 15
-            }
+function initTokenChart() {
+  const ctx = document.getElementById('tokenChart');
+  if (!ctx) return;
+  
+  const isDark = document.documentElement.classList.contains('dark');
+  
+  tokenChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+      datasets: [{
+        data: [40, 30, 20, 5, 5],
+        backgroundColor: [
+          '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
+        ],
+        borderWidth: 2,
+        borderColor: isDark ? '#1F2937' : '#FFFFFF'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: window.innerWidth < 768 ? 'bottom' : 'right',
+          labels: {
+            color: isDark ? '#FFFFFF' : '#111827',
+            font: {
+              size: window.innerWidth < 768 ? 12 : 14
+            },
+            padding: 20,
           }
-        },
-        cutout: '65%'
-      }
-    });
-  }
+        }
+      },
+      cutout: '65%'
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (tokenChart) {
+      tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
+      tokenChart.update();
+    }
+  });
+}
 // ===== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
