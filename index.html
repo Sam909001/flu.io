@@ -567,12 +567,6 @@ function startCountdown(endTime) {
     updateTimer(endTime);
   }, 1000);
 }
-    // Start the countdown timer (updates every second)
-setInterval(updateTimer, 1000);
-
-// Render initial stage progress bar
-updateStageProgress();
-
 function resetTimer() {
   const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
   localStorage.setItem('airdropEndTime', newEndTime.toString());
