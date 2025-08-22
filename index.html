@@ -420,7 +420,7 @@ function resetTimer() {
       </div>
 
       <div class="wallet-option" onclick="connectWallet('binance')">
-  <div class="wallet-icon"><img src="binance.png" alt="Binance Wallet" /></div>
+  <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png" alt="Binance Wallet" />
   Binance Wallet
 </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
@@ -973,29 +973,24 @@ async function connectTrustWallet() {
 }
 
 // Simplified WalletConnect connection
-async function connectWalletConnect() {
+async function connectWalletConnect(walletType = null) {
   try {
-    // Check if any wallet extension is available first
-    if (window.ethereum) {
-      // Try to connect with available wallet provider
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleWalletConnection(accounts[0]);
-      
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          handleWalletConnection(accounts[0]);
-        }
-      });
-    } else {
-      // Fallback to WalletConnect modal
-      showWalletConnectFallback();
+    const provider = await web3Modal.connectTo("walletconnect");
+
+    // Optionally check walletType (for logs / UI)
+    if (walletType) {
+      console.log(`Connecting with ${walletType} via WalletConnect`);
     }
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    // Show fallback modal with wallet options
-    showWalletConnectFallback();
+
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+
+    handleWalletConnection(address);
+
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    showNotification("Failed to connect with WalletConnect", "error");
   }
 }
 
