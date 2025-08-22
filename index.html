@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
   
@@ -201,48 +200,48 @@ function resetTimer() {
     </section>
     
     <!-- Tokenomics Section -->
-    <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
-      <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
-        📊 Tokenomics
-      </h2>
+   <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
+  <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
+    📊 Tokenomics
+  </h2>
 
-      <div class="grid md:grid-cols-2 gap-10 items-center">
-        <!-- Token Details -->
-        <div>
-          <ul class="space-y-4 text-lg text-gray-900 dark:text-white">
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
-              <span class="ml-2">10,000,000,000 FLUFFI</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
-              <span class="ml-2">40%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
-              <span class="ml-2">30% (Locked)</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
-              <span class="ml-2">20%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
-              <span class="ml-2">5%</span>
-            </li>
-            <li>
-              <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
-              <span class="ml-2">5% (Locked)</span>
-            </li>
-          </ul>
-        </div>
+  <div class="grid md:grid-cols-2 gap-10 items-center">
+    <!-- Token Details -->
+    <div>
+      <ul class="space-y-4 text-lg text-gray-900 dark:text-white">
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Total Supply:</span>
+          <span class="ml-2">10,000,000,000 FLUFFI</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Presale:</span>
+          <span class="ml-2">40%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Liquidity:</span>
+          <span class="ml-2">30% (Locked)</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Staking:</span>
+          <span class="ml-2">20%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Marketing:</span>
+          <span class="ml-2">5%</span>
+        </li>
+        <li>
+          <span class="font-semibold text-green-700 dark:text-green-400">Team:</span>
+          <span class="ml-2">5% (Locked)</span>
+        </li>
+      </ul>
+    </div>
 
-        <!-- Chart -->
-        <div class="flex justify-center">
-          <canvas id="tokenChart" width="280" height="280" aria-label="Token distribution chart" role="img"></canvas>
-        </div>
-      </div>
-    </section>
+    <!-- Chart -->
+    <div class="flex justify-center">
+      <canvas id="tokenChart" width="280" height="280" aria-label="Token distribution chart" role="img"></canvas>
+    </div>
+  </div>
+</section>
     
     <!-- FAQ Section -->
     <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
@@ -1397,46 +1396,100 @@ function initTokenChart() {
   
   const isDark = document.documentElement.classList.contains('dark');
   
-  tokenChart = new Chart(ctx, {
+  // Token distribution data
+  const data = {
+    labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
+    datasets: [{
+      data: [40, 30, 20, 5, 5],
+      backgroundColor: [
+        '#10B981', // Green
+        '#3B82F6', // Blue
+        '#F59E0B', // Yellow
+        '#EF4444', // Red
+        '#8B5CF6'  // Purple
+      ],
+      borderWidth: 0,
+      hoverOffset: 15
+    }]
+  };
+  
+  // Chart configuration
+  const config = {
     type: 'doughnut',
-    data: {
-      labels: ['Presale (40%)', 'Liquidity (30%)', 'Staking (20%)', 'Marketing (5%)', 'Team (5%)'],
-      datasets: [{
-        data: [40, 30, 20, 5, 5],
-        backgroundColor: [
-          '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'
-        ],
-        borderWidth: 2,
-        borderColor: isDark ? '#1F2937' : '#FFFFFF'
-      }]
-    },
+    data: data,
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      cutout: '65%',
       plugins: {
         legend: {
-          position: window.innerWidth < 768 ? 'bottom' : 'right',
+          position: 'bottom',
           labels: {
-            color: isDark ? '#FFFFFF' : '#111827',
+            color: isDark ? '#E2E8F0' : '#1F2937',
             font: {
-              size: window.innerWidth < 768 ? 12 : 14
+              size: 14,
+              family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
             },
-            padding: 20,
+            padding: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          titleColor: isDark ? '#10B981' : '#059669',
+          bodyColor: isDark ? '#E2E8F0' : '#1F2937',
+          titleFont: {
+            size: 16,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 14
+          },
+          padding: 15,
+          cornerRadius: 12,
+          callbacks: {
+            label: function(context) {
+              return `${context.label.split(' (')[0]}: ${context.parsed}%`;
+            }
           }
         }
       },
-      cutout: '65%'
+      animation: {
+        animateScale: true,
+        animateRotate: true,
+        duration: 2000,
+        easing: 'easeOutQuart'
+      }
     }
+  };
+  
+  // Create the chart
+  const tokenChart = new Chart(ctx, config);
+  
+  // Update chart on theme change
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        const isDark = document.documentElement.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#E2E8F0' : '#1F2937';
+        tokenChart.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+        tokenChart.options.plugins.tooltip.titleColor = isDark ? '#10B981' : '#059669';
+        tokenChart.options.plugins.tooltip.bodyColor = isDark ? '#E2E8F0' : '#1F2937';
+        tokenChart.update();
+      }
+    });
   });
-
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (tokenChart) {
-      tokenChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
-      tokenChart.update();
-    }
+  
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
   });
 }
+
+// Initialize the chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTokenChart();
+});
+      
 // ==== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
   let startTime = localStorage.getItem('presaleStartTime');
