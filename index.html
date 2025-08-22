@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
   
@@ -566,11 +567,40 @@ function startCountdown(endTime) {
     updateTimer(endTime);
   }, 1000);
 }
-    
+
+function updateTimer(endTime) {
+  const now = Date.now();
+  const distance = endTime - now;
+  
+  if (distance < 0) {
+    clearInterval(countdownInterval);
+    document.getElementById('days').textContent = '00';
+    document.getElementById('hours').textContent = '00';
+    document.getElementById('minutes').textContent = '00';
+    document.getElementById('seconds').textContent = '00';
+    return;
+  }
+  
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+  document.getElementById('days').textContent = days.toString().padStart(2, '0');
+  document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+  document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+  document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+}
+    // Start the countdown timer (updates every second)
+setInterval(updateTimer, 1000);
+
+// Render initial stage progress bar
+updateStageProgress();
+
 function resetTimer() {
   const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
   localStorage.setItem('airdropEndTime', newEndTime.toString());
-  startCountdown(newEndTime);
+  initTimer();
   showNotification("Timer has been reset to 7 days", "success");
 }
 // Wallet connection functions
@@ -1306,8 +1336,6 @@ function showNotification(message, type) {
         tokenChart.update();
       }
     }
-let tokenChart = null; // Add this global variable at the top of your script
-
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
   if (!ctx) return;
