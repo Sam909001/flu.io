@@ -55,14 +55,13 @@
 </nav>
 </header>
 
-  <main class="p-6 mx-auto w-full max-w-6xl">
-   <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
+<div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
   <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300">
-    <span id="presale-days">00</span>d 
-    <span id="presale-hours">00</span>h 
-    <span id="presale-minutes">00</span>m 
-    <span id="presale-seconds">00</span>s
+    <span id="days">00</span>d 
+    <span id="hours">00</span>h 
+    <span id="minutes">00</span>m 
+    <span id="seconds">00</span>s
   </div>
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -545,63 +544,119 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Timer functions
-function initializeCountdown() {
-  let endTime = localStorage.getItem('airdropEndTime');
-  
-  if (!endTime) {
-    endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-    localStorage.setItem('airdropEndTime', endTime);
+// Timer variables
+let presaleInterval = null;
+
+// Initialize the timer when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializeTimer();
+});
+
+// Initialize timer
+function initializeTimer() {
+  // Set presale start time if not already set
+  let startTime = localStorage.getItem('presaleStartTime');
+  if (!startTime) {
+    // For demo purposes, set to current time
+    startTime = Date.now();
+    localStorage.setItem('presaleStartTime', startTime);
+  } else {
+    startTime = parseInt(startTime);
   }
   
-  startCountdown(parseInt(endTime));
-}
-
-function startCountdown(endTime) {
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
+  // Update timer immediately
+  updateTimer(startTime);
+  
+  // Set interval to update timer every second
+  if (!presaleInterval) {
+    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
   }
-  
-  updateTimer(endTime);
-  
-  countdownInterval = setInterval(() => {
-    updateTimer(endTime);
-  }, 1000);
 }
 
-function updateTimer(endTime) {
+// Update timer display
+function updateTimer(startTime) {
   const now = Date.now();
-  const distance = endTime - now;
+  const totalDuration = 15 * 48 * 60 * 60 * 1000; // 15 stages * 48 hours each
+  const endTime = startTime + totalDuration;
+  const timeLeft = endTime - now;
   
-  if (distance < 0) {
-    clearInterval(countdownInterval);
+  // Calculate current stage (0-14)
+  const elapsed = now - startTime;
+  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours
+  const currentStage = Math.min(Math.floor(elapsed / stageDuration), 14);
+  const stageEndTime = startTime + ((currentStage + 1) * stageDuration);
+  const stageTimeLeft = stageEndTime - now;
+  
+  // Format time function
+  const formatTime = (ms) => {
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+    
+    return {
+      days: days.toString().padStart(2, '0'),
+      hours: hours.toString().padStart(2, '0'),
+      minutes: minutes.toString().padStart(2, '0'),
+      seconds: seconds.toString().padStart(2, '0'),
+      full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+    };
+  };
+  
+  // Update main timer
+  if (timeLeft <= 0) {
     document.getElementById('days').textContent = '00';
     document.getElementById('hours').textContent = '00';
     document.getElementById('minutes').textContent = '00';
     document.getElementById('seconds').textContent = '00';
-    return;
+    clearInterval(presaleInterval);
+  } else {
+    const totalFormatted = formatTime(timeLeft);
+    document.getElementById('days').textContent = totalFormatted.days;
+    document.getElementById('hours').textContent = totalFormatted.hours;
+    document.getElementById('minutes').textContent = totalFormatted.minutes;
+    document.getElementById('seconds').textContent = totalFormatted.seconds;
   }
   
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  // Update stage info
+  document.getElementById('current-stage').textContent = currentStage + 1;
   
-  document.getElementById('days').textContent = days.toString().padStart(2, '0');
-  document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-  document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-  document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+  const stageFormatted = formatTime(stageTimeLeft);
+  document.getElementById('stage-time-left').textContent = stageFormatted.full;
+  
+  // Update progress bar
+  const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
+  const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
+  document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
+  
+  // Update price (5% increase per stage)
+  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
 }
-    // Start the countdown timer (updates every second)
-setInterval(updateTimer, 1000);
 
-// Render initial stage progress bar
-updateStageProgress();
-
+// Reset timer function
 function resetTimer() {
-  const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
-  localStorage.setItem('airdropEndTime', newEndTime.toString());
-  initTimer();
-  showNotification("Timer has been reset to 7 days", "success");
+  // Clear intervals
+  if (presaleInterval) {
+    clearInterval(presaleInterval);
+    presaleInterval = null;
+  }
+  
+  // Remove stored start time
+  localStorage.removeItem('presaleStartTime');
+  
+  // Reset displays
+  document.getElementById('days').textContent = '00';
+  document.getElementById('hours').textContent = '00';
+  document.getElementById('minutes').textContent = '00';
+  document.getElementById('seconds').textContent = '00';
+  document.getElementById('current-stage').textContent = '1';
+  document.getElementById('stage-time-left').textContent = '00d 00h 00m 00s';
+  document.getElementById('stageProgressBar').style.width = '0%';
+  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
+  
+  // Reinitialize the timer
+  initializeTimer();
 }
 // Wallet connection functions
 function openWalletModal() {
