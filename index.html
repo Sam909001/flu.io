@@ -419,10 +419,6 @@ function resetTimer() {
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
       </div>
 
-      <div class="wallet-option" onclick="connectWallet('binance')">
-  <img src="binance.png" alt="Binance Wallet" />
-  Binance Wallet
-</div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <div class="flex items-center w-full">
           <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
@@ -971,104 +967,7 @@ async function connectTrustWallet() {
     }
   }
 }
-    
-//function Binance Wallet connection
-async function connectBinanceWallet() {
-  if (window.BinanceChain) {
-    try {
-      // Request account access
-      const accounts = await window.BinanceChain.request({ method: 'bnb_accounts' });
-      
-      if (accounts.length === 0) {
-        // Request account access if not already granted
-        const newAccounts = await window.BinanceChain.request({ method: 'bnb_accountsRequest' });
-        if (newAccounts.length > 0) {
-          handleWalletConnection(newAccounts[0]);
-        } else {
-          throw new Error("Please unlock your Binance Chain Wallet");
-        }
-      } else {
-        handleWalletConnection(accounts[0]);
-      }
-      
-      // Listen for account changes
-      window.BinanceChain.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          handleWalletConnection(accounts[0]);
-        }
-      });
-    } catch (error) {
-      console.error("Binance Wallet connection error:", error);
-      throw new Error("Failed to connect Binance Wallet: " + error.message);
-    }
-  } else {
-    throw new Error("Please install Binance Chain Wallet extension");
-  }
-}
 
-// Update the main connectWallet function to handle 'binance' case
-async function connectWallet(walletType) {
-  try {
-    closeWalletModal();
-    
-    // Update wallet button to show loading
-    const walletButton = document.getElementById('walletButton');
-    const originalText = walletButton.innerHTML;
-    walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
-    walletButton.disabled = true;
-    
-    if (walletType === 'metamask') {
-      await connectMetaMask();
-    }
-    else if (walletType === 'trust') {
-      await connectTrustWallet();
-    }
-    else if (walletType === 'walletconnect') {
-      await connectWalletConnect();
-    }
-    else if (walletType === 'phantom') {
-      await connectPhantom();
-    }
-    else if (walletType === 'binance') {
-      await connectBinanceWallet(); // Add this line
-    }
-  } catch (error) {
-    console.error("Wallet connection error:", error);
-    showNotification("Failed to connect wallet: " + error.message, "error");
-  } finally {
-    // Reset wallet button state
-    setTimeout(() => {
-      const walletButton = document.getElementById('walletButton');
-      if (walletButton && !userWalletAddress) {
-        walletButton.innerHTML = '<i class="fas fa-wallet mr-2"></i>Connect Wallet';
-        walletButton.disabled = false;
-      }
-    }, 2000);
-  }
-}
-
-// Also add a helper function to detect Binance Wallet
-function isBinanceWalletInstalled() {
-  return typeof window.BinanceChain !== 'undefined';
-}
-
-// Optional: Update the UI based on installed wallets
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if Binance Wallet is installed and show/hide option if needed
-  if (!isBinanceWalletInstalled()) {
-    const binanceOption = document.querySelector('.wallet-option[onclick*="binance"]');
-    if (binanceOption) {
-      binanceOption.style.opacity = '0.5';
-      binanceOption.style.cursor = 'not-allowed';
-      binanceOption.onclick = function() {
-        showNotification("Please install Binance Chain Wallet extension", "error");
-      };
-    }
-  }
-});
-    
 // Simplified WalletConnect connection
 async function connectWalletConnect() {
   try {
@@ -1095,6 +994,7 @@ async function connectWalletConnect() {
     showWalletConnectFallback();
   }
 }
+
 // Show WalletConnect fallback modal
 function showWalletConnectFallback() {
   const modal = document.getElementById('walletConnectModal');
