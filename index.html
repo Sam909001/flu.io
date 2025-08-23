@@ -1235,7 +1235,54 @@ function showNotification(message, type) {
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
     alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
+
+  // After successful purchase, store the purchase data
+  const purchaseData = {
+    amount: ethValue,
+    tokens: ethValue * 10000, // Example: 1 BNB = 10000 FLUFFI
+    timestamp: Date.now(),
+    txHash: tx.hash
+  };
+  
+  const existingPurchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
+  existingPurchases.push(purchaseData);
+  localStorage.setItem(`purchases_${userWalletAddress}`, JSON.stringify(existingPurchases));
+  
+  // Update display
+  updateUserBalances();
+}
+
+// Update the updateUserBalances function
+async function updateUserBalances() {
+  if (!userWalletAddress) return;
+  
+  try {
+    // Get purchase data from localStorage
+    const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
+    const totalPurchased = purchases.reduce((sum, p) => sum + p.tokens, 0);
     
+    // Get staking data
+    const stakingInfo = localStorage.getItem(`staking_${userWalletAddress}`);
+    const stakedAmount = stakingInfo ? JSON.parse(stakingInfo).amount : 0;
+    
+    // Calculate rewards
+    let rewards = 0;
+    if (stakingInfo) {
+      const data = JSON.parse(stakingInfo);
+      const daysStaked = (Date.now() - data.timestamp) / (1000 * 60 * 60 * 24);
+      rewards = (data.amount * (data.apy / 100) / 365) * daysStaked;
+    }
+    
+    // Update UI
+    document.getElementById('userBalance').textContent = totalPurchased.toFixed(2);
+    document.getElementById('userStaked').textContent = stakedAmount.toFixed(2);
+    document.getElementById('userRewards').textContent = rewards.toFixed(4);
+    document.getElementById('userPresale').textContent = totalPurchased.toFixed(2);
+    
+  } catch (error) {
+    console.error("Balance update error:", error);
+  }
+}
     // Update displayed balances
     await updateUserBalances();
   } catch (err) {
