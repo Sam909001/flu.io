@@ -1078,9 +1078,8 @@ async function connectBinanceWallet() {
       handleWalletConnection(accounts[0]);
       closeWalletConnectModal();
     } else {
-      // Redirect to Binance wallet download or web3 connection
-      if (/Android|iPhone/i.test(navigator.userAgent)) {
-      window.location.href = "bnc://app.binance.com/"; 
+   // Redirect to Binance wallet download or web3 connection
+      window.open('https://www.binance.com/en/wallet-direct', '_blank');
     }
   } catch (error) {
     showNotification("Failed to connect Binance Wallet: " + error.message, "error");
