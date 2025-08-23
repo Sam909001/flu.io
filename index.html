@@ -903,6 +903,10 @@ async function connectWallet(walletType) {
 }
 
 // MetaMask connection
+    function isInAppBrowser() {
+  return /(FBAN|FBAV|Instagram|Line|WeChat|Twitter|Telegram)/i.test(navigator.userAgent);
+}
+    
 async function connectMetaMask() {
   if (isMobile()) {
     if (window.ethereum && window.ethereum.isMetaMask) {
