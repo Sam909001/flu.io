@@ -1053,6 +1053,10 @@ function showWalletConnectFallback() {
         <img src="https://avatars.githubusercontent.com/u/18060234?s=280&v=4" alt="Coinbase">
         <span>Open in Coinbase Wallet</span>
       </div>
+      <div class="wallet-list-item" onclick="connectBinanceWallet()">
+        <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance">
+        <span>Binance Wallet</span>
+      </div>
       <div class="wallet-list-item" onclick="window.open('https://rainbow.me/connect?url=${encodeURIComponent(window.location.href)}', '_blank')">
         <img src="https://avatars.githubusercontent.com/u/48327834?s=280&v=4" alt="Rainbow">
         <span>Open in Rainbow</span>
@@ -1065,6 +1069,21 @@ function showWalletConnectFallback() {
   
   qrContainer.appendChild(walletList);
   modal.classList.add('active');
+}
+// Add this new function for Binance connection
+async function connectBinanceWallet() {
+  try {
+    if (window.BinanceChain) {
+      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      closeWalletConnectModal();
+    } else {
+      // Redirect to Binance wallet download or web3 connection
+      window.open('https://www.binance.com/en/wallet-direct', '_blank');
+    }
+  } catch (error) {
+    showNotification("Failed to connect Binance Wallet: " + error.message, "error");
+  }
 }
 
 // Phantom connection
