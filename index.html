@@ -1674,41 +1674,65 @@ function toggleDarkMode() {
   }
 }
     // ===== REFERRAL FUNCTIONS =====
-    function checkReferral() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get('ref');
-      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-        document.getElementById('refInput').value = ref;
-      }
-    }
+  // Add referral tracking system
+let referralData = {
+  referrer: null,
+  referrals: [],
+  earnings: 0
+};
 
-    async function connectReferralWallet() {
-      if (!userWalletAddress) {
-        await connectWallet();
-      }
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
+// Update checkReferral function
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  
+  if (ref && /^0x[0-9a-fA-F]{40}$/i.test(ref)) {
+    document.getElementById('refInput').value = ref;
+    
+    // Store referrer in localStorage
+    if (!localStorage.getItem('referrer')) {
+      localStorage.setItem('referrer', ref);
+      
+      // Track this referral
+      const referralRecord = {
+        referee: userWalletAddress || 'pending',
+        referrer: ref,
+        timestamp: Date.now()
+      };
+      
+      // Store in localStorage (in production, this would be on blockchain)
+      const existingReferrals = JSON.parse(localStorage.getItem('all_referrals') || '[]');
+      existingReferrals.push(referralRecord);
+      localStorage.setItem('all_referrals', JSON.stringify(existingReferrals));
     }
+  }
+}
 
-    function showReferralUI(wallet) {
-      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      document.getElementById('referralSection').innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-2 font-semibold">Your referral link:</label>
-            <div class="flex">
-              <input type="text" id="referralLinkInput" value="${referralLink}" 
-                    class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-                Copy
-              </button>
-            </div>
-          </div>
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-          </div>
+// Update showReferralUI function
+function showReferralUI(wallet) {
+  const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+  
+  // Get referral stats
+  const allReferrals = JSON.parse(localStorage.getItem('all_referrals') || '[]');
+  const myReferrals = allReferrals.filter(r => r.referrer === wallet);
+  const earnings = myReferrals.length * 100; // Example: 100 FLUFFI per referral
+  
+  document.getElementById('referralSection').innerHTML = `
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-2 font-semibold">Your referral link:</label>
+        <div class="flex">
+          <input type="text" id="referralLinkInput" value="${referralLink}" 
+                class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+          <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">${myReferrals.length}</span></p>
+        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">${earnings} FLUFFI</span></p>
+      </div>
           <div class="mt-4">
             <p class="text-sm mb-2 font-semibold">Share your link:</p>
             <div class="flex space-x-3">
