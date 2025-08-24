@@ -1283,13 +1283,13 @@ if (!document.getElementById('notification-styles')) {
   const ref = document.getElementById('refInput').value;
   
   if (!userWalletAddress) {
-    showWalletError('Please connect your wallet first.');
+    showNotification('Please connect your wallet first.');
     openWalletModal();
     return;
   }
   
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
-    showWalletError('Please enter a valid amount.');
+    showNotification('Please enter a valid amount.');
     return;
   }
   
@@ -1344,7 +1344,7 @@ if (!document.getElementById('notification-styles')) {
       buyBtn.textContent = '🚀 Buy Now';
       buyBtn.disabled = false;
     }
-    showWalletError(err.message || "Transaction failed");
+    showNotification(err.message || "Transaction failed");
   }
 }
 
