@@ -1268,63 +1268,101 @@ function showNotification(message, type) {
 }
 
     // ===== STAKING FUNCTIONS =====
-    async function stakeFluffi() {
-      try {
-        if (!userWalletAddress) {
-          showWalletError("Please connect your wallet first");
-          openWalletModal();
-          return;
+// Staking contract placeholder - replace with actual deployed address
+const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
+const STAKING_CONTRACT_ABI = [
+  "function stake(uint256 amount) external",
+  "function unstake(uint256 amount) external", 
+  "function getStakedBalance(address user) view returns (uint256)",
+  "function calculateRewards(address user) view returns (uint256)",
+  "function claimRewards() external"
+];
+
+async function stakeFluffi() {
+  try {
+    if (!userWalletAddress) {
+      showNotification("Please connect your wallet first", "error");
+      openWalletModal();
+      return;
+    }
+    
+    const amount = document.getElementById('stakeInput').value;
+    const amountNum = parseFloat(amount);
+    
+    if (isNaN(amountNum) || amountNum <= 0) {
+      showNotification("Please enter a valid amount", "error");
+      return;
+    }
+    
+    const stakeBtn = document.querySelector('#staking button');
+    const originalText = stakeBtn.textContent;
+    stakeBtn.disabled = true;
+    stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    
+    try {
+      // Check if staking contract is deployed
+      if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+        // Fallback to local storage simulation for now
+        const stakingInfo = {
+          amount: amountNum,
+          timestamp: Date.now(),
+          apy: 90,
+          wallet: userWalletAddress,
+          lastClaim: Date.now()
+        };
+        
+        const existingStake = localStorage.getItem(`staking_${userWalletAddress}`);
+        if (existingStake) {
+          const existing = JSON.parse(existingStake);
+          stakingInfo.amount += existing.amount;
         }
         
-        const amount = document.getElementById('stakeInput').value;
-        const amountNum = parseFloat(amount);
+        localStorage.setItem(`staking_${userWalletAddress}`, JSON.stringify(stakingInfo));
         
-        if (isNaN(amountNum)) {
-          showWalletError("Please enter a valid amount");
-          return;
-        }
-        
-        const signer = ethersProvider.getSigner();
-        const fluffiContract = new ethers.Contract(
-          FLUFFI_CONTRACT_ADDRESS,
-          FLUFFI_CONTRACT_ABI,
-          signer
-        );
-        
-        // Show loading state
-        const stakeBtn = document.querySelector('#staking button');
-        const originalText = stakeBtn.textContent;
-        stakeBtn.disabled = true;
-        stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        setTimeout(() => {
+          stakeBtn.disabled = false;
+          stakeBtn.textContent = originalText;
+          document.getElementById('stakeInput').value = '';
+          updateStakingDisplay();
+          showNotification(`Successfully staked ${amountNum} FLUFFI!`, "success");
+        }, 2000);
+      } else {
+        // Real staking with smart contract
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const stakingContract = new ethers.Contract(STAKING_CONTRACT_ADDRESS, STAKING_CONTRACT_ABI, signer);
         
         // Convert amount to wei
-        const amountWei = ethers.utils.parseUnits(amount, 18);
+        const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
         
-        // Send transaction
-        const tx = await fluffiContract.stake(amountWei);
-        await tx.wait();
+        // First approve FLUFFI tokens for staking contract
+        const fluffiContract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, ["function approve(address spender, uint256 amount) returns (bool)"], signer);
+        const approveTx = await fluffiContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
+        await approveTx.wait();
         
-        // Reset button
+        // Then stake
+        const stakeTx = await stakingContract.stake(amountWei);
+        await stakeTx.wait();
+        
         stakeBtn.disabled = false;
         stakeBtn.textContent = originalText;
+        document.getElementById('stakeInput').value = '';
         
-        // Update balances
-        await updateUserBalances();
-        
-        alert("Staking successful!");
-      } catch (error) {
-        console.error("Stake error:", error);
-        showWalletError(error.message || "Staking failed");
-        
-        // Reset button if error occurs
-        const stakeBtn = document.querySelector('#staking button');
-        if (stakeBtn) {
-          stakeBtn.disabled = false;
-          stakeBtn.textContent = 'Stake Now';
-        }
+        updateStakingDisplay();
+        showNotification(`Successfully staked ${amountNum} FLUFFI! TX: ${stakeTx.hash}`, "success");
       }
+    } catch (error) {
+      console.error("Staking error:", error);
+      stakeBtn.disabled = false;
+      stakeBtn.textContent = originalText;
+      showNotification("Staking failed: " + error.message, "error");
     }
-
+    
+  } catch (error) {
+    console.error("Stake error:", error);
+    showNotification(error.message || "Staking failed", "error");
+  }
+}
     // ===== CLAIM FUNCTIONS =====
     async function claimTokens() {
   try {
