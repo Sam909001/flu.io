@@ -531,10 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
     handleWalletConnection(localStorage.getItem('walletAddress'));
   }
-  
-  // Initialize countdown timer
-  initializeCountdown();
-  
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
   if (savedTasks) {
@@ -542,122 +538,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTaskUI();
   }
 });
-
-// Timer functions
-// Timer variables
-let presaleInterval = null;
-
-// Initialize the timer when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initializeTimer();
-});
-
-// Initialize timer
-function initializeTimer() {
-  // Set presale start time if not already set
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // For demo purposes, set to current time
-    startTime = Date.now();
-    localStorage.setItem('presaleStartTime', startTime);
-  } else {
-    startTime = parseInt(startTime);
-  }
-  
-  // Update timer immediately
-  updateTimer(startTime);
-  
-  // Set interval to update timer every second
-  if (!presaleInterval) {
-    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
-  }
-}
-
-// Update timer display
-function updateTimer(startTime) {
-  const now = Date.now();
-  const totalDuration = 15 * 48 * 60 * 60 * 1000; // 15 stages * 48 hours each
-  const endTime = startTime + totalDuration;
-  const timeLeft = endTime - now;
-  
-  // Calculate current stage (0-14)
-  const elapsed = now - startTime;
-  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours
-  const currentStage = Math.min(Math.floor(elapsed / stageDuration), 14);
-  const stageEndTime = startTime + ((currentStage + 1) * stageDuration);
-  const stageTimeLeft = stageEndTime - now;
-  
-  // Format time function
-  const formatTime = (ms) => {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
-    const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-    
-    return {
-      days: days.toString().padStart(2, '0'),
-      hours: hours.toString().padStart(2, '0'),
-      minutes: minutes.toString().padStart(2, '0'),
-      seconds: seconds.toString().padStart(2, '0'),
-      full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-    };
-  };
-  
-  // Update main timer
-  if (timeLeft <= 0) {
-    document.getElementById('days').textContent = '00';
-    document.getElementById('hours').textContent = '00';
-    document.getElementById('minutes').textContent = '00';
-    document.getElementById('seconds').textContent = '00';
-    clearInterval(presaleInterval);
-  } else {
-    const totalFormatted = formatTime(timeLeft);
-    document.getElementById('days').textContent = totalFormatted.days;
-    document.getElementById('hours').textContent = totalFormatted.hours;
-    document.getElementById('minutes').textContent = totalFormatted.minutes;
-    document.getElementById('seconds').textContent = totalFormatted.seconds;
-  }
-  
-  // Update stage info
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  
-  const stageFormatted = formatTime(stageTimeLeft);
-  document.getElementById('stage-time-left').textContent = stageFormatted.full;
-  
-  // Update progress bar
-  const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
-  const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
-  document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
-  
-  // Update price (5% increase per stage)
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
-}
-
-// Reset timer function
-function resetTimer() {
-  // Clear intervals
-  if (presaleInterval) {
-    clearInterval(presaleInterval);
-    presaleInterval = null;
-  }
-  
-  // Remove stored start time
-  localStorage.removeItem('presaleStartTime');
-  
-  // Reset displays
-  document.getElementById('days').textContent = '00';
-  document.getElementById('hours').textContent = '00';
-  document.getElementById('minutes').textContent = '00';
-  document.getElementById('seconds').textContent = '00';
-  document.getElementById('current-stage').textContent = '1';
-  document.getElementById('stage-time-left').textContent = '00d 00h 00m 00s';
-  document.getElementById('stageProgressBar').style.width = '0%';
-  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
-  
-  // Reinitialize the timer
-  initializeTimer();
-}
 // Wallet connection functions
 function openWalletModal() {
   document.getElementById('walletModal').classList.add('active');
