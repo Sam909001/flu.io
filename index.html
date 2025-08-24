@@ -1072,10 +1072,25 @@ function showWalletConnectFallback() {
 // Add this new function for Binance connection
 async function connectBinanceWallet() {
   try {
+    closeWalletConnectModal(); // Close modal first
+    
     if (window.BinanceChain) {
       const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
       handleWalletConnection(accounts[0]);
-      closeWalletConnectModal();
+    } else if (window.ethereum && window.ethereum.isBinance) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+    } else {
+      // Only open new tab if wallet not detected
+      showNotification("Binance Wallet not detected. Opening download page...", "info");
+      setTimeout(() => {
+        window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
+      }, 1500);
+    }
+  } catch (error) {
+    showNotification("Failed to connect Binance Wallet: " + error.message, "error");
+  }
+}
     } else {
    // Redirect to Binance wallet download or web3 connection
       window.open('https://www.binance.com/en/wallet-direct', '_blank');
