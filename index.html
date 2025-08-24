@@ -557,32 +557,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize timer
 function initializeTimer() {
-  // For production: Use a fixed future timestamp
-  // For development: Allow dynamic reset
+  // FIXED START TIME - Set this to your actual launch time
+  // This timestamp should be when you actually launch the presale
+  // Current example: December 26, 2024, 16:00:00 UTC (about now)
+  const GLOBAL_PRESALE_START = 1735232400000; // Thu Dec 26 2024 16:00:00 GMT+0000
   
-  let startTime;
+  // Or calculate 30 days from a specific date:
+  // const LAUNCH_DATE = new Date('2024-12-26T16:00:00Z').getTime();
+  // const GLOBAL_PRESALE_START = LAUNCH_DATE;
   
-  // Check if we're in dev mode
-  const isDevMode = window.location.search.includes('dev=true');
+  let startTime = GLOBAL_PRESALE_START;
   
-  if (isDevMode) {
-    // In dev mode, use localStorage or set to current time
-    startTime = localStorage.getItem('presaleStartTime');
-    if (!startTime) {
-      startTime = Date.now(); // Start from now
-      localStorage.setItem('presaleStartTime', startTime);
+  // Only allow override in dev mode
+  if (window.location.search.includes('dev=true')) {
+    const devStartTime = localStorage.getItem('presaleStartTime');
+    if (devStartTime) {
+      startTime = parseInt(devStartTime);
     }
-    startTime = parseInt(startTime);
-  } else {
-    // For production, set a fixed start time
-    // This creates a presale starting from now for 30 days
-    startTime = localStorage.getItem('presaleStartTime');
-    if (!startTime) {
-      startTime = Date.now(); // Start from current time on first load
-      localStorage.setItem('presaleStartTime', startTime);
-    }
-    startTime = parseInt(startTime);
   }
+  
+  // Update timer immediately
+  updateTimer(startTime);
+  
+  // Set interval to update timer every second
+  if (!presaleInterval) {
+    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
+  }
+}
   
   // Update timer immediately
   updateTimer(startTime);
@@ -683,32 +684,29 @@ function updateTimer(startTime) {
     </span>`;
 }
 // Reset timer function
+// Reset timer function (only works in dev mode)
 function resetTimer() {
+  // Only allow reset in dev mode
+  if (!window.location.search.includes('dev=true')) {
+    showNotification('Reset only available in development mode', 'warning');
+    return;
+  }
+  
   // Clear intervals
   if (presaleInterval) {
     clearInterval(presaleInterval);
     presaleInterval = null;
   }
   
-  // Set new start time to current time
+  // Set new start time to current time (for testing)
   const newStartTime = Date.now();
   localStorage.setItem('presaleStartTime', newStartTime.toString());
-  
-  // Reset displays immediately
-  document.getElementById('days').textContent = '30';
-  document.getElementById('hours').textContent = '00';
-  document.getElementById('minutes').textContent = '00';
-  document.getElementById('seconds').textContent = '00';
-  document.getElementById('current-stage').textContent = '1';
-  document.getElementById('stage-time-left').textContent = '2d 0h 0m 0s';
-  document.getElementById('stageProgressBar').style.width = '0%';
-  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">48h 0m 0s</span></span></span>';
   
   // Reinitialize the timer
   initializeTimer();
   
   // Show notification
-  showNotification('Timer reset successfully! Presale starts now for 30 days.', 'success');
+  showNotification('Timer reset successfully! (Dev Mode)', 'success');
 }
 // Wallet connection functions
 function openWalletModal() {
