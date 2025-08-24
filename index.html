@@ -905,7 +905,10 @@ async function connectWallet(walletType) {
 // MetaMask connection
 async function connectMetaMask() {
   if (isMobile()) {
-    if (window.ethereum && window.ethereum.isMetaMask) {
+    // Check if we're already in MetaMask browser
+    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
+    
+    if (isMetaMaskBrowser) {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         handleWalletConnection(accounts[0]);
@@ -917,13 +920,21 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
+        return; // Exit here to prevent redirect
       } catch (error) {
-      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+        console.error("MetaMask connection error:", error);
+        showNotification("Connection failed: " + error.message, "error");
+        return;
       }
-    } else {
+    }
+    
+    // Only redirect if not in MetaMask browser
+    const currentUrl = window.location.href;
+    if (!currentUrl.includes('metamask')) {
       window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
     }
   } else {
+    // Desktop logic remains the same
     if (window.ethereum && window.ethereum.isMetaMask) {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       handleWalletConnection(accounts[0]);
