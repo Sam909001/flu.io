@@ -15,156 +15,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Additional styles to fix missing CSS classes */
-    .wallet-modal {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    
-    .wallet-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .wallet-modal-content {
-      background-color: white;
-      margin: auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-    }
-    
-    .dark .wallet-modal-content {
-      background-color: #1f2937;
-    }
-    
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    
-    .wallet-option:hover {
-      background-color: #f3f4f6;
-    }
-    
-    .dark .wallet-option:hover {
-      background-color: #374151;
-    }
-    
-    .wallet-option img {
-      width: 32px;
-      height: 32px;
-      margin-right: 12px;
-    }
-    
-    .wallet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .wallet-close {
-      font-size: 24px;
-      cursor: pointer;
-    }
-    
-    .wallet-help-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    
-    .dark .wallet-help-btn {
-      background-color: #4b5563;
-    }
-    
-    .section-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    
-    .floating-notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      color: white;
-      z-index: 1000;
-      display: none;
-    }
-    
-    .floating-notification.active {
-      display: block;
-    }
-    
-    .notification-success {
-      background-color: #10b981;
-    }
-    
-    .notification-error {
-      background-color: #ef4444;
-    }
-    
-    .logo-float {
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-    
-    .price-tooltip {
-      position: relative;
-      display: inline-block;
-    }
-    
-    .price-tooltip .tooltip-text {
-      visibility: hidden;
-      width: 200px;
-      background-color: #1f2937;
-      color: white;
-      text-align: center;
-      border-radius: 6px;
-      padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .price-tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -561,23 +413,15 @@ function resetTimer() {
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
         <div class="flex items-center w-full">
-          <img src="https://registry.walletconnect.com/api/v1/logo/md/7a33d7f1-7f5e-4e75-8b88-5fd5f8168896" alt="walletconnect" class="w-6 h-6">
+          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
           <span class="ml-3">WalletConnect</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
       </div>
 
-      <div class="wallet-option" onclick="connectWallet('binance')">
-        <div class="flex items-center w-full">
-          <img src="https://seeklogo.com/images/B/binance-coin-bnb-logo-CD94CC6D60-seeklogo.com.png" alt="Binance Wallet" class="w-6 h-6">
-          <span class="ml-3">Binance Wallet</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('binance', event)">?</div>
-      </div>
-
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <div class="flex items-center w-full">
-          <img src="https://phantom.app/img/phantom_logo.png" alt="Phantom" class="w-6 h-6">
+          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
           <span class="ml-3">Phantom</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
@@ -611,26 +455,7 @@ function resetTimer() {
   <script>
 // Configuration
     const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
-    const FLUFFI_CONTRACT_ABI = [
-      // Add your complete contract ABI here
-      // This should be a complete array of all your contract methods
-      {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},
-      {"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},
-      {"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},
-      {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-      {"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"stateMutability":"payable","type":"receive"}
-    ];
+    const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
    const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
   chains: [56], // BSC Mainnet
@@ -672,7 +497,6 @@ let tasksCompleted = {
 };
 let countdownInterval = null;
 let provider = null;
-let tokenChart = null;
 
 // For development - show dev section if URL has ?dev=true
 if (window.location.search.includes('dev=true')) {
@@ -694,6 +518,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
+  // Setup form submission
+  document.getElementById('airdropForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    claimAirdrop();
+  });
+  
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
@@ -711,15 +541,6 @@ document.addEventListener('DOMContentLoaded', function() {
     tasksCompleted = JSON.parse(savedTasks);
     updateTaskUI();
   }
-  
-  // Initialize token chart
-  initTokenChart();
-  
-  // Initialize timers
-  initTimer();
-  
-  // Check for referral parameter
-  checkReferral();
 });
 
 // Timer functions
@@ -727,6 +548,11 @@ document.addEventListener('DOMContentLoaded', function() {
 let presaleInterval = null;
 
 // Initialize the timer when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializeTimer();
+});
+
+// Initialize timer
 function initializeTimer() {
   // Set presale start time if not already set
   let startTime = localStorage.getItem('presaleStartTime');
@@ -850,10 +676,11 @@ function showConnectionHelp(walletType, event) {
   event.stopPropagation();
   closeWalletModal();
   
-  let content;
+  let title, content;
   
   switch(walletType) {
     case 'metamask':
+      title = "How to Connect MetaMask";
       content = `
         <div class="help-title">
           <div class="help-icon-wrapper">
@@ -897,6 +724,7 @@ function showConnectionHelp(walletType, event) {
       break;
       
     case 'trust':
+      title = "How to Connect Trust Wallet";
       content = `
         <div class="help-title">
           <div class="help-icon-wrapper">
@@ -940,6 +768,7 @@ function showConnectionHelp(walletType, event) {
       break;
       
     case 'walletconnect':
+      title = "How to Use WalletConnect";
       content = `
         <div class="help-title">
           <div class="help-icon-wrapper">
@@ -982,50 +811,8 @@ function showConnectionHelp(walletType, event) {
       `;
       break;
       
-    case 'binance':
-      content = `
-        <div class="help-title">
-          <div class="help-icon-wrapper">
-            <img src="https://seeklogo.com/images/B/binance-coin-bnb-logo-CD94CC6D60-seeklogo.com.png" alt="Binance" class="help-icon">
-          </div>
-          <span>Binance Wallet Guide</span>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-desktop"></i>
-            </div>
-            <h3>Browser Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Install Binance Chain Wallet extension for your browser</li>
-            <li>Set up your wallet and secure your recovery phrase</li>
-            <li>Click "Connect Wallet" and select Binance Wallet</li>
-            <li>Approve the connection request in the extension</li>
-            <li>Your wallet will be connected to our dApp</li>
-          </ol>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Mobile Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Install Trust Wallet or MetaMask from App Store or Play Store</li>
-            <li>Open our website in the wallet's DApp browser</li>
-            <li>Tap "Connect Wallet" and select your wallet</li>
-            <li>Approve the connection request in the app</li>
-            <li>For WalletConnect, scan the QR code from mobile</li>
-          </ol>
-        </div>
-      `;
-      break;
-      
     case 'phantom':
+      title = "How to Connect Phantom Wallet";
       content = `
         <div class="help-title">
           <div class="help-icon-wrapper">
@@ -1100,9 +887,6 @@ async function connectWallet(walletType) {
     else if (walletType === 'phantom') {
       await connectPhantom();
     }
-    else if (walletType === 'binance') {
-      await connectBinanceWallet();
-    }
   } catch (error) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
@@ -1134,7 +918,7 @@ async function connectMetaMask() {
           }
         });
       } catch (error) {
-        window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
       }
     } else {
       window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
@@ -1156,7 +940,6 @@ async function connectMetaMask() {
     }
   }
 }
-
 // Trust Wallet connection
 async function connectTrustWallet() {
   if (isMobile()) {
@@ -1184,50 +967,123 @@ async function connectTrustWallet() {
   }
 }
 
-// Binance Wallet connection
-async function connectBinanceWallet() {
-  if (typeof window.BinanceChain !== 'undefined') {
-    try {
-      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+// Simplified WalletConnect connection
+async function connectWalletConnect() {
+  try {
+    // Check if any wallet extension is available first
+    if (window.ethereum) {
+      // Try to connect with available wallet provider
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       handleWalletConnection(accounts[0]);
       
-      window.BinanceChain.on('accountsChanged', (accounts) => {
+      window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length === 0) {
           disconnectWallet();
         } else {
           handleWalletConnection(accounts[0]);
         }
       });
-    } catch (error) {
-      throw new Error("Failed to connect Binance Wallet");
+    } else {
+      // Fallback to WalletConnect modal
+      showWalletConnectFallback();
     }
-  } else {
-    throw new Error("Please install Binance Chain Wallet extension");
-  }
-}
-
-// WalletConnect connection
-async function connectWalletConnect() {
-  try {
-    // Initialize WalletConnect
-    const web3Modal = new Web3Modal({
-      projectId: WALLETCONNECT_CONFIG.projectId,
-      chains: WALLETCONNECT_CONFIG.chains,
-      themeMode: 'dark'
-    });
-    
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    
-    handleWalletConnection(address);
   } catch (error) {
     console.error("WalletConnect error:", error);
-    throw new Error("Failed to connect with WalletConnect");
+    // Show fallback modal with wallet options
+    showWalletConnectFallback();
   }
 }
 
+// Show WalletConnect fallback modal
+function showWalletConnectFallback() {
+  const modal = document.getElementById('walletConnectModal');
+  const qrContainer = document.getElementById('walletConnectQrCode');
+  
+  // Clear previous content
+  qrContainer.innerHTML = '';
+  
+  // Create wallet options list
+  const walletList = document.createElement('div');
+  walletList.innerHTML = `
+    <style>
+      .wallet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      }
+      .wallet-list-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .dark .wallet-list-item {
+        background: #374151;
+      }
+      .wallet-list-item:hover {
+        background: #e5e7eb;
+      }
+      .dark .wallet-list-item:hover {
+        background: #4b5563;
+      }
+      .wallet-list-item img {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+      }
+      .wallet-list-item span {
+        font-weight: 500;
+      }
+    </style>
+    <div class="wallet-list">
+      <div class="wallet-list-item" onclick="window.open('https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}', '_blank')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span>Open in MetaMask</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+        <span>Open in Trust Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="connectBinanceWallet()">
+        <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance">
+        <span>Binance Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://avatars.githubusercontent.com/u/18060234?s=280&v=4" alt="Coinbase">
+        <span>Open in Coinbase Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://rainbow.me/connect?url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://avatars.githubusercontent.com/u/48327834?s=280&v=4" alt="Rainbow">
+        <span>Open in Rainbow</span>
+      </div>
+    </div>
+    <p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 10px;">
+      Choose a wallet to connect
+    </p>
+  `;
+  
+  qrContainer.appendChild(walletList);
+  modal.classList.add('active');
+}
+// Add this new function for Binance connection
+async function connectBinanceWallet() {
+  try {
+    if (window.BinanceChain) {
+      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      closeWalletConnectModal();
+    } else {
+   // Redirect to Binance wallet download or web3 connection
+      window.open('https://www.binance.com/en/wallet-direct', '_blank');
+    }
+  } catch (error) {
+    showNotification("Failed to connect Binance Wallet: " + error.message, "error");
+  }
+}
 // Phantom connection
 async function connectPhantom() {
   if (isMobile()) {
@@ -1308,16 +1164,10 @@ async function disconnectWallet() {
 }
 
 function showNotification(message, type) {
-  // Create notification element if it doesn't exist
-  let notification = document.getElementById('notification');
-  if (!notification) {
-    notification = document.createElement('div');
-    notification.id = 'notification';
-    notification.className = 'floating-notification';
-    document.body.appendChild(notification);
-  }
+  const notification = document.getElementById('notification');
+  const content = document.getElementById('notificationContent');
   
-  notification.textContent = message;
+  content.innerHTML = message;
   notification.className = `floating-notification ${type === 'success' ? 'notification-success' : 'notification-error'}`;
   notification.classList.add('active');
   
@@ -1325,21 +1175,22 @@ function showNotification(message, type) {
     notification.classList.remove('active');
   }, 3000);
 }
-
-// ===== PRESALE FUNCTIONS =====
-async function buyFluffi() {
+  </script>
+    <script>
+    // ===== PRESALE FUNCTIONS =====
+    async function buyFluffi() {
   const amount = document.getElementById('amountInput').value;
   const currency = document.getElementById('currencySelect').value;
   const ref = document.getElementById('refInput').value;
   
   if (!userWalletAddress) {
-    showNotification('Please connect your wallet first.', 'error');
+    showWalletError('Please connect your wallet first.');
     openWalletModal();
     return;
   }
   
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
-    showNotification('Please enter a valid amount.', 'error');
+    showWalletError('Please enter a valid amount.');
     return;
   }
   
@@ -1383,7 +1234,7 @@ async function buyFluffi() {
     
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
-    showNotification('🎉 Purchase successful!', 'success');
+    alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
     
     // Update displayed balances
     await updateUserBalances();
@@ -1394,77 +1245,76 @@ async function buyFluffi() {
       buyBtn.textContent = '🚀 Buy Now';
       buyBtn.disabled = false;
     }
-    showNotification(err.message || "Transaction failed", 'error');
+    showWalletError(err.message || "Transaction failed");
   }
 }
 
-// ===== STAKING FUNCTIONS =====
-async function stakeFluffi() {
-  try {
-    if (!userWalletAddress) {
-      showNotification("Please connect your wallet first", "error");
-      openWalletModal();
-      return;
+    // ===== STAKING FUNCTIONS =====
+    async function stakeFluffi() {
+      try {
+        if (!userWalletAddress) {
+          showWalletError("Please connect your wallet first");
+          openWalletModal();
+          return;
+        }
+        
+        const amount = document.getElementById('stakeInput').value;
+        const amountNum = parseFloat(amount);
+        
+        if (isNaN(amountNum)) {
+          showWalletError("Please enter a valid amount");
+          return;
+        }
+        
+        const signer = ethersProvider.getSigner();
+        const fluffiContract = new ethers.Contract(
+          FLUFFI_CONTRACT_ADDRESS,
+          FLUFFI_CONTRACT_ABI,
+          signer
+        );
+        
+        // Show loading state
+        const stakeBtn = document.querySelector('#staking button');
+        const originalText = stakeBtn.textContent;
+        stakeBtn.disabled = true;
+        stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        
+        // Convert amount to wei
+        const amountWei = ethers.utils.parseUnits(amount, 18);
+        
+        // Send transaction
+        const tx = await fluffiContract.stake(amountWei);
+        await tx.wait();
+        
+        // Reset button
+        stakeBtn.disabled = false;
+        stakeBtn.textContent = originalText;
+        
+        // Update balances
+        await updateUserBalances();
+        
+        alert("Staking successful!");
+      } catch (error) {
+        console.error("Stake error:", error);
+        showWalletError(error.message || "Staking failed");
+        
+        // Reset button if error occurs
+        const stakeBtn = document.querySelector('#staking button');
+        if (stakeBtn) {
+          stakeBtn.disabled = false;
+          stakeBtn.textContent = 'Stake Now';
+        }
+      }
     }
-    
-    const amount = document.getElementById('stakeInput').value;
-    const amountNum = parseFloat(amount);
-    
-    if (isNaN(amountNum)) {
-      showNotification("Please enter a valid amount", "error");
-      return;
-    }
-    
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const fluffiContract = new ethers.Contract(
-      FLUFFI_CONTRACT_ADDRESS,
-      FLUFFI_CONTRACT_ABI,
-      signer
-    );
-    
-    // Show loading state
-    const stakeBtn = document.querySelector('#staking button');
-    const originalText = stakeBtn.textContent;
-    stakeBtn.disabled = true;
-    stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-    
-    // Convert amount to wei
-    const amountWei = ethers.utils.parseUnits(amount, 18);
-    
-    // Send transaction
-    const tx = await fluffiContract.stake(amountWei);
-    await tx.wait();
-    
-    // Reset button
-    stakeBtn.disabled = false;
-    stakeBtn.textContent = originalText;
-    
-    // Update balances
-    await updateUserBalances();
-    
-    showNotification("Staking successful!", "success");
-  } catch (error) {
-    console.error("Stake error:", error);
-    showNotification(error.message || "Staking failed", "error");
-    
-    // Reset button if error occurs
-    const stakeBtn = document.querySelector('#staking button');
-    if (stakeBtn) {
-      stakeBtn.disabled = false;
-      stakeBtn.textContent = 'Stake Now';
-    }
-  }
-}
 
-// ===== CLAIM FUNCTIONS =====
-async function claimTokens() {
+    // ===== CLAIM FUNCTIONS =====
+    async function claimTokens() {
   try {
     if (!userWalletAddress) {
       throw new Error("Please connect your wallet first");
     }
     
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const fluffiContract = new ethers.Contract(
       FLUFFI_CONTRACT_ADDRESS,
@@ -1502,10 +1352,10 @@ async function claimTokens() {
     claimBtn.textContent = originalText;
     await updateUserBalances();
     
-    showNotification("Tokens claimed successfully!", "success");
+    alert("Tokens claimed successfully!");
   } catch (error) {
     console.error("Claim error:", error);
-    showNotification(error.message || "Claim failed", "error");
+    showWalletError(error.message || "Claim failed");
     
     const claimBtn = document.querySelector('#claim button');
     if (claimBtn) {
@@ -1515,50 +1365,49 @@ async function claimTokens() {
   }
 }
 
-// ===== UTILITY FUNCTIONS =====
-async function updateUserBalances() {
-  if (!userWalletAddress) return;
-  
-  try {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const fluffiContract = new ethers.Contract(
-      FLUFFI_CONTRACT_ADDRESS,
-      FLUFFI_CONTRACT_ABI,
-      provider
-    );
-    
-    const [balance, staked, rewards] = await Promise.all([
-      fluffiContract.balanceOf(userWalletAddress),
-      fluffiContract.stakedBalance(userWalletAddress),
-      fluffiContract.calculateRewards(userWalletAddress)
-    ]);
-    
-    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
-    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
-    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
-    
-  } catch (error) {
-    console.error("Balance update error:", error);
-  }
-}
+    // ===== UTILITY FUNCTIONS =====
+    async function updateUserBalances() {
+      if (!userWalletAddress) return;
+      
+      try {
+        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+        const fluffiContract = new ethers.Contract(
+          FLUFFI_CONTRACT_ADDRESS,
+          FLUFFI_CONTRACT_ABI,
+          provider
+        );
+        
+        const [balance, staked, rewards] = await Promise.all([
+          fluffiContract.balanceOf(userWalletAddress),
+          fluffiContract.stakedBalance(userWalletAddress),
+          fluffiContract.calculateRewards(userWalletAddress)
+        ]);
+        
+        document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
+        document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
+        document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
+        
+      } catch (error) {
+        console.error("Balance update error:", error);
+      }
+    }
 
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  }
-}
-
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('darkMode', html.classList.contains('dark'));
+      
+      // Update icon
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+      
+      // Update chart colors if needed
+      if (tokenChart) {
+        const isDark = html.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      }
+    }
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
   if (!ctx) return;
@@ -1632,7 +1481,7 @@ function initTokenChart() {
   };
   
   // Create the chart
-  tokenChart = new Chart(ctx, config);
+  const tokenChart = new Chart(ctx, config);
   
   // Update chart on theme change
   const observer = new MutationObserver(function(mutations) {
@@ -1654,85 +1503,212 @@ function initTokenChart() {
   });
 }
 
-// ===== REFERRAL FUNCTIONS =====
-function checkReferral() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const ref = urlParams.get('ref');
-  if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-    document.getElementById('refInput').value = ref;
+// Initialize the chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTokenChart();
+});
+      
+// ==== TIMER FUNCTIONS =====
+function getPresaleStartTime() {
+  let startTime = localStorage.getItem('presaleStartTime');
+  if (!startTime) {
+    // Set initial start time to now (for testing)
+    startTime = Date.now();
+    // For production, you might want to set a fixed start time:
+    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
+    localStorage.setItem('presaleStartTime', startTime);
+  }
+  return parseInt(startTime);
+}
+
+function formatTime(ms) {
+  const days = Math.floor(ms / (24 * 3600 * 1000));
+  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
+  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+  
+  return {
+    days: days.toString().padStart(2, '0'),
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: seconds.toString().padStart(2, '0'),
+    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+  };
+}
+
+function updateNextIncreaseTime() {
+  const now = Date.now();
+  const startTime = getPresaleStartTime();
+  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
+  const timeLeft = nextStageTime - now;
+  
+  const formatted = formatTime(timeLeft);
+  document.getElementById('nextIncreaseTime').textContent = formatted.full;
+}
+
+function updateTimers() {
+  const now = Date.now();
+  const startTime = getPresaleStartTime();
+  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
+  const timeLeft = endTime - now;
+
+  // Calculate stage progress
+  const currentStage = Math.min(
+    Math.floor((now - startTime) / (48 * 3600 * 1000)),
+    14 // Max stage index
+  );
+  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
+  const stageTimeLeft = stageEndTime - now;
+  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
+
+  // Update displays
+  document.getElementById('current-stage').textContent = currentStage + 1;
+  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
+
+  // Update price
+  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
+
+  // Update timers
+  if (timeLeft <= 0) {
+    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
+  } else {
+    const formattedTotal = formatTime(timeLeft);
+    const formattedStage = formatTime(stageTimeLeft);
+    
+    document.getElementById('presale-days').textContent = formattedTotal.days;
+    document.getElementById('presale-hours').textContent = formattedTotal.hours;
+    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
+    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
+    
+    document.getElementById('stage-time-left').textContent = formattedStage.full;
   }
 }
 
-async function connectReferralWallet() {
-  if (!userWalletAddress) {
-    await connectWallet();
-  }
-  if (userWalletAddress) {
-    showReferralUI(userWalletAddress);
-  }
+// Initialize the timer
+function initTimer() {
+  updateTimers();
+  updateNextIncreaseTime();
+  // Update every second
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime();
+  }, 1000);
 }
 
-function showReferralUI(wallet) {
-  const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-  document.getElementById('referralSection').innerHTML = `
-    <div class="space-y-4">
-      <div>
-        <label class="block mb-2 font-semibold">Your referral link:</label>
-        <div class="flex">
-          <input type="text" id="referralLinkInput" value="${referralLink}" 
-                class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-          <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-            Copy
-          </button>
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  if (localStorage.getItem('darkMode') === 'true' || 
+      (localStorage.getItem('darkMode') === null && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+
+  // Check if MetaMask is installed
+  if (window.ethereum?.isMetaMask) {
+    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+  }
+
+  // Initialize token chart
+  initTokenChart();
+
+  // Initialize timers
+  initTimer();
+
+  // Check for referral parameter
+  checkReferral();
+});
+
+// Toggle dark mode function
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  }
+}
+    // ===== REFERRAL FUNCTIONS =====
+    function checkReferral() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
+        document.getElementById('refInput').value = ref;
+      }
+    }
+
+    async function connectReferralWallet() {
+      if (!userWalletAddress) {
+        await connectWallet();
+      }
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
+    }
+
+    function showReferralUI(wallet) {
+      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+      document.getElementById('referralSection').innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2 font-semibold">Your referral link:</label>
+            <div class="flex">
+              <input type="text" id="referralLinkInput" value="${referralLink}" 
+                    class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+                Copy
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
+          </div>
+          <div class="mt-4">
+            <p class="text-sm mb-2 font-semibold">Share your link:</p>
+            <div class="flex space-x-3">
+              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                🐦 Twitter
+              </button>
+              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                📱 Telegram
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-      </div>
-      <div class="mt-4">
-        <p class="text-sm mb-2 font-semibold">Share your link:</p>
-        <div class="flex space-x-3">
-          <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-            🐦 Twitter
-          </button>
-          <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-            📱 Telegram
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-}
+      `;
+    }
 
-function copyReferralLink() {
-  const input = document.getElementById('referralLinkInput');
-  input.select();
-  document.execCommand('copy');
-  showNotification("Referral link copied to clipboard!", "success");
-}
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
+    }
 
-function shareOnTwitter() {
-  const link = document.getElementById('referralLinkInput').value;
-  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
-}
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+    }
 
-function shareOnTelegram() {
-  const link = document.getElementById('referralLinkInput').value;
-  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
-}
-
-// Initialize countdown timer
-function initializeCountdown() {
-  // Set up your countdown timer logic here
-  console.log("Countdown timer initialized");
-}
-
-// Update task UI
-function updateTaskUI() {
-  // Update task completion UI
-  console.log("Task UI updated");
-}
+    function shareOnTelegram() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+    }
   </script>
 </body>
 </html>
