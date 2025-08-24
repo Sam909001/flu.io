@@ -1181,17 +1181,98 @@ async function disconnectWallet() {
   showNotification("Wallet disconnected", "success");
 }
 
-function showNotification(message, type) {
-  const notification = document.getElementById('notification');
-  const content = document.getElementById('notificationContent');
+// Enhanced notification system
+function showNotification(message, type = 'info') {
+  // Remove any existing notifications
+  const existingNotifications = document.querySelectorAll('.notification-toast');
+  existingNotifications.forEach(n => n.remove());
   
-  content.innerHTML = message;
-  notification.className = `floating-notification ${type === 'success' ? 'notification-success' : 'notification-error'}`;
-  notification.classList.add('active');
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = 'notification-toast';
   
+  // Set type-specific styles
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    warning: 'bg-yellow-500',
+    info: 'bg-blue-500'
+  };
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  
+  notification.innerHTML = `
+    <div class="fixed top-20 right-4 z-50 animate-slide-in">
+      <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
+        <span class="text-2xl">${icons[type]}</span>
+        <div class="flex-1">
+          <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+          <p class="text-sm">${message}</p>
+        </div>
+        <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto remove after 5 seconds
   setTimeout(() => {
-    notification.classList.remove('active');
-  }, 3000);
+    if (notification && notification.parentNode) {
+      notification.classList.add('animate-slide-out');
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+}
+
+// Add CSS for animations (add to your style.css or in a <style> tag)
+const notificationStyles = `
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slide-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+  
+  .animate-slide-out {
+    animation: slide-out 0.3s ease-out;
+  }
+`;
+
+// Add styles to document
+if (!document.getElementById('notification-styles')) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'notification-styles';
+  styleSheet.textContent = notificationStyles;
+  document.head.appendChild(styleSheet);
 }
   </script>
     <script>
