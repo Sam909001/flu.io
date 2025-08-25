@@ -1880,38 +1880,43 @@ function toggleDarkMode() {
     }
 
     function showReferralUI(wallet) {
-      const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-      document.getElementById('referralSection').innerHTML = `
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-2 font-semibold">Your referral link:</label>
-            <div class="flex">
-              <input type="text" id="referralLinkInput" value="${referralLink}" 
-                    class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
-              <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
-                Copy
-              </button>
-            </div>
-          </div>
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-            <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 FLUFFI</span></p>
-          </div>
-          <div class="mt-4">
-            <p class="text-sm mb-2 font-semibold">Share your link:</p>
-            <div class="flex space-x-3">
-              <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                🐦 Twitter
-              </button>
-              <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-                📱 Telegram
-              </button>
-            </div>
-          </div>
+  const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+  
+  // Get referral stats from localStorage
+  const referrals = JSON.parse(localStorage.getItem(`referrals_${wallet}`) || '[]');
+  const totalReferrals = referrals.length;
+  const totalEarnings = referrals.reduce((sum, r) => sum + (parseFloat(r.amount) * 0.1), 0); // 10% commission
+  
+  document.getElementById('referralSection').innerHTML = `
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-2 font-semibold">Your referral link:</label>
+        <div class="flex">
+          <input type="text" id="referralLinkInput" value="${referralLink}" 
+                class="flex-1 p-3 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white" readonly>
+          <button onclick="copyReferralLink()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-lg">
+            Copy
+          </button>
         </div>
-      `;
-    }
-
+      </div>
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">${totalReferrals}</span></p>
+        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">${totalEarnings.toFixed(4)} BNB</span></p>
+      </div>
+      <div class="mt-4">
+        <p class="text-sm mb-2 font-semibold">Share your link:</p>
+        <div class="flex space-x-3">
+          <button onclick="shareOnTwitter()" class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+            🐦 Twitter
+          </button>
+          <button onclick="shareOnTelegram()" class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+            📱 Telegram
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
     function copyReferralLink() {
       const input = document.getElementById('referralLinkInput');
       input.select();
