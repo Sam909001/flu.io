@@ -1403,19 +1403,6 @@ if (!document.getElementById('notification-styles')) {
     showNotification(err.message || "Transaction failed", 'error');
   }
 }
-    // Update displayed balances
-    await updateUserBalances();
-  } catch (err) {
-    console.error("Buy error:", err);
-    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-    if (buyBtn) {
-      buyBtn.textContent = '🚀 Buy Now';
-      buyBtn.disabled = false;
-    }
-    showNotification(err.message || "Transaction failed");
-  }
-}
-
     // ===== STAKING FUNCTIONS =====
 // Staking contract placeholder - replace with actual deployed address
 const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
