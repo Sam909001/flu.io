@@ -381,10 +381,10 @@ function resetTimer() {
   </div>
 </section>
 
-     <!-- Trust Section with Live Counters & Real Icons -->
+<!-- Trust Section with Live Counters & Fixed Animations -->
 <section id="trust" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
   <div class="max-w-7xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">Trusted & Verified</h2>
+    <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-green-400">Trusted & Verified</h2>
     <p class="text-gray-700 dark:text-gray-300 mb-12 text-lg">
       Fluffi is backed by security, community, and transparency. Invest with confidence.
     </p>
@@ -407,32 +407,31 @@ function resetTimer() {
 
       <!-- Community Followers -->
       <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-        <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-spin">
+        <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-sway">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
         <p class="text-gray-600 dark:text-gray-300 text-sm">
           Telegram: <span id="tg-count">0</span> | Twitter: <span id="tw-count">0</span> | Discord: <span id="dc-count">0</span>
         </p>
       </div>
-      
-<!-- Trusted Partners Card -->
-<div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-  <h3 class="font-bold text-2xl text-gray-900 dark:text-white mb-4">Trusted Partners</h3>
-  <div class="flex flex-col gap-2 items-center justify-center">
-    <span class="text-purple-500 font-semibold text-xl">Senitex</span>
-    <span class="text-blue-500 font-semibold text-xl">CoinLaunch</span>
-    <span class="text-orange-500 font-semibold text-xl">CryptoHub</span>
-    <span class="text-green-500 font-semibold text-xl">CoinCarp</span>
-    <span class="text-red-500 font-semibold text-xl">ICODrops</span>
-  </div>
-</div>
 
+      <!-- Trusted Partners -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <h3 class="font-bold text-2xl text-gray-900 dark:text-white mb-4">Trusted Partners</h3>
+        <div class="flex flex-col gap-2 items-center justify-center">
+          <span class="text-purple-500 font-semibold text-xl">Senitex</span>
+          <span class="text-blue-500 font-semibold text-xl">CoinLaunch</span>
+          <span class="text-orange-500 font-semibold text-xl">CryptoHub</span>
+          <span class="text-green-500 font-semibold text-xl">CoinCarp</span>
+          <span class="text-red-500 font-semibold text-xl">ICODrops</span>
+        </div>
+      </div>
 
     </div>
   </div>
 </section>
 
 <script>
-// Example: Update follower counts dynamically (replace with real API calls)
+// Update follower counts dynamically (replace with real API calls)
 function updateFollowers() {
   document.getElementById('tg-count').textContent = '5,432';
   document.getElementById('tw-count').textContent = '10,215';
@@ -450,14 +449,14 @@ updateFollowers();
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .animate-bounce { animation: bounce 2s infinite; }
 
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 .animate-pulse { animation: pulse 2s infinite; }
 
-@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-.animate-spin { animation: spin 8s linear infinite; }
+@keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
+.animate-sway { animation: sway 3s infinite ease-in-out; }
 </style>
 
-      
+     
       <!-- Team Section with two new members -->
       <section id="team">
         <h2>Our Team</h2>
