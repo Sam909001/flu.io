@@ -345,59 +345,88 @@ function resetTimer() {
     </section>
 
     <div class="split-sections">
-      <!-- About Section -->
-      <section id="about">
-        <h2>Why Fluffi Coin?</h2>
-        <div class="about-content">
-          <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
-          <ul>
-            <li><strong>NFT STAKING PLATFORM</strong><br>Launching Q3 2025 - Stake Fluffi NFTs to earn exclusive rewards</li>
-            <li><strong>COMMUNITY DAO GOVERNANCE</strong><br>Vote on major decisions like treasury use and protocol upgrades</li>
-            <li><strong>DEFLATIONARY MECHANICS</strong><br>1% burn on every transaction reduces supply permanently</li>
-          </ul>
-          <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
-        </div>
-      </section>
-
-      <!-- Why Choose Fluffi Section -->
-<section class="why-fluffi py-16 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] text-white">
-  <div class="max-w-6xl mx-auto px-6 text-center">
-    <h2 class="text-4xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-      Why Choose FLUFFI?
-    </h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-      <!-- Feature 1 -->
-      <div class="p-6 rounded-2xl bg-[#111] shadow-lg hover:scale-105 transition">
-        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/rocket.svg" class="mx-auto w-12 h-12 mb-4 text-pink-400" alt="Rocket Icon">
-        <h3 class="text-xl font-semibold mb-2">Explosive Growth</h3>
-        <p class="text-gray-300 text-sm">
-          Early presale entry with 15 dynamic stages ensures maximum upside.
-        </p>
+     <!-- About Section -->
+<section id="about" class="about-section">
+  <div class="container">
+    <h2 class="section-title">Why Choose Fluffi?</h2>
+    <p class="section-subtitle">Fluffi Coin combines meme power with real DeFi innovation</p>
+    
+    <div class="about-cards">
+      <!-- NFT Staking -->
+      <div class="about-card">
+        <div class="icon">🎨</div>
+        <h3>NFT Staking Platform</h3>
+        <p>Launching Q3 2025 — Stake Fluffi NFTs to earn exclusive rewards and unlock premium utilities.</p>
       </div>
 
-      <!-- Feature 2 -->
-      <div class="p-6 rounded-2xl bg-[#111] shadow-lg hover:scale-105 transition">
-        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/shield.svg" class="mx-auto w-12 h-12 mb-4 text-purple-400" alt="Shield Icon">
-        <h3 class="text-xl font-semibold mb-2">Security First</h3>
-        <p class="text-gray-300 text-sm">
-          Locked liquidity & audited contracts keep your investment safe.
-        </p>
+      <!-- DAO Governance -->
+      <div class="about-card">
+        <div class="icon">⚖️</div>
+        <h3>Community DAO Governance</h3>
+        <p>Shape the future of Fluffi by voting on treasury usage, upgrades, and key ecosystem decisions.</p>
       </div>
 
-      <!-- Feature 3 -->
-      <div class="p-6 rounded-2xl bg-[#111] shadow-lg hover:scale-105 transition">
-        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/users.svg" class="mx-auto w-12 h-12 mb-4 text-pink-400" alt="Users Icon">
-        <h3 class="text-xl font-semibold mb-2">Strong Community</h3>
-        <p class="text-gray-300 text-sm">
-          Backed by thousands of meme lovers & investors worldwide.
-        </p>
+      <!-- Deflationary -->
+      <div class="about-card">
+        <div class="icon">🔥</div>
+        <h3>Deflationary Mechanics</h3>
+        <p>1% burn on every transaction — reducing supply and strengthening long-term value.</p>
       </div>
     </div>
+
+    <p class="about-footer">Fluffi bridges meme culture with sustainable financial infrastructure for the future. 🚀</p>
   </div>
 </section>
 
-
+<!-- CSS -->
+<style>
+.about-section {
+  padding: 80px 20px;
+  background: var(--background);
+  color: var(--text);
+  text-align: center;
+}
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+.section-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  opacity: 0.85;
+}
+.about-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+.about-card {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.about-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.2);
+}
+.about-card .icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+.about-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+.about-footer {
+  margin-top: 50px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+</style>
       <!-- Team Section with two new members -->
       <section id="team">
         <h2>Our Team</h2>
