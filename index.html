@@ -56,16 +56,17 @@
     </button>
 </div>
 </nav>
+    <input type="hidden" id="walletAddress" value="">
 </header>
 
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">🚀 PRESALE ENDS IN:</h3>
-<div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300">
-  <span id="days">30</span>d 
-  <span id="hours">00</span>h 
-  <span id="minutes">00</span>m 
-  <span id="seconds">00</span>s
-</div>
+  <div id="presale-timer" class="text-2xl font-mono text-red-600 dark:text-red-300">
+    <span id="days">00</span>d 
+    <span id="hours">00</span>h 
+    <span id="minutes">00</span>m 
+    <span id="seconds">00</span>s
+  </div>
   
   <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
     <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Stage Progress</h4>
@@ -153,7 +154,9 @@ function resetTimer() {
         🚀 Buy Now
       </button>
     </section>
-    
+  
+    <input type="hidden" id="referralLink" value="">
+  
     <!-- Referral Section -->
     <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
@@ -557,25 +560,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize timer
 function initializeTimer() {
-  // FIXED START TIME FOR ALL USERS - Same across all browsers
- // Start 1 hour from when you deploy
-const GLOBAL_PRESALE_START = 1735232400000 + (1 * 60 * 60 * 1000);
-  
-  let startTime;
-  
-  // Only use localStorage in dev mode for testing
-  if (window.location.search.includes('dev=true')) {
-    // Dev mode: allow localStorage override
-    startTime = localStorage.getItem('presaleStartTime');
-    if (!startTime) {
-      startTime = GLOBAL_PRESALE_START;
-      localStorage.setItem('presaleStartTime', startTime);
-    }
-    startTime = parseInt(startTime);
+  // Set presale start time if not already set
+  let startTime = localStorage.getItem('presaleStartTime');
+  if (!startTime) {
+    // For demo purposes, set to current time
+    startTime = Date.now();
+    localStorage.setItem('presaleStartTime', startTime);
   } else {
-    // Production: ALWAYS use the fixed global timestamp
-    // This ensures everyone sees the same countdown
-    startTime = GLOBAL_PRESALE_START;
+    startTime = parseInt(startTime);
   }
   
   // Update timer immediately
@@ -586,55 +578,23 @@ const GLOBAL_PRESALE_START = 1735232400000 + (1 * 60 * 60 * 1000);
     presaleInterval = setInterval(() => updateTimer(startTime), 1000);
   }
 }
-  // Update timer immediately
-  updateTimer(startTime);
-  
-  // Set interval to update timer every second
-  if (!presaleInterval) {
-    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
-  }
-}
-  
-  // Update timer immediately
-  updateTimer(startTime);
-  
-  // Set interval to update timer every second
-  if (!presaleInterval) {
-    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
-  }
-}
+
 // Update timer display
 function updateTimer(startTime) {
   const now = Date.now();
-  
-  // 30 days total duration (you can adjust this)
-  const PRESALE_DURATION_DAYS = 30;
-  const totalDuration = PRESALE_DURATION_DAYS * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-  
-  // Calculate end time
+  const totalDuration = 15 * 48 * 60 * 60 * 1000; // 15 stages * 48 hours each
   const endTime = startTime + totalDuration;
   const timeLeft = endTime - now;
   
-  // Calculate stages (15 stages over 30 days = 48 hours per stage)
-  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours per stage
-  const totalStages = 15;
+  // Calculate current stage (0-14)
   const elapsed = now - startTime;
-  const currentStage = Math.min(Math.floor(elapsed / stageDuration), totalStages - 1);
+  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours
+  const currentStage = Math.min(Math.floor(elapsed / stageDuration), 14);
   const stageEndTime = startTime + ((currentStage + 1) * stageDuration);
-  const stageTimeLeft = Math.max(0, stageEndTime - now);
+  const stageTimeLeft = stageEndTime - now;
   
   // Format time function
   const formatTime = (ms) => {
-    if (ms <= 0) {
-      return {
-        days: '00',
-        hours: '00',
-        minutes: '00',
-        seconds: '00',
-        full: '0d 0h 0m 0s'
-      };
-    }
-    
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
     const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
     const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
@@ -655,11 +615,7 @@ function updateTimer(startTime) {
     document.getElementById('hours').textContent = '00';
     document.getElementById('minutes').textContent = '00';
     document.getElementById('seconds').textContent = '00';
-    document.getElementById('presale-timer').innerHTML = '<span class="text-red-600">🎉 Presale Ended!</span>';
-    if (presaleInterval) {
-      clearInterval(presaleInterval);
-      presaleInterval = null;
-    }
+    clearInterval(presaleInterval);
   } else {
     const totalFormatted = formatTime(timeLeft);
     document.getElementById('days').textContent = totalFormatted.days;
@@ -675,24 +631,15 @@ function updateTimer(startTime) {
   document.getElementById('stage-time-left').textContent = stageFormatted.full;
   
   // Update progress bar
-  const stageProgress = stageDuration > 0 ? ((stageDuration - stageTimeLeft) / stageDuration) * 100 : 100;
-  const totalProgress = ((currentStage + (stageProgress / 100)) / totalStages) * 100;
-  document.getElementById('stageProgressBar').style.width = `${Math.min(100, totalProgress)}%`;
+  const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
+  const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
+  document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
   
   // Update price (5% increase per stage)
-  const basePrice = 0.0001;
-  const price = (basePrice * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `
-    $${price} 
-    <span class="price-tooltip">
-      <i class="fas fa-info-circle text-blue-500"></i>
-      <span class="tooltip-text">
-        <strong>Price Increase:</strong><br>
-        +5% per stage (every 48 hours)<br>
-        Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span>
-      </span>
-    </span>`;
+  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
 }
+
 // Reset timer function
 function resetTimer() {
   // Clear intervals
@@ -701,25 +648,21 @@ function resetTimer() {
     presaleInterval = null;
   }
   
-  // Set new start time to current time
-  const newStartTime = Date.now();
-  localStorage.setItem('presaleStartTime', newStartTime.toString());
+  // Remove stored start time
+  localStorage.removeItem('presaleStartTime');
   
-  // Reset displays immediately
-  document.getElementById('days').textContent = '30';
+  // Reset displays
+  document.getElementById('days').textContent = '00';
   document.getElementById('hours').textContent = '00';
   document.getElementById('minutes').textContent = '00';
   document.getElementById('seconds').textContent = '00';
   document.getElementById('current-stage').textContent = '1';
-  document.getElementById('stage-time-left').textContent = '2d 0h 0m 0s';
+  document.getElementById('stage-time-left').textContent = '00d 00h 00m 00s';
   document.getElementById('stageProgressBar').style.width = '0%';
-  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">48h 0m 0s</span></span></span>';
+  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
   
   // Reinitialize the timer
   initializeTimer();
-  
-  // Show notification
-  showNotification('Timer reset successfully! Presale starts now for 30 days.', 'success');
 }
 // Wallet connection functions
 function openWalletModal() {
