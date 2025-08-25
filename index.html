@@ -486,28 +486,6 @@ html.dark #trust p.text-lg {
   color: #D1D5DB !important; /* gray-300 */
 }
 </style>
-      <script>
-// Force dark mode text colors for trust section
-function fixTrustSectionText() {
-  if (document.documentElement.classList.contains('dark')) {
-    const trustHeading = document.querySelector('#trust h2');
-    const trustSubtitle = document.querySelector('#trust p.text-lg');
-    
-    if (trustHeading) trustHeading.style.color = 'white';
-    if (trustSubtitle) trustSubtitle.style.color = '#D1D5DB';
-  }
-}
-
-// Run on page load and when dark mode changes
-document.addEventListener('DOMContentLoaded', fixTrustSectionText);
-
-// Observe for dark mode changes
-const observer = new MutationObserver(fixTrustSectionText);
-observer.observe(document.documentElement, { 
-  attributes: true, 
-  attributeFilter: ['class'] 
-});
-</script>
      
       <!-- Team Section with two new members -->
       <section id="team">
