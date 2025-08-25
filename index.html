@@ -457,8 +457,14 @@ updateFollowers();
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 .animate-pulse { animation: pulse 2s infinite; }
 
-@keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
-.animate-sway { animation: sway 3s infinite ease-in-out; }
+@keyframes sway {
+  0% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  100% { transform: translateX(-3px); }
+}
+.animate-sway {
+  animation: sway 2.5s infinite ease-in-out;
+}
 </style>
 
      
