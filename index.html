@@ -403,46 +403,82 @@ function resetTimer() {
     Fluffi is backed by security, community, and transparency. Invest with confidence.
   </p>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-    
-    <!-- Fair & Secure -->
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col items-center transition-colors duration-300">
-      <img src="https://img.icons8.com/ios-filled/100/4CAF50/security-checked.png" 
-           alt="Fair & Secure" 
-           class="w-16 h-16 mb-4 animate-sway">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Fair & Secure</h3>
-      <p class="text-gray-700 dark:text-gray-300">Built on blockchain security for guaranteed fairness.</p>
-    </div>
+    <!-- Trust Cards Grid -->
+    <div class="grid gap-8 md:grid-cols-3 lg:grid-cols-4">
 
-    <!-- Community Driven -->
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col items-center transition-colors duration-300">
-      <img src="https://img.icons8.com/ios-filled/100/2196F3/conference-call.png" 
-           alt="Community Driven" 
-           class="w-16 h-16 mb-4 animate-pulse">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Community Driven</h3>
-      <p class="text-gray-700 dark:text-gray-300">Shaped and supported by an engaged community.</p>
-    </div>
+      <!-- Audit Badge -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://img.icons8.com/fluency/96/security-checked.png" alt="Audit Badge" class="mx-auto mb-4 animate-bounce">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Smart Contract Audited</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Verified for safety & transparency.</p>
+      </div>
 
-    <!-- Transparent -->
-    <div class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col items-center transition-colors duration-300">
-      <img src="https://img.icons8.com/ios-filled/100/FFC107/visible.png" 
-           alt="Transparent" 
-           class="w-16 h-16 mb-4">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Transparent</h3>
-      <p class="text-gray-700 dark:text-gray-300">Open and honest operations, visible to everyone.</p>
-    </div>
+      <!-- Liquidity Locked -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://img.icons8.com/color/96/lock--v1.png" alt="Liquidity Locked" class="mx-auto mb-4 animate-pulse">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Liquidity Locked</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Funds securely locked until listing.</p>
+      </div>
 
+      <!-- Community Followers -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-sway">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">
+          Telegram: <span id="tg-count" class="dark:text-green-300">0</span> | 
+          Twitter: <span id="tw-count" class="dark:text-green-300">0</span> | 
+          Discord: <span id="dc-count" class="dark:text-green-300">0</span>
+        </p>
+      </div>
+
+      <!-- Trusted Partners -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <h3 class="font-bold text-2xl text-gray-900 dark:text-white mb-4">Trusted Partners</h3>
+        <div class="flex flex-col gap-2 items-center justify-center">
+          <span class="text-purple-500 dark:text-purple-400 font-semibold text-xl">Senitex</span>
+          <span class="text-blue-500 dark:text-blue-400 font-semibold text-xl">CoinLaunch</span>
+          <span class="text-orange-500 dark:text-orange-400 font-semibold text-xl">CryptoHub</span>
+          <span class="text-green-500 dark:text-green-400 font-semibold text-xl">CoinCarp</span>
+          <span class="text-red-500 dark:text-red-400 font-semibold text-xl">ICODrops</span>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<style>
-@keyframes sway {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
-  100% { transform: translateX(0); }
+<script>
+// Update follower counts dynamically (replace with real API calls)
+function updateFollowers() {
+  document.getElementById('tg-count').textContent = '5,432';
+  document.getElementById('tw-count').textContent = '10,215';
+  document.getElementById('dc-count').textContent = '3,876';
 }
-.animate-sway {
-  animation: sway 3s infinite ease-in-out;
+updateFollowers();
+</script>
+
+<style>
+.trust-card img {
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+}
+
+/* Animations */
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.animate-bounce { animation: bounce 2s infinite; }
+
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.animate-pulse { animation: pulse 2s infinite; }
+
+@keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
+.animate-sway { animation: sway 3s infinite ease-in-out; }
+
+/* Force dark mode text colors with higher specificity */
+html.dark #trust h2 {
+  color: white !important;
+}
+
+html.dark #trust p.text-lg {
+  color: #D1D5DB !important; /* gray-300 */
 }
 </style>
      
