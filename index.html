@@ -145,9 +145,13 @@ function resetTimer() {
       <div class="flex gap-2 mb-4">
         <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
         <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
-          <option value="BNB">BNB</option>
-          <option value="USD">USD</option>
-        </select>
+  <option value="BNB">BNB</option>
+  <option value="SOL">SOL</option>
+  <option value="AVAX">AVAX</option>
+  <option value="MATIC">MATIC</option>
+  <option value="USDC">USDC</option>
+  <option value="USD">USD (Card)</option>
+</select>
       </div>
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
@@ -1289,13 +1293,13 @@ if (!document.getElementById('notification-styles')) {
   const ref = document.getElementById('refInput').value;
   
   if (!userWalletAddress) {
-    showNotification('Please connect your wallet first.');
+    showNotification('Please connect your wallet first.', 'error');
     openWalletModal();
     return;
   }
   
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
-    showNotification('Please enter a valid amount.');
+    showNotification('Please enter a valid amount.', 'error');
     return;
   }
   
@@ -1305,13 +1309,39 @@ if (!document.getElementById('notification-styles')) {
     buyBtn.textContent = '⏳ Processing...';
     buyBtn.disabled = true;
     
-    let ethValue;
+    // Currency conversion rates (example rates - should be fetched from API in production)
+    const conversionRates = {
+      'BNB': 1,
+      'SOL': 0.0015,  // 1 SOL = 0.0015 BNB (example)
+      'AVAX': 0.01,   // 1 AVAX = 0.01 BNB (example)
+      'MATIC': 0.00025, // 1 MATIC = 0.00025 BNB (example)
+      'USDC': 0.0015,  // 1 USDC = 0.0015 BNB (example)
+      'USD': 0.0015    // 1 USD = 0.0015 BNB (example)
+    };
+    
+    let bnbValue;
     if (currency === 'USD') {
-      const usdToEth = 3000; // Example rate
-      ethValue = (Number(amount) / usdToEth).toFixed(6);
+      const usdToBnb = 0.0015; // Example rate - should be dynamic
+      bnbValue = (Number(amount) * usdToBnb).toFixed(6);
     } else {
-      ethValue = Number(amount).toFixed(6);
+      bnbValue = (Number(amount) * conversionRates[currency]).toFixed(6);
     }
+    
+    // Store purchase data for tracking
+    const purchaseData = {
+      amount: Number(amount),
+      currency: currency,
+      bnbValue: bnbValue,
+      tokens: bnbValue * 10000000, // Current rate calculation
+      timestamp: Date.now(),
+      wallet: userWalletAddress,
+      referral: ref || null
+    };
+    
+    // Save to localStorage for development
+    const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
+    purchases.push(purchaseData);
+    localStorage.setItem(`purchases_${userWalletAddress}`, JSON.stringify(purchases));
     
     let referralAddress = ethers.constants.AddressZero;
     if (ref) {
@@ -1319,6 +1349,20 @@ if (!document.getElementById('notification-styles')) {
         throw new Error("Invalid referral address");
       }
       referralAddress = ref;
+      
+      // Track referral
+      const referrals = JSON.parse(localStorage.getItem(`referrals_${ref}`) || '[]');
+      referrals.push({
+        from: userWalletAddress,
+        amount: bnbValue,
+        timestamp: Date.now()
+      });
+      localStorage.setItem(`referrals_${ref}`, JSON.stringify(referrals));
+    }
+    
+    // For non-BNB currencies, show conversion notice
+    if (currency !== 'BNB') {
+      showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
     
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1327,11 +1371,11 @@ if (!document.getElementById('notification-styles')) {
     
     // Estimate gas first
     const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-      value: ethers.utils.parseEther(ethValue.toString())
+      value: ethers.utils.parseEther(bnbValue.toString())
     });
     
     const tx = await contract.contribute(referralAddress, { 
-      value: ethers.utils.parseEther(ethValue.toString()),
+      value: ethers.utils.parseEther(bnbValue.toString()),
       gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
     });
     
@@ -1339,8 +1383,26 @@ if (!document.getElementById('notification-styles')) {
     
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
-    alert('🎉 Purchase successful! Transaction hash: ' + tx.hash);
     
+    // Update tokens sold display
+    const tokensSold = document.getElementById('tokensSold');
+    const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, ''));
+    tokensSold.textContent = (currentSold + purchaseData.tokens).toLocaleString();
+    
+    showNotification(`🎉 Purchase successful! You bought ${purchaseData.tokens.toLocaleString()} FLUFFI`, 'success');
+    
+    // Update displayed balances
+    await updateUserBalances();
+  } catch (err) {
+    console.error("Buy error:", err);
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    if (buyBtn) {
+      buyBtn.textContent = '🚀 Buy Now';
+      buyBtn.disabled = false;
+    }
+    showNotification(err.message || "Transaction failed", 'error');
+  }
+}
     // Update displayed balances
     await updateUserBalances();
   } catch (err) {
