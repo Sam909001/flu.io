@@ -476,6 +476,16 @@ updateFollowers();
 
 @keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
 .animate-sway { animation: sway 3s infinite ease-in-out; }
+
+/* Ensure dark mode is properly applied */
+@media (prefers-color-scheme: dark) {
+  #trust h2 {
+    color: white !important;
+  }
+  #trust p.text-lg {
+    color: #D1D5DB !important; /* gray-300 */
+  }
+}
 </style>
      
       <!-- Team Section with two new members -->
