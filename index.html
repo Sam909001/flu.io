@@ -558,9 +558,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize timer
 function initializeTimer() {
   // FIXED START TIME FOR ALL USERS - Same across all browsers
-  // Set this to when you want the presale to start
-  // Example: December 27, 2024 at 00:00:00 UTC
-  const GLOBAL_PRESALE_START = new Date('2025-08-24T00:00:00Z').getTime();
+ // Start 1 hour from when you deploy
+const GLOBAL_PRESALE_START = 1735232400000 + (1 * 60 * 60 * 1000);
   
   let startTime;
   
