@@ -346,86 +346,101 @@ function resetTimer() {
 
     <div class="split-sections">
      <!-- About Section -->
-<section id="about" class="about-section">
-  <div class="container">
-    <h2 class="section-title">Why Choose Fluffi?</h2>
-    <p class="section-subtitle">Fluffi Coin combines meme power with real DeFi innovation</p>
-    
-    <div class="about-cards">
-      <!-- NFT Staking -->
-      <div class="about-card">
-        <div class="icon">🎨</div>
-        <h3>NFT Staking Platform</h3>
-        <p>Launching Q3 2025 — Stake Fluffi NFTs to earn exclusive rewards and unlock premium utilities.</p>
-      </div>
-
-      <!-- DAO Governance -->
-      <div class="about-card">
-        <div class="icon">⚖️</div>
-        <h3>Community DAO Governance</h3>
-        <p>Shape the future of Fluffi by voting on treasury usage, upgrades, and key ecosystem decisions.</p>
-      </div>
-
-      <!-- Deflationary -->
-      <div class="about-card">
-        <div class="icon">🔥</div>
-        <h3>Deflationary Mechanics</h3>
-        <p>1% burn on every transaction — reducing supply and strengthening long-term value.</p>
-      </div>
-    </div>
-
-    <p class="about-footer">Fluffi bridges meme culture with sustainable financial infrastructure for the future. 🚀</p>
+<section id="about">
+  <h2 class="section-title">Why Fluffi Coin?</h2>
+  <div class="about-content">
+    <p>Fluffi Coin combines viral meme appeal with powerful real-world utility and DeFi innovation:</p>
+    <ul class="about-list">
+      <li>
+        <span class="icon pulse">🎨</span>
+        <strong>NFT STAKING PLATFORM</strong><br>
+        Launching Q3 2025 – Stake Fluffi NFTs to earn exclusive rewards
+      </li>
+      <li>
+        <span class="icon swing">⚖️</span>
+        <strong>COMMUNITY DAO GOVERNANCE</strong><br>
+        Vote on major decisions like treasury use and protocol upgrades
+      </li>
+      <li>
+        <span class="icon flicker">🔥</span>
+        <strong>DEFLATIONARY MECHANICS</strong><br>
+        1% burn on every transaction reduces supply permanently
+      </li>
+    </ul>
+    <p>Fluffi bridges meme culture with sustainable financial infrastructure for the future.</p>
   </div>
 </section>
 
-<!-- CSS -->
 <style>
-.about-section {
-  padding: 80px 20px;
-  background: var(--background);
-  color: var(--text);
+/* About Section */
+#about {
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #fff7f7, #ffecec);
+  text-align: center;
+  border-radius: 16px;
+  margin: 40px auto;
+  max-width: 900px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+#about h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ff4fa3;
+}
+
+.about-content p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.about-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 20px;
+  text-align: left;
+  max-width: 700px;
+}
+
+.about-list li {
+  font-size: 1.1rem;
+  margin: 15px 0;
+  padding: 15px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 1.8rem;
+  display: inline-block;
+  min-width: 40px;
   text-align: center;
 }
-.section-title {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: var(--accent);
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
 }
-.section-subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 40px;
-  opacity: 0.85;
+.pulse { animation: pulse 1.5s infinite; }
+
+@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
 }
-.about-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
+.swing { animation: swing 2s infinite ease-in-out; }
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  40% { opacity: 0.7; transform: scale(1.1); }
+  60% { opacity: 0.9; transform: scale(0.95); }
 }
-.about-card {
-  background: var(--card-bg);
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.about-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.2);
-}
-.about-card .icon {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-.about-card h3 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-  color: var(--accent);
-}
-.about-footer {
-  margin-top: 50px;
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
+.flicker { animation: flicker 0.8s infinite; }
 </style>
       <!-- Team Section with two new members -->
       <section id="team">
