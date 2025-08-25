@@ -381,6 +381,81 @@ function resetTimer() {
   </div>
 </section>
 
+      <!-- Trust Section with Live Counters -->
+<section id="trust" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">Trusted & Verified</h2>
+    <p class="text-gray-700 dark:text-gray-300 mb-12 text-lg">
+      Fluffi is backed by security, community, and transparency. Invest with confidence.
+    </p>
+
+    <div class="grid gap-8 md:grid-cols-3 lg:grid-cols-4">
+
+      <!-- Audit Badge -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://via.placeholder.com/80?text=Audit" alt="Audit Badge" class="mx-auto mb-4 animate-bounce">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Smart Contract Audited</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Verified for safety & transparency.</p>
+      </div>
+
+      <!-- Liquidity Locked -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://via.placeholder.com/80?text=Lock" alt="Liquidity Locked" class="mx-auto mb-4 animate-pulse">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Liquidity Locked</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Funds securely locked until listing.</p>
+      </div>
+
+      <!-- Community Followers -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://via.placeholder.com/80?text=Community" alt="Community" class="mx-auto mb-4 animate-spin">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">
+          Telegram: <span id="tg-count">0</span> | Twitter: <span id="tw-count">0</span> | Discord: <span id="dc-count">0</span>
+        </p>
+      </div>
+
+      <!-- Partners -->
+      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+        <img src="https://via.placeholder.com/80?text=Partner" alt="Partners" class="mx-auto mb-4 animate-bounce">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Trusted Partners</h3>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">Binance Smart Chain, PancakeSwap & more.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+// Example: Update follower counts dynamically (replace with real API calls)
+function updateFollowers() {
+  // Example static numbers (replace with API integration)
+  document.getElementById('tg-count').textContent = '5,432';
+  document.getElementById('tw-count').textContent = '10,215';
+  document.getElementById('dc-count').textContent = '3,876';
+}
+// Initial load
+updateFollowers();
+
+// Optionally refresh every 60 seconds if using live APIs
+// setInterval(updateFollowers, 60000);
+</script>
+
+<style>
+.trust-card img {
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+}
+
+/* Animations */
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.animate-bounce { animation: bounce 2s infinite; }
+
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+.animate-pulse { animation: pulse 2s infinite; }
+
+@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+.animate-spin { animation: spin 8s linear infinite; }
+</style>
+
       
       <!-- Team Section with two new members -->
       <section id="team">
