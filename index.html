@@ -345,98 +345,44 @@ function resetTimer() {
     </section>
 
     <div class="split-sections">
-    <!-- Why Fluffi Coin Section -->
-<section class="py-16 bg-gray-900 text-white">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-4xl font-extrabold text-center mb-12 text-green-400">
+  <section id="why-fluffi" class="py-16 transition-colors duration-500 bg-white dark:bg-gray-900">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-bold mb-12 text-green-600 dark:text-green-400 transition-colors duration-500">
       Why Fluffi Coin?
     </h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid gap-8 md:grid-cols-3">
       
-      <!-- Scarcity -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
+      <!-- Meme Power -->
+      <div class="p-6 rounded-2xl shadow-lg bg-gray-50 dark:bg-gray-800 transition-colors duration-500">
         <div class="text-5xl mb-4 animate-flicker">🔥</div>
-        <h3 class="text-xl font-bold mb-2">Scarcity</h3>
-        <p class="text-gray-300">With only <span class="text-green-400 font-semibold">10B supply</span>, demand pushes value upward.</p>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Meme Power</h3>
+        <p class="text-gray-600 dark:text-gray-300">Fluffi combines humor with community strength to fuel unstoppable growth.</p>
       </div>
 
-      <!-- Community Power -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
-        <div class="text-5xl mb-4 animate-pulse-slow">🎨</div>
-        <h3 class="text-xl font-bold mb-2">Community Power</h3>
-        <p class="text-gray-300">Built by the community, for the community. Memes rule, and so does Fluffi.</p>
+      <!-- Community -->
+      <div class="p-6 rounded-2xl shadow-lg bg-gray-50 dark:bg-gray-800 transition-colors duration-500">
+        <div class="text-5xl mb-4 animate-bounce">🤝</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Strong Community</h3>
+        <p class="text-gray-600 dark:text-gray-300">Driven by passionate holders who believe in the future of memes.</p>
       </div>
 
-      <!-- Fair Launch -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
-        <div class="text-5xl mb-4 animate-balance">⚖️</div>
-        <h3 class="text-xl font-bold mb-2">Fair Launch</h3>
-        <p class="text-gray-300">No whales, no hidden bags. Everyone has a fair shot.</p>
+      <!-- Utility -->
+      <div class="p-6 rounded-2xl shadow-lg bg-gray-50 dark:bg-gray-800 transition-colors duration-500">
+        <div class="text-5xl mb-4 animate-pulse">⚡</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Real Utility</h3>
+        <p class="text-gray-600 dark:text-gray-300">From staking to rewards, Fluffi brings meme culture into DeFi.</p>
       </div>
 
-      <!-- Early Adopter Advantage -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
-        <div class="text-5xl mb-4 animate-tick">⏰</div>
-        <h3 class="text-xl font-bold mb-2">Early Adopter Advantage</h3>
-        <p class="text-gray-300">Presale buyers lock in the <span class="text-green-400 font-semibold">lowest price</span> before listings.</p>
-      </div>
-
-      <!-- Security -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
-        <div class="text-5xl mb-4 animate-glow">🛡️</div>
-        <h3 class="text-xl font-bold mb-2">Security</h3>
-        <p class="text-gray-300">Liquidity will be <span class="text-green-400 font-semibold">locked</span> and contracts audited for safety.</p>
-      </div>
-
-      <!-- Meme Culture -->
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/30 transition transform hover:-translate-y-2">
-        <div class="text-5xl mb-4 animate-bounce">😂</div>
-        <h3 class="text-xl font-bold mb-2">Meme Culture</h3>
-        <p class="text-gray-300">Fluffi isn’t just a coin—it’s a <span class="text-green-400 font-semibold">movement</span>.</p>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- Animations -->
 <style>
-  .animate-flicker {
-    animation: flicker 1.5s infinite alternate;
-  }
-  @keyframes flicker {
-    from { opacity: 1; } to { opacity: 0.4; }
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 3s infinite;
-  }
-
-  .animate-balance {
-    animation: balance 2s infinite ease-in-out;
-    display: inline-block;
-  }
-  @keyframes balance {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(10deg); }
-  }
-
-  .animate-tick {
-    animation: tick 2s infinite;
-    display: inline-block;
-  }
-  @keyframes tick {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(-20deg); }
-  }
-
-  .animate-glow {
-    animation: glow 2s infinite alternate;
-  }
-  @keyframes glow {
-    from { text-shadow: 0 0 5px #22c55e, 0 0 10px #22c55e; }
-    to { text-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e; }
-  }
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity:1; }
+  20%, 24%, 55% { opacity:0.4; }
+}
+.animate-flicker { animation: flicker 1.4s infinite; }
 </style>
       <!-- Team Section with two new members -->
       <section id="team">
