@@ -202,13 +202,70 @@ function resetTimer() {
       </button>
     </section>
 
-    <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
-      <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
-      <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
-      <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
-    </section>
+    <!-- Staking Dashboard -->
+<section id="staking" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+
+    <!-- Title -->
+    <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-green-400">
+      🐾 FLUFFI Staking Dashboard
+    </h2>
+    <p class="text-gray-700 dark:text-gray-300 mb-12 text-lg">
+      Stake your FLUFFI, watch your rewards grow, and claim them after listing.
+    </p>
+
+    <!-- Dashboard Grid -->
+    <div class="grid gap-8 md:grid-cols-3">
+
+      <!-- Total Staked -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Total Staked</h3>
+        <p class="text-3xl font-bold text-green-500" id="total-staked">0</p>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">FLUFFI Tokens</p>
+      </div>
+
+      <!-- User Balance -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Your Balance</h3>
+        <p class="text-3xl font-bold text-blue-500" id="user-balance">0</p>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">FLUFFI Available</p>
+      </div>
+
+      <!-- Estimated Earnings -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Estimated Earnings</h3>
+        <p class="text-3xl font-bold text-yellow-500" id="user-earnings">0</p>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">Based on 90% APY</p>
+      </div>
+    </div>
+
+    <!-- Claim Rewards -->
+    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+      <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Claim Progress</h3>
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+        <div class="bg-green-500 h-4 rounded-full transition-all duration-500" id="claim-progress" style="width: 25%;"></div>
+      </div>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        Rewards unlock after listing. Current unlock: <span id="claim-percent">25%</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+// Example dynamic values (replace with Web3 integration)
+let totalStaked = 1234567;
+let userBalance = 5000;
+let userEarnings = 450;
+let claimPercent = 25;
+
+// Update dashboard
+document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+document.getElementById('user-balance').textContent = userBalance.toLocaleString();
+document.getElementById('user-earnings').textContent = userEarnings.toLocaleString();
+document.getElementById('claim-percent').textContent = claimPercent + "%";
+document.getElementById('claim-progress').style.width = claimPercent + "%";
+</script>
     
     <!-- Tokenomics Section -->
    <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
