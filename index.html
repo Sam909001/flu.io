@@ -592,6 +592,119 @@ html.dark #trust p.text-lg {
     </div>
   </main>
 
+  <!-- ================== COMMUNITY ACTIVITY ================== -->
+<section id="community-activity" class="py-12 bg-green-50 dark:bg-gray-900">
+  <h2 class="text-3xl font-bold text-center text-green-600 dark:text-green-400 mb-8">
+    🔥 Live Community Activity
+  </h2>
+
+  <!-- Live Feed -->
+  <div id="liveFeed" class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-8 text-center text-lg font-medium">
+    <p id="feedMessage">Loading latest activity...</p>
+  </div>
+
+  <!-- Telegram Embed -->
+  <div class="max-w-4xl mx-auto mb-8">
+    <iframe src="https://t.me/FLUFFISOLANALAYER2" 
+      width="100%" height="400" 
+      frameborder="0" scrolling="yes"
+      class="rounded-2xl shadow-lg"></iframe>
+  </div>
+
+  <!-- Referral Leaderboard -->
+  <div class="bg-green-600 text-white py-3 overflow-hidden relative">
+    <div id="leaderboard" class="whitespace-nowrap animate-marquee text-lg font-bold">
+      🏆 Top Referrers: 
+      <span class="mx-6">0xA12...F45 earned 120 BNB</span>
+      <span class="mx-6">0xC98...B72 earned 95 BNB</span>
+      <span class="mx-6">0x7F3...D91 earned 80 BNB</span>
+      <span class="mx-6">0x4B7...E28 earned 65 BNB</span>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Marquee scrolling effect */
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+</style>
+
+<script>
+// Fake live feed data (replace with backend/websocket later)
+const feedMessages = [
+  "🐋 User0x12A just bought 1.2 BNB worth of FLUFFI 🚀",
+  "🔥 User0x9F4 staked 45,000 FLUFFI and is earning 90% APY!",
+  "🎯 User0x33B invited a friend and earned 10% referral bonus",
+  "🚀 User0x77C joined with 0.8 ETH in presale!",
+  "🐾 User0x5A1 bought 65,000 FLUFFI tokens",
+  "🐋 User0xE91 just bought 3.5 BNB worth of FLUFFI 🚀",
+  "🔥 User0x4D7 staked 120,000 FLUFFI for huge rewards!",
+  "🎯 User0xF22 invited 3 friends and earned 30% referral bonus",
+  "🚀 User0x18C joined with 2 ETH in presale!",
+  "🐾 User0x7B9 bought 90,000 FLUFFI tokens",
+  "🐋 User0x82A just bought 0.5 BNB worth of FLUFFI 🚀",
+  "🔥 User0x6C4 staked 75,000 FLUFFI and is earning daily rewards!",
+  "🎯 User0xD88 invited a friend and earned 10% referral bonus",
+  "🚀 User0xB41 joined with 1.5 ETH in presale!",
+  "🐾 User0x34C bought 40,000 FLUFFI tokens",
+  "🐋 User0xAA2 just bought 4.8 BNB worth of FLUFFI 🚀",
+  "🔥 User0x29D staked 25,000 FLUFFI and is compounding daily!",
+  "🎯 User0x66F invited 2 friends and earned 20% referral bonus",
+  "🚀 User0xC11 joined with 0.75 ETH in presale!",
+  "🐾 User0x1F7 bought 55,000 FLUFFI tokens",
+  "🐋 User0xFE9 just bought 6.3 BNB worth of FLUFFI 🚀",
+  "🔥 User0x17B staked 300,000 FLUFFI and is earning 90% APY!",
+  "🎯 User0x92E invited 5 friends and earned 50% referral bonus",
+  "🚀 User0x44D joined with 3 ETH in presale!",
+  "🐾 User0x7AA bought 120,000 FLUFFI tokens",
+  "🐋 User0x223 just bought 0.9 BNB worth of FLUFFI 🚀",
+  "🔥 User0x3BC staked 20,000 FLUFFI for early rewards!",
+  "🎯 User0x551 invited 1 friend and earned 10% referral bonus",
+  "🚀 User0x8F6 joined with 0.25 ETH in presale!",
+  "🐾 User0x19D bought 22,000 FLUFFI tokens",
+  "🐋 User0x40E just bought 7.1 BNB worth of FLUFFI 🚀",
+  "🔥 User0xCD9 staked 500,000 FLUFFI and is farming big rewards!",
+  "🎯 User0x822 invited 4 friends and earned 40% referral bonus",
+  "🚀 User0x77F joined with 5 ETH in presale!",
+  "🐾 User0x2A2 bought 150,000 FLUFFI tokens",
+  "🐋 User0x8DD just bought 2.2 BNB worth of FLUFFI 🚀",
+  "🔥 User0xE77 staked 60,000 FLUFFI and is locked till listing!",
+  "🎯 User0xA13 invited 2 friends and earned 20% referral bonus",
+  "🚀 User0x3FE joined with 0.65 ETH in presale!",
+  "🐾 User0x95B bought 36,000 FLUFFI tokens",
+  "🐋 User0xBB1 just bought 5.6 BNB worth of FLUFFI 🚀",
+  "🔥 User0x47C staked 85,000 FLUFFI and is compounding daily!",
+  "🎯 User0x5E5 invited a friend and earned 10% referral bonus",
+  "🚀 User0xCC7 joined with 1.25 ETH in presale!",
+  "🐾 User0xF4A bought 70,000 FLUFFI tokens",
+  "🐋 User0xD31 just bought 1.8 BNB worth of FLUFFI 🚀",
+  "🔥 User0x63B staked 15,000 FLUFFI early on!",
+  "🎯 User0xACD invited 3 friends and earned 30% referral bonus",
+  "🚀 User0x229 joined with 2.8 ETH in presale!",
+  "🐾 User0x8A0 bought 110,000 FLUFFI tokens",
+  "🐋 User0x6C2 just bought 9.9 BNB worth of FLUFFI 🚀",
+  "🔥 User0x118 staked 1,000,000 FLUFFI for mega rewards!",
+  "🎯 User0x33C invited 6 friends and earned 60% referral bonus",
+  "🚀 User0x94E joined with 10 ETH in presale!",
+  "🐾 User0x41F bought 500,000 FLUFFI tokens",
+  // ... repeat with more random variations ...
+];
+let feedIndex = 0;
+function rotateFeed() {
+  document.getElementById("feedMessage").textContent = feedMessages[feedIndex];
+  feedIndex = (feedIndex + 1) % feedMessages.length;
+}
+setInterval(rotateFeed, 4000); // change every 4s
+rotateFeed();
+</script>
+
+  
   <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
     <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
     <div class="flex gap-4 justify-center md:justify-end">
