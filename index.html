@@ -224,13 +224,12 @@ function resetTimer() {
         <p class="text-gray-600 dark:text-gray-400 text-sm">FLUFFI Tokens</p>
       </div>
 
-      <!-- User Balance -->
-     <div id="user-balance">
-  Your Balance<br><span id="balance">0</span>
+    <!-- User Balance -->
+<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+  <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Your Balance</h3>
+  <p class="text-3xl font-bold text-blue-500" id="user-balance-value">0</p>
+  <p class="text-gray-600 dark:text-gray-400 text-sm">FLUFFI Available</p>
 </div>
-<div id="fluffi-available">FLUFFI Available</div>
-
-
       <!-- Estimated Earnings -->
       <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Estimated Earnings</h3>
@@ -259,9 +258,9 @@ let userBalance = 5000;
 let userEarnings = 450;
 let claimPercent = 25;
 
-// Update dashboard
+// Update dashboard (target the numeric spans, not the containers)
 document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
-document.getElementById('user-balance').textContent = userBalance.toLocaleString();
+document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
 document.getElementById('user-earnings').textContent = userEarnings.toLocaleString();
 document.getElementById('claim-percent').textContent = claimPercent + "%";
 document.getElementById('claim-progress').style.width = claimPercent + "%";
@@ -2114,35 +2113,45 @@ function toggleDarkMode() {
       window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
     }
   </script>
-  ...
+  
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 <script>
-  async function loadBalance() {
-    if (window.ethereum) {
+  const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
+  const ERC20_ABI = [
+    "function balanceOf(address owner) view returns (uint256)",
+    "function decimals() view returns (uint8)"
+  ];
+
+  async function loadFluffiBalance() {
+    if (!window.ethereum) {
+      console.warn("No wallet provider found");
+      return;
+    }
+
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const userAddress = await signer.getAddress();
+      const accounts = await provider.send("eth_requestAccounts", []);
+      const userAddress = accounts[0];
 
-      // FLUFFI contract
-      const fluffiAddress = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
-      const abi = [
-        "function balanceOf(address owner) view returns (uint256)",
-        "function decimals() view returns (uint8)"
-      ];
-      const contract = new ethers.Contract(fluffiAddress, abi, provider);
-
-      // fetch balance
-      const balance = await contract.balanceOf(userAddress);
+      const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
       const decimals = await contract.decimals();
-      const formatted = ethers.utils.formatUnits(balance, decimals);
+      const rawBalance = await contract.balanceOf(userAddress);
+      const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
 
-      document.getElementById("balance").innerText = formatted;
+      document.getElementById("user-balance-value").textContent =
+        parseFloat(formattedBalance).toLocaleString();
+    } catch (err) {
+      console.error("Error fetching balance:", err);
     }
   }
 
-  // run after page loads
-  window.addEventListener("load", loadBalance);
+  // Load once connected
+  window.addEventListener("load", loadFluffiBalance);
+
+  // Update if user changes wallet
+  if (window.ethereum) {
+    window.ethereum.on("accountsChanged", loadFluffiBalance);
+  }
 </script>
 </body>
 </html>
