@@ -902,4 +902,7 @@
 .wallet-button:hover {
   background-color: #047857 !important;
 }
+html {
+  scroll-behavior: smooth;
+}
   </style>
