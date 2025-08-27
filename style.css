@@ -990,4 +990,48 @@ html {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* Mobile responsiveness fixes */
+@media (max-width: 768px) {
+  .wallet-buttons {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  #walletButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Ensure tap targets are at least 44px */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+/* Dark mode fixes */
+.dark .bg-green-50 {
+  background-color: #1f2937 !important;
+}
+
+.dark #liveFeed {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+.dark .trust-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+/* Ensure all text has proper contrast in dark mode */
+.dark body {
+  color: #e5e7eb;
+}
   </style>
