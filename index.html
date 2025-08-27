@@ -904,17 +904,10 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeTimer();
 });
 
-// Initialize timer
 function initializeTimer() {
-  // Set presale start time if not already set
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // For demo purposes, set to current time
-    startTime = Date.now();
-    localStorage.setItem('presaleStartTime', startTime);
-  } else {
-    startTime = parseInt(startTime);
-  }
+  // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
+  const startTime = new Date('2025-01-27T00:00:00Z').getTime();
+  // No need to store in localStorage since it's fixed
   
   // Update timer immediately
   updateTimer(startTime);
