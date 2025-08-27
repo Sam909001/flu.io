@@ -510,9 +510,9 @@ document.getElementById('claim-progress').style.width = claimPercent + "%";
       <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-sway">
       <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
       <p class="text-gray-600 dark:text-gray-300 text-sm">
-        Telegram: <span id="tg-count" class="text-green-600 dark:text-green-300">0</span> | 
-        Twitter: <span id="tw-count" class="text-green-600 dark:text-green-300">0</span> | 
-        Discord: <span id="dc-count" class="text-green-600 dark:text-green-300">0</span>
+        Telegram: <span id="tg-count" class="text-green-600 dark:text-green-300">5,432</span> | 
+        Twitter: <span id="tw-count" class="text-green-600 dark:text-green-300">10,215</span> | 
+        Discord: <span id="dc-count" class="text-green-600 dark:text-green-300">3,876</span>
       </p>
     </div>
 
@@ -530,16 +530,6 @@ document.getElementById('claim-progress').style.width = claimPercent + "%";
   </div>
 </section>
 
-<script>
-// Update follower counts dynamically (replace with real API calls)
-function updateFollowers() {
-  document.getElementById('tg-count').textContent = '5,432';
-  document.getElementById('tw-count').textContent = '10,215';
-  document.getElementById('dc-count').textContent = '3,876';
-}
-updateFollowers();
-</script>
-
 <style>
 .trust-card img {
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
@@ -555,15 +545,29 @@ updateFollowers();
 @keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
 .animate-sway { animation: sway 3s infinite ease-in-out; }
 
-/* Force dark mode text colors with higher specificity */
-html.dark #trust h2 {
-  color: white !important;
+/* Dark mode specific fixes */
+.dark .trust-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-html.dark #trust p.text-lg {
-  color: #D1D5DB !important; /* gray-300 */
+.dark .trust-card h3 {
+  color: #f9fafb !important; /* gray-50 */
+}
+
+.dark .trust-card p {
+  color: #d1d5db !important; /* gray-300 */
 }
 </style>
+
+<script>
+// Update follower counts dynamically (replace with real API calls)
+function updateFollowers() {
+  document.getElementById('tg-count').textContent = '5,432';
+  document.getElementById('tw-count').textContent = '10,215';
+  document.getElementById('dc-count').textContent = '3,876';
+}
+updateFollowers();
+</script>
      
       <!-- Team Section with two new members -->
       <section id="team">
