@@ -17,8 +17,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@walletconnect/modal@latest/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preload" href="fluffi.jpg" as="image">
 
 </head>
   
@@ -29,7 +32,7 @@
     <div class="flex items-center gap-3">
       <!-- Logo + Title with improved floating animation -->
       <div class="logo-container logo-float">
-        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-10 h-10 rounded-full">
+        <img src="fluffi.jpg" alt="FLUFFI Logo" class="w-10 h-10 rounded-full" loading="lazy">
       </div>
       <h1 class="text-3xl md:text-4xl font-bold text-white hover:scale-105 transition-transform duration-300">
         $FLUFFI
@@ -776,7 +779,7 @@ rotateFeed();
 
   <!-- Web3Modal v2 (WalletConnect v2) -->
 <script src="https://unpkg.com/@web3modal/standalone@2.7.1/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" defer></script>
   
   <script>
 // Configuration
