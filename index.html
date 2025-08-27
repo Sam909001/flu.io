@@ -1709,21 +1709,6 @@ async function switchToBSC() {
     }
   }
 }
-
-// Validate contract deployment & network
-async function validateContracts() {
-  // Use BSC Testnet RPC
-  const provider = new ethers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
-
-  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
-  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
-
-  const network = await provider.getNetwork();
-  if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
-
-  console.log("Contract validation passed ✅");
-}
-
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
   // 1️⃣ Rate limiter check
