@@ -799,6 +799,7 @@ rotateFeed();
   <!-- Web3Modal v2 (WalletConnect v2) -->
 <script src="https://unpkg.com/@web3modal/standalone@2.7.1/dist/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.9.2/dist/ethers.min.js"></script>
   
   <script>
 // Configuration
@@ -1713,17 +1714,19 @@ async function switchToBSC() {
 
 // Validate contract deployment & network
 async function validateContracts() {
+  // Use a JSON-RPC provider (Testnet BSC)
   const provider = new ethers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
 
+  // Check if contract is deployed
   const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
+  // Verify network
   const network = await provider.getNetwork();
   if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
 
   console.log("Contract validation passed ✅");
 }
-
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
   // 1️⃣ Rate limiter
