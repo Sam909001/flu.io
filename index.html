@@ -1712,15 +1712,16 @@ async function switchToBSC() {
 
 // Validate contract deployment & network
 async function validateContracts() {
+  // RPC provider for checking deployment
   const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
-  
-  // Check if contract is deployed
+
   const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
-  // Verify network
   const network = await provider.getNetwork();
   if (network.chainId !== 56) throw new Error("Please switch to BSC Mainnet");
+
+  console.log("Contract validation passed ✅");
 }
 
 // ===== BUY FUNCTION =====
