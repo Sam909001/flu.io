@@ -1680,7 +1680,7 @@ const rateLimiter = {
 
 // Backend purchase recorder
 async function recordPurchase(txHash, amount, tokens) {
-  const response = await fetch('/api/record-purchase', {
+  const response = await fetch('/.netlify/functions/record-purchase', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
