@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="preload" href="fluffi.jpg" as="image">
-
+  <img src="fluffi.jpg" alt="FLUFFI Logo" loading="lazy">
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -869,14 +869,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
-// REMOVED THE AUTO-CONNECT CODE - Only show connected state if already connected
-// but don't automatically reconnect
+// FIXED: Only show connected state visually but don't auto-connect
 const savedAddress = localStorage.getItem('walletAddress');
 if (savedAddress) {
   // Show the wallet as connected but don't actually connect
   const shortAddress = `${savedAddress.slice(0, 6)}...${savedAddress.slice(-4)}`;
   
-  // Update the wallet button to show the address but not be functionally connected
   const walletButtons = document.getElementById('walletButtons');
   if (walletButtons) {
     walletButtons.innerHTML = `
