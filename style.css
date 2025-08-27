@@ -905,4 +905,89 @@
 html {
   scroll-behavior: smooth;
 }
+//extra styles for dark mode (can remove it if not work)
+/* Dark mode fixes */
+.dark .bg-white {
+  background-color: #1f2937 !important; /* gray-800 */
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6 !important; /* gray-100 */
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db !important; /* gray-300 */
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important; /* gray-700 */
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important; /* gray-900 */
+}
+
+.dark .bg-gray-100 {
+  background-color: #1f2937 !important; /* gray-800 */
+}
+
+/* Trust section specific fixes */
+.dark .trust-card {
+  background-color: #1f2937 !important; /* gray-800 */
+  border: 1px solid #374151; /* gray-700 */
+}
+
+.dark .trust-card h3 {
+  color: #f9fafb !important; /* gray-50 */
+}
+
+.dark .trust-card p {
+  color: #d1d5db !important; /* gray-300 */
+}
+
+/* Staking dashboard specific fixes */
+.dark #staking .bg-white {
+  background-color: #1f2937 !important; /* gray-800 */
+}
+
+.dark #staking h3 {
+  color: #f9fafb !important; /* gray-50 */
+}
+
+.dark #staking .text-sm {
+  color: #d1d5db !important; /* gray-300 */
+}
+
+/* Wallet modal dark mode fixes */
+.dark .wallet-modal-content {
+  background-color: #1f2937 !important; /* gray-800 */
+  color: #f9fafb !important; /* gray-50 */
+}
+
+.dark .wallet-option {
+  border-color: #374151 !important; /* gray-700 */
+}
+
+.dark .wallet-option:hover {
+  background-color: #374151 !important; /* gray-700 */
+}
+
+/* Spinner animation */
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
   </style>
