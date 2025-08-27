@@ -1774,7 +1774,7 @@ async function buyFluffi() {
 
   try {
     // 3️⃣ Ensure user is on Testnet
-    await switchToBSC();
+    await switchToNetwork('BSC_TEST');
     await validateContracts();
 
     // 4️⃣ Currency conversion
