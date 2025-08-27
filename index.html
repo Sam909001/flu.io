@@ -287,18 +287,48 @@ function resetTimer() {
 </section>
 
 <script>
-// Example dynamic values (replace with Web3 integration)
-let totalStaked = 1234567;
-let userBalance = 5000;
-let userEarnings = 450;
-let claimPercent = 25;
+async function updateStakingDashboard() {
+  // Get values from localStorage (simulated for now)
+  const walletAddress = localStorage.getItem('walletAddress');
+  
+  if (walletAddress) {
+    // Retrieve stored staking info
+    const stakingInfo = JSON.parse(localStorage.getItem(`staking_${walletAddress}`) || '{}');
+    const totalStaked = stakingInfo.amount || 0;
+    
+    // Calculate earnings based on APY (90%)
+    const timeDiff = stakingInfo.timestamp ? (Date.now() - stakingInfo.timestamp) / (365 * 24 * 60 * 60 * 1000) : 0;
+    const userEarnings = totalStaked * 0.9 * timeDiff;
+    
+    // Get balance from localStorage
+    const userBalance = parseFloat(localStorage.getItem(`balance_${walletAddress}`) || '0');
+    
+    // Update UI
+    document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+    document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
+    document.getElementById('user-earnings').textContent = userEarnings.toFixed(2);
+    
+    // Progress based on time until listing (30 days from start)
+    const startTime = new Date('2025-01-27T00:00:00Z').getTime();
+    const listingTime = startTime + (30 * 24 * 60 * 60 * 1000);
+    const now = Date.now();
+    const claimPercent = Math.min(((now - startTime) / (listingTime - startTime)) * 100, 100);
+    
+    document.getElementById('claim-percent').textContent = Math.floor(claimPercent) + "%";
+    document.getElementById('claim-progress').style.width = claimPercent + "%";
+  } else {
+    // Default values when not connected
+    document.getElementById('total-staked').textContent = '0';
+    document.getElementById('user-balance-value').textContent = '0';
+    document.getElementById('user-earnings').textContent = '0';
+    document.getElementById('claim-percent').textContent = "0%";
+    document.getElementById('claim-progress').style.width = "0%";
+  }
+}
 
-// Update dashboard (target the numeric spans, not the containers)
-document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
-document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
-document.getElementById('user-earnings').textContent = userEarnings.toLocaleString();
-document.getElementById('claim-percent').textContent = claimPercent + "%";
-document.getElementById('claim-progress').style.width = claimPercent + "%";
+// Update on page load and when wallet connects
+document.addEventListener('DOMContentLoaded', updateStakingDashboard);
+window.addEventListener('storage', updateStakingDashboard);
 </script>
   
     <!-- Tokenomics Section -->
