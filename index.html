@@ -876,25 +876,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
-// REMOVED THE AUTO-CONNECT CODE - Only show connected state if already connected
-// but don't automatically reconnect
+// Just check if wallet was previously connected but don't auto-reconnect
 const savedAddress = localStorage.getItem('walletAddress');
 if (savedAddress) {
-  // Show the wallet as connected but don't actually connect
-  const shortAddress = `${savedAddress.slice(0, 6)}...${savedAddress.slice(-4)}`;
-  
-  // Update the wallet button to show the address but not be functionally connected
-  const walletButtons = document.getElementById('walletButtons');
-  if (walletButtons) {
-    walletButtons.innerHTML = `
-      <span class="wallet-address-display bg-green-700 text-white py-1 px-3 rounded">${shortAddress}</span>
-      <button class="disconnect-btn bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded ml-2" onclick="disconnectWallet()">Disconnect</button>
-    `;
-  }
-  
-  // Generate referral link (for display only)
-  const referralLink = `https://fluffi.io/airdrop?ref=${savedAddress}`;
-  document.getElementById('referralLink').value = referralLink;
+  // Clear the saved address to prevent auto-reconnect attempts
+  localStorage.removeItem('walletAddress');
+  localStorage.removeItem('walletConnected');
 }
   
   // Initialize countdown timer
