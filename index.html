@@ -2340,5 +2340,50 @@ function toggleDarkMode() {
     });
   });
 </script>
+  <script>(async () => {
+  const feedList = document.getElementById('feed-list');
+
+  // BSC RPC provider
+  const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+
+  // Presale contract
+  const presaleAddress = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+  const presaleAbi = [
+    "event Contribution(address indexed buyer, uint256 amount, address indexed referrer)",
+    // Add other events like Staked/Claimed if needed
+  ];
+
+  const contract = new ethers.Contract(presaleAddress, presaleAbi, provider);
+
+  // Function to display event
+  function addFeedItem(text) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md animate-fade-in";
+    feedList.prepend(li);
+
+    // Limit to last 10 events
+    if (feedList.childNodes.length > 10) feedList.removeChild(feedList.lastChild);
+  }
+
+  // Fetch last 10 Contribution events
+  const latestBlock = await provider.getBlockNumber();
+  const events = await contract.queryFilter(contract.filters.Contribution(), latestBlock - 5000, latestBlock);
+  events.slice(-10).forEach(e => {
+    const buyer = e.args.buyer;
+    const amount = ethers.formatEther(e.args.amount);
+    const ref = e.args.referrer !== ethers.ZeroAddress ? e.args.referrer : "No Referrer";
+    addFeedItem(`🐋 ${buyer} just bought ${amount} BNB (Ref: ${ref})`);
+  });
+
+  // Listen for new Contribution events live
+  contract.on("Contribution", (buyer, amount, referrer) => {
+    const refText = referrer !== ethers.ZeroAddress ? referrer : "No Referrer";
+    const amountBNB = ethers.formatEther(amount);
+    addFeedItem(`🐋 ${buyer} just bought ${amountBNB} BNB (Ref: ${refText})`);
+  });
+
+})();
+</script>
 </body>
 </html>
