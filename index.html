@@ -1647,142 +1647,32 @@ if (!document.getElementById('notification-styles')) {
   document.head.appendChild(styleSheet);
 }
   </script>
-  <script>
-    // Add contract validation
-async function validateContracts() {
-  const provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
-  
-  // Check if contracts are deployed
-  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
-  if (presaleCode === "0x") {
-    throw new Error("Presale contract not deployed");
-  }
-  
-  // Verify contract is on correct network
-  const network = await provider.getNetwork();
-  if (network.chainId !== 56) { // BSC Mainnet
-    throw new Error("Please switch to BSC Mainnet");
-  }
-}
-  </script>
-    <script>
-    // ===== PRESALE FUNCTIONS =====
-    async function buyFluffi() {
-      if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
-    showNotification('Too many attempts. Please wait.', 'warning');
-    return;
-  }
-      
-  const amount = document.getElementById('amountInput').value;
-  const currency = document.getElementById('currencySelect').value;
-  const ref = document.getElementById('refInput').value;
-  
-  if (!userWalletAddress) {
-    showNotification('Please connect your wallet first.', 'error');
-    openWalletModal();
-    return;
-  }
-  
-  if (!amount || isNaN(amount) || Number(amount) <= 0) {
-    showNotification('Please enter a valid amount.', 'error');
-    return;
-  }
-  
-  try {
-    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-    const prevText = buyBtn.textContent;
-    buyBtn.textContent = '⏳ Processing...';
-    buyBtn.disabled = true;
-    
-    // Currency conversion rates (example rates - should be fetched from API in production)
-    const conversionRates = {
-      'BNB': 1,
-      'SOL': 0.0015,  // 1 SOL = 0.0015 BNB (example)
-      'AVAX': 0.01,   // 1 AVAX = 0.01 BNB (example)
-      'MATIC': 0.00025, // 1 MATIC = 0.00025 BNB (example)
-      'USDC': 0.0015,  // 1 USDC = 0.0015 BNB (example)
-      'USD': 0.0015    // 1 USD = 0.0015 BNB (example)
-    };
-    
-    let bnbValue;
-    if (currency === 'USD') {
-      const usdToBnb = 0.0015; // Example rate - should be dynamic
-      bnbValue = (Number(amount) * usdToBnb).toFixed(6);
-    } else {
-      bnbValue = (Number(amount) * conversionRates[currency]).toFixed(6);
-    }
-    
-    // Store purchase data for tracking
-    const purchaseData = {
-      amount: Number(amount),
-      currency: currency,
-      bnbValue: bnbValue,
-      tokens: bnbValue * 10000000, // Current rate calculation
-      timestamp: Date.now(),
-      wallet: userWalletAddress,
-      referral: ref || null
-    };
-    
- // Record purchase on backend
-await recordPurchase(tx.hash, purchaseData.amount, purchaseData.tokens);
-    
-    let referralAddress = ethers.constants.AddressZero;
-    if (ref) {
-      if (!ethers.utils.isAddress(ref)) {
-        throw new Error("Invalid referral address");
-      }
-      referralAddress = ref;
-      
-      // Track referral
-      const referrals = JSON.parse(localStorage.getItem(`referrals_${ref}`) || '[]');
-      referrals.push({
-        from: userWalletAddress,
-        amount: bnbValue,
-        timestamp: Date.now()
-      });
-      localStorage.setItem(`referrals_${ref}`, JSON.stringify(referrals));
-    }
-    
-    // For non-BNB currencies, show conversion notice
-    if (currency !== 'BNB') {
-      showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
-    }
-    
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
-    
-    // Estimate gas first
-    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-      value: ethers.utils.parseEther(bnbValue.toString())
-    });
-    
-    const tx = await contract.contribute(referralAddress, { 
-      value: ethers.utils.parseEther(bnbValue.toString()),
-      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-    });
-    
-    await tx.wait();
-    
-    buyBtn.textContent = prevText;
-    buyBtn.disabled = false;
-    
-    // Update tokens sold display
-    const tokensSold = document.getElementById('tokensSold');
-    const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, ''));
-    tokensSold.textContent = (currentSold + purchaseData.tokens).toLocaleString();
-    
-    showNotification(`🎉 Purchase successful! You bought ${purchaseData.tokens.toLocaleString()} FLUFFI`, 'success');
+ <script>
+   // ===== HELPER FUNCTIONS =====
 
-    // Move sensitive operations to backend
-// Instead of storing purchases in localStorage:
+// Rate limiter to prevent spam
+const rateLimiter = {
+  attempts: {},
+  canAttempt(action, wallet, maxAttempts = 5, windowMs = 60000) {
+    const key = `${action}_${wallet}`;
+    const now = Date.now();
+    if (!this.attempts[key]) this.attempts[key] = [];
+
+    // Clean old attempts
+    this.attempts[key] = this.attempts[key].filter(time => now - time < windowMs);
+
+    if (this.attempts[key].length >= maxAttempts) return false;
+
+    this.attempts[key].push(now);
+    return true;
+  }
+};
+
+// Backend purchase recorder
 async function recordPurchase(txHash, amount, tokens) {
-  // Call your backend API
   const response = await fetch('/api/record-purchase', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       wallet: userWalletAddress,
       txHash,
@@ -1791,14 +1681,137 @@ async function recordPurchase(txHash, amount, tokens) {
       timestamp: Date.now()
     })
   });
-  
-  if (!response.ok) {
-    throw new Error('Failed to record purchase');
+  if (!response.ok) throw new Error('Failed to record purchase');
+}
+
+// Network switch to BSC
+async function switchToBSC() {
+  if (!window.ethereum) return; // No wallet
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x38' }], // BSC Mainnet
+    });
+  } catch (error) {
+    if (error.code === 4902) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x38',
+          chainName: 'BSC Mainnet',
+          nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+          rpcUrls: ['https://bsc-dataseed.binance.org/'],
+          blockExplorerUrls: ['https://bscscan.com/']
+        }]
+      });
+    } else {
+      console.error(error);
+    }
   }
 }
-    
-    // Update displayed balances
+
+// Validate contract deployment & network
+async function validateContracts() {
+  const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+  
+  // Check if contract is deployed
+  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
+  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
+
+  // Verify network
+  const network = await provider.getNetwork();
+  if (network.chainId !== 56) throw new Error("Please switch to BSC Mainnet");
+}
+
+// ===== BUY FUNCTION =====
+async function buyFluffi() {
+  // 1️⃣ Rate limiter check
+  if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
+    showNotification('Too many attempts. Please wait.', 'warning');
+    return;
+  }
+
+  // 2️⃣ Get input values
+  const amount = document.getElementById('amountInput').value;
+  const currency = document.getElementById('currencySelect').value;
+  const ref = document.getElementById('refInput').value;
+
+  if (!userWalletAddress) {
+    showNotification('Please connect your wallet first.', 'error');
+    openWalletModal();
+    return;
+  }
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    showNotification('Please enter a valid amount.', 'error');
+    return;
+  }
+
+  try {
+    const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+    const prevText = buyBtn.textContent;
+    buyBtn.textContent = '⏳ Processing...';
+    buyBtn.disabled = true;
+
+    // 3️⃣ Ensure user is on BSC
+    await switchToBSC();
+    await validateContracts();
+
+    // 4️⃣ Conversion rates
+    const conversionRates = {
+      'BNB': 1,
+      'SOL': 0.0015,
+      'AVAX': 0.01,
+      'MATIC': 0.00025,
+      'USDC': 0.0015,
+      'USD': 0.0015
+    };
+    let bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
+
+    if (currency !== 'BNB') {
+      showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
+    }
+
+    // 5️⃣ Prepare referral
+    let referralAddress = ethers.ZeroAddress;
+    if (ref) {
+      if (!ethers.isAddress(ref)) throw new Error("Invalid referral address");
+      referralAddress = ref;
+    }
+
+    // 6️⃣ Initialize provider & contract
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+
+    // 7️⃣ Estimate gas & send transaction
+    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+      value: ethers.parseEther(bnbValue)
+    });
+    const tx = await contract.contribute(referralAddress, {
+      value: ethers.parseEther(bnbValue),
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
+    await tx.wait();
+
+    // 8️⃣ Record purchase on backend
+    const tokensBought = bnbValue * 10000000; // Current token rate
+    await recordPurchase(tx.hash, Number(amount), tokensBought);
+
+    // 9️⃣ Update tokens sold display
+    const tokensSold = document.getElementById('tokensSold');
+    const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, ''));
+    tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
+
+    showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
+
+    // 10️⃣ Update balances / live feed
     await updateUserBalances();
+
+    // Reset button
+    buyBtn.textContent = prevText;
+    buyBtn.disabled = false;
+
   } catch (err) {
     console.error("Buy error:", err);
     const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
@@ -1809,6 +1822,8 @@ async function recordPurchase(txHash, amount, tokens) {
     showNotification(err.message || "Transaction failed", 'error');
   }
 }
+ </script>
+    <script>
     // ===== STAKING FUNCTIONS =====
 // Staking contract placeholder - replace with actual deployed address
 const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
