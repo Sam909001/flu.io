@@ -1713,7 +1713,7 @@ async function switchToBSC() {
 // Validate contract deployment & network
 async function validateContracts() {
   // RPC provider for checking deployment
-  const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+  const provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
 
   const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
