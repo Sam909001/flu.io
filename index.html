@@ -1693,7 +1693,7 @@ if (!document.getElementById('notification-styles')) {
       referral: ref || null
     };
     
-    // Save to localStorage for development
+    /// Save to localStorage for development
     const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
     purchases.push(purchaseData);
     localStorage.setItem(`purchases_${userWalletAddress}`, JSON.stringify(purchases));
