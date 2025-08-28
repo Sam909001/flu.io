@@ -23,34 +23,35 @@
       color: #1a1a1a;
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
     }
     
-    .dark {
-      background: #111827 !important;
+    body.dark-mode {
+      background: linear-gradient(to bottom, #1a202c, #2d3748) !important;
       color: #f0f0f0 !important;
     }
 
-    .dark .text-gray-700 {
+    .dark-mode .text-gray-700 {
       color: #f0f0f0 !important;
     }
 
-    .dark .text-gray-600 {
+    .dark-mode .text-gray-600 {
       color: #d1d5db !important;
     }
 
-    .dark .text-gray-500 {
+    .dark-mode .text-gray-500 {
       color: #9ca3af !important;
     }
 
-    .dark .text-gray-400 {
+    .dark-mode .text-gray-400 {
       color: #9ca3af !important;
     }
 
-    .dark .border-gray-200 {
+    .dark-mode .border-gray-200 {
       border-color: #374151 !important;
     }
 
-    .dark input::placeholder {
+    .dark-mode input::placeholder {
       color: #9ca3af !important;
     }
 
@@ -87,9 +88,9 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
-    .dark input[type="text"], 
-    .dark input[type="email"],
-    .dark select {
+    .dark-mode input[type="text"], 
+    .dark-mode input[type="email"],
+    .dark-mode select {
       background-color: #374151;
       color: white !important;
       border-color: #4B5563;
@@ -118,12 +119,12 @@
       height: 24px;
     }
     
-    .dark .wallet-btn {
+    .dark-mode .wallet-btn {
       background: #374151;
       color: white;
     }
     
-    .dark .wallet-btn:hover {
+    .dark-mode .wallet-btn:hover {
       background: #4B5563;
     }
     
@@ -160,7 +161,7 @@
       overflow-y: auto;
     }
     
-    .dark .wallet-modal-content {
+    .dark-mode .wallet-modal-content {
       background: #1f2937;
       color: #f0f0f0;
     }
@@ -182,7 +183,7 @@
       background: #f5f5f5;
     }
     
-    .dark .wallet-option:hover {
+    .dark-mode .wallet-option:hover {
       background: #374151;
     }
     
@@ -214,15 +215,15 @@
       color: #EF4444;
     }
     
-    .dark .text-gray-700 {
+    .dark-mode .text-gray-700 {
       color: #f0f0f0 !important;
     }
     
-    .dark .text-gray-600 {
+    .dark-mode .text-gray-600 {
       color: #d1d5db !important;
     }
     
-    .dark .text-gray-500 {
+    .dark-mode .text-gray-500 {
       color: #9ca3af !important;
     }
     
@@ -258,7 +259,7 @@
       font-size: 16px;
     }
     
-    .dark .wallet-connect-content {
+    .dark-mode .wallet-connect-content {
       background: #1f2937;
       color: #f0f0f0;
     }
@@ -281,7 +282,7 @@
       color: #666;
     }
     
-    .dark .wallet-connect-close {
+    .dark-mode .wallet-connect-close {
       color: #aaa;
     }
     
@@ -345,7 +346,7 @@
       font-size: 16px;
     }
     
-    .dark .wallet-address-display {
+    .dark-mode .wallet-address-display {
       background: rgba(255,255,255,0.1);
     }
     
@@ -358,7 +359,7 @@
       font-size: 16px;
     }
     
-    .dark .username-input {
+    .dark-mode .username-input {
       background: #1f2937;
       border-color: #4b5563;
       color: white;
@@ -399,7 +400,7 @@
       font-size: 16px;
     }
 
-    .dark .timer-digit {
+    .dark-mode .timer-digit {
       background: rgba(0, 0, 0, 0.2);
     }
     
@@ -414,7 +415,7 @@
       font-size: 14px;
     }
     
-    .dark .timer-reset-btn {
+    .dark-mode .timer-reset-btn {
       background: var(--secondary-dark);
     }
     
@@ -442,7 +443,7 @@
       overflow: hidden;
     }
     
-    .dark .wallet-icon {
+    .dark-mode .wallet-icon {
       background: #374151;
     }
     
@@ -455,7 +456,7 @@
       transition: all 0.3s ease;
     }
     
-    .dark .guide-section {
+    .dark-mode .guide-section {
       background: #1f2937;
     }
     
@@ -544,11 +545,11 @@
       transform: scale(1.1);
     }
     
-    .dark .wallet-help-btn {
+    .dark-mode .wallet-help-btn {
       background: rgba(255,255,255,0.1);
     }
     
-    .dark .wallet-help-btn:hover {
+    .dark-mode .wallet-help-btn:hover {
       background: rgba(255,255,255,0.2);
     }
     
@@ -583,7 +584,7 @@
       position: relative;
     }
     
-    .dark .help-modal-content {
+    .dark-mode .help-modal-content {
       background: #1f2937;
     }
     
@@ -596,7 +597,7 @@
       color: #666;
     }
     
-    .dark .help-close {
+    .dark-mode .help-close {
       color: #aaa;
     }
     
@@ -689,7 +690,7 @@
       color: var(--primary);
     }
     
-    .dark .platform-icon {
+    .dark-mode .platform-icon {
       background: rgba(16, 185, 129, 0.2);
     }
     
@@ -730,25 +731,6 @@
       z-index: 10000;
     }
     
-    /* ADDED FIXES */
-    .dark .guide-section {
-      background: #1f2937 !important;
-      color: #f0f0f0 !important;
-      border: 1px solid #374151;
-    }
-    
-    .dark .guide-section h2,
-    .dark .guide-section h3,
-    .dark .guide-section li {
-      color: #f0f0f0 !important;
-    }
-    
-    .dark .wallet-modal-content,
-    .dark .help-modal-content {
-      background: #1f2937 !important;
-      color: #f0f0f0 !important;
-    }
-    
     /* Logo styling */
     .logo-container {
       display: flex;
@@ -762,7 +744,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     
-    .dark .logo-container {
+    .dark-mode .logo-container {
       background: #374151;
     }
     
@@ -783,7 +765,7 @@
       transition: all 0.3s ease;
     }
     
-    .dark .tokenomics-section {
+    .dark-mode .tokenomics-section {
       background: #1f2937;
     }
     
@@ -802,7 +784,7 @@
       transition: all 0.3s ease;
     }
     
-    .dark .token-card {
+    .dark-mode .token-card {
       background: #374151;
     }
     
@@ -825,6 +807,10 @@
       padding: 24px;
       margin-bottom: 24px;
       transition: all 0.3s ease;
+    }
+    
+    .dark-mode .referral-section {
+      background: #1f2937;
     }
     
     .referral-box {
@@ -865,6 +851,10 @@
       transition: all 0.3s ease;
     }
     
+    .dark-mode .faq-section {
+      background: #1f2937;
+    }
+    
     .progress-bar {
       height: 8px;
       background: #e5e7eb;
@@ -873,7 +863,7 @@
       margin-top: 8px;
     }
     
-    .dark .progress-bar {
+    .dark-mode .progress-bar {
       background: #374151;
     }
     
@@ -901,7 +891,7 @@
       border-radius: 50px;
     }
     
-    .dark .social-proof-item {
+    .dark-mode .social-proof-item {
       background: #374151;
     }
     
@@ -927,7 +917,7 @@
       transform: translateX(0);
     }
     
-    .dark .floating-notification {
+    .dark-mode .floating-notification {
       background: #1f2937;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
@@ -955,47 +945,45 @@
       to { transform: rotate(360deg); }
     }
 
-    .dark .wallet-address-display {
+    .dark-mode .wallet-address-display {
       color: #f0f0f0 !important;
     }
 
-    .dark .username-input::placeholder {
+    .dark-mode .username-input::placeholder {
       color: #9ca3af !important;
     }
     
     /* Fix FAQ section in dark mode */
-    .dark .faq-section {
+    .dark-mode .faq-section {
       background: #1f2937 !important;
       color: #f0f0f0 !important;
-      border: 1px solid #374151;
     }
 
-    .dark .faq-question {
+    .dark-mode .faq-question {
       color: #f0f0f0 !important;
     }
 
-    .dark .faq-answer {
+    .dark-mode .faq-answer {
       color: #d1d5db !important;
     }
 
     /* Fix Airdrop form section in dark mode */
-    .dark .airdrop-section {
+    .dark-mode .airdrop-section {
       background: #1f2937 !important;
       color: #f0f0f0 !important;
-      border: 1px solid #374151;
     }
 
-    .dark .airdrop-section label {
+    .dark-mode .airdrop-section label {
       color: #f0f0f0 !important;
     }
 
-    .dark .airdrop-section input {
+    .dark-mode .airdrop-section input {
       background: #374151 !important;
       color: white !important;
       border-color: #4B5563 !important;
     }
 
-    .dark .airdrop-section input::placeholder {
+    .dark-mode .airdrop-section input::placeholder {
       color: #9ca3af !important;
     }
 
@@ -1006,17 +994,17 @@
     }
 
     /* Ensure all text in these sections is visible */
-    .dark .tasks-section,
-    .dark .airdrop-section,
-    .dark .faq-section,
-    .dark .referral-section,
-    .dark .tokenomics-section,
-    .dark .guide-section {
+    .dark-mode .tasks-section,
+    .dark-mode .airdrop-section,
+    .dark-mode .faq-section,
+    .dark-mode .referral-section,
+    .dark-mode .tokenomics-section,
+    .dark-mode .guide-section {
       color: #f0f0f0 !important;
     }
 
-    .dark .tasks-section label,
-    .dark .tasks-section span {
+    .dark-mode .tasks-section label,
+    .dark-mode .tasks-section span {
       color: #f0f0f0 !important;
     }
     
@@ -1025,29 +1013,29 @@
       background: white !important;
     }
 
-    .dark .bg-white {
+    .dark-mode .bg-white {
       background: #1f2937 !important;
     }
 
     /* Fix text colors in all sections */
-    .dark .text-gray-800 {
+    .dark-mode .text-gray-800 {
       color: #f0f0f0 !important;
     }
 
-    .dark .text-gray-900 {
+    .dark-mode .text-gray-900 {
       color: #f0f0f0 !important;
     }
 
-    .dark .text-gray-600 {
+    .dark-mode .text-gray-600 {
       color: #d1d5db !important;
     }
 
     /* Fix border colors in dark mode */
-    .dark .border-gray-200 {
+    .dark-mode .border-gray-200 {
       border-color: #374151 !important;
     }
 
-    .dark .border-gray-700 {
+    .dark-mode .border-gray-700 {
       border-color: #4B5563 !important;
     }
     
@@ -1060,7 +1048,7 @@
       color: #000000 !important;
     }
 
-    .dark .referral-input {
+    .dark-mode .referral-input {
       color: #ffffff !important;
       background: #374151 !important;
     }
@@ -1070,7 +1058,7 @@
       color: #666666 !important;
     }
 
-    .dark .referral-input::placeholder {
+    .dark-mode .referral-input::placeholder {
       color: #cccccc !important;
     }
     
@@ -1093,7 +1081,7 @@
       padding-bottom: 16px;
     }
 
-    .dark .faq-item {
+    .dark-mode .faq-item {
       border-color: #374151;
     }
 
@@ -1109,21 +1097,55 @@
       margin-top: 8px;
       display: none;
     }
-      /* Fix for Referral Section text in dark mode */
-  .dark .referral-section,
-  .dark .referral-section p,
-  .dark .referral-section h2,
-  .dark .referral-section h3 {
-    color: #f0f0f0 !important;
-  }
-  
-  .dark .referral-section p.text-gray-600 {
-    color: #d1d5db !important;
-  }
+    
+    /* Fix for Referral Section text in dark mode */
+    .dark-mode .referral-section,
+    .dark-mode .referral-section p,
+    .dark-mode .referral-section h2,
+    .dark-mode .referral-section h3 {
+      color: #f0f0f0 !important;
+    }
+    
+    .dark-mode .referral-section p.text-gray-600 {
+      color: #d1d5db !important;
+    }
+    
+    /* Fix for footer */
+    .dark-mode footer {
+      background: #1f2937 !important;
+      color: #d1d5db !important;
+    }
+    
+    /* Fix for header */
+    .dark-mode header {
+      background: #065f46 !important;
+    }
+    
+    /* Fix for all card backgrounds */
+    .dark-mode .bg-green-100 {
+      background-color: #064e3b !important;
+    }
+    
+    .dark-mode .bg-green-900 {
+      background-color: #064e3b !important;
+    }
+    
+    .dark-mode .text-green-200 {
+      color: #a7f3d0 !important;
+    }
+    
+    /* Fix for all text colors */
+    .dark-mode .text-gray-900 {
+      color: #f9fafb !important;
+    }
+    
+    .dark-mode .text-gray-300 {
+      color: #d1d5db !important;
+    }
   </style>
 </head>
 
-<body class="text-gray-800 dark:text-white">
+<body class="text-gray-800">
   <!-- Floating notification -->
   <div id="notification" class="floating-notification">
     <div id="notificationContent"></div>
@@ -1141,7 +1163,7 @@
       </h1>
     </div>
     <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 px-2 rounded text-black" aria-label="Toggle dark mode">
         <span id="darkModeIcon">🌙</span>
       </button>
       <div class="wallet-buttons" id="walletButtons">
@@ -1154,8 +1176,8 @@
 
   <main class="p-6 mx-auto w-full max-w-4xl">
     <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
-      <p class="text-gray-900 dark:text-gray-300">Claim your free FLUFFI tokens by completing simple tasks</p>
+      <h2 class="text-3xl font-bold text-green-600 mb-2">FLUFFI Token Airdrop</h2>
+      <p class="text-gray-900">Claim your free FLUFFI tokens by completing simple tasks</p>
       
       <!-- Social proof counters -->
       <div class="social-proof">
@@ -1202,7 +1224,7 @@
       </div>
     </div>
     
-    <!-- Tokenomics Section ->
+    <!-- Tokenomics Section -->
     <div class="tokenomics-section">
       <div class="guide-header">
         <div class="guide-icon">
@@ -1240,28 +1262,28 @@
     </div>
     
     <!-- Airdrop Status -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">Airdrop Status</h3>
-        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
       </div>
       
       <div class="space-y-4">
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Total Airdrop Allocation</p>
+          <p class="text-gray-600 mb-1">Total Airdrop Allocation</p>
           <p class="text-2xl font-bold">100,000,000 FLUFFI</p>
         </div>
         
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Tokens Claimed</p>
+          <p class="text-gray-600 mb-1">Tokens Claimed</p>
           <div class="progress-bar">
             <div id="progressFill" class="progress-fill" style="width: 38.22%"></div>
           </div>
-          <p class="text-right text-sm mt-1 text-gray-600 dark:text-gray-300">38,220,000 FLUFFI (38.22%)</p>
+          <p class="text-right text-sm mt-1 text-gray-600">38,220,000 FLUFFI (38.22%)</p>
         </div>
         
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
+          <p class="text-gray-600 mb-1">Airdrop Ends In</p>
           <div class="flex flex-wrap gap-4 justify-center">
             <div class="timer-digit">
               <div id="days" class="text-2xl font-mono font-bold">07</div>
@@ -1290,26 +1312,26 @@
     </div>
     
    <!-- Referral Section -->
-<div class="referral-section bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-6">
+<div class="referral-section bg-white p-6 rounded-xl shadow-lg mt-6">
   <div class="guide-header flex items-center mb-4">
-    <div class="guide-icon bg-green-100 dark:bg-green-900 p-3 rounded-full mr-4">
-      <i class="fas fa-user-friends text-green-600 dark:text-green-300"></i>
+    <div class="guide-icon bg-green-100 p-3 rounded-full mr-4">
+      <i class="fas fa-user-friends text-green-600"></i>
     </div>
-    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Refer Friends & Earn More</h2>
+    <h2 class="text-2xl font-bold text-gray-800">Refer Friends & Earn More</h2>
   </div>
-  <p class="text-gray-600 dark:text-gray-300 mb-6">Invite friends to join the airdrop and earn 10% of their token rewards</p>
+  <p class="text-gray-600 mb-6">Invite friends to join the airdrop and earn 10% of their token rewards</p>
   
-  <div class="referral-box bg-gray-50 dark:bg-gray-700 p-5 rounded-lg">
-    <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-3">Your Referral Link</h3>
+  <div class="referral-box bg-gray-50 p-5 rounded-lg">
+    <h3 class="font-bold text-lg text-gray-800 mb-3">Your Referral Link</h3>
     <div class="referral-input-group flex">
-      <input type="text" id="referralLink" class="referral-input flex-grow p-3 rounded-l-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500" value="https://fluffi.io/airdrop?ref=yourcode" readonly>
+      <input type="text" id="referralLink" class="referral-input flex-grow p-3 rounded-l-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" value="https://fluffi.io/airdrop?ref=yourcode" readonly>
       <button onclick="copyReferralLink()" class="referral-btn bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-r-lg font-medium transition-colors">Copy</button>
     </div>
-    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">Share this link with friends to earn bonus tokens</p>
+    <p class="mt-3 text-sm text-gray-600">Share this link with friends to earn bonus tokens</p>
   </div>
     
     <!-- Top Referrals Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
       <h3 class="text-xl font-semibold mb-4">Top Referrals</h3>
       <div class="overflow-x-auto">
         <table class="referral-table w-full">
@@ -1360,70 +1382,70 @@
     <!-- Reordered sections container -->
     <div class="sections-container">
       <!-- Tasks Section -->
-      <div class="tasks-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <div class="tasks-section bg-white rounded-lg shadow-lg p-6 mb-6">
         <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
         
         <div class="space-y-4">
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 rounded-lg">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task1" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50" disabled>
+              <label for="task1" class="text-gray-700">
                 Follow us on Twitter
               </label>
               <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
               <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
               <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
           </div>
           
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 rounded-lg">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task2" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50" disabled>
+              <label for="task2" class="text-gray-700">
                 Join our Telegram
               </label>
               <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
               <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
               <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+1,000 FLUFFI</span>
           </div>
           
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 rounded-lg">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task3" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50" disabled>
+              <label for="task3" class="text-gray-700">
                 Like & Retweet our pinned tweet
               </label>
               <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
               <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+3,000 FLUFFI</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+3,000 FLUFFI</span>
           </div>
         </div>
       </div>
       
       <!-- Airdrop Form -->
-      <div class="airdrop-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <div class="airdrop-section bg-white rounded-lg shadow-lg p-6">
         <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
         
         <form id="airdropForm">
           <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-            <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
+            <label class="block text-gray-700 mb-2">Email Address</label>
+            <input type="email" id="email" required class="w-full p-3 border rounded-lg">
           </div>
           
           <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+            <label class="block text-gray-700 mb-2">Wallet Address</label>
             <input type="text" id="walletAddress" required 
                   placeholder="0x..." 
-                  class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
+                  class="w-full p-3 border rounded-lg" readonly>
           </div>
           
           <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Referral Code (optional)</label>
-            <input type="text" id="referralCode" placeholder="Enter referral code" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
+            <label class="block text-gray-700 mb-2">Referral Code (optional)</label>
+            <input type="text" id="referralCode" placeholder="Enter referral code" class="w-full p-3 border rounded-lg">
           </div>
 
           <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg flex items-center justify-center font-bold">
@@ -1483,7 +1505,7 @@
     </div>
     
     <!-- Developer Test Section (Hidden in production) -->
-    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden">
+    <div id="devSection" class="bg-white rounded-lg shadow-lg p-6 mt-6 hidden">
       <h3 class="text-xl font-semibold mb-4">Developer Tools</h3>
       <div class="space-y-2">
         <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
@@ -1505,7 +1527,7 @@
     </div>
   </main>
 
-  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8">
+  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 bg-gray-100 mt-8">
     <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
     <div class="flex gap-4 justify-center md:justify-end">
       <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
@@ -1523,7 +1545,7 @@
 
   <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
-    <div class="wallet-modal-content dark:bg-gray-800">
+    <div class="wallet-modal-content">
       <div class="wallet-header">
         <h3 class="text-xl font-bold">Connect Wallet</h3>
         <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
@@ -1562,10 +1584,10 @@
 
   <!-- WalletConnect QR Code Modal -->
   <div id="walletConnectModal" class="wallet-connect-modal">
-    <div class="wallet-connect-content dark:bg-gray-800">
+    <div class="wallet-connect-content">
       <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
       <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <p class="text-gray-600 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
       <div id="walletConnectQrCode"></div>
       <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
     </div>
@@ -1573,7 +1595,7 @@
   
   <!-- Connection Help Modal -->
   <div id="connectionHelpModal" class="help-modal">
-    <div class="help-modal-content dark:bg-gray-800">
+    <div class="help-modal-content">
       <span class="help-close" onclick="closeHelpModal()">&times;</span>
       <div id="helpContent"></div>
     </div>
@@ -1607,10 +1629,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.matchMedia('(prefers-color-scheme: dark)').matches);
   
   if (isDarkMode) {
-    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark-mode');
     document.getElementById('darkModeIcon').textContent = '☀️';
   } else {
-    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark-mode');
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
@@ -2066,13 +2088,13 @@ function showWalletConnectFallback() {
         cursor: pointer;
         transition: background 0.2s;
       }
-      .dark .wallet-list-item {
+      .dark-mode .wallet-list-item {
         background: #374151;
       }
       .wallet-list-item:hover {
         background: #e5e7eb;
       }
-      .dark .wallet-list-item:hover {
+      .dark-mode .wallet-list-item:hover {
         background: #4b5563;
       }
       .wallet-list-item img {
@@ -2401,7 +2423,7 @@ function showNotification(message, type) {
     function createConfetti() {
       const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
       
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 150; i) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
@@ -2503,10 +2525,10 @@ function showNotification(message, type) {
 
     // Toggle dark mode function
     function toggleDarkMode() {
-      const html = document.documentElement;
-      const isDark = !html.classList.contains('dark');
+      const body = document.body;
+      const isDark = !body.classList.contains('dark-mode');
       
-      html.classList.toggle('dark', isDark);
+      body.classList.toggle('dark-mode', isDark);
       localStorage.setItem('darkMode', isDark);
       
       const darkModeIcon = document.getElementById('darkModeIcon');
@@ -2515,25 +2537,5 @@ function showNotification(message, type) {
       showNotification(`Dark mode ${isDark ? 'enabled' : 'disabled'}`, "success");
     }
   </script>
-  <script>async function recordReferral(referrer, userWallet) {
-  try {
-    const response = await fetch('/.netlify/functions/recordReferral', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        referrer: referrer,
-        userWallet: userWallet,
-        timestamp: Date.now()
-      })
-    });
-
-    const data = await response.json();
-    if (!data.success) throw new Error(data.error || "Failed to record referral");
-    console.log("Referral stored securely:", data);
-  } catch (err) {
-    console.error("Referral error:", err);
-  }
-}
-</script>
 </body>
 </html>
