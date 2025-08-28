@@ -2516,5 +2516,25 @@ function showNotification(message, type) {
       showNotification(`Dark mode ${isDark ? 'enabled' : 'disabled'}`, "success");
     }
   </script>
+  <script>async function recordReferral(referrer, userWallet) {
+  try {
+    const response = await fetch('/.netlify/functions/recordReferral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        referrer: referrer,
+        userWallet: userWallet,
+        timestamp: Date.now()
+      })
+    });
+
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || "Failed to record referral");
+    console.log("Referral stored securely:", data);
+  } catch (err) {
+    console.error("Referral error:", err);
+  }
+}
+</script>
 </body>
 </html>
