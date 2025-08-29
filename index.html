@@ -1808,11 +1808,11 @@ const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
   value: ethers.utils.parseEther(bnbValue)
 });
 
-const tx = await contract.contribute(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue),
-  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+const tx = await contract.buyTokens({
+  value: ethers.utils.parseEther("0.1") // amount in BNB
 });
-    await tx.wait();
+await tx.wait();
+console.log("Tokens purchased!");
 
     // 8️⃣ Record purchase on backend
     const tokensBought = bnbValue * 10000000; // Example token rate
