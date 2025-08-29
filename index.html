@@ -56,6 +56,12 @@
     <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
       <i class="fas fa-wallet"></i>Connect Wallet
     </button>
+  <div id="walletInfo" style="margin-top: 15px; padding: 10px; border: 1px solid #444; border-radius: 8px;">
+  <p><strong>Wallet:</strong> <span id="walletAddress">Not Connected</span></p>
+  <p><strong>Balance:</strong> <span id="userBalance">0</span> FLUFFI</p>
+  <p><strong>Staked:</strong> <span id="userStaked">0</span> FLUFFI</p>
+  <p><strong>Rewards:</strong> <span id="userRewards">0</span> FLUFFI</p>
+</div>
 </div>
 </nav>
     <input type="hidden" id="walletAddress" value="">
