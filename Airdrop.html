@@ -1840,9 +1840,9 @@
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         let bonusTokens = 0;
-        if (tasksCompleted.twitter) bonusTokens += 1000;
-        if (tasksCompleted.telegram) bonusTokens += 1000;
-        if (tasksCompleted.retweet) bonusTokens += 3000;
+        if (tasksCompleted.twitter) bonusTokens += 10000;
+        if (tasksCompleted.telegram) bonusTokens += 10000;
+        if (tasksCompleted.retweet) bonusTokens += 30000;
         
         createConfetti();
         alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
