@@ -1804,9 +1804,10 @@ const signer = provider.getSigner();
 const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue)
+const gasEstimate = await contract.estimateGas.buyTokens({
+  value: ethers.utils.parseEther("0.1")
 });
+console.log("Estimated gas:", gasEstimate.toString());
 
 const tx = await contract.buyTokens({
   value: ethers.utils.parseEther("0.1") // amount in BNB
