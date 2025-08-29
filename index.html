@@ -56,12 +56,6 @@
     <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
       <i class="fas fa-wallet"></i>Connect Wallet
     </button>
-  <div id="walletInfo" style="margin-top: 15px; padding: 10px; border: 1px solid #444; border-radius: 8px;">
-  <p><strong>Wallet:</strong> <span id="walletAddress">Not Connected</span></p>
-  <p><strong>Balance:</strong> <span id="userBalance">0</span> FLUFFI</p>
-  <p><strong>Staked:</strong> <span id="userStaked">0</span> FLUFFI</p>
-  <p><strong>Rewards:</strong> <span id="userRewards">0</span> FLUFFI</p>
-</div>
 </div>
 </nav>
     <input type="hidden" id="walletAddress" value="">
@@ -837,8 +831,8 @@ rotateFeed();
   
   <script>
 // Configuration
-    const FLUFFI_CONTRACT_ADDRESS = "0xd976e9E2da70810A290d1FFA05500AbE66F53C05";
-    const FLUFFI_CONTRACT_ABI = [{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"name":"recoverERC20","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"togglePresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"stateMutability":"payable","type":"receive"}]
+    const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+    const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
    const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
   chains: [56], // BSC Mainnet
@@ -1810,16 +1804,15 @@ const signer = provider.getSigner();
 const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.buyTokens({
-  value: ethers.utils.parseEther("0.1")
+const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+  value: ethers.utils.parseEther(bnbValue)
 });
-console.log("Estimated gas:", gasEstimate.toString());
 
-const tx = await contract.buyTokens({
-  value: ethers.utils.parseEther("0.1") // amount in BNB
+const tx = await contract.contribute(referralAddress, {
+  value: ethers.utils.parseEther(bnbValue),
+  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
 });
-await tx.wait();
-console.log("Tokens purchased!");
+    await tx.wait();
 
     // 8️⃣ Record purchase on backend
     const tokensBought = bnbValue * 10000000; // Example token rate
@@ -1848,8 +1841,8 @@ console.log("Tokens purchased!");
     <script>
     // ===== STAKING FUNCTIONS =====
 // Staking contract placeholder - replace with actual deployed address
-const STAKING_CONTRACT_ADDRESS = "0xd976e9E2da70810A290d1FFA05500AbE66F53C05"; // PLACEHOLDER - Replace with actual staking contract
-const STAKING_CONTRACT_ABI =
+const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
+const STAKING_CONTRACT_ABI = [
   "function stake(uint256 amount) external",
   "function unstake(uint256 amount) external", 
   "function getStakedBalance(address user) view returns (uint256)",
