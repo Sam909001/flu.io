@@ -1813,11 +1813,21 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Ensure user is on Testnet
-    await switchToNetwork('BSC_TEST');
-    await validateContracts();
+    // 3️⃣ Initialize provider & signer
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
 
-    // 4️⃣ Currency conversion
+    // 4️⃣ Detect chain & select contract address
+    const network = await provider.getNetwork();
+    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+    if (!contractAddress) throw new Error("Unsupported network");
+
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
+
+    // 5️⃣ Optional: Switch network if needed (your switchToNetwork function)
+    // await switchToNetwork(network.chainId);
+
+    // 6️⃣ Currency conversion
     const conversionRates = {
       'BNB': 1,
       'SOL': 0.0015,
@@ -1827,39 +1837,33 @@ async function buyFluffi() {
       'USD': 0.0015
     };
     const bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
-
     if (currency !== 'BNB') {
       showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
 
-    // 5️⃣ Prepare referral
+    // 7️⃣ Prepare referral address
     let referralAddress = ethers.constants.AddressZero;
     if (ref) {
       if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
       referralAddress = ref;
     }
 
-   // 6️⃣ Initialize provider & contract (ethers v5)
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+    // 8️⃣ Estimate gas & send transaction
+    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue)
+    });
 
-    // 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue)
-});
-
-const tx = await contract.buyTokens(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue),
-  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-});
+    const tx = await contract.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue),
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
     await tx.wait();
 
-    // 8️⃣ Record purchase on backend
+    // 9️⃣ Record purchase on backend
     const tokensBought = bnbValue * 10000000; // Example token rate
     await recordPurchase(tx.hash, Number(amount), tokensBought);
 
-    // 9️⃣ Update UI
+    // 🔟 Update UI
     const tokensSold = document.getElementById('tokensSold');
     const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
     tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
