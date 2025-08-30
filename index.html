@@ -380,7 +380,7 @@
     🐾 Secure Your Spot in the FLUFFI Revolution!
   </h1>
   <p class="text-xl md:text-2xl mb-8 font-light">
-    🚀 Limited Presale — Don’t Miss Out on the Next Big Meme Coin!
+    🚀 Limited Presale — Don't Miss Out on the Next Big Meme Coin!
   </p>
   <a href="#presale" 
      onclick="document.getElementById('presale').scrollIntoView({ behavior: 'smooth' }); return false;" 
@@ -572,13 +572,13 @@
       </div>
     </div>
 
-    <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
+    <!-- Staking Form -->
+    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-md mx-auto">
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">📈 Stake Your $FLUFFI</h3>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
-    </section>
+    </div>
     
     <!-- Claim Rewards -->
     <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
@@ -1038,50 +1038,103 @@ const NETWORKS = {
   }
 };
 
-// Contract addresses for each network (REPLACE WITH YOUR ACTUAL CONTRACT ADDRESSES)
+// Fixed contract addresses
 const CONTRACT_ADDRESSES = {
-  ETH_MAINNET: "YOUR_ETH_MAINNET_CONTRACT_ADDRESS",
-  ETH_TESTNET: "YOUR_ETH_TESTNET_CONTRACT_ADDRESS",
-  BSC_MAINNET: "YOUR_BSC_MAINNET_CONTRACT_ADDRESS",
-  BSC_TESTNET: "0x514947bF40Fe6816a606567Be1b4dFDD733B00DA", // Your existing BSC contract
-  AVAX_MAINNET: "YOUR_AVAX_MAINNET_CONTRACT_ADDRESS",
-  AVAX_TESTNET: "YOUR_AVAX_TESTNET_CONTRACT_ADDRESS",
-  MATIC_MAINNET: "YOUR_MATIC_MAINNET_CONTRACT_ADDRESS",
-  MATIC_TESTNET: "YOUR_MATIC_TESTNET_CONTRACT_ADDRESS",
-  SOL_MAINNET: "YOUR_SOL_MAINNET_CONTRACT_ADDRESS",
-  SOL_TESTNET: "YOUR_SOL_TESTNET_CONTRACT_ADDRESS"
+  ETH_MAINNET: "0x0000000000000000000000000000000000000000",
+  ETH_TESTNET: "0x0000000000000000000000000000000000000000",
+  BSC_MAINNET: "0x0000000000000000000000000000000000000000",
+  BSC_TESTNET: "0x514947bF40Fe6816a606567Be1b4dFDD733B00DA",
+  AVAX_MAINNET: "0x0000000000000000000000000000000000000000",
+  AVAX_TESTNET: "0x0000000000000000000000000000000000000000",
+  MATIC_MAINNET: "0x0000000000000000000000000000000000000000",
+  MATIC_TESTNET: "0x0000000000000000000000000000000000000000",
+  SOL_MAINNET: "YOUR_SOL_MAINNET_PROGRAM_ID",
+  SOL_TESTNET: "YOUR_SOL_TESTNET_PROGRAM_ID"
 };
 
-// Contract ABIs for each network (REPLACE WITH YOUR ACTUAL CONTRACT ABIs)
+// Contract ABIs for each network
 const CONTRACT_ABIS = {
-  ETH_MAINNET: [...],
-  ETH_TESTNET: [...],
-  BSC_MAINNET: [...],
-  BSC_TESTNET: [...],
-  AVAX_MAINNET: [...],
-  AVAX_TESTNET: [...],
-  MATIC_MAINNET: [...],
-  MATIC_TESTNET: [...],
-  // Note: Solana uses a different program interface, not ABI
+  ETH_MAINNET: [],
+  ETH_TESTNET: [],
+  BSC_MAINNET: [],
+  BSC_TESTNET: [],
+  AVAX_MAINNET: [],
+  AVAX_TESTNET: [],
+  MATIC_MAINNET: [],
+  MATIC_TESTNET: []
 };
-
-// Default network
-let currentNetwork = "BSC_TESTNET";
-let countdownInterval = null;
-let presaleInterval = null;
 
 // Global variables
-let userWalletAddress = null;
-let tasksCompleted = {
-  twitter: false,
-  telegram: false,
-  retweet: false
-};
+let currentNetwork = "BSC_TESTNET";
 let countdownInterval = null;
+let userWalletAddress = null;
 let provider = null;
 
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  const darkMode = localStorage.getItem('darkMode');
+  const isDarkMode = darkMode === 'true' || 
+                    (darkMode === null && 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+  
+  // Initialize network selector
+  const savedNetwork = localStorage.getItem('selectedNetwork');
+  if (savedNetwork && NETWORKS[savedNetwork]) {
+    currentNetwork = savedNetwork;
+  }
+  document.getElementById('networkSelect').value = currentNetwork;
+  updateCurrencyDisplay();
+  updateContractInfo();
+  updateNetworkIndicator();
+  
+  // Initialize countdown timer
+  initializeCountdown();
+  
+  // Initialize token chart
+  initTokenChart();
+  
+  // Initialize live feed
+  initializeLiveFeed();
+  
+  // Check for referral parameter
+  checkReferral();
+  
+  // Listen for network changes
+  if (window.ethereum) {
+    window.ethereum.on('chainChanged', (chainId) => {
+      // Find network by chainId
+      const networkKey = Object.keys(NETWORKS).find(key => 
+        NETWORKS[key].chainId === chainId && !NETWORKS[key].isSolana
+      );
+      
+      if (networkKey) {
+        currentNetwork = networkKey;
+        localStorage.setItem('selectedNetwork', networkKey);
+        document.getElementById('networkSelect').value = networkKey;
+        updateCurrencyDisplay();
+        updateContractInfo();
+        updateNetworkIndicator();
+        showNotification(`Switched to ${NETWORKS[networkKey].name}`, "info");
+      } else {
+        showNotification("Unsupported network. Please switch to a supported network.", "warning");
+      }
+      
+      // Reload the page to ensure everything works correctly
+      window.location.reload();
+    });
+  }
+});
+
 // ===== NETWORK FUNCTIONS =====
-// REPLACE the entire changeNetwork function (around line 516-570)
 async function changeNetwork(networkKey) {
   const network = NETWORKS[networkKey];
   if (!network) {
@@ -1140,10 +1193,6 @@ async function changeNetwork(networkKey) {
       }
     }
   }
-}
-  
-  // Update contract info
-  updateContractInfo();
 }
 
 function updateCurrencyDisplay() {
@@ -1205,12 +1254,14 @@ function updateContractInfo() {
   
   // Update contract address display if you have one
   const contractElement = document.getElementById('contractAddress');
-  if (contractElement && contractAddress && contractAddress !== "YOUR_CONTRACT_ADDRESS") {
+  if (contractElement && contractAddress && contractAddress !== "0x0000000000000000000000000000000000000000") {
     contractElement.textContent = `${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}`;
     contractElement.href = `${network.explorer}/address/${contractAddress}`;
     contractElement.classList.remove("hidden");
-  } else {
-    contractElement.classList.add("hidden");
+  } else if (contractElement) {
+    contractElement.textContent = "Not deployed yet";
+    contractElement.href = "#";
+    contractElement.classList.remove("hidden");
   }
 }
 
@@ -1242,181 +1293,110 @@ function showConnectionHelp(walletType, event) {
   event.stopPropagation();
   closeWalletModal();
   
-  let title, content;
+  let content;
   
   switch(walletType) {
     case 'metamask':
-      title = "How to Connect MetaMask";
       content = `
-        <div class="help-title">
-          <div class="help-icon-wrapper">
-            <i class="fas fa-fox help-icon"></i>
+        <h3 class="text-lg font-bold mb-4">MetaMask Connection Guide</h3>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold">Browser Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
+              <li>Create a new wallet or import an existing one</li>
+              <li>Click "Connect Wallet" on our site and select MetaMask</li>
+              <li>Approve the connection request in the MetaMask popup</li>
+              <li>Your wallet address will appear when connected</li>
+            </ol>
           </div>
-          <span>MetaMask Connection Guide</span>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-desktop"></i>
-            </div>
-            <h3>Browser Instructions</h3>
+          <div>
+            <h4 class="font-semibold">Mobile Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install the MetaMask app from your app store</li>
+              <li>Open our website in the MetaMask in-app browser</li>
+              <li>Tap "Connect Wallet" and select MetaMask</li>
+              <li>Approve the connection request in the app</li>
+            </ol>
           </div>
-          <ol class="help-steps">
-            <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
-            <li>Create a new wallet or import an existing one</li>
-            <li>Click "Connect Wallet" on our site and select MetaMask</li>
-            <li>Approve the connection request in the MetaMask popup</li>
-            <li>Your wallet address will appear when connected</li>
-          </ol>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Mobile Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Install the MetaMask app from your app store</li>
-            <li>Open our website in the MetaMask in-app browser</li>
-            <li>Tap "Connect Wallet" and select MetaMask</li>
-            <li>Approve the connection request in the app</li>
-            <li>For direct connection, open our site via MetaMask browser</li>
-          </ol>
         </div>
       `;
       break;
       
     case 'trust':
-      title = "How to Connect Trust Wallet";
       content = `
-        <div class="help-title">
-          <div class="help-icon-wrapper">
-            <i class="fas fa-shield-alt help-icon"></i>
+        <h3 class="text-lg font-bold mb-4">Trust Wallet Connection Guide</h3>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold">Browser Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install Trust Wallet extension for your browser</li>
+              <li>Set up your wallet and secure your recovery phrase</li>
+              <li>Click "Connect Wallet" and select Trust Wallet</li>
+              <li>Approve the connection request in the extension</li>
+            </ol>
           </div>
-          <span>Trust Wallet Connection Guide</span>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-desktop"></i>
-            </div>
-            <h3>Browser Instructions</h3>
+          <div>
+            <h4 class="font-semibold">Mobile Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install Trust Wallet from App Store or Play Store</li>
+              <li>Open our website in Trust Wallet's DApp browser</li>
+              <li>Tap "Connect Wallet" and select Trust Wallet</li>
+              <li>Approve the connection request in the app</li>
+            </ol>
           </div>
-          <ol class="help-steps">
-            <li>Install Trust Wallet extension for your browser</li>
-            <li>Set up your wallet and secure your recovery phrase</li>
-            <li>Click "Connect Wallet" and select Trust Wallet</li>
-            <li>Approve the connection request in the extension</li>
-            <li>Your wallet will be connected to our dApp</li>
-          </ol>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Mobile Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Install Trust Wallet from App Store or Play Store</li>
-            <li>Open our website in Trust Wallet's DApp browser</li>
-            <li>Tap "Connect Wallet" and select Trust Wallet</li>
-            <li>Approve the connection request in the app</li>
-            <li>For WalletConnect, scan the QR code from mobile</li>
-          </ol>
         </div>
       `;
       break;
       
     case 'walletconnect':
-      title = "How to Use WalletConnect";
       content = `
-        <div class="help-title">
-          <div class="help-icon-wrapper">
-            <i class="fas fa-qrcode help-icon"></i>
+        <h3 class="text-lg font-bold mb-4">WalletConnect Guide</h3>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold">Browser Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Select WalletConnect from the wallet options</li>
+              <li>Choose your preferred wallet from the list</li>
+              <li>Follow the connection instructions for your wallet</li>
+              <li>Approve the connection request in your wallet</li>
+            </ol>
           </div>
-          <span>WalletConnect Guide</span>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-desktop"></i>
-            </div>
-            <h3>Browser Instructions</h3>
+          <div>
+            <h4 class="font-semibold">Mobile Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Make sure you have a compatible wallet installed</li>
+              <li>Select WalletConnect from the wallet options</li>
+              <li>Choose your wallet from the list of installed wallets</li>
+              <li>Approve the connection request in your wallet app</li>
+            </ol>
           </div>
-          <ol class="help-steps">
-            <li>Select WalletConnect from the wallet options</li>
-            <li>Choose your preferred wallet from the list</li>
-            <li>Follow the connection instructions for your wallet</li>
-            <li>Approve the connection request in your wallet</li>
-            <li>Your wallet will be connected to our dApp</li>
-          </ol>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Mobile Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Make sure you have a compatible wallet installed</li>
-            <li>Select WalletConnect from the wallet options</li>
-            <li>Choose your wallet from the list of installed wallets</li>
-            <li>Approve the connection request in your wallet app</li>
-            <li>Your wallet will connect to our dApp</li>
-          </ol>
         </div>
       `;
       break;
       
     case 'phantom':
-      title = "How to Connect Phantom Wallet";
       content = `
-        <div class="help-title">
-          <div class="help-icon-wrapper">
-            <i class="fas fa-ghost help-icon"></i>
+        <h3 class="text-lg font-bold mb-4">Phantom Wallet Guide</h3>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold">Browser Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
+              <li>Create a new wallet or import an existing one</li>
+              <li>Click "Connect Wallet" and select Phantom</li>
+              <li>Approve the connection request in the Phantom popup</li>
+            </ol>
           </div>
-          <span>Phantom Wallet Guide</span>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-desktop"></i>
-            </div>
-            <h3>Browser Instructions</h3>
+          <div>
+            <h4 class="font-semibold">Mobile Instructions:</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+              <li>Install Phantom app from App Store or Play Store</li>
+              <li>Open our website in Phantom's in-app browser</li>
+              <li>Tap "Connect Wallet" and select Phantom</li>
+              <li>Approve the connection request in the app</li>
+            </ol>
           </div>
-          <ol class="help-steps">
-            <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
-            <li>Create a new wallet or import an existing one</li>
-            <li>Click "Connect Wallet" and select Phantom</li>
-            <li>Approve the connection request in the Phantom popup</li>
-            <li>Your Solana address will connect to our dApp</li>
-          </ol>
-        </div>
-        
-        <div class="help-platform">
-          <div class="platform-header">
-            <div class="platform-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3>Mobile Instructions</h3>
-          </div>
-          <ol class="help-steps">
-            <li>Install Phantom app from App Store or Play Store</li>
-            <li>Open our website in Phantom's in-app browser</li>
-            <li>Tap "Connect Wallet" and select Phantom</li>
-            <li>Approve the connection request in the app</li>
-            <li>For direct connection, open our site via Phantom browser</li>
-          </ol>
         </div>
       `;
       break;
@@ -1473,7 +1453,7 @@ async function connectWallet(walletType) {
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
       if (walletButton && !userWalletAddress) {
-        walletButton.innerHTML = '<i class="fas fa-wallet mr-2"></i>Connect Wallet';
+        walletButton.innerHTML = '<i class="fas fa-wallet"></i>Connect Wallet';
         walletButton.disabled = false;
       }
     }, 2000);
@@ -1498,7 +1478,7 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
-        return; // Exit here to prevent redirect
+        return;
       } catch (error) {
         console.error("MetaMask connection error:", error);
         showNotification("Connection failed: " + error.message, "error");
@@ -1512,7 +1492,7 @@ async function connectMetaMask() {
       window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
     }
   } else {
-    // Desktop logic remains the same
+    // Desktop logic
     if (window.ethereum && window.ethereum.isMetaMask) {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       handleWalletConnection(accounts[0]);
@@ -1558,7 +1538,6 @@ async function connectTrustWallet() {
 }
 
 // WalletConnect connection
-// REPLACE connectWalletConnect function
 async function connectWalletConnect() {
   try {
     if (isMobile()) {
@@ -1572,32 +1551,6 @@ async function connectWalletConnect() {
   } catch (error) {
     console.error("WalletConnect error:", error);
     showNotification("Connection failed", "error");
-  }
-}
-// Phantom connection
-async function connectPhantom() {
-  if (isMobile()) {
-    if (window.phantom && window.phantom.solana) {
-      try {
-        const response = await window.phantom.solana.connect();
-        handleWalletConnection(response.publicKey.toString());
-      } catch (error) {
-        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-      }
-    } else {
-      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-    }
-  } else {
-    if (window.phantom && window.phantom.solana) {
-      try {
-        const response = await window.phantom.solana.connect();
-        handleWalletConnection(response.publicKey.toString());
-      } catch (error) {
-        throw new Error("Failed to connect Phantom wallet");
-      }
-    } else {
-      throw new Error("Please install Phantom wallet");
-    }
   }
 }
 
@@ -1675,8 +1628,8 @@ async function disconnectWallet() {
   const walletButtons = document.getElementById('walletButtons');
   walletButtons.innerHTML = `
     <button id="walletButton" onclick="openWalletModal()" 
-    class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
-      <i class="fas fa-wallet mr-2"></i>Connect Wallet
+    class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2">
+      <i class="fas fa-wallet"></i>Connect Wallet
     </button>
   `;
   
@@ -1718,19 +1671,17 @@ function showNotification(message, type = 'info') {
   };
   
   notification.innerHTML = `
-    <div class="fixed top-20 right-4 z-50 animate-slide-in">
-      <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
-        <span class="text-2xl">${icons[type]}</span>
-        <div class="flex-1">
-          <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
-          <p class="text-sm">${message}</p>
-        </div>
-        <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+    <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
+      <span class="text-2xl">${icons[type]}</span>
+      <div class="flex-1">
+        <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+        <p class="text-sm">${message}</p>
       </div>
+      <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
     </div>
   `;
   
@@ -1747,12 +1698,6 @@ function showNotification(message, type = 'info') {
 
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
-  // Rate limiter check
-  if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
-    showNotification('Too many attempts. Please wait.', 'warning');
-    return;
-  }
-
   // Get user inputs
   const amount = document.getElementById('amountInput').value;
   const currency = document.getElementById('currencySelect').value;
@@ -1769,211 +1714,30 @@ async function buyFluffi() {
     return;
   }
 
-  const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-  const prevText = buyBtn.textContent;
-  buyBtn.textContent = '⏳ Processing...';
-  buyBtn.disabled = true;
-
-  try {
-    const network = NETWORKS[currentNetwork];
-    
-    // For Solana networks, use a different approach
-    if (network.isSolana) {
-      await buyWithSolana(amount, currency, ref);
-    } else {
-      // For EVM networks
-      await switchToNetwork(currentNetwork);
-      await validateContracts();
-
-      // Currency conversion rates
-      const conversionRates = await getConversionRates(currency, network.currency);
-      const nativeValue = (Number(amount) * conversionRates).toFixed(6);
-
-      // Prepare referral
-      let referralAddress = ethers.constants.AddressZero;
-      if (ref) {
-        if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
-        referralAddress = ref;
-      }
-
-      // Initialize provider & contract
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
-      const contractABI = CONTRACT_ABIS[currentNetwork];
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      // Estimate gas & send transaction
-      const gasEstimate = await contract.estimateGas.buyTokens({
-        value: ethers.utils.parseEther(nativeValue)
-      });
-
-      const tx = await contract.buyTokens({
-        value: ethers.utils.parseEther(nativeValue)
-      });
-      await tx.wait();
-
-      // Record purchase on backend
-      const tokensBought = await calculateTokensBought(nativeValue, network.currency);
-      await recordPurchase(tx.hash, Number(amount), tokensBought, network.currency);
-
-      // Update UI
-      updateTokensSold(tokensBought);
-      showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
-    }
-
-    await updateUserBalances();
-    buyBtn.textContent = prevText;
-    buyBtn.disabled = false;
-
-  } catch (err) {
-    console.error("Buy error:", err);
-    buyBtn.textContent = '🚀 Buy Now';
-    buyBtn.disabled = false;
-    showNotification(err.message || "Transaction failed", 'error');
-  }
-}
-
-// Helper function for Solana purchases
-async function buyWithSolana(amount, currency, ref) {
-  // This would be implemented differently for Solana
-  // You would use @solana/web3.js and your Solana program
-  
-  showNotification("Solana support coming soon!", "info");
-  throw new Error("Solana support not yet implemented");
-}
-
-// Get conversion rates between currencies
-async function getConversionRates(fromCurrency, toCurrency) {
-  // In a real implementation, you would fetch this from an API
-  const rates = {
-    'ETH': { 'ETH': 1, 'USDC': 1/3000, 'USDT': 1/3000, 'DAI': 1/3000, 'USD': 1/3000 },
-    'BNB': { 'BNB': 1, 'USDC': 1/500, 'USDT': 1/500, 'DAI': 1/500, 'USD': 1/500 },
-    'AVAX': { 'AVAX': 1, 'USDC': 1/30, 'USDT': 1/30, 'DAI': 1/30, 'USD': 1/30 },
-    'MATIC': { 'MATIC': 1, 'USDC': 1/0.8, 'USDT': 1/0.8, 'DAI': 1/0.8, 'USD': 1/0.8 },
-    'SOL': { 'SOL': 1, 'USDC': 1/80, 'USDT': 1/80, 'DAI': 1/80, 'USD': 1/80 }
-  };
-  
-  if (rates[toCurrency] && rates[toCurrency][fromCurrency]) {
-    return rates[toCurrency][fromCurrency];
-  }
-  
-  return 1; // Default to 1:1 if no rate found
-}
-
-// Rate limiter to prevent spam
-const rateLimiter = {
-  attempts: {},
-  canAttempt(action, wallet, maxAttempts = 5, windowMs = 60000) {
-    const key = `${action}_${wallet}`;
-    const now = Date.now();
-    if (!this.attempts[key]) this.attempts[key] = [];
-
-    // Clean old attempts
-    this.attempts[key] = this.attempts[key].filter(time => now - time < windowMs);
-
-    if (this.attempts[key].length >= maxAttempts) return false;
-
-    this.attempts[key].push(now);
-    return true;
-  }
-};
-
-// Backend purchase recorder
-async function recordPurchase(txHash, amount, tokens, currency) {
-  // In a real implementation, you would send this to your backend
-  console.log(`Recording purchase: ${amount} ${currency} for ${tokens} FLUFFI, TX: ${txHash}`);
-  
-  // Simulate API call
-  return new Promise(resolve => setTimeout(resolve, 1000));
-}
-
-// Network switch function
-async function switchToNetwork(networkKey) {
-  if (!window.ethereum) return;
-  
-  const network = NETWORKS[networkKey];
-  if (!network || network.isSolana) return;
-  
-  try {
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: network.chainId }],
-    });
-  } catch (error) {
-    if (error.code === 4902) {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: network.chainId,
-          chainName: network.name,
-          rpcUrls: [network.rpcUrl],
-          nativeCurrency: {
-            name: network.currency,
-            symbol: network.currencySymbol,
-            decimals: 18
-          },
-          blockExplorerUrls: [network.explorer]
-        }]
-      });
-    }
-  }
-}
-
-// Validate contract deployment & network
-async function validateContracts() {
-  const network = NETWORKS[currentNetwork];
-  
-  if (network.isSolana) {
-    // Solana validation would be different
+  const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
+  if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+    showNotification("Smart contract not deployed on this network yet", "warning");
     return;
   }
-  
-  const provider = new ethers.providers.JsonRpcProvider(network.rpcUrl);
-  const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
 
-  // Check if contract is deployed
-  const presaleCode = await provider.getCode(contractAddress);
-  if (presaleCode === "0x") throw new Error(`Presale contract not deployed on ${network.name}`);
-
-  // Verify network
-  const providerNetwork = await provider.getNetwork();
-  const expectedChainId = parseInt(network.chainId, 16);
-  if (providerNetwork.chainId !== expectedChainId) {
-    throw new Error(`Please switch to ${network.name}`);
-  }
-
-  console.log("Contract validation passed ✅");
-}
-
-// Calculate tokens bought
-async function calculateTokensBought(amount, currency) {
-  // This would use the actual token price from the contract
-  // For now, we'll use a fixed rate for demonstration
-  const rate = 10000; // 1 BNB = 10,000 FLUFFI (example rate)
-  return amount * rate;
-}
-
-// Update tokens sold display
-function updateTokensSold(amount) {
-  const tokensSold = document.getElementById('tokensSold');
-  const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
-  tokensSold.textContent = (currentSold + amount).toLocaleString();
+  showNotification("Transaction would be sent to smart contract when deployed", "info");
 }
 
 // ===== TIMER FUNCTIONS =====
 function initializeCountdown() {
-  // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
-  const startTime = new Date('2025-08-27T00:00:00Z').getTime();
-  // No need to store in localStorage since it's fixed
+  // Clear any existing interval
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+  
+  // Fixed presale start time
+  const startTime = new Date('2025-01-27T00:00:00Z').getTime();
   
   // Update timer immediately
   updateTimer(startTime);
   
   // Set interval to update timer every second
-  if (!presaleInterval) {
-    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
-  }
+  countdownInterval = setInterval(() => updateTimer(startTime), 1000);
 }
 
 // Update timer display
@@ -2006,35 +1770,47 @@ function updateTimer(startTime) {
     };
   };
   
-  // Update main timer
+  // Update main timer - fix element IDs
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+  
   if (timeLeft <= 0) {
-    document.getElementById('days').textContent = '00';
-    document.getElementById('hours').textContent = '00';
-    document.getElementById('minutes').textContent = '00';
-    document.getElementById('seconds').textContent = '00';
-    clearInterval(presaleInterval);
+    if (daysEl) daysEl.textContent = '00';
+    if (hoursEl) hoursEl.textContent = '00';
+    if (minutesEl) minutesEl.textContent = '00';
+    if (secondsEl) secondsEl.textContent = '00';
+    clearInterval(countdownInterval);
   } else {
     const totalFormatted = formatTime(timeLeft);
-    document.getElementById('days').textContent = totalFormatted.days;
-    document.getElementById('hours').textContent = totalFormatted.hours;
-    document.getElementById('minutes').textContent = totalFormatted.minutes;
-    document.getElementById('seconds').textContent = totalFormatted.seconds;
+    if (daysEl) daysEl.textContent = totalFormatted.days;
+    if (hoursEl) hoursEl.textContent = totalFormatted.hours;
+    if (minutesEl) minutesEl.textContent = totalFormatted.minutes;
+    if (secondsEl) secondsEl.textContent = totalFormatted.seconds;
   }
   
   // Update stage info
-  document.getElementById('current-stage').textContent = currentStage + 1;
+  const stageEl = document.getElementById('current-stage');
+  const stageTimeEl = document.getElementById('stage-time-left');
+  const progressEl = document.getElementById('stageProgressBar');
+  
+  if (stageEl) stageEl.textContent = currentStage + 1;
   
   const stageFormatted = formatTime(stageTimeLeft);
-  document.getElementById('stage-time-left').textContent = stageFormatted.full;
+  if (stageTimeEl) stageTimeEl.textContent = stageFormatted.full;
   
   // Update progress bar
   const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
   const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
-  document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
+  if (progressEl) progressEl.style.width = `${totalProgress}%`;
   
   // Update price (5% increase per stage)
   const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
+  const priceEl = document.getElementById('currentPrice');
+  if (priceEl) {
+    priceEl.innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
+  }
 }
 
 // Reset timer function
@@ -2074,8 +1850,8 @@ function resetTimer() {
   
   showNotification("Timer reset successfully", "success");
 }
+
 // ===== STAKING FUNCTIONS =====
-// REPLACE stakeFluffi function (around line 1244-1290)
 async function stakeFluffi() {
   try {
     if (!userWalletAddress) {
@@ -2099,74 +1875,11 @@ async function stakeFluffi() {
       return;
     }
     
-    const stakeBtn = document.querySelector('#staking button');
-    const originalText = stakeBtn.textContent;
-    stakeBtn.disabled = true;
-    stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-    
-    try {
-      // Real staking with smart contract
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      
-      // This would be your actual staking contract
-      // For now, show message that staking will be available after deployment
-      showNotification("Smart contract staking will be available after mainnet deployment", "info");
-      
-    } catch (error) {
-      console.error("Staking error:", error);
-      showNotification("Staking failed: " + error.message, "error");
-    } finally {
-      stakeBtn.disabled = false;
-      stakeBtn.textContent = originalText;
-    }
+    showNotification("Smart contract staking will be available after mainnet deployment", "info");
     
   } catch (error) {
     console.error("Stake error:", error);
     showNotification(error.message || "Staking failed", "error");
-  }
-}
-
-function updateStakingDisplay() {
-  updateStakingDashboard();
-}
-
-async function updateStakingDashboard() {
-  // Get values from localStorage (simulated for now)
-  const walletAddress = localStorage.getItem('walletAddress');
-  
-  if (walletAddress) {
-    // Retrieve stored staking info
-    const stakingInfo = JSON.parse(localStorage.getItem(`staking_${walletAddress}`) || '{}');
-    const totalStaked = stakingInfo.amount || 0;
-    
-    // Calculate earnings based on APY (90%)
-    const timeDiff = stakingInfo.timestamp ? (Date.now() - stakingInfo.timestamp) / (365 * 24 * 60 * 60 * 1000) : 0;
-    const userEarnings = totalStaked * 0.9 * timeDiff;
-    
-    // Get balance from localStorage
-    const userBalance = parseFloat(localStorage.getItem(`balance_${walletAddress}`) || '0');
-    
-    // Update UI
-    document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
-    document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
-    document.getElementById('user-earnings').textContent = userEarnings.toFixed(2);
-    
-    // Progress based on time until listing (30 days from start)
-    const startTime = new Date('2025-01-27T00:00:00Z').getTime();
-    const listingTime = startTime + (30 * 24 * 60 * 60 * 1000);
-    const now = Date.now();
-    const claimPercent = Math.min(((now - startTime) / (listingTime - startTime)) * 100, 100);
-    
-    document.getElementById('claim-percent').textContent = Math.floor(claimPercent) + "%";
-    document.getElementById('claim-progress').style.width = claimPercent + "%";
-  } else {
-    // Default values when not connected
-    document.getElementById('total-staked').textContent = '0';
-    document.getElementById('user-balance-value').textContent = '0';
-    document.getElementById('user-earnings').textContent = '0';
-    document.getElementById('claim-percent').textContent = "0%";
-    document.getElementById('claim-progress').style.width = "0%";
   }
 }
 
@@ -2179,70 +1892,7 @@ async function claimTokens() {
       return;
     }
     
-    // Check if presale has ended
-    const presaleEndTime = getPresaleEndTime();
-    const now = Date.now();
-    
-    if (now < presaleEndTime) {
-      const timeLeft = formatTime(presaleEndTime - now);
-      showNotification(`Presale hasn't ended yet. ${timeLeft.full} remaining`, "warning");
-      return;
-    }
-    
-    // Get user's purchase data
-    const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
-    const claims = JSON.parse(localStorage.getItem(`claims_${userWalletAddress}`) || '[]');
-    
-    // Calculate total claimable
-    const totalPurchased = purchases.reduce((sum, p) => sum + p.tokens, 0);
-    const totalClaimed = claims.reduce((sum, c) => sum + c.amount, 0);
-    const claimable = totalPurchased - totalClaimed;
-    
-    if (claimable <= 0) {
-      showNotification("No tokens available to claim", "info");
-      return;
-    }
-    
-    const claimBtn = document.querySelector('button[onclick="claimTokens()"]');
-    const originalText = claimBtn.textContent;
-    claimBtn.disabled = true;
-    claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
-    
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      
-      // For now, simulate claim (replace with actual contract call when deployed)
-      // In production, this would call the claim function on the contract
-      
-      setTimeout(() => {
-        // Record the claim
-        const claimRecord = {
-          amount: claimable,
-          timestamp: Date.now(),
-          txHash: '0x' + Math.random().toString(16).substr(2, 64) // Simulated tx hash
-        };
-        
-        claims.push(claimRecord);
-        localStorage.setItem(`claims_${userWalletAddress}`, JSON.stringify(claims));
-        
-        // Update balances
-        const currentBalance = parseFloat(localStorage.getItem(`balance_${userWalletAddress}`) || '0');
-        localStorage.setItem(`balance_${userWalletAddress}`, (currentBalance + claimable).toString());
-        
-        claimBtn.disabled = false;
-        claimBtn.textContent = originalText;
-        
-        updateUserBalances();
-        showNotification(`Successfully claimed ${claimable.toFixed(2)} FLUFFI!`, "success");
-      }, 3000);
-      
-    } catch (error) {
-      console.error("Claim error:", error);
-      claimBtn.disabled = false;
-      claimBtn.textContent = originalText;
-      showNotification("Claim failed: " + error.message, "error");
-    }
+    showNotification("Claim will be available after presale ends", "info");
     
   } catch (error) {
     console.error("Claim error:", error);
@@ -2250,66 +1900,7 @@ async function claimTokens() {
   }
 }
 
-// Add helper function for presale end time
-function getPresaleEndTime() {
-  const startTime = getPresaleStartTime();
-  return startTime + (15 * 48 * 60 * 60 * 1000); // 15 stages * 48 hours
-}
-
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // Set initial start time to now (for testing)
-    startTime = Date.now();
-    // For production, you might want to set a fixed start time:
-    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
-    localStorage.setItem('presaleStartTime', startTime);
-  }
-  return parseInt(startTime);
-}
-
-function formatTime(ms) {
-  const days = Math.floor(ms / (24 * 3600 * 1000));
-  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
-  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-  
-  return {
-    days: days.toString().padStart(2, '0'),
-    hours: hours.toString().padStart(2, '0'),
-    minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0'),
-    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-  };
-}
-
 // ===== UTILITY FUNCTIONS =====
-async function updateUserBalances() {
-  if (!userWalletAddress) return;
-  
-  try {
-    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
-    const fluffiContract = new ethers.Contract(
-      FLUFFI_CONTRACT_ADDRESS,
-      FLUFFI_CONTRACT_ABI,
-      provider
-    );
-    
-    const [balance, staked, rewards] = await Promise.all([
-      fluffiContract.balanceOf(userWalletAddress),
-      fluffiContract.stakedBalance(userWalletAddress),
-      fluffiContract.calculateRewards(userWalletAddress)
-    ]);
-    
-    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
-    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
-    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
-    
-  } catch (error) {
-    console.error("Balance update error:", error);
-  }
-}
-
 function toggleDarkMode() {
   const html = document.documentElement;
   html.classList.toggle('dark');
@@ -2320,14 +1911,14 @@ function toggleDarkMode() {
   darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
   
   // Update chart colors if needed
-  if (tokenChart) {
+  if (window.tokenChart) {
     const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
+    window.tokenChart.options.plugins.legend.labels.color = isDark ? '#E5E7EB' : '#374151';
+    window.tokenChart.update();
   }
 }
 
-// REPLACE initTokenChart function (around line 1415-1485)
+// Token chart initialization
 function initTokenChart() {
   // Wait for Chart.js to load
   if (typeof Chart === 'undefined') {
@@ -2426,162 +2017,26 @@ function initTokenChart() {
     console.error('Failed to initialize token chart:', error);
   }
 }
-      
-// ==== TIMER FUNCTIONS =====
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // Set initial start time to now (for testing)
-    startTime = Date.now();
-    // For production, you might want to set a fixed start time:
-    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
-    localStorage.setItem('presaleStartTime', startTime);
+
+// ===== REFERRAL FUNCTIONS =====
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
+    document.getElementById('refInput').value = ref;
   }
-  return parseInt(startTime);
 }
 
-function formatTime(ms) {
-  const days = Math.floor(ms / (24 * 3600 * 1000));
-  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
-  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-  
-  return {
-    days: days.toString().padStart(2, '0'),
-    hours: hours.toString().padStart(2, '0'),
-    minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0'),
-    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-  };
-}
-
-function updateNextIncreaseTime() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
-  const timeLeft = nextStageTime - now;
-  
-  const formatted = formatTime(timeLeft);
-  document.getElementById('nextIncreaseTime').textContent = formatted.full;
-}
-
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
-  const timeLeft = endTime - now;
-
-  // Calculate stage progress
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / (48 * 3600 * 1000)),
-    14 // Max stage index
-  );
-  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
-  const stageTimeLeft = stageEndTime - now;
-  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
-
-  // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
-
-  // Update price
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
-
-  // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
+async function connectReferralWallet() {
+  if (!userWalletAddress) {
+    openWalletModal();
   } else {
-    const formattedTotal = formatTime(timeLeft);
-    const formattedStage = formatTime(stageTimeLeft);
-    
-    document.getElementById('presale-days').textContent = formattedTotal.days;
-    document.getElementById('presale-hours').textContent = formattedTotal.hours;
-    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
-    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
-    
-    document.getElementById('stage-time-left').textContent = formattedStage.full;
+    showReferralUI(userWalletAddress);
   }
 }
 
-// Initialize the timer
-function initTimer() {
-  updateTimers();
-  updateNextIncreaseTime();
-  // Update every second
-  setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
-}
-
-// Initialize everything when page loads
-// REPLACE the DOMContentLoaded event listener (around line 1574-1600)
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  const darkMode = localStorage.getItem('darkMode');
-  const isDarkMode = darkMode === 'true' || 
-                    (darkMode === null && 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches);
-  
-  if (isDarkMode) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
-
-  // Initialize other components
-  initTokenChart();
-  initializeCountdown();
-  initializeLiveFeed();
-  checkReferral();
-});
-
-// Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  }
-}
-    // ===== REFERRAL FUNCTIONS =====
-    function checkReferral() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get('ref');
-      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-        document.getElementById('refInput').value = ref;
-      }
-    }
-
-    async function connectReferralWallet() {
-      if (!userWalletAddress) {
-        await connectWallet();
-      }
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
-
-    function showReferralUI(wallet) {
+function showReferralUI(wallet) {
   const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
-  
-  // Get referral stats from localStorage
-  const referrals = JSON.parse(localStorage.getItem(`referrals_${wallet}`) || '[]');
-  const totalReferrals = referrals.length;
-  const totalEarnings = referrals.reduce((sum, r) => sum + (parseFloat(r.amount) * 0.1), 0); // 10% commission
   
   document.getElementById('referralSection').innerHTML = `
     <div class="space-y-4">
@@ -2596,8 +2051,8 @@ function toggleDarkMode() {
         </div>
       </div>
       <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">${totalReferrals}</span></p>
-        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">${totalEarnings.toFixed(4)} BNB</span></p>
+        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
+        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 BNB</span></p>
       </div>
       <div class="mt-4">
         <p class="text-sm mb-2 font-semibold">Share your link:</p>
@@ -2613,75 +2068,25 @@ function toggleDarkMode() {
     </div>
   `;
 }
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
-    }
 
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
-    }
+function copyReferralLink() {
+  const input = document.getElementById('referralLinkInput');
+  input.select();
+  document.execCommand('copy');
+  showNotification("Referral link copied to clipboard!", "success");
+}
 
-    function shareOnTelegram() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
-    }
-  </script>
-  
-<script>
-  const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
-  const ERC20_ABI = [
-    "function balanceOf(address owner) view returns (uint256)",
-    "function decimals() view returns (uint8)"
-  ];
+function shareOnTwitter() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+}
 
-  async function loadFluffiBalance() {
-    if (!window.ethereum) {
-      console.warn("No wallet provider found");
-      return;
-    }
+function shareOnTelegram() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+}
 
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const userAddress = accounts[0];
-
-      const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
-      const decimals = await contract.decimals();
-      const rawBalance = await contract.balanceOf(userAddress);
-      const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
-
-      document.getElementById("user-balance-value").textContent =
-        parseFloat(formattedBalance).toLocaleString();
-    } catch (err) {
-      console.error("Error fetching balance:", err);
-    }
-  }
-
-  // Load once connected
-  window.addEventListener("load", loadFluffiBalance);
-
-  // Update if user changes wallet
-  if (window.ethereum) {
-    window.ethereum.on("accountsChanged", loadFluffiBalance);
-  }
-</script>
-  <script>
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    });
-  });
-</script>
-<script>
-// Simulated live feed since contract isn't deployed on mainnet yet
+// Simulated live feed
 function initializeLiveFeed() {
   const feedList = document.getElementById('feed-list');
   
@@ -2718,8 +2123,19 @@ function initializeLiveFeed() {
   setInterval(addActivity, 5000);
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initializeLiveFeed);
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
 </script>
 </body>
 </html>
