@@ -1784,6 +1784,55 @@ async function validateContracts() {
   console.log("Contract validation passed ✅");
 }
 // ===== BUY FUNCTION =====
+   /**
+ * Switches the user's network to the specified chainId.
+ * If the chain is not added to MetaMask, it prompts the user to add it.
+ * @param {string} chainId - The chain ID in hexadecimal format (e.g., '0x89' for Polygon).
+ * @param {string} chainName - The name of the chain (e.g., 'Polygon Mainnet').
+ * @param {string} rpcUrl - The RPC URL for the chain.
+ * @param {string} nativeCurrencyName - The name of the native currency (e.g., 'MATIC').
+ * @param {string} nativeCurrencySymbol - The symbol of the native currency (e.g., 'MATIC').
+ * @param {number} nativeCurrencyDecimals - The decimals of the native currency (e.g., 18).
+ * @param {string} blockExplorerUrl - The URL of the block explorer for the chain.
+ */
+async function switchNetwork(chainId, chainName, rpcUrl, nativeCurrencyName, nativeCurrencySymbol, nativeCurrencyDecimals, blockExplorerUrl) {
+  try {
+    // Check if the Ethereum provider is available
+    if (window.ethereum) {
+      // Request to switch the network
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId }]
+      });
+      console.log(`Switched to ${chainName}`);
+    }
+  } catch (switchError) {
+    // If the chain is not added to MetaMask, add it
+    if (switchError.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId,
+            chainName,
+            rpcUrls: [rpcUrl],
+            nativeCurrency: {
+              name: nativeCurrencyName,
+              symbol: nativeCurrencySymbol,
+              decimals: nativeCurrencyDecimals
+            },
+            blockExplorerUrls: [blockExplorerUrl]
+          }]
+        });
+        console.log(`${chainName} added to MetaMask`);
+      } catch (addError) {
+        console.error(`Failed to add ${chainName} to MetaMask:`, addError);
+      }
+    } else {
+      console.error(`Failed to switch to ${chainName}:`, switchError);
+    }
+  }
+}
 async function buyFluffi() {
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
