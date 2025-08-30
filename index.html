@@ -2824,6 +2824,16 @@ if (window.ethereum) {
     updateUIForNetwork('custom', `Unknown (${chainId})`);
   });
 }
+    // 2️⃣ Add event listener for the presale network selector
+document.addEventListener('DOMContentLoaded', () => {
+  const presaleSelect = document.getElementById('presaleNetworkSelect');
+  if (presaleSelect) {
+    presaleSelect.addEventListener('change', async function() {
+      const selectedChainId = this.value;
+      await switchNetwork(selectedChainId);
+    });
+  }
+});
 </script>
 </body>
 </html>
