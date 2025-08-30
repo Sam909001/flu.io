@@ -1836,9 +1836,21 @@ async function switchNetwork(chainId, chainName, rpcUrl, nativeCurrencyName, nat
     }
   }
 }
- </script>
-  <script>
 // ===== BUY FUNCTION =====
+// --- Multichain contract addresses ---
+const CONTRACT_ADDRESSES = {
+  1: "0x...EthereumMainnet",
+  5: "0x...GoerliTestnet",
+  56: "0x...BSCMainnet",
+  97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
+  137: "0x...PolygonMainnet",
+  80001: "0xE47565637b477dc1De60dfcCB98015806fd22176",
+  43114: "0x...AvalancheMainnet",
+  43113: "0x...AvalancheFujiTestnet"
+};
+
+const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ReferralRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REFERRAL_PERCENT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimReferralRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCurrentTokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referralRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
 async function buyFluffi() {
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
@@ -1848,7 +1860,7 @@ async function buyFluffi() {
 
   // 2️⃣ Get user inputs
   const amount = document.getElementById('amountInput').value;
-  const currency = 'BNB'; // Default to BNB since there's no currency select in your HTML
+  const currency = document.getElementById('currencySelect').value;
   const ref = document.getElementById('refInput').value;
 
   if (!userWalletAddress) {
@@ -1868,11 +1880,21 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Ensure user is on Testnet
-    await switchToNetwork('BSC_TEST');
-    await validateContracts();
+    // 3️⃣ Initialize provider & signer
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
 
-    // 4️⃣ Currency conversion
+    // 4️⃣ Detect chain & select contract address
+    const network = await provider.getNetwork();
+    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+    if (!contractAddress) throw new Error("Unsupported network");
+
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
+
+    // 5️⃣ Optional: Switch network if needed (your switchToNetwork function)
+    // await switchToNetwork(network.chainId);
+
+    // 6️⃣ Currency conversion
     const conversionRates = {
       'BNB': 1,
       'SOL': 0.0015,
@@ -1882,39 +1904,33 @@ async function buyFluffi() {
       'USD': 0.0015
     };
     const bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
-
     if (currency !== 'BNB') {
       showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
 
-    // 5️⃣ Prepare referral
+    // 7️⃣ Prepare referral address
     let referralAddress = ethers.constants.AddressZero;
     if (ref) {
       if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
       referralAddress = ref;
     }
 
-   // 6️⃣ Initialize provider & contract (ethers v5)
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+    // 8️⃣ Estimate gas & send transaction
+    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue)
+    });
 
-// 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue)
-});
-
-const tx = await contract.buyTokens(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue),
-  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-});
+    const tx = await contract.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue),
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
     await tx.wait();
 
-    // 8️⃣ Record purchase on backend
+    // 9️⃣ Record purchase on backend
     const tokensBought = bnbValue * 10000000; // Example token rate
     await recordPurchase(tx.hash, Number(amount), tokensBought);
 
-    // 9️⃣ Update UI
+    // 🔟 Update UI
     const tokensSold = document.getElementById('tokensSold');
     const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
     tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
@@ -1933,9 +1949,6 @@ const tx = await contract.buyTokens(referralAddress, {
     showNotification(err.message || "Transaction failed", 'error');
   }
 }
- </script>
- </script>
-    <script>
     // ===== STAKING FUNCTIONS =====
 // Staking contract placeholder - replace with actual deployed address
 const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
