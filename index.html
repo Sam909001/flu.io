@@ -1067,6 +1067,8 @@ const CONTRACT_ABIS = {
 
 // Default network
 let currentNetwork = "BSC_TESTNET";
+let countdownInterval = null;
+let presaleInterval = null;
 
 // Global variables
 let userWalletAddress = null;
@@ -1078,92 +1080,8 @@ let tasksCompleted = {
 let countdownInterval = null;
 let provider = null;
 
-// ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  const darkMode = localStorage.getItem('darkMode');
-  const isDarkMode = darkMode === 'true' || 
-                    (darkMode === null && 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches);
-  
-  if (isDarkMode) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
-  
-  // Initialize network selector
-  const savedNetwork = localStorage.getItem('selectedNetwork');
-  if (savedNetwork && NETWORKS[savedNetwork]) {
-    currentNetwork = savedNetwork;
-  }
-  document.getElementById('networkSelect').value = currentNetwork;
-  updateCurrencyDisplay();
-  updateContractInfo();
-  updateNetworkIndicator();
-  
-  // Setup form submission
-  document.getElementById('airdropForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    claimAirdrop();
-  });
-  
-  // Setup wallet button
-  document.getElementById('walletButton').addEventListener('click', openWalletModal);
-  
-  // Just check if wallet was previously connected but don't auto-reconnect
-  const savedAddress = localStorage.getItem('walletAddress');
-  if (savedAddress) {
-    // Clear the saved address to prevent auto-reconnect attempts
-    localStorage.removeItem('walletAddress');
-    localStorage.removeItem('walletConnected');
-  }
-  
-  // Initialize countdown timer
-  initializeCountdown();
-  
-  // Load completed tasks from localStorage
-  const savedTasks = localStorage.getItem('completedTasks');
-  if (savedTasks) {
-    tasksCompleted = JSON.parse(savedTasks);
-    updateTaskUI();
-  }
-  
-  // Initialize token chart
-  initTokenChart();
-  
-  // Initialize live feed
-  initializeLiveFeed();
-  
-  // Listen for network changes
-  if (window.ethereum) {
-    window.ethereum.on('chainChanged', (chainId) => {
-      // Find network by chainId
-      const networkKey = Object.keys(NETWORKS).find(key => 
-        NETWORKS[key].chainId === chainId && !NETWORKS[key].isSolana
-      );
-      
-      if (networkKey) {
-        currentNetwork = networkKey;
-        localStorage.setItem('selectedNetwork', networkKey);
-        document.getElementById('networkSelect').value = networkKey;
-        updateCurrencyDisplay();
-        updateContractInfo();
-        updateNetworkIndicator();
-        showNotification(`Switched to ${NETWORKS[networkKey].name}`, "info");
-      } else {
-        showNotification("Unsupported network. Please switch to a supported network.", "warning");
-      }
-      
-      // Reload the page to ensure everything works correctly
-      window.location.reload();
-    });
-  }
-});
-
 // ===== NETWORK FUNCTIONS =====
+// REPLACE the entire changeNetwork function (around line 516-570)
 async function changeNetwork(networkKey) {
   const network = NETWORKS[networkKey];
   if (!network) {
@@ -1171,17 +1089,18 @@ async function changeNetwork(networkKey) {
     return;
   }
   
-  // Update current network
+  // Update current network first
+  const oldNetwork = currentNetwork;
   currentNetwork = networkKey;
   localStorage.setItem('selectedNetwork', networkKey);
   
-  // Update UI
+  // Update UI immediately
   document.getElementById('networkSelect').value = networkKey;
   updateCurrencyDisplay();
   updateContractInfo();
   updateNetworkIndicator();
   
-  // If wallet is connected and it's an EVM network, switch network
+  // If wallet is connected and it's an EVM network, try to switch
   if (userWalletAddress && window.ethereum && !network.isSolana) {
     try {
       await window.ethereum.request({
@@ -1190,33 +1109,38 @@ async function changeNetwork(networkKey) {
       });
       showNotification(`Switched to ${network.name}`, "success");
     } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: network.chainId,
-                chainName: network.name,
-                rpcUrls: [network.rpcUrl],
-                nativeCurrency: {
-                  name: network.currency,
-                  symbol: network.currencySymbol,
-                  decimals: 18
-                },
-                blockExplorerUrls: [network.explorer]
-              }
-            ]
+            params: [{
+              chainId: network.chainId,
+              chainName: network.name,
+              rpcUrls: [network.rpcUrl],
+              nativeCurrency: {
+                name: network.currency,
+                symbol: network.currencySymbol,
+                decimals: 18
+              },
+              blockExplorerUrls: [network.explorer]
+            }]
           });
+          showNotification(`Added and switched to ${network.name}`, "success");
         } catch (addError) {
-          showNotification(`Failed to add ${network.name}: ${addError.message}`, "error");
+          showNotification(`Failed to add ${network.name}`, "error");
+          // Revert network change
+          currentNetwork = oldNetwork;
+          document.getElementById('networkSelect').value = oldNetwork;
         }
       } else {
-        showNotification(`Failed to switch to ${network.name}: ${switchError.message}`, "error");
+        showNotification(`Failed to switch network`, "error");
+        // Revert network change
+        currentNetwork = oldNetwork;
+        document.getElementById('networkSelect').value = oldNetwork;
       }
     }
   }
+}
   
   // Update contract info
   updateContractInfo();
@@ -1634,16 +1558,22 @@ async function connectTrustWallet() {
 }
 
 // WalletConnect connection
+// REPLACE connectWalletConnect function
 async function connectWalletConnect() {
   try {
-    showNotification("WalletConnect support coming soon!", "info");
-    // WalletConnect implementation would go here
+    if (isMobile()) {
+      // For mobile, try to open in wallet app
+      const currentUrl = encodeURIComponent(window.location.href);
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+    } else {
+      // For desktop, show message about WalletConnect v2
+      showNotification("Please use MetaMask or Trust Wallet extension", "info");
+    }
   } catch (error) {
     console.error("WalletConnect error:", error);
-    showNotification("Failed to connect", "error");
+    showNotification("Connection failed", "error");
   }
 }
-
 // Phantom connection
 async function connectPhantom() {
   if (isMobile()) {
@@ -2109,30 +2039,43 @@ function updateTimer(startTime) {
 
 // Reset timer function
 function resetTimer() {
-  // Clear intervals
-  if (presaleInterval) {
-    clearInterval(presaleInterval);
-    presaleInterval = null;
+  // Clear existing interval
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
   }
   
-  // Remove stored start time
-  localStorage.removeItem('presaleStartTime');
+  // Reset all timer displays to initial state
+  const elements = ['days', 'hours', 'minutes', 'seconds'];
+  elements.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '00';
+  });
   
-  // Reset displays
-  document.getElementById('days').textContent = '00';
-  document.getElementById('hours').textContent = '00';
-  document.getElementById('minutes').textContent = '00';
-  document.getElementById('seconds').textContent = '00';
-  document.getElementById('current-stage').textContent = '1';
-  document.getElementById('stage-time-left').textContent = '00d 00h 00m 00s';
-  document.getElementById('stageProgressBar').style.width = '0%';
-  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
+  // Reset stage info
+  const stageEl = document.getElementById('current-stage');
+  const stageTimeEl = document.getElementById('stage-time-left');
+  const progressEl = document.getElementById('stageProgressBar');
   
-  // Reinitialize the timer
-  initializeCountdown();
+  if (stageEl) stageEl.textContent = '1';
+  if (stageTimeEl) stageTimeEl.textContent = '00d 00h 00m 00s';
+  if (progressEl) progressEl.style.width = '0%';
+  
+  // Reset price
+  const priceEl = document.getElementById('currentPrice');
+  if (priceEl) {
+    priceEl.innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
+  }
+  
+  // Reinitialize the timer after a short delay
+  setTimeout(() => {
+    initializeCountdown();
+  }, 100);
+  
+  showNotification("Timer reset successfully", "success");
 }
-
 // ===== STAKING FUNCTIONS =====
+// REPLACE stakeFluffi function (around line 1244-1290)
 async function stakeFluffi() {
   try {
     if (!userWalletAddress) {
@@ -2149,68 +2092,33 @@ async function stakeFluffi() {
       return;
     }
     
+    // Check if we have a real staking contract
+    const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
+    if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+      showNotification("Staking not available on this network yet", "warning");
+      return;
+    }
+    
     const stakeBtn = document.querySelector('#staking button');
     const originalText = stakeBtn.textContent;
     stakeBtn.disabled = true;
     stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
     
     try {
-      // Check if staking contract is deployed
-      if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-        // Fallback to local storage simulation for now
-        const stakingInfo = {
-          amount: amountNum,
-          timestamp: Date.now(),
-          apy: 90,
-          wallet: userWalletAddress,
-          lastClaim: Date.now()
-        };
-        
-        const existingStake = localStorage.getItem(`staking_${userWalletAddress}`);
-        if (existingStake) {
-          const existing = JSON.parse(existingStake);
-          stakingInfo.amount += existing.amount;
-        }
-        
-        localStorage.setItem(`staking_${userWalletAddress}`, JSON.stringify(stakingInfo));
-        
-        setTimeout(() => {
-          stakeBtn.disabled = false;
-          stakeBtn.textContent = originalText;
-          document.getElementById('stakeInput').value = '';
-          updateStakingDisplay();
-          showNotification(`Successfully staked ${amountNum} FLUFFI!`, "success");
-        }, 2000);
-      } else {
-        // Real staking with smart contract
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const stakingContract = new ethers.Contract(STAKING_CONTRACT_ADDRESS, STAKING_CONTRACT_ABI, signer);
-        
-        // Convert amount to wei
-        const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
-        
-        // First approve FLUFFI tokens for staking contract
-        const fluffiContract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, ["function approve(address spender, uint256 amount) returns (bool)"], signer);
-        const approveTx = await fluffiContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
-        await approveTx.wait();
-        
-        // Then stake
-        const stakeTx = await stakingContract.stake(amountWei);
-        await stakeTx.wait();
-        
-        stakeBtn.disabled = false;
-        stakeBtn.textContent = originalText;
-        document.getElementById('stakeInput').value = '';
-        
-        updateStakingDisplay();
-        showNotification(`Successfully staked ${amountNum} FLUFFI! TX: ${stakeTx.hash}`, "success");
-      }
+      // Real staking with smart contract
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      
+      // This would be your actual staking contract
+      // For now, show message that staking will be available after deployment
+      showNotification("Smart contract staking will be available after mainnet deployment", "info");
+      
     } catch (error) {
       console.error("Staking error:", error);
+      showNotification("Staking failed: " + error.message, "error");
+    } finally {
       stakeBtn.disabled = false;
       stakeBtn.textContent = originalText;
-      showNotification("Staking failed: " + error.message, "error");
     }
     
   } catch (error) {
@@ -2419,9 +2327,19 @@ function toggleDarkMode() {
   }
 }
 
+// REPLACE initTokenChart function (around line 1415-1485)
 function initTokenChart() {
+  // Wait for Chart.js to load
+  if (typeof Chart === 'undefined') {
+    setTimeout(initTokenChart, 100);
+    return;
+  }
+  
   const ctx = document.getElementById('tokenChart');
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn('Token chart canvas not found');
+    return;
+  }
   
   const isDark = document.documentElement.classList.contains('dark');
   
@@ -2437,7 +2355,8 @@ function initTokenChart() {
         '#EF4444', // Red
         '#8B5CF6'  // Purple
       ],
-      borderWidth: 0,
+      borderWidth: 2,
+      borderColor: isDark ? '#374151' : '#ffffff',
       hoverOffset: 15
     }]
   };
@@ -2448,33 +2367,36 @@ function initTokenChart() {
     data: data,
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true,
       cutout: '65%',
       plugins: {
         legend: {
           position: 'bottom',
           labels: {
-            color: isDark ? '#E2E8F0' : '#1F2937',
+            color: isDark ? '#E5E7EB' : '#374151',
             font: {
-              size: 14,
-              family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+              size: 12,
+              family: "'Inter', sans-serif"
             },
-            padding: 20
+            padding: 15,
+            usePointStyle: true
           }
         },
         tooltip: {
-          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: isDark ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           titleColor: isDark ? '#10B981' : '#059669',
-          bodyColor: isDark ? '#E2E8F0' : '#1F2937',
+          bodyColor: isDark ? '#E5E7EB' : '#374151',
+          borderColor: isDark ? '#4B5563' : '#D1D5DB',
+          borderWidth: 1,
           titleFont: {
-            size: 16,
+            size: 14,
             weight: 'bold'
           },
           bodyFont: {
-            size: 14
+            size: 12
           },
-          padding: 15,
-          cornerRadius: 12,
+          padding: 12,
+          cornerRadius: 8,
           callbacks: {
             label: function(context) {
               return `${context.label.split(' (')[0]}: ${context.parsed}%`;
@@ -2485,39 +2407,25 @@ function initTokenChart() {
       animation: {
         animateScale: true,
         animateRotate: true,
-        duration: 2000,
+        duration: 1500,
         easing: 'easeOutQuart'
       }
     }
   };
   
-  // Create the chart
-  const tokenChart = new Chart(ctx, config);
-  
-  // Update chart on theme change
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.attributeName === 'class') {
-        const isDark = document.documentElement.classList.contains('dark');
-        tokenChart.options.plugins.legend.labels.color = isDark ? '#E2E8F0' : '#1F2937';
-        tokenChart.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-        tokenChart.options.plugins.tooltip.titleColor = isDark ? '#10B981' : '#059669';
-        tokenChart.options.plugins.tooltip.bodyColor = isDark ? '#E2E8F0' : '#1F2937';
-        tokenChart.update();
-      }
-    });
-  });
-  
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  });
+  try {
+    // Destroy existing chart if it exists
+    if (window.tokenChart) {
+      window.tokenChart.destroy();
+    }
+    
+    // Create the chart
+    window.tokenChart = new Chart(ctx, config);
+    console.log('Token chart initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize token chart:', error);
+  }
 }
-
-// Initialize the chart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initTokenChart();
-});
       
 // ==== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
@@ -2609,11 +2517,15 @@ function initTimer() {
 }
 
 // Initialize everything when page loads
+// REPLACE the DOMContentLoaded event listener (around line 1574-1600)
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  const darkMode = localStorage.getItem('darkMode');
+  const isDarkMode = darkMode === 'true' || 
+                    (darkMode === null && 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDarkMode) {
     document.documentElement.classList.add('dark');
     document.getElementById('darkModeIcon').textContent = '☀️';
   } else {
@@ -2621,18 +2533,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
 
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-  }
-
-  // Initialize token chart
+  // Initialize other components
   initTokenChart();
-
-  // Initialize timers
-  initTimer();
-
-  // Check for referral parameter
+  initializeCountdown();
+  initializeLiveFeed();
   checkReferral();
 });
 
