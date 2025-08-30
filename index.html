@@ -7,8 +7,8 @@
   <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token">
   <meta name="author" content="FLUFFI Team">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
   <title>$FLUFFI Presale & Staking</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
@@ -18,301 +18,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-  <style>
-    /* Custom styles */
-    .logo-float {
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    .wallet-modal, .wallet-connect-modal, .help-modal {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    
-    .wallet-modal.active, .wallet-connect-modal.active, .help-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .wallet-modal-content, .wallet-connect-content, .help-modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 12px;
-      position: relative;
-    }
-    
-    .dark .wallet-modal-content, 
-    .dark .wallet-connect-content, 
-    .dark .help-modal-content {
-      background-color: #1f2937;
-      color: white;
-    }
-    
-    .wallet-close, .wallet-connect-close, .help-close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .wallet-close:hover, .wallet-close:focus,
-    .wallet-connect-close:hover, .wallet-connect-close:focus,
-    .help-close:hover, .help-close:focus {
-      color: black;
-      text-decoration: none;
-    }
-    
-    .dark .wallet-close, .dark .wallet-connect-close, .dark .help-close {
-      color: #ccc;
-    }
-    
-    .dark .wallet-close:hover, .dark .wallet-close:focus,
-    .dark .wallet-connect-close:hover, .dark .wallet-connect-close:focus,
-    .dark .help-close:hover, .dark .help-close:focus {
-      color: white;
-    }
-    
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .wallet-option:hover {
-      background-color: #f5f5f5;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .dark .wallet-option {
-      border-color: #4b5563;
-    }
-    
-    .dark .wallet-option:hover {
-      background-color: #374151;
-    }
-    
-    .wallet-option img {
-      width: 32px;
-      height: 32px;
-    }
-    
-    .wallet-help-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-color: #e5e7eb;
-      color: #4b5563;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .dark .wallet-help-btn {
-      background-color: #4b5563;
-      color: #e5e7eb;
-    }
-    
-    .wallet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .price-tooltip {
-      position: relative;
-      display: inline-block;
-      margin-left: 5px;
-    }
-    
-    .price-tooltip .tooltip-text {
-      visibility: hidden;
-      width: 200px;
-      background-color: #1f2937;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -100px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 12px;
-    }
-    
-    .price-tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-    
-    .dark .price-tooltip .tooltip-text {
-      background-color: #f3f4f6;
-      color: #1f2937;
-    }
-    
-    .wallet-address-display {
-      background-color: #e5e7eb;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-family: monospace;
-      margin-right: 10px;
-    }
-    
-    .dark .wallet-address-display {
-      background-color: #374151;
-      color: white;
-    }
-    
-    .disconnect-btn {
-      background-color: #ef4444;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    
-    .disconnect-btn:hover {
-      background-color: #dc2626;
-    }
-    
-    .section-title {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 2rem;
-    }
-    
-    .section-title:after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, #10b981, #3b82f6);
-      border-radius: 2px;
-    }
-    
-    .trust-card {
-      transition: all 0.3s ease;
-    }
-    
-    .trust-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark .trust-card:hover {
-      box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1);
-    }
-    
-    .notification-toast {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      z-index: 1000;
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-    }
-    
-    .animate-slide-out {
-      animation: slideOut 0.3s ease-out;
-    }
-    
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    /* Network indicator styles */
-    .network-indicator {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    
-    .network-testnet {
-      background-color: #f59e0b;
-      color: #92400e;
-    }
-    
-    .network-mainnet {
-      background-color: #10b981;
-      color: #064e3b;
-    }
-    
-    /* Animation for live feed items */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate-fade-in {
-      animation: fadeIn 0.5s ease-out;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preload" href="fluffi.jpg" as="image">
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -329,64 +38,41 @@
       </h1>
     </div>
    
-    <!-- Navigation with network selector -->
-    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
-      <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
-      <a href="#presale" class="text-white hover:underline">Presale</a>
-      <a href="#staking" class="text-white hover:underline">Staking</a>
-      <a href="#faq" class="text-white hover:underline">FAQ</a>
-      <a href="referral.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Referral</a>
-      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Whitepaper</a>
-      <a href="how-to-buy.html" target="_blank" rel="noopener noreferrer" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
-        How to Buy FLUFFI
-      </a>
-      
-      <!-- Network Selector -->
-      <div class="network-selector">
-        <select id="networkSelect" class="p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-700" onchange="changeNetwork(this.value)">
-          <option value="ETH_MAINNET">Ethereum</option>
-          <option value="ETH_TESTNET">Ethereum Testnet</option>
-          <option value="BSC_MAINNET">BNB Chain</option>
-          <option value="BSC_TESTNET" selected>BNB Testnet</option>
-          <option value="AVAX_MAINNET">Avalanche</option>
-          <option value="AVAX_TESTNET">Avalanche Fuji</option>
-          <option value="MATIC_MAINNET">Polygon</option>
-          <option value="MATIC_TESTNET">Polygon Mumbai</option>
-          <option value="SOL_MAINNET">Solana</option>
-          <option value="SOL_TESTNET">Solana Testnet</option>
-        </select>
-      </div>
-      
-      <!-- Network Indicator -->
-      <div id="networkIndicator" class="network-indicator network-testnet">Testnet</div>
-      
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
-        <span id="darkModeIcon">🌙</span>
-      </button>
-      
-      <div class="wallet-buttons" id="walletButtons">
-        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
-          <i class="fas fa-wallet"></i>Connect Wallet
-        </button>
-      </div>
-    </nav>
+<!-- Replace your current navigation with this -->
+<nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
+  <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
+  <a href="#presale" class="text-white hover:underline">Presale</a>
+  <a href="#staking" class="text-white hover:underline">Staking</a>
+  <a href="#faq" class="text-white hover:underline">FAQ</a>
+  <a href="referral.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Referral</a>
+  <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Whitepaper</a>
+  <a href="how-to-buy.html" target="_blank" rel="noopener noreferrer" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
+    How to Buy FLUFFI
+  </a>
+  <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
+    <span id="darkModeIcon">🌙</span>
+  </button>
+<div class="wallet-buttons" id="walletButtons">
+    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
+      <i class="fas fa-wallet"></i>Connect Wallet
+    </button>
+</div>
+</nav>
     <input type="hidden" id="walletAddress" value="">
-  </div>
 </header>
-
 <!-- Hero Messaging Section -->
 <section id="hero-message" class="py-16 px-6 text-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white shadow-xl">
   <h1 class="text-4xl md:text-5xl font-extrabold mb-6 animate-bounce">
     🐾 Secure Your Spot in the FLUFFI Revolution!
   </h1>
   <p class="text-xl md:text-2xl mb-8 font-light">
-    🚀 Limited Presale — Don't Miss Out on the Next Big Meme Coin!
+    🚀 Limited Presale — Don’t Miss Out on the Next Big Meme Coin!
   </p>
-  <a href="#presale" 
-     onclick="document.getElementById('presale').scrollIntoView({ behavior: 'smooth' }); return false;" 
-     class="inline-block bg-white text-green-700 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 transition-transform duration-300">
-    Join Presale Now 🚀
-  </a>
+ <a href="#presale" 
+   onclick="document.getElementById('presale').scrollIntoView({ behavior: 'smooth' }); return false;" 
+   class="inline-block bg-white text-green-700 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 transition-transform duration-300">
+  Join Presale Now 🚀
+</a>
 </section>
 
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
@@ -413,132 +99,138 @@
   </div>
 </div>
 
+    <script>
+    /* Testing function - remove in production */
+function resetTimer() {
+  localStorage.removeItem('presaleStartTime');
+  location.reload();
+}
+</script>
+
 <!-- Testing button - remove in production -->
 <button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
   Reset Timer (For Testing)
 </button>
     
-<!-- Presale Section -->
-<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+    <!-- Presale Section -->
+   <section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
   <h2 class="section-title text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 mb-6">
     🚀 Limited Presale — Act Fast!
   </h2>
 
-  <div id="live-feed" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md max-w-xl mx-auto">
-    <h2 class="text-xl font-bold mb-2 text-center text-gray-800 dark:text-white">🔥 Live FLUFFI Activity</h2>
-    <ul id="feed-list" class="space-y-2 text-gray-700 dark:text-gray-300">
-      <!-- Live events will appear here -->
-    </ul>
-  </div>
+     <div id="live-feed" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md max-w-xl mx-auto">
+  <h2 class="text-xl font-bold mb-2 text-center text-gray-800 dark:text-white">🔥 Live FLUFFI Activity</h2>
+  <ul id="feed-list" class="space-y-2 text-gray-700 dark:text-gray-300">
+    <!-- Live events will appear here -->
+  </ul>
+</div>
 
-  <div id="walletError" class="wallet-error hidden"></div>
+        <div id="walletError" class="wallet-error hidden"></div>
+        
+        <div id="walletStatus" class="wallet-address hidden">
+          <strong>Connected:</strong> <span id="connectedAddress"></span>
+          <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+            Disconnect
+          </button>
+        </div>
+      </div>
+
+      <div class="fluio-status-container">
+        <div class="fluio-price mt-2">
+          <div class="price-header flex items-center justify-between">
+            <span class="font-semibold text-lg">$FLUFFI</span>
+            <span class="live-badge text-green-500 font-bold">LIVE</span>
+          </div>
+          <div class="current-price price-container" id="currentPrice">
+            $0.000100
+            <span class="price-tooltip">
+              <i class="fas fa-info-circle text-blue-500" aria-hidden="true"></i>
+              <span class="tooltip-text">
+              <strong>Price Increase:</strong><br>
+              +5% per stage (every 48 hours)<br>
+               Next increase: <span id="nextIncreaseTime">00:00:00</span>
+               </span>
+              </span>
+            </span>
+          </div>
+          <div class="price-change text-sm text-gray-500">+0.00%</div>
+        </div>
+      </div>
+
+      <div class="flex items-center mt-4 mb-4">
+        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
+        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+      </div>
+
+      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+
+      <div class="flex gap-2 mb-4">
+        <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
+        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
+  <option value="BNB">BNB</option>
+  <option value="SOL">SOL</option>
+  <option value="AVAX">AVAX</option>
+  <option value="MATIC">MATIC</option>
+  <option value="USDC">USDC</option>
+  <option value="USD">USD (Card)</option>
+</select>
+      </div>
+      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
+      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+        🚀 Buy Now
+      </button>
+    </section>
   
-  <div id="walletStatus" class="wallet-address hidden">
-    <strong>Connected:</strong> <span id="connectedAddress"></span>
-    <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-      Disconnect
-    </button>
-  </div>
-
-  <div class="fluio-status-container">
-    <div class="fluio-price mt-2">
-      <div class="price-header flex items-center justify-between">
-        <span class="font-semibold text-lg">$FLUFFI</span>
-        <span class="live-badge text-green-500 font-bold">LIVE</span>
-      </div>
-      <div class="current-price price-container" id="currentPrice">
-        $0.000100
-        <span class="price-tooltip">
-          <i class="fas fa-info-circle text-blue-500" aria-hidden="true"></i>
-          <span class="tooltip-text">
-            <strong>Price Increase:</strong><br>
-            +5% per stage (every 48 hours)<br>
-            Next increase: <span id="nextIncreaseTime">00:00:00</span>
-          </span>
-        </span>
-      </div>
-      <div class="price-change text-sm text-gray-500">+0.00%</div>
-    </div>
-  </div>
-
-  <div class="flex items-center mt-4 mb-4">
-    <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-    </svg>
-    <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-    <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
-  </div>
-
-  <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
-
-  <div class="flex gap-2 mb-4">
-    <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
-    <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
-      <option value="BNB">BNB</option>
-      <option value="SOL">SOL</option>
-      <option value="AVAX">AVAX</option>
-      <option value="MATIC">MATIC</option>
-      <option value="USDC">USDC</option>
-      <option value="USD">USD (Card)</option>
-    </select>
-  </div>
-  <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
-  <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-    🚀 Buy Now
-  </button>
+    <input type="hidden" id="referralLink" value="">
   
-  <!-- Contract address display -->
-  <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-    <p>Contract Address: <a id="contractAddress" href="#" target="_blank" class="text-blue-500 hover:underline break-all">Loading...</a></p>
-  </div>
-</section>
-  
-<input type="hidden" id="referralLink" value="">
+    <!-- Referral Section -->
+    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
+      <div id="referralSection">
+        <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+          Connect Wallet for Referrals
+        </button>
+      </div>
+    </section>
 
-<!-- Referral Section -->
-<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-  <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
-  <div id="referralSection">
-    <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-    <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
-      Connect Wallet for Referrals
-    </button>
-  </div>
-</section>
+    <!-- Claim Section -->
+    <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+      <h2 class="section-title">🎁 Claim $FLUFFI</h2>
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+        <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <p class="text-sm text-gray-600 dark:text-gray-300">Wallet Balance:</p>
+            <p class="font-mono text-lg font-bold" id="userBalance">0</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600 dark:text-gray-300">Staked:</p>
+            <p class="font-mono text-lg font-bold" id="userStaked">0</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600 dark:text-gray-300">Rewards:</p>
+            <p class="font-mono text-lg font-bold" id="userRewards">0</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600 dark:text-gray-300">Presale Allocation:</p>
+            <p class="font-mono text-lg font-bold" id="userPresale">0</p>
+          </div>
+        </div>
+      </div>
+      <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
+      <button onclick="claimTokens()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">
+        Claim Tokens
+      </button>
+    </section>
 
-<!-- Claim Section -->
-<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-  <h2 class="section-title">🎁 Claim $FLUFFI</h2>
-  <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
-    <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
-    <div class="grid grid-cols-2 gap-2">
-      <div>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Wallet Balance:</p>
-        <p class="font-mono text-lg font-bold" id="userBalance">0</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Staked:</p>
-        <p class="font-mono text-lg font-bold" id="userStaked">0</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Rewards:</p>
-        <p class="font-mono text-lg font-bold" id="userRewards">0</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Presale Allocation:</p>
-        <p class="font-mono text-lg font-bold" id="userPresale">0</p>
-      </div>
-    </div>
-  </div>
-  <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-  <button onclick="claimTokens()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">
-    Claim Tokens
-  </button>
-</section>
-
-<!-- Staking Dashboard -->
+   <!-- Staking Dashboard -->
 <section id="staking" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
   <div class="max-w-5xl mx-auto px-6 text-center">
+
     <!-- Title -->
     <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">
       🐾 FLUFFI Staking Dashboard
@@ -550,6 +242,7 @@
 
     <!-- Dashboard Grid -->
     <div class="grid gap-8 md:grid-cols-3">
+
       <!-- Total Staked -->
       <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Total Staked</h3>
@@ -572,13 +265,13 @@
       </div>
     </div>
 
-    <!-- Staking Form -->
-    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-md mx-auto">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">📈 Stake Your $FLUFFI</h3>
+        <!-- Staking Section -->
+    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+      <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
-    </div>
+    </section>
     
     <!-- Claim Rewards -->
     <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
@@ -593,8 +286,53 @@
   </div>
 </section>
 
-<!-- Tokenomics Section -->
-<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
+<script>
+async function updateStakingDashboard() {
+  // Get values from localStorage (simulated for now)
+  const walletAddress = localStorage.getItem('walletAddress');
+  
+  if (walletAddress) {
+    // Retrieve stored staking info
+    const stakingInfo = JSON.parse(localStorage.getItem(`staking_${walletAddress}`) || '{}');
+    const totalStaked = stakingInfo.amount || 0;
+    
+    // Calculate earnings based on APY (90%)
+    const timeDiff = stakingInfo.timestamp ? (Date.now() - stakingInfo.timestamp) / (365 * 24 * 60 * 60 * 1000) : 0;
+    const userEarnings = totalStaked * 0.9 * timeDiff;
+    
+    // Get balance from localStorage
+    const userBalance = parseFloat(localStorage.getItem(`balance_${walletAddress}`) || '0');
+    
+    // Update UI
+    document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+    document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
+    document.getElementById('user-earnings').textContent = userEarnings.toFixed(2);
+    
+    // Progress based on time until listing (30 days from start)
+    const startTime = new Date('2025-01-27T00:00:00Z').getTime();
+    const listingTime = startTime + (30 * 24 * 60 * 60 * 1000);
+    const now = Date.now();
+    const claimPercent = Math.min(((now - startTime) / (listingTime - startTime)) * 100, 100);
+    
+    document.getElementById('claim-percent').textContent = Math.floor(claimPercent) + "%";
+    document.getElementById('claim-progress').style.width = claimPercent + "%";
+  } else {
+    // Default values when not connected
+    document.getElementById('total-staked').textContent = '0';
+    document.getElementById('user-balance-value').textContent = '0';
+    document.getElementById('user-earnings').textContent = '0';
+    document.getElementById('claim-percent').textContent = "0%";
+    document.getElementById('claim-progress').style.width = "0%";
+  }
+}
+
+// Update on page load and when wallet connects
+document.addEventListener('DOMContentLoaded', updateStakingDashboard);
+window.addEventListener('storage', updateStakingDashboard);
+</script>
+  
+    <!-- Tokenomics Section -->
+   <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
   <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
     📊 Tokenomics
   </h2>
@@ -637,207 +375,266 @@
   </div>
 </section>
     
-<!-- FAQ Section -->
-<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
-  <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
+    <!-- FAQ Section -->
+    <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What's the token tax?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      <p>5% total tax on all transactions:</p>
-      <ul class="list-disc list-inside ml-2">
-        <li>3% Marketing</li>
-        <li>2% Automatic Liquidity</li>
-      </ul>
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What's the token tax?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          <p>5% total tax on all transactions:</p>
+          <ul class="list-disc list-inside ml-2">
+            <li>3% Marketing</li>
+            <li>2% Automatic Liquidity</li>
+          </ul>
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      How to claim after presale?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
-    </div>
-  </details>
+       <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          How to claim after presale?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What's the vesting schedule?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      <ul class="list-disc list-inside ml-2">
-        <li>Presale tokens: 100% unlocked at TGE</li>
-        <li>Team tokens: 24-month linear vesting</li>
-      </ul>
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What's the vesting schedule?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          <ul class="list-disc list-inside ml-2">
+            <li>Presale tokens: 100% unlocked at TGE</li>
+            <li>Team tokens: 24-month linear vesting</li>
+          </ul>
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      How do I buy $FLUFFI?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Connect your wallet, enter amount in BNB, and click "Buy Now".
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          How do I buy $FLUFFI?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Connect your wallet, enter amount in BNB, and click "Buy Now".
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      When does staking end?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Staking ends at the official listing date.
-    </div>
-  </details>
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          When does staking end?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Staking ends at the official listing date.
+        </div>
+      </details>
 
-  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
-    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-      What chains are supported?
-      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-      Currently supporting BNB, with plans for ETH, SOL, and AVAX.
+      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
+        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+          What chains are supported?
+          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+          Currently supporting BNB, with plans for ETH, SOL, and AVAX.
+        </div>
+      </details>
+    </section>
+
+    <div class="split-sections">
+
+<!-- Why Fluffi Coin Section -->
+<section id="why" class="py-16 px-6 text-center">
+  <h2 class="text-4xl font-bold mb-12 text-green-500">Why Fluffi Coin?</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+
+    <!-- Meme Power -->
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+      <div class="text-5xl mb-4 animate-bounce">🔥</div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Meme Power</h3>
+      <p class="mt-3 text-gray-700 dark:text-gray-300">
+        Fluffi thrives on community-driven meme culture with viral potential.
+      </p>
     </div>
-  </details>
+
+    <!-- Community Driven -->
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+      <div class="text-5xl mb-4 animate-pulse">🎨</div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Community Driven</h3>
+      <p class="mt-3 text-gray-700 dark:text-gray-300">
+        100% transparent, fun, and powered by YOU — the community.
+      </p>
+    </div>
+
+    <!-- Fair & Secure -->
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+      <div class="text-5xl mb-4 animate-sway">⚖️</div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Fair & Secure</h3>
+      <p class="mt-3 text-gray-700 dark:text-gray-300">
+        Locked liquidity, audited contracts, and fair presale stages.
+      </p>
+    </div>
+
+  </div>
 </section>
 
-<div class="split-sections">
-  <!-- Why Fluffi Coin Section -->
-  <section id="why" class="py-16 px-6 text-center">
-    <h2 class="text-4xl font-bold mb-12 text-green-500">Why Fluffi Coin?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-      <!-- Meme Power -->
-      <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
-        <div class="text-5xl mb-4 animate-bounce">🔥</div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Meme Power</h3>
-        <p class="mt-3 text-gray-700 dark:text-gray-300">
-          Fluffi thrives on community-driven meme culture with viral potential.
-        </p>
-      </div>
+<style>
+/* Custom sway animation for the scales icon */
+@keyframes sway {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
 
-      <!-- Community Driven -->
-      <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
-        <div class="text-5xl mb-4 animate-pulse">🎨</div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Community Driven</h3>
-        <p class="mt-3 text-gray-700 dark:text-gray-300">
-          100% transparent, fun, and powered by YOU — the community.
-        </p>
-      </div>
+.animate-sway {
+  animation: sway 2s infinite ease-in-out;
+  display: inline-block;
+}
+</style>
 
-      <!-- Fair & Secure -->
-      <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
-        <div class="text-5xl mb-4 animate-sway">⚖️</div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Fair & Secure</h3>
-        <p class="mt-3 text-gray-700 dark:text-gray-300">
-          Locked liquidity, audited contracts, and fair presale stages.
-        </p>
+<!-- Trust Section with Live Counters & Full Dark/Light Fix -->
+<section class="py-16 px-6 bg-gray-100 dark:bg-gray-900 text-center transition-colors duration-300">
+  <h2 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Trusted & Verified</h2>
+  <p class="text-lg mb-12 text-gray-700 dark:text-gray-300">
+    Fluffi is backed by security, community, and transparency. Invest with confidence.
+  </p>
+
+  <!-- Trust Cards Grid -->
+  <div class="grid gap-8 md:grid-cols-3 lg:grid-cols-4">
+
+    <!-- Audit Badge -->
+    <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+      <img src="https://img.icons8.com/fluency/96/security-checked.png" alt="Audit Badge" class="mx-auto mb-4 animate-bounce">
+      <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Smart Contract Audited</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm">Verified for safety & transparency.</p>
+    </div>
+
+    <!-- Liquidity Locked -->
+    <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+      <img src="https://img.icons8.com/color/96/lock--v1.png" alt="Liquidity Locked" class="mx-auto mb-4 animate-pulse">
+      <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Liquidity Locked</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm">Funds securely locked until listing.</p>
+    </div>
+
+    <!-- Community Followers -->
+    <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+      <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-sway">
+      <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm">
+        Telegram: <span id="tg-count" class="text-green-600 dark:text-green-300">5,432</span> | 
+        Twitter: <span id="tw-count" class="text-green-600 dark:text-green-300">10,215</span> | 
+        Discord: <span id="dc-count" class="text-green-600 dark:text-green-300">3,876</span>
+      </p>
+    </div>
+
+    <!-- Trusted Partners -->
+    <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
+      <h3 class="font-bold text-2xl text-gray-900 dark:text-white mb-4">Trusted Partners</h3>
+      <div class="flex flex-col gap-2 items-center justify-center">
+        <span class="text-purple-600 dark:text-purple-400 font-semibold text-xl">Senitex</span>
+        <span class="text-blue-600 dark:text-blue-400 font-semibold text-xl">CoinLaunch</span>
+        <span class="text-orange-600 dark:text-orange-400 font-semibold text-xl">CryptoHub</span>
+        <span class="text-green-600 dark:text-green-400 font-semibold text-xl">CoinCarp</span>
+        <span class="text-red-600 dark:text-red-400 font-semibold text-xl">ICODrops</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Trust Section with Live Counters & Full Dark/Light Fix -->
-  <section class="py-16 px-6 bg-gray-100 dark:bg-gray-900 text-center transition-colors duration-300">
-    <h2 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Trusted & Verified</h2>
-    <p class="text-lg mb-12 text-gray-700 dark:text-gray-300">
-      Fluffi is backed by security, community, and transparency. Invest with confidence.
-    </p>
+<style>
+.trust-card img {
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+}
 
-    <!-- Trust Cards Grid -->
-    <div class="grid gap-8 md:grid-cols-3 lg:grid-cols-4">
-      <!-- Audit Badge -->
-      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-        <img src="https://img.icons8.com/fluency/96/security-checked.png" alt="Audit Badge" class="mx-auto mb-4 animate-bounce">
-        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Smart Contract Audited</h3>
-        <p class="text-gray-600 dark:text-gray-300 text-sm">Verified for safety & transparency.</p>
-      </div>
+/* Animations */
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.animate-bounce { animation: bounce 2s infinite; }
 
-      <!-- Liquidity Locked -->
-      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-        <img src="https://img.icons8.com/color/96/lock--v1.png" alt="Liquidity Locked" class="mx-auto mb-4 animate-pulse">
-        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Liquidity Locked</h3>
-        <p class="text-gray-600 dark:text-gray-300 text-sm">Funds securely locked until listing.</p>
-      </div>
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.animate-pulse { animation: pulse 2s infinite; }
 
-      <!-- Community Followers -->
-      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-        <img src="https://img.icons8.com/fluency/96/groups.png" alt="Community" class="mx-auto mb-4 animate-sway">
-        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
-        <p class="text-gray-600 dark:text-gray-300 text-sm">
-          Telegram: <span id="tg-count" class="text-green-600 dark:text-green-300">5,432</span> | 
-          Twitter: <span id="tw-count" class="text-green-600 dark:text-green-300">10,215</span> | 
-          Discord: <span id="dc-count" class="text-green-600 dark:text-green-300">3,876</span>
-        </p>
-      </div>
+@keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
+.animate-sway { animation: sway 3s infinite ease-in-out; }
 
-      <!-- Trusted Partners -->
-      <div class="trust-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-green-500/40 transition transform hover:-translate-y-2">
-        <h3 class="font-bold text-2xl text-gray-900 dark:text-white mb-4">Trusted Partners</h3>
-        <div class="flex flex-col gap-2 items-center justify-center">
-          <span class="text-purple-600 dark:text-purple-400 font-semibold text-xl">Senitex</span>
-          <span class="text-blue-600 dark:text-blue-400 font-semibold text-xl">CoinLaunch</span>
-          <span class="text-orange-600 dark:text-orange-400 font-semibold text-xl">CryptoHub</span>
-          <span class="text-green-600 dark:text-green-400 font-semibold text-xl">CoinCarp</span>
-          <span class="text-red-600 dark:text-red-400 font-semibold text-xl">ICODrops</span>
+/* Dark mode specific fixes */
+.dark .trust-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .trust-card h3 {
+  color: #f9fafb !important; /* gray-50 */
+}
+
+.dark .trust-card p {
+  color: #d1d5db !important; /* gray-300 */
+}
+</style>
+
+<script>
+// Update follower counts dynamically (replace with real API calls)
+function updateFollowers() {
+  document.getElementById('tg-count').textContent = '5,432';
+  document.getElementById('tw-count').textContent = '10,215';
+  document.getElementById('dc-count').textContent = '3,876';
+}
+updateFollowers();
+</script>
+     
+      <!-- Team Section with two new members -->
+      <section id="team">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+          <div class="team-member">
+            <h3>James Chen</h3>
+            <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
+          </div>
+          <div class="team-member">
+            <h3>Priya Patel</h3>
+            <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
+          </div>
+          
+          <!-- New team member 1: Former AVAX Developer -->
+          <div class="team-member">
+            <h3>Marcus Johnson</h3>
+            <p>Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
+          </div>
+          
+          <!-- New team member 2: Marketing Specialist -->
+          <div class="team-member">
+            <h3>Sophia Williams</h3>
+            <p>Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
-  </section>
+  </main>
 
-  <!-- Team Section with two new members -->
-  <section id="team" class="py-16 px-6 bg-white dark:bg-gray-900">
-    <h2 class="text-3xl font-bold text-center mb-12 text-green-600 dark:text-green-400">Our Team</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-      <div class="team-member bg-gray-100 dark:bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-        <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">James Chen</h3>
-        <p class="text-gray-700 dark:text-gray-300">Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
-      </div>
-      <div class="team-member bg-gray-100 dark:bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-        <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Priya Patel</h3>
-        <p class="text-gray-700 dark:text-gray-300">Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
-      </div>
-      
-      <!-- New team member 1: Former AVAX Developer -->
-      <div class="team-member bg-gray-100 dark:bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-        <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Marcus Johnson</h3>
-        <p class="text-gray-700 dark:text-gray-300">Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
-      </div>
-      
-      <!-- New team member 2: Marketing Specialist -->
-      <div class="team-member bg-gray-100 dark:bg-gray-800 p-6 rounded-2xl shadow-lg text-center">
-        <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Sophia Williams</h3>
-        <p class="text-gray-700 dark:text-gray-300">Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- ================== COMMUNITY ACTIVITY ================== -->
+ <!-- ================== COMMUNITY ACTIVITY ================== -->
 <section id="community-activity" class="py-12 bg-green-50 dark:bg-gray-800">
   <h2 class="text-3xl font-bold text-center text-green-600 dark:text-green-400 mb-8">
     🔥 Live Community Activity
@@ -868,81 +665,1039 @@
   </div>
 </section>
 
-<footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
-  <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
-  <div class="flex gap-4 justify-center md:justify-end">
-    <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
-    </a>
-    <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
-    </a>
-  </div>
-</footer>
+<style>
+/* Marquee scrolling effect */
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
 
-<!-- Wallet Connect Modal -->
-<div id="walletModal" class="wallet-modal">
-  <div class="wallet-modal-content dark:bg-gray-800">
-    <div class="wallet-header">
-      <h3 class="text-xl font-bold">Connect Wallet</h3>
-      <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
-    </div>
-    <div class="wallet-option" onclick="connectWallet('metamask')">
-      <div class="flex items-center w-full">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-        <span class="ml-3">MetaMask</span>
-      </div>
-      <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
-    </div>
-    <div class="wallet-option" onclick="connectWallet('trust')">
-      <div class="flex items-center w-full">
-        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
-        <span class="ml-3">Trust Wallet</span>
-      </div>
-      <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
-    </div>
-    <div class="wallet-option" onclick="connectWallet('walletconnect')">
-      <div class="flex items-center w-full">
-        <img src="https://walletconnect.org/_next/static/media/logo_mark.84dd8525.svg" alt="WalletConnect" class="w-6 h-6">
-        <span class="ml-3">WalletConnect</span>
-      </div>
-      <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
-    </div>
+/* Dark mode fixes for community activity */
+.dark #community-activity {
+  background-color: #1f2937; /* gray-800 */
+}
 
-    <div class="wallet-option" onclick="connectWallet('phantom')">
-      <div class="flex items-center w-full">
-        <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" class="w-6 h-6">
-        <span class="ml-3">Phantom</span>
-      </div>
-      <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
-    </div>
-  </div>
-</div>
-
-<!-- WalletConnect QR Code Modal -->
-<div id="walletConnectModal" class="wallet-connect-modal">
-  <div class="wallet-connect-content dark:bg-gray-800">
-    <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
-    <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
-    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
-    <div id="walletConnectQrCode"></div>
-    <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
-  </div>
-</div>
-
-<!-- Connection Help Modal -->
-<div id="connectionHelpModal" class="help-modal">
-  <div class="help-modal-content dark:bg-gray-800">
-    <span class="help-close" onclick="closeHelpModal()">&times;</span>
-    <div id="helpContent"></div>
-  </div>
-</div>
-
-<!-- Web3Modal v2 (WalletConnect v2) -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
+.dark #liveFeed {
+  background-color: #374151; /* gray-700 */
+  border: 1px solid #4b5563; /* gray-600 */
+}
+</style>
 <script>
-// ===== NETWORK CONFIGURATION =====
+// Fake live feed data (replace with backend/websocket later)
+const feedMessages = [
+  "🐋 User0x12A just bought 1.2 BNB worth of FLUFFI 🚀",
+  "🔥 User0x9F4 staked 45,000 FLUFFI and is earning 90% APY!",
+  "🎯 User0x33B invited a friend and earned 10% referral bonus",
+  "🚀 User0x77C joined with 0.8 ETH in presale!",
+  "🐾 User0x5A1 bought 65,000 FLUFFI tokens",
+  "🐋 User0xE91 just bought 3.5 BNB worth of FLUFFI 🚀",
+  "🔥 User0x4D7 staked 120,000 FLUFFI for huge rewards!",
+  "🎯 User0xF22 invited 3 friends and earned 30% referral bonus",
+  "🚀 User0x18C joined with 2 ETH in presale!",
+  "🐾 User0x7B9 bought 90,000 FLUFFI tokens",
+  "🐋 User0x82A just bought 0.5 BNB worth of FLUFFI 🚀",
+  "🔥 User0x6C4 staked 75,000 FLUFFI and is earning daily rewards!",
+  "🎯 User0xD88 invited a friend and earned 10% referral bonus",
+  "🚀 User0xB41 joined with 1.5 ETH in presale!",
+  "🐾 User0x34C bought 40,000 FLUFFI tokens",
+  "🐋 User0xAA2 just bought 4.8 BNB worth of FLUFFI 🚀",
+  "🔥 User0x29D staked 25,000 FLUFFI and is compounding daily!",
+  "🎯 User0x66F invited 2 friends and earned 20% referral bonus",
+  "🚀 User0xC11 joined with 0.75 ETH in presale!",
+  "🐾 User0x1F7 bought 55,000 FLUFFI tokens",
+  "🐋 User0xFE9 just bought 6.3 BNB worth of FLUFFI 🚀",
+  "🔥 User0x17B staked 300,000 FLUFFI and is earning 90% APY!",
+  "🎯 User0x92E invited 5 friends and earned 50% referral bonus",
+  "🚀 User0x44D joined with 3 ETH in presale!",
+  "🐾 User0x7AA bought 120,000 FLUFFI tokens",
+  "🐋 User0x223 just bought 0.9 BNB worth of FLUFFI 🚀",
+  "🔥 User0x3BC staked 20,000 FLUFFI for early rewards!",
+  "🎯 User0x551 invited 1 friend and earned 10% referral bonus",
+  "🚀 User0x8F6 joined with 0.25 ETH in presale!",
+  "🐾 User0x19D bought 22,000 FLUFFI tokens",
+  "🐋 User0x40E just bought 7.1 BNB worth of FLUFFI 🚀",
+  "🔥 User0xCD9 staked 500,000 FLUFFI and is farming big rewards!",
+  "🎯 User0x822 invited 4 friends and earned 40% referral bonus",
+  "🚀 User0x77F joined with 5 ETH in presale!",
+  "🐾 User0x2A2 bought 150,000 FLUFFI tokens",
+  "🐋 User0x8DD just bought 2.2 BNB worth of FLUFFI 🚀",
+  "🔥 User0xE77 staked 60,000 FLUFFI and is locked till listing!",
+  "🎯 User0xA13 invited 2 friends and earned 20% referral bonus",
+  "🚀 User0x3FE joined with 0.65 ETH in presale!",
+  "🐾 User0x95B bought 36,000 FLUFFI tokens",
+  "🐋 User0xBB1 just bought 5.6 BNB worth of FLUFFI 🚀",
+  "🔥 User0x47C staked 85,000 FLUFFI and is compounding daily!",
+  "🎯 User0x5E5 invited a friend and earned 10% referral bonus",
+  "🚀 User0xCC7 joined with 1.25 ETH in presale!",
+  "🐾 User0xF4A bought 70,000 FLUFFI tokens",
+  "🐋 User0xD31 just bought 1.8 BNB worth of FLUFFI 🚀",
+  "🔥 User0x63B staked 15,000 FLUFFI early on!",
+  "🎯 User0xACD invited 3 friends and earned 30% referral bonus",
+  "🚀 User0x229 joined with 2.8 ETH in presale!",
+  "🐾 User0x8A0 bought 110,000 FLUFFI tokens",
+  "🐋 User0x6C2 just bought 9.9 BNB worth of FLUFFI 🚀",
+  "🔥 User0x118 staked 1,000,000 FLUFFI for mega rewards!",
+  "🎯 User0x33C invited 6 friends and earned 60% referral bonus",
+  "🚀 User0x94E joined with 10 ETH in presale!",
+  "🐾 User0x41F bought 500,000 FLUFFI tokens",
+  // ... repeat with more random variations ...
+];
+let feedIndex = 0;
+function rotateFeed() {
+  document.getElementById("feedMessage").textContent = feedMessages[feedIndex];
+  feedIndex = (feedIndex + 1) % feedMessages.length;
+}
+setInterval(rotateFeed, 4000); // change every 4s
+rotateFeed();
+</script>
+  
+  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
+    <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
+    <div class="flex gap-4 justify-center md:justify-end">
+      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
+      </a>
+      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
+        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
+      </a>
+    </div>
+  </footer>
+
+   <!-- Wallet Connect Modal -->
+  <div id="walletModal" class="wallet-modal">
+    <div class="wallet-modal-content dark:bg-gray-800">
+      <div class="wallet-header">
+        <h3 class="text-xl font-bold">Connect Wallet</h3>
+        <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('metamask')">
+        <div class="flex items-center w-full">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+          <span class="ml-3">MetaMask</span>
+        </div>
+        <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('trust')">
+        <div class="flex items-center w-full">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+          <span class="ml-3">Trust Wallet</span>
+        </div>
+        <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
+      </div>
+      <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <div class="flex items-center w-full">
+          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
+          <span class="ml-3">WalletConnect</span>
+        </div>
+        <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
+      </div>
+
+      <div class="wallet-option" onclick="connectWallet('phantom')">
+        <div class="flex items-center w-full">
+          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
+          <span class="ml-3">Phantom</span>
+        </div>
+        <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WalletConnect QR Code Modal -->
+  <div id="walletConnectModal" class="wallet-connect-modal">
+    <div class="wallet-connect-content dark:bg-gray-800">
+      <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
+      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <div id="walletConnectQrCode"></div>
+      <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
+    </div>
+  </div>
+  
+  <!-- Connection Help Modal -->
+  <div id="connectionHelpModal" class="help-modal">
+    <div class="help-modal-content dark:bg-gray-800">
+      <span class="help-close" onclick="closeHelpModal()">&times;</span>
+      <div id="helpContent"></div>
+    </div>
+  </div>
+
+  <!-- Web3Modal v2 (WalletConnect v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  
+  
+  <script>
+// Configuration
+    const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+    const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+   const WALLETCONNECT_CONFIG = {
+  projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
+  chains: [56], // BSC Mainnet
+  showQrModal: false,
+  qrModalOptions: {
+    themeMode: 'dark',
+    mobileWallets: [
+      {
+        id: 'metamask',
+        name: 'MetaMask',
+        links: {
+          native: 'metamask://',
+          universal: 'https://metamask.app.link'
+        }
+      },
+      {
+        id: 'trust',
+        name: 'Trust Wallet',
+        links: {
+          native: 'trust://',
+          universal: 'https://link.trustwallet.com'
+        }
+      }
+    ]
+  },
+  metadata: {
+    name: "FLUFFI Presale",
+    description: "Connect to participate in FLUFFI presale",
+    url: window.location.href,
+    icons: ["https://fluffi.site/logo.png"]
+  }
+};
+  // Global variables
+let userWalletAddress = null;
+let tasksCompleted = {
+  twitter: false,
+  telegram: false,
+  retweet: false
+};
+let countdownInterval = null;
+let provider = null;
+
+// For development - show dev section if URL has ?dev=true
+if (window.location.search.includes('dev=true')) {
+  document.getElementById('devSection').classList.remove('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  const darkMode = localStorage.getItem('darkMode');
+  const isDarkMode = darkMode === 'true' || 
+                    (darkMode === null && 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+  
+  // Setup form submission
+  document.getElementById('airdropForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    claimAirdrop();
+  });
+  
+  // Setup wallet button
+  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  
+// Just check if wallet was previously connected but don't auto-reconnect
+const savedAddress = localStorage.getItem('walletAddress');
+if (savedAddress) {
+  // Clear the saved address to prevent auto-reconnect attempts
+  localStorage.removeItem('walletAddress');
+  localStorage.removeItem('walletConnected');
+}
+  
+  // Initialize countdown timer
+  initializeCountdown();
+  
+  // Load completed tasks from localStorage
+  const savedTasks = localStorage.getItem('completedTasks');
+  if (savedTasks) {
+    tasksCompleted = JSON.parse(savedTasks);
+    updateTaskUI();
+  }
+});
+
+// Timer functions
+// Timer variables
+let presaleInterval = null;
+
+// Initialize the timer when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializeTimer();
+});
+
+function initializeTimer() {
+  // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
+  const startTime = new Date('2025-08-27T00:00:00Z').getTime();
+  // No need to store in localStorage since it's fixed
+  
+  // Update timer immediately
+  updateTimer(startTime);
+  
+  // Set interval to update timer every second
+  if (!presaleInterval) {
+    presaleInterval = setInterval(() => updateTimer(startTime), 1000);
+  }
+}
+
+// Update timer display
+function updateTimer(startTime) {
+  const now = Date.now();
+  const totalDuration = 15 * 48 * 60 * 60 * 1000; // 15 stages * 48 hours each
+  const endTime = startTime + totalDuration;
+  const timeLeft = endTime - now;
+  
+  // Calculate current stage (0-14)
+  const elapsed = now - startTime;
+  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours
+  const currentStage = Math.min(Math.floor(elapsed / stageDuration), 14);
+  const stageEndTime = startTime + ((currentStage + 1) * stageDuration);
+  const stageTimeLeft = stageEndTime - now;
+  
+  // Format time function
+  const formatTime = (ms) => {
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+    
+    return {
+      days: days.toString().padStart(2, '0'),
+      hours: hours.toString().padStart(2, '0'),
+      minutes: minutes.toString().padStart(2, '0'),
+      seconds: seconds.toString().padStart(2, '0'),
+      full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+    };
+  };
+  
+  // Update main timer
+  if (timeLeft <= 0) {
+    document.getElementById('days').textContent = '00';
+    document.getElementById('hours').textContent = '00';
+    document.getElementById('minutes').textContent = '00';
+    document.getElementById('seconds').textContent = '00';
+    clearInterval(presaleInterval);
+  } else {
+    const totalFormatted = formatTime(timeLeft);
+    document.getElementById('days').textContent = totalFormatted.days;
+    document.getElementById('hours').textContent = totalFormatted.hours;
+    document.getElementById('minutes').textContent = totalFormatted.minutes;
+    document.getElementById('seconds').textContent = totalFormatted.seconds;
+  }
+  
+  // Update stage info
+  document.getElementById('current-stage').textContent = currentStage + 1;
+  
+  const stageFormatted = formatTime(stageTimeLeft);
+  document.getElementById('stage-time-left').textContent = stageFormatted.full;
+  
+  // Update progress bar
+  const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
+  const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
+  document.getElementById('stageProgressBar').style.width = `${totalProgress}%`;
+  
+  // Update price (5% increase per stage)
+  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
+}
+
+// Reset timer function
+function resetTimer() {
+  // Clear intervals
+  if (presaleInterval) {
+    clearInterval(presaleInterval);
+    presaleInterval = null;
+  }
+  
+  // Remove stored start time
+  localStorage.removeItem('presaleStartTime');
+  
+  // Reset displays
+  document.getElementById('days').textContent = '00';
+  document.getElementById('hours').textContent = '00';
+  document.getElementById('minutes').textContent = '00';
+  document.getElementById('seconds').textContent = '00';
+  document.getElementById('current-stage').textContent = '1';
+  document.getElementById('stage-time-left').textContent = '00d 00h 00m 00s';
+  document.getElementById('stageProgressBar').style.width = '0%';
+  document.getElementById('currentPrice').innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
+  
+  // Reinitialize the timer
+  initializeTimer();
+}
+// Wallet connection functions
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('active');
+}
+
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('active');
+}
+
+function closeWalletConnectModal() {
+  document.getElementById('walletConnectModal').classList.remove('active');
+}
+
+// Connection Help Modal Functions
+function showConnectionHelp(walletType, event) {
+  event.stopPropagation();
+  closeWalletModal();
+  
+  let title, content;
+  
+  switch(walletType) {
+    case 'metamask':
+      title = "How to Connect MetaMask";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-fox help-icon"></i>
+          </div>
+          <span>MetaMask Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" on our site and select MetaMask</li>
+            <li>Approve the connection request in the MetaMask popup</li>
+            <li>Your wallet address will appear when connected</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask app from your app store</li>
+            <li>Open our website in the MetaMask in-app browser</li>
+            <li>Tap "Connect Wallet" and select MetaMask</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via MetaMask browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'trust':
+      title = "How to Connect Trust Wallet";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-shield-alt help-icon"></i>
+          </div>
+          <span>Trust Wallet Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet extension for your browser</li>
+            <li>Set up your wallet and secure your recovery phrase</li>
+            <li>Click "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the extension</li>
+            <li>Your wallet will be connected to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet from App Store or Play Store</li>
+            <li>Open our website in Trust Wallet's DApp browser</li>
+            <li>Tap "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the app</li>
+            <li>For WalletConnect, scan the QR code from mobile</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'walletconnect':
+      title = "How to Use WalletConnect";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-qrcode help-icon"></i>
+          </div>
+          <span>WalletConnect Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Select WalletConnect from the wallet options</li>
+            <li>Choose your preferred wallet from the list</li>
+            <li>Follow the connection instructions for your wallet</li>
+            <li>Approve the connection request in your wallet</li>
+            <li>Your wallet will be connected to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Make sure you have a compatible wallet installed</li>
+            <li>Select WalletConnect from the wallet options</li>
+            <li>Choose your wallet from the list of installed wallets</li>
+            <li>Approve the connection request in your wallet app</li>
+            <li>Your wallet will connect to our dApp</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'phantom':
+      title = "How to Connect Phantom Wallet";
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-ghost help-icon"></i>
+          </div>
+          <span>Phantom Wallet Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the Phantom popup</li>
+            <li>Your Solana address will connect to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom app from App Store or Play Store</li>
+            <li>Open our website in Phantom's in-app browser</li>
+            <li>Tap "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via Phantom browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+  }
+  
+  document.getElementById('helpContent').innerHTML = content;
+  document.getElementById('connectionHelpModal').classList.add('active');
+}
+
+function closeHelpModal() {
+  document.getElementById('connectionHelpModal').classList.remove('active');
+}
+
+// Main wallet connection function
+async function connectWallet(walletType) {
+  try {
+    closeWalletModal();
+    
+    // Update wallet button to show loading
+    const walletButton = document.getElementById('walletButton');
+    const originalText = walletButton.innerHTML;
+    walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
+    walletButton.disabled = true;
+    
+    if (walletType === 'metamask') {
+      await connectMetaMask();
+    }
+    else if (walletType === 'trust') {
+      await connectTrustWallet();
+    }
+    else if (walletType === 'walletconnect') {
+      await connectWalletConnect();
+    }
+    else if (walletType === 'phantom') {
+      await connectPhantom();
+    }
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+    showNotification("Failed to connect wallet: " + error.message, "error");
+  } finally {
+    // Reset wallet button state
+    setTimeout(() => {
+      const walletButton = document.getElementById('walletButton');
+      if (walletButton && !userWalletAddress) {
+        walletButton.innerHTML = '<i class="fas fa-wallet mr-2"></i>Connect Wallet';
+        walletButton.disabled = false;
+      }
+    }, 2000);
+  }
+}
+
+// MetaMask connection
+async function connectMetaMask() {
+  if (isMobile()) {
+    // Check if we're already in MetaMask browser
+    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
+    
+    if (isMetaMaskBrowser) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+        
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            handleWalletConnection(accounts[0]);
+          }
+        });
+        return; // Exit here to prevent redirect
+      } catch (error) {
+        console.error("MetaMask connection error:", error);
+        showNotification("Connection failed: " + error.message, "error");
+        return;
+      }
+    }
+    
+    // Only redirect if not in MetaMask browser
+    const currentUrl = window.location.href;
+    if (!currentUrl.includes('metamask')) {
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+    }
+  } else {
+    // Desktop logic remains the same
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          handleWalletConnection(accounts[0]);
+        }
+      });
+    } else {
+      throw new Error("Please install MetaMask extension");
+    }
+  }
+}
+// Trust Wallet connection
+async function connectTrustWallet() {
+  if (isMobile()) {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+      }
+    } else {
+      window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+    }
+  } else {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        throw new Error("Failed to connect Trust Wallet");
+      }
+    } else {
+      throw new Error("Please install Trust Wallet extension");
+    }
+  }
+}
+
+// Simplified WalletConnect connection
+// Replace the incomplete WalletConnect with a working implementation
+async function connectWalletConnect() {
+  try {
+    // Use Web3Modal for better wallet integration
+    const Web3Modal = window.Web3Modal.default;
+    const WalletConnectProvider = window.WalletConnectProvider.default;
+    
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+          rpc: {
+            56: "https://bsc-dataseed.binance.org/"
+          }
+        }
+      }
+    };
+    
+    const web3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions
+    });
+    
+    const instance = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(instance);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    
+    handleWalletConnection(address);
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    showNotification("Failed to connect", "error");
+  }
+}
+// Show WalletConnect fallback modal
+function showWalletConnectFallback() {
+  const modal = document.getElementById('walletConnectModal');
+  const qrContainer = document.getElementById('walletConnectQrCode');
+  
+  // Clear previous content
+  qrContainer.innerHTML = '';
+  
+  // Create wallet options list
+  const walletList = document.createElement('div');
+  walletList.innerHTML = `
+    <style>
+      .wallet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      }
+      .wallet-list-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .dark .wallet-list-item {
+        background: #374151;
+      }
+      .wallet-list-item:hover {
+        background: #e5e7eb;
+      }
+      .dark .wallet-list-item:hover {
+        background: #4b5563;
+      }
+      .wallet-list-item img {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+      }
+      .wallet-list-item span {
+        font-weight: 500;
+      }
+    </style>
+    <div class="wallet-list">
+      <div class="wallet-list-item" onclick="window.open('https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}', '_blank')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span>Open in MetaMask</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+        <span>Open in Trust Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="connectBinanceWallet()">
+        <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance">
+        <span>Binance Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://avatars.githubusercontent.com/u/18060234?s=280&v=4" alt="Coinbase">
+        <span>Open in Coinbase Wallet</span>
+      </div>
+      <div class="wallet-list-item" onclick="window.open('https://rainbow.me/connect?url=${encodeURIComponent(window.location.href)}', '_blank')">
+        <img src="https://avatars.githubusercontent.com/u/48327834?s=280&v=4" alt="Rainbow">
+        <span>Open in Rainbow</span>
+      </div>
+    </div>
+    <p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 10px;">
+      Choose a wallet to connect
+    </p>
+  `;
+  
+  qrContainer.appendChild(walletList);
+  modal.classList.add('active');
+}
+// Add this new function for Binance connection
+async function connectBinanceWallet() {
+  try {
+    closeWalletConnectModal(); // Close modal first
+    
+    if (window.BinanceChain) {
+      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+    } else if (window.ethereum && window.ethereum.isBinance) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+    } else {
+      // Only open new tab if wallet not detected
+      showNotification("Binance Wallet not detected. Opening download page...", "info");
+      setTimeout(() => {
+        window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
+      }, 1500);
+    }
+  } catch (error) {
+    showNotification("Failed to connect Binance Wallet: " + error.message, "error");
+  }
+}
+// Phantom connection
+async function connectPhantom() {
+  if (isMobile()) {
+    if (window.phantom && window.phantom.solana) {
+      try {
+        const response = await window.phantom.solana.connect();
+        handleWalletConnection(response.publicKey.toString());
+      } catch (error) {
+        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+      }
+    } else {
+      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+    }
+  } else {
+    if (window.phantom && window.phantom.solana) {
+      try {
+        const response = await window.phantom.solana.connect();
+        handleWalletConnection(response.publicKey.toString());
+      } catch (error) {
+        throw new Error("Failed to connect Phantom wallet");
+      }
+    } else {
+      throw new Error("Please install Phantom wallet");
+    }
+  }
+}
+
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function handleWalletConnection(address) {
+  userWalletAddress = address;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+  
+  walletButtons.innerHTML = `
+    <span class="wallet-address-display">${shortAddress}</span>
+    <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+  `;
+  
+  document.getElementById('walletAddress').value = address;
+  
+  // Generate referral link
+  const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
+  document.getElementById('referralLink').value = referralLink;
+  
+  localStorage.setItem('walletConnected', 'true');
+  localStorage.setItem('walletAddress', address);
+  
+  // Close any open modals
+  closeWalletConnectModal();
+  
+  showNotification("Wallet connected successfully!", "success");
+}
+
+async function disconnectWallet() {
+  userWalletAddress = null;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  walletButtons.innerHTML = `
+    <button id="walletButton" onclick="openWalletModal()" 
+    class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+      <i class="fas fa-wallet mr-2"></i>Connect Wallet
+    </button>
+  `;
+  
+  document.getElementById('walletAddress').value = '';
+  
+  localStorage.removeItem('walletConnected');
+  localStorage.removeItem('walletAddress');
+  
+  // Reset provider
+  provider = null;
+  
+  showNotification("Wallet disconnected", "success");
+}
+
+// Enhanced notification system
+function showNotification(message, type = 'info') {
+  // Remove any existing notifications
+  const existingNotifications = document.querySelectorAll('.notification-toast');
+  existingNotifications.forEach(n => n.remove());
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = 'notification-toast';
+  
+  // Set type-specific styles
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    warning: 'bg-yellow-500',
+    info: 'bg-blue-500'
+  };
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  
+  notification.innerHTML = `
+    <div class="fixed top-20 right-4 z-50 animate-slide-in">
+      <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
+        <span class="text-2xl">${icons[type]}</span>
+        <div class="flex-1">
+          <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+          <p class="text-sm">${message}</p>
+        </div>
+        <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (notification && notification.parentNode) {
+      notification.classList.add('animate-slide-out');
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+}
+
+// Add CSS for animations (add to your style.css or in a <style> tag)
+const notificationStyles = `
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slide-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+  
+  .animate-slide-out {
+    animation: slide-out 0.3s ease-out;
+  }
+`;
+
+// Add styles to document
+if (!document.getElementById('notification-styles')) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'notification-styles';
+  styleSheet.textContent = notificationStyles;
+  document.head.appendChild(styleSheet);
+}
+  </script>
+ <script>
+   // ===== HELPER FUNCTIONS =====
+
+// Rate limiter to prevent spam
+const rateLimiter = {
+  attempts: {},
+  canAttempt(action, wallet, maxAttempts = 5, windowMs = 60000) {
+    const key = `${action}_${wallet}`;
+    const now = Date.now();
+    if (!this.attempts[key]) this.attempts[key] = [];
+
+    // Clean old attempts
+    this.attempts[key] = this.attempts[key].filter(time => now - time < windowMs);
+
+    if (this.attempts[key].length >= maxAttempts) return false;
+
+    this.attempts[key].push(now);
+    return true;
+  }
+};
+
+// Backend purchase recorder
+async function recordPurchase(txHash, amount, tokens) {
+  const response = await fetch('/.netlify/functions/record-purchase', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      wallet: userWalletAddress,
+      txHash,
+      amount,
+      tokens,
+      timestamp: Date.now()
+    })
+  });
+  if (!response.ok) throw new Error('Failed to record purchase');
+}
+
+// Network switch to BSC Testnet
+async function switchToNetwork(chainName = 'BSC') {
+  if (!window.ethereum) return;
+  
+  // Network configuration
 const NETWORKS = {
   ETH_MAINNET: {
     name: "Ethereum Mainnet",
@@ -1038,667 +1793,80 @@ const NETWORKS = {
   }
 };
 
-// Fixed contract addresses
+// Contract addresses for each network (REPLACE WITH YOUR ACTUAL CONTRACT ADDRESSES)
 const CONTRACT_ADDRESSES = {
-  ETH_MAINNET: "0x0000000000000000000000000000000000000000",
-  ETH_TESTNET: "0x0000000000000000000000000000000000000000",
-  BSC_MAINNET: "0x0000000000000000000000000000000000000000",
+  ETH_MAINNET: "YOUR_ETH_MAINNET_CONTRACT_ADDRESS",
+  ETH_TESTNET: "YOUR_ETH_TESTNET_CONTRACT_ADDRESS",
+  BSC_MAINNET: "YOUR_BSC_MAINNET_CONTRACT_ADDRESS",
   BSC_TESTNET: "0x514947bF40Fe6816a606567Be1b4dFDD733B00DA",
-  AVAX_MAINNET: "0x0000000000000000000000000000000000000000",
+  AVAX_MAINNET: "YOUR_AVAX_MAINNET_CONTRACT_ADDRESS",
   AVAX_TESTNET: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
-  MATIC_MAINNET: "0x0000000000000000000000000000000000000000",
-  MATIC_TESTNET: "0x0000000000000000000000000000000000000000",
-  SOL_MAINNET: "YOUR_SOL_MAINNET_PROGRAM_ID",
-  SOL_TESTNET: "YOUR_SOL_TESTNET_PROGRAM_ID"
+  MATIC_MAINNET: "YOUR_MATIC_MAINNET_CONTRACT_ADDRESS",
+  MATIC_TESTNET: "YOUR_MATIC_TESTNET_CONTRACT_ADDRESS",
+  SOL_MAINNET: "YOUR_SOL_MAINNET_CONTRACT_ADDRESS",
+  SOL_TESTNET: "YOUR_SOL_TESTNET_CONTRACT_ADDRESS"
 };
 
-// Contract ABIs for each network
+// Contract ABIs for each network (REPLACE WITH YOUR ACTUAL CONTRACT ABIs)
 const CONTRACT_ABIS = {
-  ETH_MAINNET: [],
-  ETH_TESTNET: [],
-  BSC_MAINNET: [],
+  ETH_MAINNET: [...],
+  ETH_TESTNET: [...],
+  BSC_MAINNET: [...],
   BSC_TESTNET: [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}],
-  AVAX_MAINNET: [],
+  AVAX_MAINNET: [...],
   AVAX_TESTNET: [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}],
-  MATIC_MAINNET: [],
-  MATIC_TESTNET: []
-};
+  MATIC_MAINNET: [...],
+  MATIC_TESTNET: [...],
 
-// Global variables
+// Default network
 let currentNetwork = "BSC_TESTNET";
-let countdownInterval = null;
-let userWalletAddress = null;
-let provider = null;
-
-// ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  const darkMode = localStorage.getItem('darkMode');
-  const isDarkMode = darkMode === 'true' || 
-                    (darkMode === null && 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches);
   
-  if (isDarkMode) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
+  const network = networks[chainName];
+  if (!network) return;
   
-  // Initialize network selector
-  const savedNetwork = localStorage.getItem('selectedNetwork');
-  if (savedNetwork && NETWORKS[savedNetwork]) {
-    currentNetwork = savedNetwork;
-  }
-  document.getElementById('networkSelect').value = currentNetwork;
-  updateCurrencyDisplay();
-  updateContractInfo();
-  updateNetworkIndicator();
-  
-  // Initialize countdown timer
-  initializeCountdown();
-  
-  // Initialize token chart
-  initTokenChart();
-  
-  // Initialize live feed
-  initializeLiveFeed();
-  
-  // Check for referral parameter
-  checkReferral();
-  
-  // Listen for network changes
-  if (window.ethereum) {
-    window.ethereum.on('chainChanged', (chainId) => {
-      // Find network by chainId
-      const networkKey = Object.keys(NETWORKS).find(key => 
-        NETWORKS[key].chainId === chainId && !NETWORKS[key].isSolana
-      );
-      
-      if (networkKey) {
-        currentNetwork = networkKey;
-        localStorage.setItem('selectedNetwork', networkKey);
-        document.getElementById('networkSelect').value = networkKey;
-        updateCurrencyDisplay();
-        updateContractInfo();
-        updateNetworkIndicator();
-        showNotification(`Switched to ${NETWORKS[networkKey].name}`, "info");
-      } else {
-        showNotification("Unsupported network. Please switch to a supported network.", "warning");
-      }
-      
-      // Reload the page to ensure everything works correctly
-      window.location.reload();
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: network.chainId }],
     });
-  }
-});
-
-// ===== NETWORK FUNCTIONS =====
-async function changeNetwork(networkKey) {
-  const network = NETWORKS[networkKey];
-  if (!network) {
-    showNotification("Invalid network selected", "error");
-    return;
-  }
-  
-  // Update current network first
-  const oldNetwork = currentNetwork;
-  currentNetwork = networkKey;
-  localStorage.setItem('selectedNetwork', networkKey);
-  
-  // Update UI immediately
-  document.getElementById('networkSelect').value = networkKey;
-  updateCurrencyDisplay();
-  updateContractInfo();
-  updateNetworkIndicator();
-  
-  // If wallet is connected and it's an EVM network, try to switch
-  if (userWalletAddress && window.ethereum && !network.isSolana) {
-    try {
+  } catch (error) {
+    if (error.code === 4902) {
       await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: network.chainId }],
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: network.chainId,
+          chainName: network.name,
+          rpcUrls: [network.rpcUrl],
+        }]
       });
-      showNotification(`Switched to ${network.name}`, "success");
-    } catch (switchError) {
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: network.chainId,
-              chainName: network.name,
-              rpcUrls: [network.rpcUrl],
-              nativeCurrency: {
-                name: network.currency,
-                symbol: network.currencySymbol,
-                decimals: 18
-              },
-              blockExplorerUrls: [network.explorer]
-            }]
-          });
-          showNotification(`Added and switched to ${network.name}`, "success");
-        } catch (addError) {
-          showNotification(`Failed to add ${network.name}`, "error");
-          // Revert network change
-          currentNetwork = oldNetwork;
-          document.getElementById('networkSelect').value = oldNetwork;
-        }
-      } else {
-        showNotification(`Failed to switch network`, "error");
-        // Revert network change
-        currentNetwork = oldNetwork;
-        document.getElementById('networkSelect').value = oldNetwork;
-      }
     }
   }
 }
 
-function updateCurrencyDisplay() {
-  const network = NETWORKS[currentNetwork];
-  const currencySelect = document.getElementById('currencySelect');
-  const amountInput = document.getElementById('amountInput');
-  
-  // Set the default currency based on network
-  currencySelect.value = network.currency;
-  amountInput.placeholder = `Amount in ${network.currency}`;
-  
-  // Update currency options based on network
-  updateCurrencyOptions();
-}
+// Validate contract deployment & network
+async function validateContracts() {
+  // Use ethers v5 syntax
+  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
 
-function updateCurrencyOptions() {
-  const currencySelect = document.getElementById('currencySelect');
-  const network = NETWORKS[currentNetwork];
-  
-  // Clear existing options
-  currencySelect.innerHTML = '';
-  
-  // Add network's native currency
-  const nativeOption = document.createElement('option');
-  nativeOption.value = network.currency;
-  nativeOption.textContent = network.currency;
-  currencySelect.appendChild(nativeOption);
-  
-  // Add other currencies based on network
-  if (network.currency === 'ETH' || network.currency === 'BNB' || 
-      network.currency === 'AVAX' || network.currency === 'MATIC') {
-    // For EVM networks, add stablecoins and popular options
-    const usdcOption = document.createElement('option');
-    usdcOption.value = 'USDC';
-    usdcOption.textContent = 'USDC';
-    currencySelect.appendChild(usdcOption);
-    
-    const usdtOption = document.createElement('option');
-    usdtOption.value = 'USDT';
-    usdtOption.textContent = 'USDT';
-    currencySelect.appendChild(usdtOption);
-    
-    const daiOption = document.createElement('option');
-    daiOption.value = 'DAI';
-    daiOption.textContent = 'DAI';
-    currencySelect.appendChild(daiOption);
-  }
-  
-  // Add USD option for card payments (would use a payment processor)
-  const usdOption = document.createElement('option');
-  usdOption.value = 'USD';
-  usdOption.textContent = 'USD (Card)';
-  currencySelect.appendChild(usdOption);
-}
+  // Check if contract is deployed
+  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
+  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
-function updateContractInfo() {
-  const network = NETWORKS[currentNetwork];
-  const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
-  
-  // Update contract address display if you have one
-  const contractElement = document.getElementById('contractAddress');
-  if (contractElement && contractAddress && contractAddress !== "0x0000000000000000000000000000000000000000") {
-    contractElement.textContent = `${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}`;
-    contractElement.href = `${network.explorer}/address/${contractAddress}`;
-    contractElement.classList.remove("hidden");
-  } else if (contractElement) {
-    contractElement.textContent = "Not deployed yet";
-    contractElement.href = "#";
-    contractElement.classList.remove("hidden");
-  }
-}
+  // Verify network
+  const network = await provider.getNetwork();
+  if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
 
-function updateNetworkIndicator() {
-  const indicator = document.getElementById('networkIndicator');
-  const network = NETWORKS[currentNetwork];
-  
-  if (!indicator) return;
-  
-  indicator.textContent = network.testnet ? 'Testnet' : 'Mainnet';
-  indicator.className = `network-indicator ${network.testnet ? 'network-testnet' : 'network-mainnet'}`;
+  console.log("Contract validation passed ✅");
 }
-
-// ===== WALLET FUNCTIONS =====
-function openWalletModal() {
-  document.getElementById('walletModal').classList.add('active');
-}
-
-function closeWalletModal() {
-  document.getElementById('walletModal').classList.remove('active');
-}
-
-function closeWalletConnectModal() {
-  document.getElementById('walletConnectModal').classList.remove('active');
-}
-
-// Connection Help Modal Functions
-function showConnectionHelp(walletType, event) {
-  event.stopPropagation();
-  closeWalletModal();
-  
-  let content;
-  
-  switch(walletType) {
-    case 'metamask':
-      content = `
-        <h3 class="text-lg font-bold mb-4">MetaMask Connection Guide</h3>
-        <div class="space-y-4">
-          <div>
-            <h4 class="font-semibold">Browser Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
-              <li>Create a new wallet or import an existing one</li>
-              <li>Click "Connect Wallet" on our site and select MetaMask</li>
-              <li>Approve the connection request in the MetaMask popup</li>
-              <li>Your wallet address will appear when connected</li>
-            </ol>
-          </div>
-          <div>
-            <h4 class="font-semibold">Mobile Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install the MetaMask app from your app store</li>
-              <li>Open our website in the MetaMask in-app browser</li>
-              <li>Tap "Connect Wallet" and select MetaMask</li>
-              <li>Approve the connection request in the app</li>
-            </ol>
-          </div>
-        </div>
-      `;
-      break;
-      
-    case 'trust':
-      content = `
-        <h3 class="text-lg font-bold mb-4">Trust Wallet Connection Guide</h3>
-        <div class="space-y-4">
-          <div>
-            <h4 class="font-semibold">Browser Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install Trust Wallet extension for your browser</li>
-              <li>Set up your wallet and secure your recovery phrase</li>
-              <li>Click "Connect Wallet" and select Trust Wallet</li>
-              <li>Approve the connection request in the extension</li>
-            </ol>
-          </div>
-          <div>
-            <h4 class="font-semibold">Mobile Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install Trust Wallet from App Store or Play Store</li>
-              <li>Open our website in Trust Wallet's DApp browser</li>
-              <li>Tap "Connect Wallet" and select Trust Wallet</li>
-              <li>Approve the connection request in the app</li>
-            </ol>
-          </div>
-        </div>
-      `;
-      break;
-      
-    case 'walletconnect':
-      content = `
-        <h3 class="text-lg font-bold mb-4">WalletConnect Guide</h3>
-        <div class="space-y-4">
-          <div>
-            <h4 class="font-semibold">Browser Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Select WalletConnect from the wallet options</li>
-              <li>Choose your preferred wallet from the list</li>
-              <li>Follow the connection instructions for your wallet</li>
-              <li>Approve the connection request in your wallet</li>
-            </ol>
-          </div>
-          <div>
-            <h4 class="font-semibold">Mobile Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Make sure you have a compatible wallet installed</li>
-              <li>Select WalletConnect from the wallet options</li>
-              <li>Choose your wallet from the list of installed wallets</li>
-              <li>Approve the connection request in your wallet app</li>
-            </ol>
-          </div>
-        </div>
-      `;
-      break;
-      
-    case 'phantom':
-      content = `
-        <h3 class="text-lg font-bold mb-4">Phantom Wallet Guide</h3>
-        <div class="space-y-4">
-          <div>
-            <h4 class="font-semibold">Browser Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
-              <li>Create a new wallet or import an existing one</li>
-              <li>Click "Connect Wallet" and select Phantom</li>
-              <li>Approve the connection request in the Phantom popup</li>
-            </ol>
-          </div>
-          <div>
-            <h4 class="font-semibold">Mobile Instructions:</h4>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li>Install Phantom app from App Store or Play Store</li>
-              <li>Open our website in Phantom's in-app browser</li>
-              <li>Tap "Connect Wallet" and select Phantom</li>
-              <li>Approve the connection request in the app</li>
-            </ol>
-          </div>
-        </div>
-      `;
-      break;
-  }
-  
-  document.getElementById('helpContent').innerHTML = content;
-  document.getElementById('connectionHelpModal').classList.add('active');
-}
-
-function closeHelpModal() {
-  document.getElementById('connectionHelpModal').classList.remove('active');
-}
-
-// Main wallet connection function
-async function connectWallet(walletType) {
-  try {
-    closeWalletModal();
-    
-    // Update wallet button to show loading
-    const walletButton = document.getElementById('walletButton');
-    const originalText = walletButton.innerHTML;
-    walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
-    walletButton.disabled = true;
-    
-    const network = NETWORKS[currentNetwork];
-    
-    if (network.isSolana) {
-      // Handle Solana wallets
-      if (walletType === 'phantom') {
-        await connectSolanaWallet();
-      } else {
-        showNotification("Please use Phantom wallet for Solana", "error");
-      }
-    } else {
-      // Handle EVM wallets
-      if (walletType === 'metamask') {
-        await connectMetaMask();
-      }
-      else if (walletType === 'trust') {
-        await connectTrustWallet();
-      }
-      else if (walletType === 'walletconnect') {
-        await connectWalletConnect();
-      }
-      else if (walletType === 'phantom') {
-        showNotification("Phantom is for Solana, please select an EVM network", "error");
-      }
-    }
-  } catch (error) {
-    console.error("Wallet connection error:", error);
-    showNotification("Failed to connect wallet: " + error.message, "error");
-  } finally {
-    // Reset wallet button state
-    setTimeout(() => {
-      const walletButton = document.getElementById('walletButton');
-      if (walletButton && !userWalletAddress) {
-        walletButton.innerHTML = '<i class="fas fa-wallet"></i>Connect Wallet';
-        walletButton.disabled = false;
-      }
-    }, 2000);
-  }
-}
-
-// MetaMask connection
-async function connectMetaMask() {
-  if (isMobile()) {
-    // Check if we're already in MetaMask browser
-    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
-    
-    if (isMetaMaskBrowser) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-        
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length === 0) {
-            disconnectWallet();
-          } else {
-            handleWalletConnection(accounts[0]);
-          }
-        });
-        return;
-      } catch (error) {
-        console.error("MetaMask connection error:", error);
-        showNotification("Connection failed: " + error.message, "error");
-        return;
-      }
-    }
-    
-    // Only redirect if not in MetaMask browser
-    const currentUrl = window.location.href;
-    if (!currentUrl.includes('metamask')) {
-      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-    }
-  } else {
-    // Desktop logic
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleWalletConnection(accounts[0]);
-      
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          handleWalletConnection(accounts[0]);
-        }
-      });
-    } else {
-      throw new Error("Please install MetaMask extension");
-    }
-  }
-}
-
-// Trust Wallet connection
-async function connectTrustWallet() {
-  if (isMobile()) {
-    if (window.ethereum && window.ethereum.isTrust) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-      } catch (error) {
-        window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-      }
-    } else {
-      window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-    }
-  } else {
-    if (window.ethereum && window.ethereum.isTrust) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-      } catch (error) {
-        throw new Error("Failed to connect Trust Wallet");
-      }
-    } else {
-      throw new Error("Please install Trust Wallet extension");
-    }
-  }
-}
-
-// WalletConnect connection
-async function connectWalletConnect() {
-  try {
-    if (isMobile()) {
-      // For mobile, try to open in wallet app
-      const currentUrl = encodeURIComponent(window.location.href);
-      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-    } else {
-      // For desktop, show message about WalletConnect v2
-      showNotification("Please use MetaMask or Trust Wallet extension", "info");
-    }
-  } catch (error) {
-    console.error("WalletConnect error:", error);
-    showNotification("Connection failed", "error");
-  }
-}
-
-// Solana connection function
-async function connectSolanaWallet() {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      showNotification("Please install Phantom wallet for Solana", "error");
-      window.open('https://phantom.app/', '_blank');
-      return;
-    }
-    
-    const response = await window.solana.connect();
-    const publicKey = response.publicKey.toString();
-    
-    handleWalletConnection(publicKey);
-    
-    // Listen for account changes
-    window.solana.on('accountChanged', (publicKey) => {
-      if (publicKey) {
-        handleWalletConnection(publicKey.toString());
-      } else {
-        disconnectWallet();
-      }
-    });
-    
-  } catch (error) {
-    console.error("Solana connection error:", error);
-    showNotification("Failed to connect Phantom wallet: " + error.message, "error");
-  }
-}
-
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-function handleWalletConnection(address) {
-  userWalletAddress = address;
-  
-  const walletButtons = document.getElementById('walletButtons');
-  const network = NETWORKS[currentNetwork];
-  
-  // Format address based on network
-  let shortAddress;
-  if (network.isSolana) {
-    shortAddress = `${address.slice(0, 4)}...${address.slice(-4)}`;
-  } else {
-    shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-  }
-  
-  walletButtons.innerHTML = `
-    <span class="wallet-address-display">${shortAddress}</span>
-    <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
-  `;
-  
-  document.getElementById('walletAddress').value = address;
-  
-  // Generate referral link
-  const referralLink = `https://fluffi.io/airdrop?ref=${address}&network=${currentNetwork}`;
-  document.getElementById('referralLink').value = referralLink;
-  
-  localStorage.setItem('walletConnected', 'true');
-  localStorage.setItem('walletAddress', address);
-  localStorage.setItem('walletNetwork', currentNetwork);
-  
-  // Close any open modals
-  closeWalletConnectModal();
-  
-  showNotification("Wallet connected successfully!", "success");
-}
-
-async function disconnectWallet() {
-  userWalletAddress = null;
-  
-  const walletButtons = document.getElementById('walletButtons');
-  walletButtons.innerHTML = `
-    <button id="walletButton" onclick="openWalletModal()" 
-    class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2">
-      <i class="fas fa-wallet"></i>Connect Wallet
-    </button>
-  `;
-  
-  document.getElementById('walletAddress').value = '';
-  
-  localStorage.removeItem('walletConnected');
-  localStorage.removeItem('walletAddress');
-  localStorage.removeItem('walletNetwork');
-  
-  // Reset provider
-  provider = null;
-  
-  showNotification("Wallet disconnected", "success");
-}
-
-// Enhanced notification system
-function showNotification(message, type = 'info') {
-  // Remove any existing notifications
-  const existingNotifications = document.querySelectorAll('.notification-toast');
-  existingNotifications.forEach(n => n.remove());
-  
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = 'notification-toast';
-  
-  // Set type-specific styles
-  const colors = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    warning: 'bg-yellow-500',
-    info: 'bg-blue-500'
-  };
-  
-  const icons = {
-    success: '✅',
-    error: '❌',
-    warning: '⚠️',
-    info: 'ℹ️'
-  };
-  
-  notification.innerHTML = `
-    <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
-      <span class="text-2xl">${icons[type]}</span>
-      <div class="flex-1">
-        <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
-        <p class="text-sm">${message}</p>
-      </div>
-      <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-  `;
-  
-  document.body.appendChild(notification);
-  
-  // Auto remove after 5 seconds
-  setTimeout(() => {
-    if (notification && notification.parentNode) {
-      notification.classList.add('animate-slide-out');
-      setTimeout(() => notification.remove(), 300);
-    }
-  }, 5000);
-}
-
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
-  // Get user inputs
+  // 1️⃣ Rate limiter
+  if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
+    showNotification('Too many attempts. Please wait.', 'warning');
+    return;
+  }
+
+  // 2️⃣ Get user inputs
   const amount = document.getElementById('amountInput').value;
   const currency = document.getElementById('currencySelect').value;
   const ref = document.getElementById('refInput').value;
@@ -1714,215 +1882,90 @@ async function buyFluffi() {
     return;
   }
 
-  const network = NETWORKS[currentNetwork];
-  const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
-  
-  // Check if contract is deployed on this network
-  if (!contractAddress || contractAddress.startsWith("0x0000000000000000000000000000000000000000") || 
-      contractAddress === "YOUR_CONTRACT_ADDRESS") {
-    showNotification(`Contract not deployed on ${network.name} yet`, "error");
-    return;
-  }
-
   const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
   const prevText = buyBtn.textContent;
   buyBtn.textContent = '⏳ Processing...';
   buyBtn.disabled = true;
 
   try {
-    // For Solana networks
-    if (network.isSolana) {
-      await buyWithSolana(amount, currency, ref);
-    } 
-    // For EVM networks
-    else {
-      await buyWithEVM(amount, currency, ref, contractAddress);
+    // 3️⃣ Ensure user is on Testnet
+    await switchToNetwork('BSC_TEST');
+    await validateContracts();
+
+    // 4️⃣ Currency conversion
+    const conversionRates = {
+      'BNB': 1,
+      'SOL': 0.0015,
+      'AVAX': 0.01,
+      'MATIC': 0.00025,
+      'USDC': 0.0015,
+      'USD': 0.0015
+    };
+    const bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
+
+    if (currency !== 'BNB') {
+      showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
-  } catch (err) {
-    console.error("Buy error:", err);
-    showNotification(err.message || "Transaction failed", 'error');
-  } finally {
+
+    // 5️⃣ Prepare referral
+    let referralAddress = ethers.constants.AddressZero;
+    if (ref) {
+      if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
+      referralAddress = ref;
+    }
+
+   // 6️⃣ Initialize provider & contract (ethers v5)
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+
+    // 7️⃣ Estimate gas & send transaction
+const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+  value: ethers.utils.parseEther(bnbValue)
+});
+
+const tx = await contract.contribute(referralAddress, {
+  value: ethers.utils.parseEther(bnbValue),
+  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+});
+    await tx.wait();
+
+    // 8️⃣ Record purchase on backend
+    const tokensBought = bnbValue * 10000000; // Example token rate
+    await recordPurchase(tx.hash, Number(amount), tokensBought);
+
+    // 9️⃣ Update UI
+    const tokensSold = document.getElementById('tokensSold');
+    const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
+    tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
+
+    showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
+
+    await updateUserBalances();
+
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
+
+  } catch (err) {
+    console.error("Buy error:", err);
+    buyBtn.textContent = '🚀 Buy Now';
+    buyBtn.disabled = false;
+    showNotification(err.message || "Transaction failed", 'error');
   }
 }
+ </script>
+    <script>
+    // ===== STAKING FUNCTIONS =====
+// Staking contract placeholder - replace with actual deployed address
+const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
+const STAKING_CONTRACT_ABI = [
+  "function stake(uint256 amount) external",
+  "function unstake(uint256 amount) external", 
+  "function getStakedBalance(address user) view returns (uint256)",
+  "function calculateRewards(address user) view returns (uint256)",
+  "function claimRewards() external"
+];
 
-// EVM purchase function
-async function buyWithEVM(amount, currency, ref, contractAddress) {
-  const network = NETWORKS[currentNetwork];
-  
-  // Switch to the correct network
-  await switchToNetwork(currentNetwork);
-  
-  // Validate contract
-  await validateContracts();
-  
-  // Currency conversion
-  const conversionRates = await getConversionRates(currency, network.currency);
-  const nativeValue = (Number(amount) * conversionRates).toFixed(6);
-
-  // Prepare referral
-  let referralAddress = ethers.constants.AddressZero;
-  if (ref) {
-    if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
-    referralAddress = ref;
-  }
-
-  // Initialize provider & contract
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const contractABI = CONTRACT_ABIS[currentNetwork];
-  const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-  // Estimate gas & send transaction
-  const gasEstimate = await contract.estimateGas.buyTokens({
-    value: ethers.utils.parseEther(nativeValue)
-  });
-
-  const tx = await contract.buyTokens({
-    value: ethers.utils.parseEther(nativeValue)
-  });
-  await tx.wait();
-
-  // Record purchase
-  const tokensBought = await calculateTokensBought(nativeValue, network.currency);
-  await recordPurchase(tx.hash, Number(amount), tokensBought, network.currency);
-
-  // Update UI
-  updateTokensSold(tokensBought);
-  showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
-  await updateUserBalances();
-}
-
-// ===== TIMER FUNCTIONS =====
-function initializeCountdown() {
-  // Clear any existing interval
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-  }
-  
-  // Fixed presale start time
-  const startTime = new Date('2025-01-27T00:00:00Z').getTime();
-  
-  // Update timer immediately
-  updateTimer(startTime);
-  
-  // Set interval to update timer every second
-  countdownInterval = setInterval(() => updateTimer(startTime), 1000);
-}
-
-// Update timer display
-function updateTimer(startTime) {
-  const now = Date.now();
-  const totalDuration = 15 * 48 * 60 * 60 * 1000; // 15 stages * 48 hours each
-  const endTime = startTime + totalDuration;
-  const timeLeft = endTime - now;
-  
-  // Calculate current stage (0-14)
-  const elapsed = now - startTime;
-  const stageDuration = 48 * 60 * 60 * 1000; // 48 hours
-  const currentStage = Math.min(Math.floor(elapsed / stageDuration), 14);
-  const stageEndTime = startTime + ((currentStage + 1) * stageDuration);
-  const stageTimeLeft = stageEndTime - now;
-  
-  // Format time function
-  const formatTime = (ms) => {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
-    const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-    
-    return {
-      days: days.toString().padStart(2, '0'),
-      hours: hours.toString().padStart(2, '0'),
-      minutes: minutes.toString().padStart(2, '0'),
-      seconds: seconds.toString().padStart(2, '0'),
-      full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-    };
-  };
-  
-  // Update main timer - fix element IDs
-  const daysEl = document.getElementById('days');
-  const hoursEl = document.getElementById('hours');
-  const minutesEl = document.getElementById('minutes');
-  const secondsEl = document.getElementById('seconds');
-  
-  if (timeLeft <= 0) {
-    if (daysEl) daysEl.textContent = '00';
-    if (hoursEl) hoursEl.textContent = '00';
-    if (minutesEl) minutesEl.textContent = '00';
-    if (secondsEl) secondsEl.textContent = '00';
-    clearInterval(countdownInterval);
-  } else {
-    const totalFormatted = formatTime(timeLeft);
-    if (daysEl) daysEl.textContent = totalFormatted.days;
-    if (hoursEl) hoursEl.textContent = totalFormatted.hours;
-    if (minutesEl) minutesEl.textContent = totalFormatted.minutes;
-    if (secondsEl) secondsEl.textContent = totalFormatted.seconds;
-  }
-  
-  // Update stage info
-  const stageEl = document.getElementById('current-stage');
-  const stageTimeEl = document.getElementById('stage-time-left');
-  const progressEl = document.getElementById('stageProgressBar');
-  
-  if (stageEl) stageEl.textContent = currentStage + 1;
-  
-  const stageFormatted = formatTime(stageTimeLeft);
-  if (stageTimeEl) stageTimeEl.textContent = stageFormatted.full;
-  
-  // Update progress bar
-  const stageProgress = 100 - (stageTimeLeft / stageDuration) * 100;
-  const totalProgress = ((currentStage + (stageProgress / 100)) / 15) * 100;
-  if (progressEl) progressEl.style.width = `${totalProgress}%`;
-  
-  // Update price (5% increase per stage)
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  const priceEl = document.getElementById('currentPrice');
-  if (priceEl) {
-    priceEl.innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">${stageFormatted.full}</span></span></span>`;
-  }
-}
-
-// Reset timer function
-function resetTimer() {
-  // Clear existing interval
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
-  
-  // Reset all timer displays to initial state
-  const elements = ['days', 'hours', 'minutes', 'seconds'];
-  elements.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '00';
-  });
-  
-  // Reset stage info
-  const stageEl = document.getElementById('current-stage');
-  const stageTimeEl = document.getElementById('stage-time-left');
-  const progressEl = document.getElementById('stageProgressBar');
-  
-  if (stageEl) stageEl.textContent = '1';
-  if (stageTimeEl) stageTimeEl.textContent = '00d 00h 00m 00s';
-  if (progressEl) progressEl.style.width = '0%';
-  
-  // Reset price
-  const priceEl = document.getElementById('currentPrice');
-  if (priceEl) {
-    priceEl.innerHTML = '$0.000100 <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00d 00h 00m 00s</span></span></span>';
-  }
-  
-  // Reinitialize the timer after a short delay
-  setTimeout(() => {
-    initializeCountdown();
-  }, 100);
-  
-  showNotification("Timer reset successfully", "success");
-}
-
-// ===== STAKING FUNCTIONS =====
 async function stakeFluffi() {
   try {
     if (!userWalletAddress) {
@@ -1939,22 +1982,79 @@ async function stakeFluffi() {
       return;
     }
     
-    // Check if we have a real staking contract
-    const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
-    if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
-      showNotification("Staking not available on this network yet", "warning");
-      return;
-    }
+    const stakeBtn = document.querySelector('#staking button');
+    const originalText = stakeBtn.textContent;
+    stakeBtn.disabled = true;
+    stakeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
     
-    showNotification("Smart contract staking will be available after mainnet deployment", "info");
+    try {
+      // Check if staking contract is deployed
+      if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+        // Fallback to local storage simulation for now
+        const stakingInfo = {
+          amount: amountNum,
+          timestamp: Date.now(),
+          apy: 90,
+          wallet: userWalletAddress,
+          lastClaim: Date.now()
+        };
+        
+        const existingStake = localStorage.getItem(`staking_${userWalletAddress}`);
+        if (existingStake) {
+          const existing = JSON.parse(existingStake);
+          stakingInfo.amount += existing.amount;
+        }
+        
+        localStorage.setItem(`staking_${userWalletAddress}`, JSON.stringify(stakingInfo));
+        
+        setTimeout(() => {
+          stakeBtn.disabled = false;
+          stakeBtn.textContent = originalText;
+          document.getElementById('stakeInput').value = '';
+          updateStakingDisplay();
+          showNotification(`Successfully staked ${amountNum} FLUFFI!`, "success");
+        }, 2000);
+      } else {
+        // Real staking with smart contract
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const stakingContract = new ethers.Contract(STAKING_CONTRACT_ADDRESS, STAKING_CONTRACT_ABI, signer);
+        
+        // Convert amount to wei
+        const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+        
+        // First approve FLUFFI tokens for staking contract
+        const fluffiContract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, ["function approve(address spender, uint256 amount) returns (bool)"], signer);
+        const approveTx = await fluffiContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
+        await approveTx.wait();
+        
+        // Then stake
+        const stakeTx = await stakingContract.stake(amountWei);
+        await stakeTx.wait();
+        
+        stakeBtn.disabled = false;
+        stakeBtn.textContent = originalText;
+        document.getElementById('stakeInput').value = '';
+        
+        updateStakingDisplay();
+        showNotification(`Successfully staked ${amountNum} FLUFFI! TX: ${stakeTx.hash}`, "success");
+      }
+    } catch (error) {
+      console.error("Staking error:", error);
+      stakeBtn.disabled = false;
+      stakeBtn.textContent = originalText;
+      showNotification("Staking failed: " + error.message, "error");
+    }
     
   } catch (error) {
     console.error("Stake error:", error);
     showNotification(error.message || "Staking failed", "error");
   }
 }
-
-// ===== CLAIM FUNCTIONS =====
+      function updateStakingDisplay() {
+  updateStakingDashboard(); // Call the dashboard update function
+}
+    // ===== CLAIM FUNCTIONS =====
 async function claimTokens() {
   try {
     if (!userWalletAddress) {
@@ -1963,7 +2063,70 @@ async function claimTokens() {
       return;
     }
     
-    showNotification("Claim will be available after presale ends", "info");
+    // Check if presale has ended
+    const presaleEndTime = getPresaleEndTime();
+    const now = Date.now();
+    
+    if (now < presaleEndTime) {
+      const timeLeft = formatTime(presaleEndTime - now);
+      showNotification(`Presale hasn't ended yet. ${timeLeft.full} remaining`, "warning");
+      return;
+    }
+    
+    // Get user's purchase data
+    const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
+    const claims = JSON.parse(localStorage.getItem(`claims_${userWalletAddress}`) || '[]');
+    
+    // Calculate total claimable
+    const totalPurchased = purchases.reduce((sum, p) => sum + p.tokens, 0);
+    const totalClaimed = claims.reduce((sum, c) => sum + c.amount, 0);
+    const claimable = totalPurchased - totalClaimed;
+    
+    if (claimable <= 0) {
+      showNotification("No tokens available to claim", "info");
+      return;
+    }
+    
+    const claimBtn = document.querySelector('button[onclick="claimTokens()"]');
+    const originalText = claimBtn.textContent;
+    claimBtn.disabled = true;
+    claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Claiming...';
+    
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      
+      // For now, simulate claim (replace with actual contract call when deployed)
+      // In production, this would call the claim function on the contract
+      
+      setTimeout(() => {
+        // Record the claim
+        const claimRecord = {
+          amount: claimable,
+          timestamp: Date.now(),
+          txHash: '0x' + Math.random().toString(16).substr(2, 64) // Simulated tx hash
+        };
+        
+        claims.push(claimRecord);
+        localStorage.setItem(`claims_${userWalletAddress}`, JSON.stringify(claims));
+        
+        // Update balances
+        const currentBalance = parseFloat(localStorage.getItem(`balance_${userWalletAddress}`) || '0');
+        localStorage.setItem(`balance_${userWalletAddress}`, (currentBalance + claimable).toString());
+        
+        claimBtn.disabled = false;
+        claimBtn.textContent = originalText;
+        
+        updateUserBalances();
+        showNotification(`Successfully claimed ${claimable.toFixed(2)} FLUFFI!`, "success");
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Claim error:", error);
+      claimBtn.disabled = false;
+      claimBtn.textContent = originalText;
+      showNotification("Claim failed: " + error.message, "error");
+    }
     
   } catch (error) {
     console.error("Claim error:", error);
@@ -1971,37 +2134,57 @@ async function claimTokens() {
   }
 }
 
-// ===== UTILITY FUNCTIONS =====
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (window.tokenChart) {
-    const isDark = html.classList.contains('dark');
-    window.tokenChart.options.plugins.legend.labels.color = isDark ? '#E5E7EB' : '#374151';
-    window.tokenChart.update();
-  }
+// Add helper function for presale end time
+function getPresaleEndTime() {
+  const startTime = getPresaleStartTime();
+  return startTime + (15 * 48 * 60 * 60 * 1000); // 15 stages * 48 hours
 }
+    // ===== UTILITY FUNCTIONS =====
+    async function updateUserBalances() {
+      if (!userWalletAddress) return;
+      
+      try {
+        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+        const fluffiContract = new ethers.Contract(
+          FLUFFI_CONTRACT_ADDRESS,
+          FLUFFI_CONTRACT_ABI,
+          provider
+        );
+        
+        const [balance, staked, rewards] = await Promise.all([
+          fluffiContract.balanceOf(userWalletAddress),
+          fluffiContract.stakedBalance(userWalletAddress),
+          fluffiContract.calculateRewards(userWalletAddress)
+        ]);
+        
+        document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
+        document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
+        document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
+        
+      } catch (error) {
+        console.error("Balance update error:", error);
+      }
+    }
 
-// Token chart initialization
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('darkMode', html.classList.contains('dark'));
+      
+      // Update icon
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+      
+      // Update chart colors if needed
+      if (tokenChart) {
+        const isDark = html.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      }
+    }
 function initTokenChart() {
-  // Wait for Chart.js to load
-  if (typeof Chart === 'undefined') {
-    setTimeout(initTokenChart, 100);
-    return;
-  }
-  
   const ctx = document.getElementById('tokenChart');
-  if (!ctx) {
-    console.warn('Token chart canvas not found');
-    return;
-  }
+  if (!ctx) return;
   
   const isDark = document.documentElement.classList.contains('dark');
   
@@ -2017,8 +2200,7 @@ function initTokenChart() {
         '#EF4444', // Red
         '#8B5CF6'  // Purple
       ],
-      borderWidth: 2,
-      borderColor: isDark ? '#374151' : '#ffffff',
+      borderWidth: 0,
       hoverOffset: 15
     }]
   };
@@ -2029,36 +2211,33 @@ function initTokenChart() {
     data: data,
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       cutout: '65%',
       plugins: {
         legend: {
           position: 'bottom',
           labels: {
-            color: isDark ? '#E5E7EB' : '#374151',
+            color: isDark ? '#E2E8F0' : '#1F2937',
             font: {
-              size: 12,
-              family: "'Inter', sans-serif"
+              size: 14,
+              family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
             },
-            padding: 15,
-            usePointStyle: true
+            padding: 20
           }
         },
         tooltip: {
-          backgroundColor: isDark ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
           titleColor: isDark ? '#10B981' : '#059669',
-          bodyColor: isDark ? '#E5E7EB' : '#374151',
-          borderColor: isDark ? '#4B5563' : '#D1D5DB',
-          borderWidth: 1,
+          bodyColor: isDark ? '#E2E8F0' : '#1F2937',
           titleFont: {
-            size: 14,
+            size: 16,
             weight: 'bold'
           },
           bodyFont: {
-            size: 12
+            size: 14
           },
-          padding: 12,
-          cornerRadius: 8,
+          padding: 15,
+          cornerRadius: 12,
           callbacks: {
             label: function(context) {
               return `${context.label.split(' (')[0]}: ${context.parsed}%`;
@@ -2069,45 +2248,199 @@ function initTokenChart() {
       animation: {
         animateScale: true,
         animateRotate: true,
-        duration: 1500,
+        duration: 2000,
         easing: 'easeOutQuart'
       }
     }
   };
   
-  try {
-    // Destroy existing chart if it exists
-    if (window.tokenChart) {
-      window.tokenChart.destroy();
-    }
-    
-    // Create the chart
-    window.tokenChart = new Chart(ctx, config);
-    console.log('Token chart initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize token chart:', error);
-  }
+  // Create the chart
+  const tokenChart = new Chart(ctx, config);
+  
+  // Update chart on theme change
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        const isDark = document.documentElement.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#E2E8F0' : '#1F2937';
+        tokenChart.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+        tokenChart.options.plugins.tooltip.titleColor = isDark ? '#10B981' : '#059669';
+        tokenChart.options.plugins.tooltip.bodyColor = isDark ? '#E2E8F0' : '#1F2937';
+        tokenChart.update();
+      }
+    });
+  });
+  
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
 }
 
-// ===== REFERRAL FUNCTIONS =====
-function checkReferral() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const ref = urlParams.get('ref');
-  if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-    document.getElementById('refInput').value = ref;
+// Initialize the chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTokenChart();
+});
+      
+// ==== TIMER FUNCTIONS =====
+function getPresaleStartTime() {
+  let startTime = localStorage.getItem('presaleStartTime');
+  if (!startTime) {
+    // Set initial start time to now (for testing)
+    startTime = Date.now();
+    // For production, you might want to set a fixed start time:
+    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
+    localStorage.setItem('presaleStartTime', startTime);
   }
+  return parseInt(startTime);
 }
 
-async function connectReferralWallet() {
-  if (!userWalletAddress) {
-    openWalletModal();
+function formatTime(ms) {
+  const days = Math.floor(ms / (24 * 3600 * 1000));
+  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
+  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+  
+  return {
+    days: days.toString().padStart(2, '0'),
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: seconds.toString().padStart(2, '0'),
+    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+  };
+}
+
+function updateNextIncreaseTime() {
+  const now = Date.now();
+  const startTime = getPresaleStartTime();
+  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
+  const timeLeft = nextStageTime - now;
+  
+  const formatted = formatTime(timeLeft);
+  document.getElementById('nextIncreaseTime').textContent = formatted.full;
+}
+
+function updateTimers() {
+  const now = Date.now();
+  const startTime = getPresaleStartTime();
+  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
+  const timeLeft = endTime - now;
+
+  // Calculate stage progress
+  const currentStage = Math.min(
+    Math.floor((now - startTime) / (48 * 3600 * 1000)),
+    14 // Max stage index
+  );
+  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
+  const stageTimeLeft = stageEndTime - now;
+  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
+
+  // Update displays
+  document.getElementById('current-stage').textContent = currentStage + 1;
+  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
+
+  // Update price
+  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
+  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
+
+  // Update timers
+  if (timeLeft <= 0) {
+    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
+    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
   } else {
-    showReferralUI(userWalletAddress);
+    const formattedTotal = formatTime(timeLeft);
+    const formattedStage = formatTime(stageTimeLeft);
+    
+    document.getElementById('presale-days').textContent = formattedTotal.days;
+    document.getElementById('presale-hours').textContent = formattedTotal.hours;
+    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
+    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
+    
+    document.getElementById('stage-time-left').textContent = formattedStage.full;
   }
 }
 
-function showReferralUI(wallet) {
+// Initialize the timer
+function initTimer() {
+  updateTimers();
+  updateNextIncreaseTime();
+  // Update every second
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime();
+  }, 1000);
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  if (localStorage.getItem('darkMode') === 'true' || 
+      (localStorage.getItem('darkMode') === null && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+
+  // Check if MetaMask is installed
+  if (window.ethereum?.isMetaMask) {
+    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+  }
+
+  // Initialize token chart
+  initTokenChart();
+
+  // Initialize timers
+  initTimer();
+
+  // Check for referral parameter
+  checkReferral();
+});
+
+// Toggle dark mode function
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  }
+}
+    // ===== REFERRAL FUNCTIONS =====
+    function checkReferral() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
+        document.getElementById('refInput').value = ref;
+      }
+    }
+
+    async function connectReferralWallet() {
+      if (!userWalletAddress) {
+        await connectWallet();
+      }
+      if (userWalletAddress) {
+        showReferralUI(userWalletAddress);
+      }
+    }
+
+    function showReferralUI(wallet) {
   const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
+  
+  // Get referral stats from localStorage
+  const referrals = JSON.parse(localStorage.getItem(`referrals_${wallet}`) || '[]');
+  const totalReferrals = referrals.length;
+  const totalEarnings = referrals.reduce((sum, r) => sum + (parseFloat(r.amount) * 0.1), 0); // 10% commission
   
   document.getElementById('referralSection').innerHTML = `
     <div class="space-y-4">
@@ -2122,8 +2455,8 @@ function showReferralUI(wallet) {
         </div>
       </div>
       <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">0</span></p>
-        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">0 BNB</span></p>
+        <p class="dark:text-gray-300">👥 Total referrals: <span class="font-bold">${totalReferrals}</span></p>
+        <p class="dark:text-gray-300">💰 Earnings: <span class="font-bold">${totalEarnings.toFixed(4)} BNB</span></p>
       </div>
       <div class="mt-4">
         <p class="text-sm mb-2 font-semibold">Share your link:</p>
@@ -2139,25 +2472,75 @@ function showReferralUI(wallet) {
     </div>
   `;
 }
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      document.execCommand('copy');
+      alert("Referral link copied to clipboard!");
+    }
 
-function copyReferralLink() {
-  const input = document.getElementById('referralLinkInput');
-  input.select();
-  document.execCommand('copy');
-  showNotification("Referral link copied to clipboard!", "success");
-}
+    function shareOnTwitter() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+    }
 
-function shareOnTwitter() {
-  const link = document.getElementById('referralLinkInput').value;
-  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
-}
+    function shareOnTelegram() {
+      const link = document.getElementById('referralLinkInput').value;
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+    }
+  </script>
+  
+<script>
+  const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
+  const ERC20_ABI = [
+    "function balanceOf(address owner) view returns (uint256)",
+    "function decimals() view returns (uint8)"
+  ];
 
-function shareOnTelegram() {
-  const link = document.getElementById('referralLinkInput').value;
-  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
-}
+  async function loadFluffiBalance() {
+    if (!window.ethereum) {
+      console.warn("No wallet provider found");
+      return;
+    }
 
-// Simulated live feed
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      const userAddress = accounts[0];
+
+      const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
+      const decimals = await contract.decimals();
+      const rawBalance = await contract.balanceOf(userAddress);
+      const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
+
+      document.getElementById("user-balance-value").textContent =
+        parseFloat(formattedBalance).toLocaleString();
+    } catch (err) {
+      console.error("Error fetching balance:", err);
+    }
+  }
+
+  // Load once connected
+  window.addEventListener("load", loadFluffiBalance);
+
+  // Update if user changes wallet
+  if (window.ethereum) {
+    window.ethereum.on("accountsChanged", loadFluffiBalance);
+  }
+</script>
+  <script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  });
+</script>
+<script>
+// Simulated live feed since contract isn't deployed on mainnet yet
 function initializeLiveFeed() {
   const feedList = document.getElementById('feed-list');
   
@@ -2194,19 +2577,8 @@ function initializeLiveFeed() {
   setInterval(addActivity, 5000);
 }
 
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initializeLiveFeed);
 </script>
 </body>
 </html>
