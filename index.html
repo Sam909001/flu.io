@@ -1817,6 +1817,20 @@ async function buyFluffi() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
+    // ✅ Disable ENS lookups
+function disableEnsLookups(provider) {
+  const originalResolveName = provider.resolveName.bind(provider);
+  provider.resolveName = async (name) => {
+    if (ethers.utils.isAddress(name)) return name; // already an address
+    console.warn("ENS lookup skipped for:", name);
+    return null; // skip ENS
+  };
+  return provider;
+}
+disableEnsLookups(provider);
+
+const signer = provider.getSigner();
+
     // 4️⃣ Detect chain & select contract address
     const network = await provider.getNetwork();
     const contractAddress = CONTRACT_ADDRESSES[network.chainId];
