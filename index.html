@@ -1814,22 +1814,16 @@ async function buyFluffi() {
 
   try {
     // 3️⃣ Initialize provider & signer
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    let provider = new ethers.providers.Web3Provider(window.ethereum);
 
     // ✅ Disable ENS lookups
-function disableEnsLookups(provider) {
-  const originalResolveName = provider.resolveName.bind(provider);
-  provider.resolveName = async (name) => {
-    if (ethers.utils.isAddress(name)) return name; // already an address
-    console.warn("ENS lookup skipped for:", name);
-    return null; // skip ENS
-  };
-  return provider;
-}
-disableEnsLookups(provider);
+    provider.resolveName = async (name) => {
+      if (ethers.utils.isAddress(name)) return name; // already an address
+      console.warn("ENS lookup skipped for:", name);
+      return null;
+    };
 
-const signer = provider.getSigner();
+    const signer = provider.getSigner();
 
     // 4️⃣ Detect chain & select contract address
     const network = await provider.getNetwork();
@@ -1838,10 +1832,7 @@ const signer = provider.getSigner();
 
     const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
-    // 5️⃣ Optional: Switch network if needed (your switchToNetwork function)
-    // await switchToNetwork(network.chainId);
-
-    // 6️⃣ Currency conversion
+    // 5️⃣ Currency conversion
     const conversionRates = {
       'BNB': 1,
       'SOL': 0.0015,
@@ -1855,14 +1846,14 @@ const signer = provider.getSigner();
       showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
 
-    // 7️⃣ Prepare referral address
+    // 6️⃣ Prepare referral address
     let referralAddress = ethers.constants.AddressZero;
     if (ref) {
       if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
       referralAddress = ref;
     }
 
-    // 8️⃣ Estimate gas & send transaction
+    // 7️⃣ Estimate gas & send transaction
     const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
       value: ethers.utils.parseEther(bnbValue)
     });
@@ -1873,11 +1864,11 @@ const signer = provider.getSigner();
     });
     await tx.wait();
 
-    // 9️⃣ Record purchase on backend
+    // 8️⃣ Record purchase on backend
     const tokensBought = bnbValue * 10000000; // Example token rate
     await recordPurchase(tx.hash, Number(amount), tokensBought);
 
-    // 🔟 Update UI
+    // 9️⃣ Update UI
     const tokensSold = document.getElementById('tokensSold');
     const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
     tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
