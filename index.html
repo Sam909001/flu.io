@@ -1714,13 +1714,84 @@ async function buyFluffi() {
     return;
   }
 
+  const network = NETWORKS[currentNetwork];
   const contractAddress = CONTRACT_ADDRESSES[currentNetwork];
-  if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
-    showNotification("Smart contract not deployed on this network yet", "warning");
+  
+  // Check if contract is deployed on this network
+  if (!contractAddress || contractAddress.startsWith("0x0000000000000000000000000000000000000000") || 
+      contractAddress === "YOUR_CONTRACT_ADDRESS") {
+    showNotification(`Contract not deployed on ${network.name} yet`, "error");
     return;
   }
 
-  showNotification("Transaction would be sent to smart contract when deployed", "info");
+  const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+  const prevText = buyBtn.textContent;
+  buyBtn.textContent = '⏳ Processing...';
+  buyBtn.disabled = true;
+
+  try {
+    // For Solana networks
+    if (network.isSolana) {
+      await buyWithSolana(amount, currency, ref);
+    } 
+    // For EVM networks
+    else {
+      await buyWithEVM(amount, currency, ref, contractAddress);
+    }
+  } catch (err) {
+    console.error("Buy error:", err);
+    showNotification(err.message || "Transaction failed", 'error');
+  } finally {
+    buyBtn.textContent = prevText;
+    buyBtn.disabled = false;
+  }
+}
+
+// EVM purchase function
+async function buyWithEVM(amount, currency, ref, contractAddress) {
+  const network = NETWORKS[currentNetwork];
+  
+  // Switch to the correct network
+  await switchToNetwork(currentNetwork);
+  
+  // Validate contract
+  await validateContracts();
+  
+  // Currency conversion
+  const conversionRates = await getConversionRates(currency, network.currency);
+  const nativeValue = (Number(amount) * conversionRates).toFixed(6);
+
+  // Prepare referral
+  let referralAddress = ethers.constants.AddressZero;
+  if (ref) {
+    if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
+    referralAddress = ref;
+  }
+
+  // Initialize provider & contract
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const contractABI = CONTRACT_ABIS[currentNetwork];
+  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  // Estimate gas & send transaction
+  const gasEstimate = await contract.estimateGas.buyTokens({
+    value: ethers.utils.parseEther(nativeValue)
+  });
+
+  const tx = await contract.buyTokens({
+    value: ethers.utils.parseEther(nativeValue)
+  });
+  await tx.wait();
+
+  // Record purchase
+  const tokensBought = await calculateTokensBought(nativeValue, network.currency);
+  await recordPurchase(tx.hash, Number(amount), tokensBought, network.currency);
+
+  // Update UI
+  updateTokensSold(tokensBought);
+  showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
+  await updateUserBalances();
 }
 
 // ===== TIMER FUNCTIONS =====
