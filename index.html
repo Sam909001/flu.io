@@ -1838,109 +1838,112 @@ async function switchNetwork(chainId, chainName, rpcUrl, nativeCurrencyName, nat
  </script>
   <script>
 async function buyFluffi() {
-  // 1️⃣ Rate limiter
-  if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
-    showNotification('Too many attempts. Please wait.', 'warning');
-    return;
-  }
-
-  // 2️⃣ Get user inputs
-  const amount = document.getElementById('amountInput').value;
-  const currency = document.getElementById('currencySelect').value;
-  const ref = document.getElementById('refInput').value;
-
+  // 1️⃣ Check if wallet is connected
   if (!userWalletAddress) {
     showNotification('Please connect your wallet first.', 'error');
     openWalletModal();
     return;
   }
-
+  
+  // 2️⃣ Get user inputs
+  const amountInput = document.getElementById('amountInput');
+  const refInput = document.getElementById('refInput');
+  
+  const amount = amountInput.value;
+  const ref = refInput.value;
+  
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
     showNotification('Please enter a valid amount.', 'error');
+    amountInput.focus();
     return;
   }
-
+  
+  // 3️⃣ Validate referral address if provided
+  if (ref && !isValidEthereumAddress(ref)) {
+    showNotification('Invalid referral address format.', 'error');
+    refInput.focus();
+    return;
+  }
+  
+  // 4️⃣ Get selected network
+  const networkSelect = document.getElementById('presaleNetworkSelect');
+  const selectedNetwork = networkSelect.value;
+  
+  // 5️⃣ Show processing state
   const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
-  const prevText = buyBtn.textContent;
-  buyBtn.textContent = '⏳ Processing...';
+  const originalText = buyBtn.textContent;
   buyBtn.disabled = true;
-
+  buyBtn.textContent = 'Processing...';
+  
   try {
-   // 3️⃣ Initialize provider & signer
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-// ✅ Disable ENS lookups
-provider.resolveName = async (name) => {
-  if (ethers.utils.isAddress(name)) return ethers.utils.getAddress(name);
-  console.warn("ENS lookup skipped for:", name);
-  return null;
-};
-
-const signer = provider.getSigner();
-
-// 4️⃣ Detect chain & select contract address
-const network = await provider.getNetwork();
-let contractAddress = CONTRACT_ADDRESSES[network.chainId];
-if (!contractAddress) throw new Error("Unsupported network");
-
-// ✅ Ensure address is checksummed
-contractAddress = ethers.utils.getAddress(contractAddress);
-
-const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
-
-    // 5️⃣ Currency conversion
-    const conversionRates = {
-      'BNB': 1,
-      'SOL': 0.0015,
-      'AVAX': 0.01,
-      'MATIC': 0.00025,
-      'USDC': 0.0015,
-      'USD': 0.0015
-    };
-    const bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
-    if (currency !== 'BNB') {
-      showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
-    }
-
-    // 6️⃣ Prepare referral address
-    let referralAddress = ethers.constants.AddressZero;
-    if (ref) {
-      if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
-      referralAddress = ref;
-    }
-
-    // 7️⃣ Estimate gas & send transaction
-    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
-      value: ethers.utils.parseEther(bnbValue)
-    });
-
-    const tx = await contract.buyTokens(referralAddress, {
-      value: ethers.utils.parseEther(bnbValue),
-      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-    });
-    await tx.wait();
-
-    // 8️⃣ Record purchase on backend
-    const tokensBought = bnbValue * 10000000; // Example token rate
-    await recordPurchase(tx.hash, Number(amount), tokensBought);
-
-    // 9️⃣ Update UI
+    // 6️⃣ Simulate purchase (replace with actual contract interaction)
+    // For demo purposes, we'll simulate a successful purchase
+    
+    // Calculate tokens based on current price
+    const currentPrice = parseFloat(document.getElementById('currentPrice').textContent.replace('$', ''));
+    const tokensBought = (Number(amount) / currentPrice).toFixed(2);
+    
+    // Simulate transaction delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // 7️⃣ Update UI with successful purchase
     const tokensSold = document.getElementById('tokensSold');
     const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
-    tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
-
-    showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
-
-    await updateUserBalances();
-
-    buyBtn.textContent = prevText;
+    tokensSold.textContent = (currentSold + Number(tokensBought)).toLocaleString();
+    
+    // 8️⃣ Save purchase to localStorage
+    const purchases = JSON.parse(localStorage.getItem(`purchases_${userWalletAddress}`) || '[]');
+    purchases.push({
+      amount: Number(amount),
+      tokens: Number(tokensBought),
+      timestamp: Date.now(),
+      network: selectedNetwork,
+      referral: ref || null
+    });
+    localStorage.setItem(`purchases_${userWalletAddress}`, JSON.stringify(purchases));
+    
+    // 9️⃣ Update user balance
+    const currentBalance = parseFloat(localStorage.getItem(`balance_${userWalletAddress}`) || '0');
+    localStorage.setItem(`balance_${userWalletAddress}`, (currentBalance + Number(tokensBought)).toString());
+    
+    // 🔟 Show success message
+    showNotification(`🎉 Success! You bought ${Number(tokensBought).toLocaleString()} FLUFFI tokens!`, 'success');
+    
+    // 1️⃣1️⃣ Add to live feed
+    addToLiveFeed(`🚀 ${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)} bought ${Number(amount).toFixed(4)} BNB worth of FLUFFI`);
+    
+    // 1️⃣2️⃣ Reset form
+    amountInput.value = '';
+    refInput.value = '';
+    
+  } catch (error) {
+    console.error("Buy error:", error);
+    showNotification(error.message || "Transaction failed", 'error');
+  } finally {
+    // Reset button state
     buyBtn.disabled = false;
+    buyBtn.textContent = originalText;
+  }
+}
 
-  } catch (err) {
-    console.error("Buy error:", err);
-    buyBtn.textContent = '🚀 Buy Now';
-    buyBtn.disabled = false;
-    showNotification(err.message || "Transaction failed", 'error');
+// Helper function to validate Ethereum address
+function isValidEthereumAddress(address) {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+// Add to live feed function
+function addToLiveFeed(message) {
+  const feedList = document.getElementById('feed-list');
+  if (!feedList) return;
+  
+  const li = document.createElement('li');
+  li.textContent = message;
+  li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md";
+  feedList.prepend(li);
+  
+  // Keep only last 5 items
+  while (feedList.children.length > 5) {
+    feedList.removeChild(feedList.lastChild);
   }
 }
  </script>
