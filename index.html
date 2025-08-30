@@ -280,91 +280,44 @@
     .dark .trust-card p {
       color: #d1d5db !important;
     }
-    /* Add these rules to your existing <style> tag */
-#presale, #referral, section.p-6 {
-  max-width: 72rem !important; /* Increased from max-w-2xl to max-w-6xl */
-}
-
-#tokenomics {
-  max-width: 72rem !important; /* Increased from max-w-4xl to max-w-6xl */
-}
-
-#faq {
-  max-width: 72rem !important; /* Increased from max-w-3xl to max-w-6xl */
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  #presale, #referral, section.p-6, #tokenomics, #faq {
-    max-width: 100% !important;
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-}
-    /* Add these styles to fix dark mode visibility */
-.dark input[type="number"],
-.dark input[type="text"],
-.dark select {
-  background-color: #374151;
-  color: #f9fafb;
-  border-color: #4b5563;
-}
-
-.dark input[type="number"]::placeholder,
-.dark input[type="text"]::placeholder {
-  color: #9ca3af;
-}
-
-.dark .bg-gray-100 {
-  background-color: #374151;
-}
-
-.dark .text-gray-600 {
-  color: #d1d5db;
-}
-
-.dark .text-gray-500 {
-  color: #9ca3af;
-}
-    /* Enhanced dark mode fixes */
-.dark #presale,
-.dark #referral,
-.dark #tokenomics,
-.dark #faq,
-.dark section {
-  background-color: #1f2937 !important;
-  color: #f9fafb !important;
-}
-
-.dark .fluio-status-container,
-.dark .fluio-price {
-  background-color: #374151;
-  color: #f9fafb;
-}
-
-.dark .price-header span,
-.dark .current-price,
-.dark .price-change {
-  color: #f9fafb !important;
-}
-
-.dark #live-feed {
-  background-color: #374151 !important;
-}
-
-.dark #feed-list li {
-  background-color: #4b5563 !important;
-  color: #f9fafb !important;
-}
-
-.dark details {
-  background-color: #374151;
-  border-color: #4b5563;
-}
-
-.dark summary {
-  color: #f9fafb !important;
-}
+    
+    /* Fix for wider sections */
+    .section-container {
+      width: 100%;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Fix for dark mode text visibility */
+    .dark .text-gray-800 {
+      color: #e5e7eb;
+    }
+    .dark .text-gray-700 {
+      color: #d1d5db;
+    }
+    .dark .text-gray-600 {
+      color: #9ca3af;
+    }
+    
+    /* Fix for live feed */
+    .live-feed-container {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    /* Fix for wallet connection issues */
+    .wallet-status {
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      margin-top: 0.5rem;
+      background-color: #f3f4f6;
+    }
+    .dark .wallet-status {
+      background-color: #374151;
+    }
   </style>
 </head>
   
@@ -396,10 +349,10 @@
         <span id="darkModeIcon">🌙</span>
       </button>
       
-      <!-- Network Selection -->
+      <!-- Network Selection - Added BSC Testnet -->
       <select id="networkSelect" class="p-2 border rounded-lg text-black dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Network selection">
-        <option value="97">BSC Testnet</option>
         <option value="56">BSC Mainnet</option>
+        <option value="97">BSC Testnet</option>
         <option value="1">Ethereum Mainnet</option>
         <option value="5">Ethereum Goerli</option>
         <option value="137">Polygon Mainnet</option>
@@ -460,12 +413,12 @@
 </div>
 
 <!-- Testing button - remove in production -->
-<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded z-50 hidden">
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded z-50">
   Reset Timer (For Testing)
 </button>
     
 <!-- Presale Section -->
-<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-5xl mx-auto">
+<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 section-container">
   <h2 class="section-title text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 mb-6">
     🚀 Limited Presale — Act Fast!
   </h2>
@@ -479,7 +432,7 @@
 
   <div id="walletError" class="wallet-error hidden"></div>
         
-  <div id="walletStatus" class="wallet-address hidden">
+  <div id="walletStatus" class="wallet-status hidden">
     <strong>Connected:</strong> <span id="connectedAddress"></span>
     <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
       Disconnect
@@ -539,7 +492,7 @@
 <input type="hidden" id="referralLink" value="">
   
 <!-- Referral Section -->
-<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 max-w-5xl mx-auto">
+<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 section-container">
   <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
   <div id="referralSection">
     <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
@@ -550,7 +503,7 @@
 </section>
 
 <!-- Claim Section -->
-<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-5xl mx-auto">
+<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 section-container">
   <h2 class="section-title">🎁 Claim $FLUFFI</h2>
   <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
     <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
@@ -581,7 +534,7 @@
 
 <!-- Staking Dashboard -->
 <section id="staking" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
-  <div class="max-w-5xl mx-auto px-6 text-center">
+  <div class="section-container px-6 text-center">
     <!-- Title -->
     <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">
       🐾 FLUFFI Staking Dashboard
@@ -616,7 +569,7 @@
     </div>
 
     <!-- Staking Section -->
-    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-5xl mx-auto">
+    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
@@ -624,7 +577,7 @@
     </div>
     
     <!-- Claim Rewards -->
-    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-5xl mx-auto">
+    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
       <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Claim Progress</h3>
       <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
         <div class="bg-green-500 h-4 rounded-full transition-all duration-500" id="claim-progress" style="width: 25%;"></div>
@@ -637,7 +590,7 @@
 </section>
   
 <!-- Tokenomics Section -->
-<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12 max-w-4xl mx-auto">
+<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12 section-container">
   <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
     📊 Tokenomics
   </h2>
@@ -681,7 +634,7 @@
 </section>
     
 <!-- FAQ Section -->
-<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-5xl mx-auto">
+<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 section-container">
   <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
 
   <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
@@ -868,12 +821,14 @@
   </h2>
 
   <!-- Live Feed -->
-  <div id="liveFeed" class="max-w-2xl mx-auto bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-lg mb-8 text-center">
-    <p id="feedMessage" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading latest activity...</p>
+  <div class="section-container">
+    <div id="liveFeed" class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-lg mb-8 text-center">
+      <p id="feedMessage" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading latest activity...</p>
+    </div>
   </div>
 
   <!-- Telegram Embed -->
-  <div class="max-w-4xl mx-auto mb-8">
+  <div class="section-container mb-8">
     <iframe src="https://t.me/FLUFFISOLANALAYER2" 
       width="100%" height="400" 
       frameborder="0" scrolling="yes"
@@ -967,31 +922,29 @@
   
 <script>
 // Configuration
-  // Global chart variable
-let tokenChart = null;
 const CONTRACT_ADDRESSES = {
   // BSC
-  56: "0x0000000000000000000000000000000000000001", // BSC Mainnet (replace with actual)
-  97: "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297", // BSC Testnet
+  56: "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297", // BSC Mainnet
+  97: "0xPLACEHOLDER_BSC_TESTNET_ADDRESS", // BSC Testnet
   
   // Ethereum
-  1: "0x0000000000000000000000000000000000000001", // Ethereum Mainnet (placeholder)
-  5: "0x0000000000000000000000000000000000000005", // Ethereum Goerli (placeholder)
+  1: "0xPLACEHOLDER_ETH_MAINNET_ADDRESS", // Ethereum Mainnet
+  5: "0xPLACEHOLDER_ETH_GOERLI_ADDRESS", // Ethereum Goerli
   
   // Polygon
-  137: "0x0000000000000000000000000000000000000137", // Polygon Mainnet (placeholder)
-  80001: "0x0000000000000000000000000000000000080001", // Polygon Mumbai (placeholder)
+  137: "0xPLACEHOLDER_POLYGON_MAINNET_ADDRESS", // Polygon Mainnet
+  80001: "0xPLACEHOLDER_POLYGON_MUMBAI_ADDRESS", // Polygon Mumbai
   
   // Avalanche
-  43114: "0x0000000000000000000000000000000000043114", // Avalanche Mainnet (placeholder)
-  43113: "0x0000000000000000000000000000000000043113", // Avalanche Fuji (placeholder)
+  43114: "0xPLACEHOLDER_AVAX_MAINNET_ADDRESS", // Avalanche Mainnet
+  43113: "0xPLACEHOLDER_AVAX_FUJI_ADDRESS", // Avalanche Fuji
   
   // Solana (different format)
-  "solana-mainnet": "FLUFFISolanaMainnetProgramID", // Solana Mainnet (placeholder)
-  "solana-devnet": "FLUFFISolanaDevnetProgramID" // Solana Devnet (placeholder)
+  "solana-mainnet": "PLACEHOLDER_SOLANA_MAINNET_ADDRESS",
+  "solana-devnet": "PLACEHOLDER_SOLANA_DEVNET_ADDRESS"
 };
 
-const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 
 const NETWORK_CONFIGS = {
   // Ethereum
@@ -1113,7 +1066,7 @@ const NETWORK_CONFIGS = {
 
 const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [1, 56, 137, 43114, 10, 42161, 8453], // Mainnets
+  chains: [1, 56, 97, 137, 43114, 10, 42161, 8453], // Added BSC Testnet (97)
   showQrModal: false,
   qrModalOptions: {
     themeMode: 'dark',
@@ -1161,6 +1114,7 @@ let tasksCompleted = {
 };
 let countdownInterval = null;
 let provider = null;
+let tokenChart = null; // Chart instance
 
 // Get current network
 function getCurrentNetwork() {
@@ -1178,6 +1132,7 @@ if (window.location.search.includes('dev=true')) {
   document.getElementById('devSection').classList.remove('hidden');
 }
 
+// Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
   const darkMode = localStorage.getItem('darkMode');
@@ -1193,19 +1148,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
-  // Setup form submission
-// Remove or comment out this code since airdropForm doesn't exist
-if (document.getElementById('airdropForm')) {
-  document.getElementById('airdropForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    claimAirdrop();
-  });
-}
-  
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
-  // Just check if wallet was previously connected but don't auto-reconnect
+  // Check if wallet was previously connected
   const savedAddress = localStorage.getItem('walletAddress');
   if (savedAddress) {
     // Clear the saved address to prevent auto-reconnect attempts
@@ -1214,7 +1160,7 @@ if (document.getElementById('airdropForm')) {
   }
   
   // Initialize countdown timer
-   initializeTimer();
+  initializeTimer();
   
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
@@ -1228,53 +1174,20 @@ if (document.getElementById('airdropForm')) {
   
   // Initialize live feed
   initializeLiveFeed();
-  // Add this function definition
-function updateStakingDashboard() {
-  if (!userWalletAddress) {
-    // Reset to default values when disconnected
-    document.getElementById('total-staked').textContent = '0';
-    document.getElementById('user-balance-value').textContent = '0';
-    document.getElementById('user-earnings').textContent = '0';
-    document.getElementById('userBalance').textContent = '0';
-    document.getElementById('userStaked').textContent = '0';
-    document.getElementById('userRewards').textContent = '0';
-    document.getElementById('userPresale').textContent = '0';
-    return;
-  }
   
-  // Get staking info from localStorage (simulation)
-  const stakingInfo = localStorage.getItem(`staking_${userWalletAddress}`);
-  if (stakingInfo) {
-    const info = JSON.parse(stakingInfo);
-    const daysSinceStake = (Date.now() - info.timestamp) / (1000 * 60 * 60 * 24);
-    const estimatedEarnings = info.amount * (0.9 / 365) * daysSinceStake; // 90% APY
-    
-    document.getElementById('total-staked').textContent = info.amount.toFixed(2);
-    document.getElementById('user-earnings').textContent = estimatedEarnings.toFixed(2);
-  }
-  
-  // Update user balances
-  const balance = localStorage.getItem(`balance_${userWalletAddress}`) || '0';
-  document.getElementById('user-balance-value').textContent = parseFloat(balance).toFixed(2);
-  document.getElementById('userBalance').textContent = parseFloat(balance).toFixed(2);
-}
   // Initialize staking dashboard
   updateStakingDashboard();
+  
+  // Initialize community activity
+  initializeCommunityActivity();
 });
 
 // Timer functions
-// Timer variables
 let presaleInterval = null;
-
-// Initialize the timer when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initializeTimer();
-});
 
 function initializeTimer() {
   // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
   const startTime = new Date('2025-08-27T00:00:00Z').getTime();
-  // No need to store in localStorage since it's fixed
   
   // Update timer immediately
   updateTimer(startTime);
@@ -1989,35 +1902,19 @@ async function switchToNetwork(chainId = null) {
     return false;
   }
   
-  // Check if network config exists
-  if (!NETWORK_CONFIGS[targetChainId]) {
-    showNotification("Network configuration not found", "error");
-    return false;
-  }
-  
   try {
     await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
+      method: 'wallet_switchEhereumChain',
       params: [{ chainId: NETWORK_CONFIGS[targetChainId].chainId }],
     });
-    showNotification(`Switched to ${NETWORK_CONFIGS[targetChainId].name}`, "success");
     return true;
   } catch (error) {
     if (error.code === 4902) {
       try {
-        // Network not added, try to add it
-        const config = NETWORK_CONFIGS[targetChainId];
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: config.chainId,
-            chainName: config.name,
-            nativeCurrency: config.nativeCurrency,
-            rpcUrls: [config.rpcUrl],
-            blockExplorerUrls: [config.explorer]
-          }],
+          params: [NETWORK_CONFIGS[targetChainId]],
         });
-        showNotification(`Added ${config.name} to wallet`, "success");
         return true;
       } catch (addError) {
         console.error("Error adding chain:", addError);
@@ -2033,40 +1930,20 @@ async function switchToNetwork(chainId = null) {
 
 // Validate contract deployment & network
 async function validateContracts() {
-  try {
-    const network = getCurrentNetwork();
-    
-    // Skip validation for Solana networks
-    if (network.includes('solana')) {
-      return true;
-    }
-    
-    // Get the appropriate RPC URL
-    const rpcUrl = NETWORK_CONFIGS[network]?.rpcUrl;
-    if (!rpcUrl) {
-      throw new Error("Network configuration not found");
-    }
-    
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    const contractAddress = getContractAddress();
-    
-    // For placeholder addresses, skip validation
-    if (contractAddress.startsWith("0x000000")) {
-      console.log("Using placeholder contract address - skipping validation");
-      return true;
-    }
-    
-    const code = await provider.getCode(contractAddress);
-    if (code === "0x") {
-      throw new Error("Contract not deployed on this network");
-    }
-    
-    console.log("Contract validation passed ✅");
-    return true;
-  } catch (error) {
-    console.error("Contract validation error:", error);
-    throw error;
-  }
+  // Use ethers v5 syntax
+  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
+
+  // Check if contract is deployed
+  const contractAddress = getContractAddress();
+  const presaleCode = await provider.getCode(contractAddress);
+  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
+
+  // Verify network
+  const network = await provider.getNetwork();
+  const currentNetwork = getCurrentNetwork();
+  if (network.chainId !== parseInt(currentNetwork)) throw new Error("Please switch to the correct network");
+
+  console.log("Contract validation passed ✅");
 }
 
 // ===== BUY FUNCTION =====
@@ -2145,15 +2022,10 @@ async function buyFluffi() {
     const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
-// 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.buyTokens({
-  value: ethers.utils.parseEther(nativeValue)
-});
-console.log("Estimated gas:", gasEstimate.toString());
-
-const tx = await contract.buyTokens({
-  value: ethers.utils.parseEther(nativeValue)
-});
+    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+      value: ethers.utils.parseEther(nativeValue)
+    });
+    console.log("Estimated gas:", gasEstimate.toString());
 
     const tx = await contract.contribute(referralAddress, {
       value: ethers.utils.parseEther(nativeValue)
@@ -2414,49 +2286,95 @@ function formatTime(ms) {
   };
 }
 
-    // ===== UTILITY FUNCTIONS =====
-    async function updateUserBalances() {
-      if (!userWalletAddress) return;
+// ===== STAKING DASHBOARD FUNCTIONS =====
+function updateStakingDashboard() {
+  try {
+    // If wallet is connected, show user's staking info
+    if (userWalletAddress) {
+      const stakingInfo = JSON.parse(localStorage.getItem(`staking_${userWalletAddress}`) || '{}');
+      const stakedAmount = stakingInfo.amount || 0;
       
-      try {
-        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
-        const fluffiContract = new ethers.Contract(
-          FLUFFI_CONTRACT_ADDRESS,
-          FLUFFI_CONTRACT_ABI,
-          provider
-        );
+      // Calculate estimated earnings (90% APY)
+      if (stakingInfo.timestamp) {
+        const stakingDuration = (Date.now() - stakingInfo.timestamp) / (1000 * 60 * 60 * 24); // Days
+        const apy = 0.9; // 90% APY
+        const dailyRate = apy / 365;
+        const earnings = stakedAmount * dailyRate * stakingDuration;
         
-        const [balance, staked, rewards] = await Promise.all([
-          fluffiContract.balanceOf(userWalletAddress),
-          fluffiContract.stakedBalance(userWalletAddress),
-          fluffiContract.calculateRewards(userWalletAddress)
-        ]);
-        
-        document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
-        document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
-        document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
-        
-      } catch (error) {
-        console.error("Balance update error:", error);
+        document.getElementById('user-earnings').textContent = earnings.toFixed(2);
+      } else {
+        document.getElementById('user-earnings').textContent = '0';
       }
+      
+      document.getElementById('user-balance-value').textContent = stakedAmount.toFixed(2);
+      
+      // Get total staked from all users (simulated)
+      let totalStaked = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('staking_')) {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data && data.amount) {
+            totalStaked += data.amount;
+          }
+        }
+      }
+      document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+    } else {
+      // Reset to defaults if no wallet connected
+      document.getElementById('user-balance-value').textContent = '0';
+      document.getElementById('user-earnings').textContent = '0';
+      document.getElementById('total-staked').textContent = '0';
     }
+  } catch (error) {
+    console.error("Error updating staking dashboard:", error);
+  }
+}
 
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
-      
-      // Update icon
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-      
-      // Update chart colors if needed
-      if (tokenChart) {
-        const isDark = html.classList.contains('dark');
-        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-        tokenChart.update();
-      }
-    }
+// ===== UTILITY FUNCTIONS =====
+async function updateUserBalances() {
+  if (!userWalletAddress) return;
+  
+  try {
+    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_ADDRESS,
+      ERC20_ABI,
+      provider
+    );
+    
+    const [balance, staked, rewards] = await Promise.all([
+      fluffiContract.balanceOf(userWalletAddress),
+      fluffiContract.stakedBalance(userWalletAddress),
+      fluffiContract.calculateRewards(userWalletAddress)
+    ]);
+    
+    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
+    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
+    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
+    
+  } catch (error) {
+    console.error("Balance update error:", error);
+  }
+}
+
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  }
+}
+
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
   if (!ctx) return;
@@ -2530,7 +2448,7 @@ function initTokenChart() {
   };
   
   // Create the chart
-  const tokenChart = new Chart(ctx, config);
+  tokenChart = new Chart(ctx, config);
   
   // Update chart on theme change
   const observer = new MutationObserver(function(mutations) {
@@ -2552,164 +2470,82 @@ function initTokenChart() {
   });
 }
 
-// Initialize the chart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initTokenChart();
-});
-      
-// ==== TIMER FUNCTIONS =====
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // Set initial start time to now (for testing)
-    startTime = Date.now();
-    // For production, you might want to set a fixed start time:
-    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
-    localStorage.setItem('presaleStartTime', startTime);
-  }
-  return parseInt(startTime);
-}
-
-function formatTime(ms) {
-  const days = Math.floor(ms / (24 * 3600 * 1000));
-  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
-  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+// Initialize live feed
+function initializeLiveFeed() {
+  const feedList = document.getElementById('feed-list');
   
-  return {
-    days: days.toString().padStart(2, '0'),
-    hours: hours.toString().padStart(2, '0'),
-    minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0'),
-    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-  };
-}
-
-function updateNextIncreaseTime() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
-  const timeLeft = nextStageTime - now;
+  const activities = [
+    "🐋 User 0x1a2...3b4 just bought 0.5 BNB worth of FLUFFI",
+    "🔥 User 0x5c6...7d8 staked 10,000 FLUFFI tokens",
+    "🚀 User 0x9e0...1f2 joined with 1.2 BNB",
+    "💰 User 0x3g4...5h6 earned 500 FLUFFI from referrals",
+    "🎯 User 0x7i8...9j0 claimed 25,000 FLUFFI tokens"
+  ];
   
-  const formatted = formatTime(timeLeft);
-  document.getElementById('nextIncreaseTime').textContent = formatted.full;
-}
-
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
-  const timeLeft = endTime - now;
-
-  // Calculate stage progress
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / (48 * 3600 * 1000)),
-    14 // Max stage index
-  );
-  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
-  const stageTimeLeft = stageEndTime - now;
-  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
-
-  // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
-
-  // Update price
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
-
-  // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
-  } else {
-    const formattedTotal = formatTime(timeLeft);
-    const formattedStage = formatTime(stageTimeLeft);
+  let index = 0;
+  
+  function addActivity() {
+    const li = document.createElement('li');
+    li.textContent = activities[index % activities.length];
+    li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md animate-fade-in";
+    feedList.prepend(li);
     
-    document.getElementById('presale-days').textContent = formattedTotal.days;
-    document.getElementById('presale-hours').textContent = formattedTotal.hours;
-    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
-    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
+    // Keep only last 5 items
+    while (feedList.children.length > 5) {
+      feedList.removeChild(feedList.lastChild);
+    }
     
-    document.getElementById('stage-time-left').textContent = formattedStage.full;
+    index++;
   }
+  
+  // Add initial activities
+  for (let i = 0; i < 3; i++) {
+    addActivity();
+  }
+  
+  // Add new activity every 5 seconds
+  setInterval(addActivity, 5000);
 }
 
-// Initialize the timer
-function initTimer() {
-  updateTimers();
-  updateNextIncreaseTime();
-  // Update every second
+// Initialize community activity
+function initializeCommunityActivity() {
+  const feedMessage = document.getElementById('feedMessage');
+  const messages = [
+    "🔥 User 0xA12...F45 just bought 2.5 BNB worth of FLUFFI!",
+    "🚀 User 0xC98...B72 staked 50,000 FLUFFI tokens!",
+    "💰 User 0x7F3...D91 earned 1.2 BNB in referral rewards!",
+    "🎯 User 0x4B7...E28 joined the presale with 1.8 BNB!",
+    "🐋 User 0x9E0...1F2 just bought 5 BNB worth of FLUFFI!"
+  ];
+  
+  let index = 0;
+  
+  // Update message every 3 seconds
   setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
+    feedMessage.textContent = messages[index % messages.length];
+    index++;
+  }, 3000);
 }
 
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
-
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-  }
-
-  // Initialize token chart
-  initTokenChart();
-
-  // Initialize timers
-  initTimer();
-
-  // Check for referral parameter
-  checkReferral();
-});
-
-// Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
+// ===== REFERRAL FUNCTIONS =====
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
+    document.getElementById('refInput').value = ref;
   }
 }
-    // ===== REFERRAL FUNCTIONS =====
-    function checkReferral() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get('ref');
-      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-        document.getElementById('refInput').value = ref;
-      }
-    }
 
-    async function connectReferralWallet() {
-      if (!userWalletAddress) {
-        await connectWallet();
-      }
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
+async function connectReferralWallet() {
+  if (!userWalletAddress) {
+    await connectWallet();
+  }
+  if (userWalletAddress) {
+    showReferralUI(userWalletAddress);
+  }
+}
 
-    function showReferralUI(wallet) {
+function showReferralUI(wallet) {
   const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
   
   // Get referral stats from localStorage
@@ -2747,160 +2583,71 @@ function toggleDarkMode() {
     </div>
   `;
 }
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
-    }
 
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
-    }
+function copyReferralLink() {
+  const input = document.getElementById('referralLinkInput');
+  input.select();
+  document.execCommand('copy');
+  alert("Referral link copied to clipboard!");
+}
 
-    function shareOnTelegram() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
-    }
-  </script>
-  
-<script>
-  const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
-  const ERC20_ABI = [
-    "function balanceOf(address owner) view returns (uint256)",
-    "function decimals() view returns (uint8)"
-  ];
+function shareOnTwitter() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+}
 
-  async function loadFluffiBalance() {
-    if (!window.ethereum) {
-      console.warn("No wallet provider found");
-      return;
-    }
+function shareOnTelegram() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+}
 
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const userAddress = accounts[0];
+// FLUFFI token address and ABI for balance checking
+const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
 
-      const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
-      const decimals = await contract.decimals();
-      const rawBalance = await contract.balanceOf(userAddress);
-      const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
-
-      document.getElementById("user-balance-value").textContent =
-        parseFloat(formattedBalance).toLocaleString();
-    } catch (err) {
-      console.error("Error fetching balance:", err);
-    }
+async function loadFluffiBalance() {
+  if (!window.ethereum) {
+    console.warn("No wallet provider found");
+    return;
   }
 
-  // Load once connected
-  window.addEventListener("load", loadFluffiBalance);
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    const userAddress = accounts[0];
 
-  // Update if user changes wallet
-  if (window.ethereum) {
-    window.ethereum.on("accountsChanged", loadFluffiBalance);
+    const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
+    const decimals = await contract.decimals();
+    const rawBalance = await contract.balanceOf(userAddress);
+    const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
+
+    document.getElementById("user-balance-value").textContent =
+      parseFloat(formattedBalance).toLocaleString();
+  } catch (err) {
+    console.error("Error fetching balance:", err);
   }
-</script>
-  <script>
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+}
+
+// Load once connected
+window.addEventListener("load", loadFluffiBalance);
+
+// Update if user changes wallet
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", loadFluffiBalance);
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
   });
-</script>
-<script>
-// Simulated live feed since contract isn't deployed on mainnet yet
-function initializeLiveFeed() {
-  const feedList = document.getElementById('feed-list');
-  const feedMessage = document.getElementById('feedMessage');
-  
-  // Update feed message if it exists
-  if (feedMessage) {
-    feedMessage.textContent = "Latest activity loading...";
-    setTimeout(() => {
-      if (feedMessage) {
-        feedMessage.style.display = 'none';
-      }
-    }, 2000);
-  }
-  
-  const activities = [
-    "🐋 User 0x1a2...3b4 just bought 0.5 BNB worth of FLUFFI",
-    "🔥 User 0x5c6...7d8 staked 10,000 FLUFFI tokens",
-    "🚀 User 0x9e0...1f2 joined with 1.2 BNB",
-    "💰 User 0x3g4...5h6 earned 500 FLUFFI from referrals",
-    "🎯 User 0x7i8...9j0 claimed 25,000 FLUFFI tokens"
-  ];
-  
-  let index = 0;
-  
-  function addActivity() {
-    const li = document.createElement('li');
-    li.textContent = activities[index % activities.length];
-    li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md animate-fade-in";
-    feedList.prepend(li);
-    
-    // Keep only last 5 items
-    while (feedList.children.length > 5) {
-      feedList.removeChild(feedList.lastChild);
-    }
-    
-    index++;
-  }
-  
-  // Add initial activities
-  for (let i = 0; i < 3; i++) {
-    addActivity();
-  }
-  
-  // Add new activity every 5 seconds
-  setInterval(addActivity, 5000);
-}
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initializeLiveFeed);
-  // Add missing updateTaskUI function
-function updateTaskUI() {
-  // This function updates task UI if you have a task system
-  console.log("Tasks updated:", tasksCompleted);
-}
-
-// Add missing animateCommunityCounters function
-function animateCommunityCounters() {
-  const counters = {
-    'tg-count': { start: 0, end: 5432, duration: 2000 },
-    'tw-count': { start: 0, end: 10215, duration: 2000 },
-    'dc-count': { start: 0, end: 3876, duration: 2000 }
-  };
-  
-  Object.keys(counters).forEach(id => {
-    const element = document.getElementById(id);
-    if (!element) return;
-    
-    const { start, end, duration } = counters[id];
-    const increment = (end - start) / (duration / 50);
-    let current = start;
-    
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= end) {
-        current = end;
-        clearInterval(timer);
-      }
-      element.textContent = Math.floor(current).toLocaleString();
-    }, 50);
-  });
-}
-
-// Call this in your initialization
-document.addEventListener('DOMContentLoaded', function() {
-  animateCommunityCounters();
 });
 </script>
 </body>
