@@ -301,6 +301,31 @@
     margin-right: 1rem;
   }
 }
+    /* Add these styles to fix dark mode visibility */
+.dark input[type="number"],
+.dark input[type="text"],
+.dark select {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.dark input[type="number"]::placeholder,
+.dark input[type="text"]::placeholder {
+  color: #9ca3af;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
   </style>
 </head>
   
@@ -401,7 +426,7 @@
 </button>
     
 <!-- Presale Section -->
-<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-2xl mx-auto">
+<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-5xl mx-auto">
   <h2 class="section-title text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 mb-6">
     🚀 Limited Presale — Act Fast!
   </h2>
@@ -475,7 +500,7 @@
 <input type="hidden" id="referralLink" value="">
   
 <!-- Referral Section -->
-<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 max-w-2xl mx-auto">
+<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 max-w-5xl mx-auto">
   <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
   <div id="referralSection">
     <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
@@ -486,7 +511,7 @@
 </section>
 
 <!-- Claim Section -->
-<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-2xl mx-auto">
+<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 max-w-5xl mx-auto">
   <h2 class="section-title">🎁 Claim $FLUFFI</h2>
   <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
     <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
@@ -552,7 +577,7 @@
     </div>
 
     <!-- Staking Section -->
-    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-5xl mx-auto">
       <h2 class="text-2xl font-bold mb-4">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
@@ -560,7 +585,7 @@
     </div>
     
     <!-- Claim Rewards -->
-    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-5xl mx-auto">
       <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Claim Progress</h3>
       <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
         <div class="bg-green-500 h-4 rounded-full transition-all duration-500" id="claim-progress" style="width: 25%;"></div>
@@ -617,7 +642,7 @@
 </section>
     
 <!-- FAQ Section -->
-<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
+<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-5xl mx-auto">
   <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
 
   <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
@@ -907,7 +932,7 @@
 let tokenChart = null;
 const CONTRACT_ADDRESSES = {
   // BSC
-  56: "0x6F5f48A159Cd46a10faDEED95b29028972554747", // BSC Mainnet (replace with actual)
+  56: "0x0000000000000000000000000000000000000001", // BSC Mainnet (replace with actual)
   97: "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297", // BSC Testnet
   
   // Ethereum
