@@ -1878,16 +1878,29 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Initialize provider & signer
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+   // 3️⃣ Initialize provider & signer
+const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // 4️⃣ Detect chain & select contract address
-    const network = await provider.getNetwork();
-    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-    if (!contractAddress) throw new Error("Unsupported network");
+// ✅ Disable ENS lookups
+function disableEnsLookups(provider) {
+  const originalResolveName = provider.resolveName.bind(provider);
+  provider.resolveName = async (name) => {
+    if (ethers.utils.isAddress(name)) return name; // already an address
+    console.warn("ENS lookup skipped for:", name);
+    return null; // skip ENS
+  };
+  return provider;
+}
+disableEnsLookups(provider);
 
-    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
+const signer = provider.getSigner();
+
+// 4️⃣ Detect chain & select contract address
+const network = await provider.getNetwork();
+const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+if (!contractAddress) throw new Error("Unsupported network");
+
+const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 5️⃣ Optional: Switch network if needed (your switchToNetwork function)
     // await switchToNetwork(network.chainId);
@@ -1896,10 +1909,10 @@ async function buyFluffi() {
     const conversionRates = {
       'BNB': 1,
       'SOL': 0.0015,
-      'AVAX': 0.01,
+      'AVAX': 0.000001,
       'MATIC': 0.00025,
-      'USDC': 0.0015,
-      'USD': 0.0015
+      'USDC': 0.0001,
+      'USD': 0.0001
     };
     const bnbValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
     if (currency !== 'BNB') {
