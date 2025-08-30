@@ -1928,7 +1928,7 @@ async function stakeFluffi() {
         const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
         
         // First approve FLUFFI tokens for staking contract
-        const fluffiContract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, ["function approve(address spender, uint256 amount) returns (bool)"], signer);
+        const fluffiContract = new ethers.Contract(getContractAddress(), ["function approve(address spender, uint256 amount) returns (bool)"], signer);
         const approveTx = await fluffiContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
         await approveTx.wait();
         
@@ -1955,7 +1955,8 @@ async function stakeFluffi() {
     showNotification(error.message || "Staking failed", "error");
   }
 }
-      function updateStakingDisplay() {
+
+function updateStakingDisplay() {
   updateStakingDashboard(); // Call the dashboard update function
 }
     // ===== CLAIM FUNCTIONS =====
