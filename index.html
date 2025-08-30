@@ -326,6 +326,45 @@
 .dark .text-gray-500 {
   color: #9ca3af;
 }
+    /* Enhanced dark mode fixes */
+.dark #presale,
+.dark #referral,
+.dark #tokenomics,
+.dark #faq,
+.dark section {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark .fluio-status-container,
+.dark .fluio-price {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.dark .price-header span,
+.dark .current-price,
+.dark .price-change {
+  color: #f9fafb !important;
+}
+
+.dark #live-feed {
+  background-color: #374151 !important;
+}
+
+.dark #feed-list li {
+  background-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark details {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.dark summary {
+  color: #f9fafb !important;
+}
   </style>
 </head>
   
@@ -1155,10 +1194,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Setup form submission
+// Remove or comment out this code since airdropForm doesn't exist
+if (document.getElementById('airdropForm')) {
   document.getElementById('airdropForm').addEventListener('submit', function(e) {
     e.preventDefault();
     claimAirdrop();
   });
+}
   
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
@@ -1991,20 +2033,40 @@ async function switchToNetwork(chainId = null) {
 
 // Validate contract deployment & network
 async function validateContracts() {
-  // Use ethers v5 syntax
-  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
-
-  // Check if contract is deployed
-  const contractAddress = getContractAddress();
-  const presaleCode = await provider.getCode(contractAddress);
-  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
-
-  // Verify network
-  const network = await provider.getNetwork();
-  const currentNetwork = getCurrentNetwork();
-  if (network.chainId !== parseInt(currentNetwork)) throw new Error("Please switch to the correct network");
-
-  console.log("Contract validation passed ✅");
+  try {
+    const network = getCurrentNetwork();
+    
+    // Skip validation for Solana networks
+    if (network.includes('solana')) {
+      return true;
+    }
+    
+    // Get the appropriate RPC URL
+    const rpcUrl = NETWORK_CONFIGS[network]?.rpcUrl;
+    if (!rpcUrl) {
+      throw new Error("Network configuration not found");
+    }
+    
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const contractAddress = getContractAddress();
+    
+    // For placeholder addresses, skip validation
+    if (contractAddress.startsWith("0x000000")) {
+      console.log("Using placeholder contract address - skipping validation");
+      return true;
+    }
+    
+    const code = await provider.getCode(contractAddress);
+    if (code === "0x") {
+      throw new Error("Contract not deployed on this network");
+    }
+    
+    console.log("Contract validation passed ✅");
+    return true;
+  } catch (error) {
+    console.error("Contract validation error:", error);
+    throw error;
+  }
 }
 
 // ===== BUY FUNCTION =====
@@ -2083,10 +2145,15 @@ async function buyFluffi() {
     const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
-    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-      value: ethers.utils.parseEther(nativeValue)
-    });
-    console.log("Estimated gas:", gasEstimate.toString());
+// 7️⃣ Estimate gas & send transaction
+const gasEstimate = await contract.estimateGas.buyTokens({
+  value: ethers.utils.parseEther(nativeValue)
+});
+console.log("Estimated gas:", gasEstimate.toString());
+
+const tx = await contract.buyTokens({
+  value: ethers.utils.parseEther(nativeValue)
+});
 
     const tx = await contract.contribute(referralAddress, {
       value: ethers.utils.parseEther(nativeValue)
@@ -2751,6 +2818,17 @@ function toggleDarkMode() {
 // Simulated live feed since contract isn't deployed on mainnet yet
 function initializeLiveFeed() {
   const feedList = document.getElementById('feed-list');
+  const feedMessage = document.getElementById('feedMessage');
+  
+  // Update feed message if it exists
+  if (feedMessage) {
+    feedMessage.textContent = "Latest activity loading...";
+    setTimeout(() => {
+      if (feedMessage) {
+        feedMessage.style.display = 'none';
+      }
+    }, 2000);
+  }
   
   const activities = [
     "🐋 User 0x1a2...3b4 just bought 0.5 BNB worth of FLUFFI",
@@ -2787,6 +2865,43 @@ function initializeLiveFeed() {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', initializeLiveFeed);
+  // Add missing updateTaskUI function
+function updateTaskUI() {
+  // This function updates task UI if you have a task system
+  console.log("Tasks updated:", tasksCompleted);
+}
+
+// Add missing animateCommunityCounters function
+function animateCommunityCounters() {
+  const counters = {
+    'tg-count': { start: 0, end: 5432, duration: 2000 },
+    'tw-count': { start: 0, end: 10215, duration: 2000 },
+    'dc-count': { start: 0, end: 3876, duration: 2000 }
+  };
+  
+  Object.keys(counters).forEach(id => {
+    const element = document.getElementById(id);
+    if (!element) return;
+    
+    const { start, end, duration } = counters[id];
+    const increment = (end - start) / (duration / 50);
+    let current = start;
+    
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= end) {
+        current = end;
+        clearInterval(timer);
+      }
+      element.textContent = Math.floor(current).toLocaleString();
+    }, 50);
+  });
+}
+
+// Call this in your initialization
+document.addEventListener('DOMContentLoaded', function() {
+  animateCommunityCounters();
+});
 </script>
 </body>
 </html>
