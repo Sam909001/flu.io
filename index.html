@@ -1813,24 +1813,27 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Initialize provider & signer
-    let provider = new ethers.providers.Web3Provider(window.ethereum);
+   // 3️⃣ Initialize provider & signer
+const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // ✅ Disable ENS lookups
-    provider.resolveName = async (name) => {
-      if (ethers.utils.isAddress(name)) return name; // already an address
-      console.warn("ENS lookup skipped for:", name);
-      return null;
-    };
+// ✅ Disable ENS lookups
+provider.resolveName = async (name) => {
+  if (ethers.utils.isAddress(name)) return ethers.utils.getAddress(name);
+  console.warn("ENS lookup skipped for:", name);
+  return null;
+};
 
-    const signer = provider.getSigner();
+const signer = provider.getSigner();
 
-    // 4️⃣ Detect chain & select contract address
-    const network = await provider.getNetwork();
-    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-    if (!contractAddress) throw new Error("Unsupported network");
+// 4️⃣ Detect chain & select contract address
+const network = await provider.getNetwork();
+let contractAddress = CONTRACT_ADDRESSES[network.chainId];
+if (!contractAddress) throw new Error("Unsupported network");
 
-    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
+// ✅ Ensure address is checksummed
+contractAddress = ethers.utils.getAddress(contractAddress);
+
+const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 5️⃣ Currency conversion
     const conversionRates = {
