@@ -280,6 +280,27 @@
     .dark .trust-card p {
       color: #d1d5db !important;
     }
+    /* Add these rules to your existing <style> tag */
+#presale, #referral, section.p-6 {
+  max-width: 72rem !important; /* Increased from max-w-2xl to max-w-6xl */
+}
+
+#tokenomics {
+  max-width: 72rem !important; /* Increased from max-w-4xl to max-w-6xl */
+}
+
+#faq {
+  max-width: 72rem !important; /* Increased from max-w-3xl to max-w-6xl */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #presale, #referral, section.p-6, #tokenomics, #faq {
+    max-width: 100% !important;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
   </style>
 </head>
   
@@ -375,7 +396,7 @@
 </div>
 
 <!-- Testing button - remove in production -->
-<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded z-50">
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded z-50 hidden">
   Reset Timer (For Testing)
 </button>
     
@@ -882,26 +903,28 @@
   
 <script>
 // Configuration
+  // Global chart variable
+let tokenChart = null;
 const CONTRACT_ADDRESSES = {
   // BSC
-  56: "0xPLACEHOLDER_ETH_MAINNET_ADDRESS", // BSC Mainnet
+  56: "0x6F5f48A159Cd46a10faDEED95b29028972554747", // BSC Mainnet (replace with actual)
   97: "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297", // BSC Testnet
   
   // Ethereum
-  1: "0xPLACEHOLDER_ETH_MAINNET_ADDRESS", // Ethereum Mainnet
-  5: "0xPLACEHOLDER_ETH_GOERLI_ADDRESS", // Ethereum Goerli
+  1: "0x0000000000000000000000000000000000000001", // Ethereum Mainnet (placeholder)
+  5: "0x0000000000000000000000000000000000000005", // Ethereum Goerli (placeholder)
   
   // Polygon
-  137: "0xPLACEHOLDER_POLYGON_MAINNET_ADDRESS", // Polygon Mainnet
-  80001: "0xPLACEHOLDER_POLYGON_MUMBAI_ADDRESS", // Polygon Mumbai
+  137: "0x0000000000000000000000000000000000000137", // Polygon Mainnet (placeholder)
+  80001: "0x0000000000000000000000000000000000080001", // Polygon Mumbai (placeholder)
   
   // Avalanche
-  43114: "0xPLACEHOLDER_AVAX_MAINNET_ADDRESS", // Avalanche Mainnet
-  43113: "0xPLACEHOLDER_AVAX_FUJI_ADDRESS", // Avalanche Fuji
+  43114: "0x0000000000000000000000000000000000043114", // Avalanche Mainnet (placeholder)
+  43113: "0x0000000000000000000000000000000000043113", // Avalanche Fuji (placeholder)
   
   // Solana (different format)
-  "solana-mainnet": "PLACEHOLDER_SOLANA_MAINNET_ADDRESS",
-  "solana-devnet": "PLACEHOLDER_SOLANA_DEVNET_ADDRESS"
+  "solana-mainnet": "FLUFFISolanaMainnetProgramID", // Solana Mainnet (placeholder)
+  "solana-devnet": "FLUFFISolanaDevnetProgramID" // Solana Devnet (placeholder)
 };
 
 const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}]
@@ -1124,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Initialize countdown timer
-  initializeCountdown();
+   initializeTimer();
   
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
@@ -1138,7 +1161,36 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize live feed
   initializeLiveFeed();
+  // Add this function definition
+function updateStakingDashboard() {
+  if (!userWalletAddress) {
+    // Reset to default values when disconnected
+    document.getElementById('total-staked').textContent = '0';
+    document.getElementById('user-balance-value').textContent = '0';
+    document.getElementById('user-earnings').textContent = '0';
+    document.getElementById('userBalance').textContent = '0';
+    document.getElementById('userStaked').textContent = '0';
+    document.getElementById('userRewards').textContent = '0';
+    document.getElementById('userPresale').textContent = '0';
+    return;
+  }
   
+  // Get staking info from localStorage (simulation)
+  const stakingInfo = localStorage.getItem(`staking_${userWalletAddress}`);
+  if (stakingInfo) {
+    const info = JSON.parse(stakingInfo);
+    const daysSinceStake = (Date.now() - info.timestamp) / (1000 * 60 * 60 * 24);
+    const estimatedEarnings = info.amount * (0.9 / 365) * daysSinceStake; // 90% APY
+    
+    document.getElementById('total-staked').textContent = info.amount.toFixed(2);
+    document.getElementById('user-earnings').textContent = estimatedEarnings.toFixed(2);
+  }
+  
+  // Update user balances
+  const balance = localStorage.getItem(`balance_${userWalletAddress}`) || '0';
+  document.getElementById('user-balance-value').textContent = parseFloat(balance).toFixed(2);
+  document.getElementById('userBalance').textContent = parseFloat(balance).toFixed(2);
+}
   // Initialize staking dashboard
   updateStakingDashboard();
 });
@@ -1870,19 +1922,35 @@ async function switchToNetwork(chainId = null) {
     return false;
   }
   
+  // Check if network config exists
+  if (!NETWORK_CONFIGS[targetChainId]) {
+    showNotification("Network configuration not found", "error");
+    return false;
+  }
+  
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: NETWORK_CONFIGS[targetChainId].chainId }],
     });
+    showNotification(`Switched to ${NETWORK_CONFIGS[targetChainId].name}`, "success");
     return true;
   } catch (error) {
     if (error.code === 4902) {
       try {
+        // Network not added, try to add it
+        const config = NETWORK_CONFIGS[targetChainId];
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
-          params: [NETWORK_CONFIGS[targetChainId]],
+          params: [{
+            chainId: config.chainId,
+            chainName: config.name,
+            nativeCurrency: config.nativeCurrency,
+            rpcUrls: [config.rpcUrl],
+            blockExplorerUrls: [config.explorer]
+          }],
         });
+        showNotification(`Added ${config.name} to wallet`, "success");
         return true;
       } catch (addError) {
         console.error("Error adding chain:", addError);
