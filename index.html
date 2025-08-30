@@ -75,6 +75,7 @@
 </nav>
     <input type="hidden" id="walletAddress" value="">
 </header>
+  
 <!-- Hero Messaging Section -->
 <section id="hero-message" class="py-16 px-6 text-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white shadow-xl">
   <h1 class="text-4xl md:text-5xl font-extrabold mb-6 animate-bounce">
@@ -185,12 +186,16 @@ function resetTimer() {
       <div class="flex gap-2 mb-4">
         <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
         <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
-  <option value="BNB">BNB</option>
-  <option value="SOL">SOL</option>
-  <option value="AVAX">AVAX</option>
-  <option value="MATIC">MATIC</option>
-  <option value="USDC">USDC</option>
-  <option value="USD">USD (Card)</option>
+       <option value="97">BSC Testnet</option>
+        <option value="56">BSC Mainnet</option>
+        <option value="1">Ethereum Mainnet</option>
+        <option value="5">Ethereum Goerli</option>
+        <option value="137">Polygon Mainnet</option>
+        <option value="80001">Polygon Mumbai</option>
+        <option value="43114">Avalanche Mainnet</option>
+        <option value="43113">Avalanche Fuji</option>
+        <option value="solana-mainnet">Solana Mainnet</option>
+        <option value="solana-devnet">Solana Devnet</option>
 </select>
       </div>
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
