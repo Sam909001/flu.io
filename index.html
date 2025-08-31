@@ -417,7 +417,7 @@ if (!document.getElementById('network-styles')) {
         <option value="56">BSC Mainnet</option>
         <option value="97">BSC Testnet</option>
         <option value="1">Ethereum Mainnet</option>
-        <option value="5">Ethereum Goerli</option>
+        <option value="5">Ethereum sepolia</option>
         <option value="137">Polygon Mainnet</option>
         <option value="80001">Polygon Mumbai</option>
         <option value="43114">Avalanche Mainnet</option>
@@ -3047,17 +3047,17 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://etherscan.io'
   },
-  '5': {
-    chainId: '0x5',
-    chainName: 'Ethereum Goerli Testnet',
-    rpcUrl: 'https://goerli.infura.io/v3/',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://goerli.etherscan.io'
+ '11155111': {
+  chainId: '0xAA36A7', // 11155111 in hex
+  chainName: 'Ethereum Sepolia Testnet',
+  rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f', // replace with your Infura project ID
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'ETH',
+    decimals: 18
   },
+  blockExplorerUrl: 'https://sepolia.etherscan.io'
+},
   '137': {
     chainId: '0x89',
     chainName: 'Polygon Mainnet',
