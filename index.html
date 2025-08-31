@@ -2208,14 +2208,9 @@ const network = await provider.getNetwork();
       referralAddress = ref;
     }
 
-   // 6️⃣ Initialize provider & contract (ethers v5)
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
-// Get the contract address for the current network
-const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-if (!contractAddress) throw new Error("No contract address for this network");
-
-const network = await provider.getNetwork();
+const network = await provider.getNetwork(); // Add this line
 const contractAddress = CONTRACT_ADDRESSES[network.chainId];
 if (!contractAddress) throw new Error("No contract address for this network");
 const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
