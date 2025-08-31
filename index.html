@@ -2138,7 +2138,10 @@ async function validateContracts() {
   const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
 
   // Check if contract is deployed
-  const presaleCode = await provider.getCode(CONTRACT_ADDRESSES[network.chainId]);
+  const network = await provider.getNetwork();
+const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+if (!contractAddress) throw new Error("No contract address for this network");
+const presaleCode = await provider.getCode(contractAddress);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
   // Verify network
@@ -2148,6 +2151,9 @@ async function validateContracts() {
 }
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
+  // Add this at the beginning of your buyFluffi() function:
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const network = await provider.getNetwork();
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
     showNotification('Too many attempts. Please wait.', 'warning');
@@ -2177,7 +2183,7 @@ async function buyFluffi() {
 
   try {
     // 3️⃣ Ensure user is on Testnet
-    await switchToNetwork('BSC_TEST');
+    await switchToNetwork(97); // BSC Testnet chain ID
     await validateContracts();
 
     // 4️⃣ Currency conversion
@@ -2209,6 +2215,9 @@ const signer = provider.getSigner();
 const contractAddress = CONTRACT_ADDRESSES[network.chainId];
 if (!contractAddress) throw new Error("No contract address for this network");
 
+const network = await provider.getNetwork();
+const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+if (!contractAddress) throw new Error("No contract address for this network");
 const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
