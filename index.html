@@ -1156,15 +1156,77 @@ const CONTRACT_ADDRESSES = {
   43113: "0xE47565637b477dc1De60dfcCB98015806fd22176"
   // Solana handled separately
 };
-    
-    const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 
-    // Function to get contract for the current chain
+    // Add this after your CONTRACT_ADDRESSES:
+const NETWORK_CONFIGS = {
+  1: {
+    name: "Ethereum Mainnet",
+    currency: "ETH",
+    rpcUrl: "https://mainnet.infura.io/v3/YOUR_PROJECT_ID",
+    explorer: "https://etherscan.io"
+  },
+  5: {
+    name: "Goerli Testnet",
+    currency: "ETH",
+    rpcUrl: "https://goerli.infura.io/v3/YOUR_PROJECT_ID",
+    explorer: "https://goerli.etherscan.io"
+  },
+  56: {
+    name: "BSC Mainnet",
+    currency: "BNB",
+    rpcUrl: "https://bsc-dataseed.binance.org/",
+    explorer: "https://bscscan.com"
+  },
+  97: {
+    name: "BSC Testnet",
+    currency: "BNB",
+    rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    explorer: "https://testnet.bscscan.com"
+  },
+  137: {
+    name: "Polygon Mainnet",
+    currency: "MATIC",
+    rpcUrl: "https://polygon-rpc.com/",
+    explorer: "https://polygonscan.com"
+  },
+  80001: {
+    name: "Mumbai Testnet",
+    currency: "MATIC",
+    rpcUrl: "https://rpc-mumbai.maticvigil.com/",
+    explorer: "https://mumbai.polygonscan.com"
+  },
+  43114: {
+    name: "Avalanche Mainnet",
+    currency: "AVAX",
+    rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
+    explorer: "https://snowtrace.io"
+  },
+  43113: {
+    name: "Avalanche Testnet",
+    currency: "AVAX",
+    rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
+    explorer: "https://testnet.snowtrace.io"
+  }
+};
+    
+    const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ReferralRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REFERRAL_PERCENT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimReferralRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCurrentTokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referralRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+
+// getFluffiContract function:
 async function getFluffiContract(provider) {
-  const network = await provider.getNetwork();   // get chainId
-  const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-  if (!contractAddress) throw new Error("Unsupported chain");
-  return new ethers.Contract(contractAddress, ABI, provider.getSigner());
+  try {
+    const network = await provider.getNetwork();
+    const chainId = network.chainId;
+    const contractAddress = CONTRACT_ADDRESSES[chainId];
+    
+    if (!contractAddress) {
+      throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
+    }
+    
+    return new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, provider.getSigner());
+  } catch (error) {
+    console.error("Error getting contract:", error);
+    throw error;
+  }
 }
     
     const WALLETCONNECT_CONFIG = {
@@ -1989,10 +2051,7 @@ if (!document.getElementById('notification-styles')) {
   styleSheet.textContent = notificationStyles;
   document.head.appendChild(styleSheet);
 }
-  </script>
- <script>
    // ===== HELPER FUNCTIONS =====
-
 // Rate limiter to prevent spam
 const rateLimiter = {
   attempts: {},
@@ -2028,36 +2087,48 @@ async function recordPurchase(txHash, amount, tokens) {
 }
 
 // Network switch to BSC Testnet
-async function switchToNetwork(chainName = 'BSC') {
-  if (!window.ethereum) return;
-  
-  const networks = {
-    'BSC': { chainId: '0x38', rpcUrl: 'https://bsc-dataseed.binance.org/', name: 'BSC Mainnet' },
-    'BSC_TEST': { chainId: '0x61', rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', name: 'BSC Testnet' },
-    'ETH': { chainId: '0x1', rpcUrl: 'https://mainnet.infura.io/v3/', name: 'Ethereum' },
-    'POLYGON': { chainId: '0x89', rpcUrl: 'https://polygon-rpc.com/', name: 'Polygon' },
-    'AVAX': { chainId: '0xa86a', rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', name: 'Avalanche' }
-  };
-  
-  const network = networks[chainName];
-  if (!network) return;
-  
+// Replace your switchToNetwork function with this:
+async function switchToNetwork(chainId) {
+  if (!window.ethereum) {
+    showNotification("Please install a Web3 wallet like MetaMask", "error");
+    return false;
+  }
+
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: network.chainId }],
+      params: [{ chainId: `0x${chainId.toString(16)}` }],
     });
-  } catch (error) {
-    if (error.code === 4902) {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: network.chainId,
-          chainName: network.name,
-          rpcUrls: [network.rpcUrl],
-        }]
-      });
+    return true;
+  } catch (switchError) {
+    // This error code indicates that the chain has not been added to MetaMask
+    if (switchError.code === 4902) {
+      try {
+        const networkConfig = NETWORK_CONFIGS[chainId];
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: `0x${chainId.toString(16)}`,
+            chainName: networkConfig.name,
+            nativeCurrency: {
+              name: networkConfig.currency,
+              symbol: networkConfig.currency,
+              decimals: 18
+            },
+            rpcUrls: [networkConfig.rpcUrl],
+            blockExplorerUrls: [networkConfig.explorer]
+          }]
+        });
+        return true;
+      } catch (addError) {
+        console.error("Error adding network:", addError);
+        showNotification(`Failed to add network: ${addError.message}`, "error");
+        return false;
+      }
     }
+    console.error("Error switching network:", switchError);
+    showNotification(`Failed to switch network: ${switchError.message}`, "error");
+    return false;
   }
 }
 
