@@ -1,14 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="$FLUFFI is a Solana Layer 2 meme token with presale and staking features. Join the community and earn rewards.">
-  <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, Solana, meme token">
+  <meta name="description" content="$FLUFFI is a multi-chain meme token with presale and staking features. Join the community and earn rewards.">
+  <meta name="keywords" content="Fluffi, $FLUFFI, crypto, presale, staking, multi-chain, meme token">
   <meta name="author" content="FLUFFI Team">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>$FLUFFI Presale & Staking</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="fluffi.jpg" type="image/jpeg">
@@ -18,13 +19,310 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" href="fluffi.jpg" as="image">
+  <style>
+    /* Custom styles */
+    .wallet-modal, .wallet-connect-modal, .help-modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .wallet-modal-content, .wallet-connect-content, .help-modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .dark .wallet-modal-content, .dark .wallet-connect-content, .dark .help-modal-content {
+      background-color: #1f2937;
+    }
+    .wallet-close, .wallet-connect-close, .help-close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .wallet-close:hover, .wallet-close:focus,
+    .wallet-connect-close:hover, .wallet-connect-close:focus,
+    .help-close:hover, .help-close:focus {
+      color: #000;
+      text-decoration: none;
+    }
+    .dark .wallet-close, .dark .wallet-connect-close, .dark .help-close {
+      color: #ccc;
+    }
+    .dark .wallet-close:hover, .dark .wallet-close:focus,
+    .dark .wallet-connect-close:hover, .dark .wallet-connect-close:focus,
+    .dark .help-close:hover, .dark .help-close:focus {
+      color: #fff;
+    }
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dark .wallet-option {
+      border-color: #4b5563;
+    }
+    .wallet-option:hover {
+      background-color: #f3f4f6;
+      transform: translateY(-2px);
+    }
+    .dark .wallet-option:hover {
+      background-color: #374151;
+    }
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+    }
+    .wallet-help-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .dark .wallet-help-btn {
+      background-color: #4b5563;
+      color: #e5e7eb;
+    }
+    .active {
+      display: block;
+    }
+    .section-title {
+      color: #059669;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .dark .section-title {
+      color: #10b981;
+    }
+    .price-tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .price-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #1f2937;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+    }
+    .dark .price-tooltip .tooltip-text {
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    .price-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .logo-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .notification-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    @keyframes slide-in {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slide-out {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+    .animate-slide-in {
+      animation: slide-in 0.3s ease-out;
+    }
+    .animate-slide-out {
+      animation: slide-out 0.3s ease-out;
+    }
+    .help-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .help-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+    .dark .help-icon-wrapper {
+      background-color: #4b5563;
+    }
+    .help-icon {
+      font-size: 20px;
+    }
+    .help-platform {
+      margin-bottom: 20px;
+    }
+    .platform-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .platform-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    .dark .platform-icon {
+      background-color: #4b5563;
+    }
+    .help-steps {
+      padding-left: 20px;
+    }
+    .help-steps li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .trust-card {
+      transition: all 0.3s ease;
+    }
+    .trust-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .dark .trust-card:hover {
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    @keyframes marquee {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-marquee {
+      display: inline-block;
+      animation: marquee 20s linear infinite;
+    }
+    @keyframes bounce { 
+      0%, 100% { transform: translateY(0); } 
+      50% { transform: translateY(-10px); } 
+    }
+    .animate-bounce { animation: bounce 2s infinite; }
+    @keyframes pulse { 
+      0%, 100% { transform: scale(1); } 
+      50% { transform: scale(1.05); } 
+    }
+    .animate-pulse { animation: pulse 2s infinite; }
+    @keyframes sway { 
+      0% { transform: translateX(0);} 
+      50% { transform: translateX(5px);} 
+      100% { transform: translateX(0);} 
+    }
+    .animate-sway { animation: sway 3s infinite ease-in-out; }
+    .dark .trust-card {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dark .trust-card h3 {
+      color: #f9fafb !important;
+    }
+    .dark .trust-card p {
+      color: #d1d5db !important;
+    }
+    
+    /* Fix for wider sections */
+    .section-container {
+      width: 100%;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Fix for dark mode text visibility */
+    .dark .text-gray-800 {
+      color: #e5e7eb;
+    }
+    .dark .text-gray-700 {
+      color: #d1d5db;
+    }
+    .dark .text-gray-600 {
+      color: #9ca3af;
+    }
+    
+    /* Fix for live feed */
+    .live-feed-container {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    /* Fix for wallet connection issues */
+    .wallet-status {
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      margin-top: 0.5rem;
+      background-color: #f3f4f6;
+    }
+    .dark .wallet-status {
+      background-color: #374151;
+    }
+  </style>
 </head>
   
-<body class="text-gray-800 dark:text-white">
+<body class="text-gray-800 dark:text-white bg-gray-50 dark:bg-gray-900">
    <!-- Header -->
  <header class="bg-green-600 shadow sticky top-0 z-10 px-4 py-3">
   <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between">
@@ -38,25 +336,24 @@
       </h1>
     </div>
    
-<!-- Replace your current navigation with this -->
-<nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
-  <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
-  <a href="#presale" class="text-white hover:underline">Presale</a>
-  <a href="#staking" class="text-white hover:underline">Staking</a>
-  <a href="#faq" class="text-white hover:underline">FAQ</a>
-  <a href="referral.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Referral</a>
-  <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Whitepaper</a>
-  <a href="how-to-buy.html" target="_blank" rel="noopener noreferrer" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
-    How to Buy FLUFFI
-  </a>
-  <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
-    <span id="darkModeIcon">🌙</span>
-  </button>
-
-  <!-- Network Selection -->
+    <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
+      <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
+      <a href="#presale" class="text-white hover:underline">Presale</a>
+      <a href="#staking" class="text-white hover:underline">Staking</a>
+      <a href="#faq" class="text-white hover:underline">FAQ</a>
+      <a href="referral.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Referral</a>
+      <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Whitepaper</a>
+      <a href="how-to-buy.html" target="_blank" rel="noopener noreferrer" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
+        How to Buy FLUFFI
+      </a>
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
+        <span id="darkModeIcon">🌙</span>
+      </button>
+      
+      <!-- Network Selection - Added BSC Testnet -->
       <select id="networkSelect" class="p-2 border rounded-lg text-black dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Network selection">
-        <option value="97">BSC Testnet</option>
         <option value="56">BSC Mainnet</option>
+        <option value="97">BSC Testnet</option>
         <option value="1">Ethereum Mainnet</option>
         <option value="5">Ethereum Goerli</option>
         <option value="137">Polygon Mainnet</option>
@@ -66,29 +363,30 @@
         <option value="solana-mainnet">Solana Mainnet</option>
         <option value="solana-devnet">Solana Devnet</option>
       </select>
-  
-<div class="wallet-buttons" id="walletButtons">
-    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
-      <i class="fas fa-wallet"></i>Connect Wallet
-    </button>
-</div>
-</nav>
+      
+      <div class="wallet-buttons" id="walletButtons">
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center gap-2" onclick="openWalletModal()">
+          <i class="fas fa-wallet"></i>Connect Wallet
+        </button>
+      </div>
+    </nav>
     <input type="hidden" id="walletAddress" value="">
+  </div>
 </header>
-  
+
 <!-- Hero Messaging Section -->
 <section id="hero-message" class="py-16 px-6 text-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white shadow-xl">
   <h1 class="text-4xl md:text-5xl font-extrabold mb-6 animate-bounce">
     🐾 Secure Your Spot in the FLUFFI Revolution!
   </h1>
   <p class="text-xl md:text-2xl mb-8 font-light">
-    🚀 Limited Presale — Don’t Miss Out on the Next Big Meme Coin!
+    🚀 Limited Presale — Don't Miss Out on the Next Big Meme Coin!
   </p>
- <a href="#presale" 
-   onclick="document.getElementById('presale').scrollIntoView({ behavior: 'smooth' }); return false;" 
-   class="inline-block bg-white text-green-700 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 transition-transform duration-300">
-  Join Presale Now 🚀
-</a>
+  <a href="#presale" 
+     onclick="document.getElementById('presale').scrollIntoView({ behavior: 'smooth' }); return false;" 
+     class="inline-block bg-white text-green-700 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 transition-transform duration-300">
+    Join Presale Now 🚀
+  </a>
 </section>
 
 <div id="countdown-container" class="text-center my-10 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-xl mx-auto">
@@ -115,142 +413,129 @@
   </div>
 </div>
 
-    <script>
-    /* Testing function - remove in production */
-function resetTimer() {
-  localStorage.removeItem('presaleStartTime');
-  location.reload();
-}
-</script>
-
 <!-- Testing button - remove in production -->
-<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded">
+<button onclick="resetTimer()" class="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded z-50">
   Reset Timer (For Testing)
 </button>
     
-    <!-- Presale Section -->
-   <section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+<!-- Presale Section -->
+<section id="presale" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 section-container">
   <h2 class="section-title text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 mb-6">
     🚀 Limited Presale — Act Fast!
   </h2>
 
-     <div id="live-feed" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md max-w-xl mx-auto">
-  <h2 class="text-xl font-bold mb-2 text-center text-gray-800 dark:text-white">🔥 Live FLUFFI Activity</h2>
-  <ul id="feed-list" class="space-y-2 text-gray-700 dark:text-gray-300">
-    <!-- Live events will appear here -->
-  </ul>
-</div>
+  <div id="live-feed" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+    <h2 class="text-xl font-bold mb-2 text-center text-gray-800 dark:text-white">🔥 Live FLUFFI Activity</h2>
+    <ul id="feed-list" class="space-y-2 text-gray-700 dark:text-gray-300">
+      <!-- Live events will appear here -->
+    </ul>
+  </div>
 
-        <div id="walletError" class="wallet-error hidden"></div>
+  <div id="walletError" class="wallet-error hidden"></div>
         
-        <div id="walletStatus" class="wallet-address hidden">
-          <strong>Connected:</strong> <span id="connectedAddress"></span>
-          <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-            Disconnect
-          </button>
-        </div>
-      </div>
+  <div id="walletStatus" class="wallet-status hidden">
+    <strong>Connected:</strong> <span id="connectedAddress"></span>
+    <button onclick="disconnectWallet()" class="ml-2 mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+      Disconnect
+    </button>
+  </div>
 
-      <div class="fluio-status-container">
-        <div class="fluio-price mt-2">
-          <div class="price-header flex items-center justify-between">
-            <span class="font-semibold text-lg">$FLUFFI</span>
-            <span class="live-badge text-green-500 font-bold">LIVE</span>
-          </div>
-          <div class="current-price price-container" id="currentPrice">
-            $0.000100
-            <span class="price-tooltip">
-              <i class="fas fa-info-circle text-blue-500" aria-hidden="true"></i>
-              <span class="tooltip-text">
-              <strong>Price Increase:</strong><br>
-              +5% per stage (every 48 hours)<br>
-               Next increase: <span id="nextIncreaseTime">00:00:00</span>
-               </span>
-              </span>
-            </span>
-          </div>
-          <div class="price-change text-sm text-gray-500">+0.00%</div>
-        </div>
+  <div class="fluio-status-container">
+    <div class="fluio-price mt-2">
+      <div class="price-header flex items-center justify-between">
+        <span class="font-semibold text-lg">$FLUFFI</span>
+        <span class="live-badge text-green-500 font-bold">LIVE</span>
       </div>
-
-      <div class="flex items-center mt-4 mb-4">
-        <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-        </svg>
-        <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
-        <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+      <div class="current-price price-container" id="currentPrice">
+        $0.000100
+        <span class="price-tooltip">
+          <i class="fas fa-info-circle text-blue-500" aria-hidden="true"></i>
+          <span class="tooltip-text">
+            <strong>Price Increase:</strong><br>
+            +5% per stage (every 48 hours)<br>
+            Next increase: <span id="nextIncreaseTime">00:00:00</span>
+          </span>
+        </span>
       </div>
+      <div class="price-change text-sm text-gray-500">+0.00%</div>
+    </div>
+  </div>
 
-      <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+  <div class="flex items-center mt-4 mb-4">
+    <svg class="w-5 h-5 mr-2 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+    </svg>
+    <span class="font-mono text-lg font-bold" id="tokensSold">67,431,509</span>
+    <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">FLUFFI sold</span>
+  </div>
 
-      <div class="flex gap-2 mb-4">
-        <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
-        <select id="presaleNetworkSelect">
-        <option value="97">BSC Testnet</option>
-        <option value="56">BSC Mainnet</option>
-        <option value="1">Ethereum Mainnet</option>
-        <option value="5">Ethereum Goerli</option>
-        <option value="137">Polygon Mainnet</option>
-        <option value="80001">Polygon Mumbai</option>
-        <option value="43114">Avalanche Mainnet</option>
-        <option value="43113">Avalanche Fuji</option>
-        <option value="solana-mainnet">Solana Mainnet</option>
-        <option value="solana-devnet">Solana Devnet</option>
-</select>
-      </div>
-      <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
-      <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
-        🚀 Buy Now
-      </button>
-    </section>
+  <p class="mb-4 text-green-600 font-semibold">🎯 Referral Bonus: <strong>10%</strong></p>
+
+  <div class="flex gap-2 mb-4">
+    <input type="number" placeholder="Amount" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
+    <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
+      <option value="BNB">BNB</option>
+      <option value="ETH">ETH</option>
+      <option value="MATIC">MATIC</option>
+      <option value="AVAX">AVAX</option>
+      <option value="SOL">SOL</option>
+      <option value="USDC">USDC</option>
+      <option value="USDT">USDT</option>
+      <option value="USD">USD (Card)</option>
+    </select>
+  </div>
+  <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
+  <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
+    🚀 Buy Now
+  </button>
+</section>
   
-    <input type="hidden" id="referralLink" value="">
+<input type="hidden" id="referralLink" value="">
   
-    <!-- Referral Section -->
-    <section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-      <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
-      <div id="referralSection">
-        <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
-        <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
-          Connect Wallet for Referrals
-        </button>
-      </div>
-    </section>
+<!-- Referral Section -->
+<section id="referral" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 section-container">
+  <h2 class="text-2xl font-bold mb-4">💰 Earn with Referrals</h2>
+  <div id="referralSection">
+    <p class="mb-4">Connect your wallet to access your referral link and start earning!</p>
+    <button id="referralConnectBtn" onclick="connectReferralWallet()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+      Connect Wallet for Referrals
+    </button>
+  </div>
+</section>
 
-    <!-- Claim Section -->
-    <section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">🎁 Claim $FLUFFI</h2>
-      <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
-        <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Wallet Balance:</p>
-            <p class="font-mono text-lg font-bold" id="userBalance">0</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Staked:</p>
-            <p class="font-mono text-lg font-bold" id="userStaked">0</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Rewards:</p>
-            <p class="font-mono text-lg font-bold" id="userRewards">0</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Presale Allocation:</p>
-            <p class="font-mono text-lg font-bold" id="userPresale">0</p>
-          </div>
-        </div>
+<!-- Claim Section -->
+<section class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 section-container">
+  <h2 class="section-title">🎁 Claim $FLUFFI</h2>
+  <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+    <h3 class="font-semibold mb-2 text-lg">Your Balances</h3>
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Wallet Balance:</p>
+        <p class="font-mono text-lg font-bold" id="userBalance">0</p>
       </div>
-      <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
-      <button onclick="claimTokens()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">
-        Claim Tokens
-      </button>
-    </section>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Staked:</p>
+        <p class="font-mono text-lg font-bold" id="userStaked">0</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Rewards:</p>
+        <p class="font-mono text-lg font-bold" id="userRewards">0</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Presale Allocation:</p>
+        <p class="font-mono text-lg font-bold" id="userPresale">0</p>
+      </div>
+    </div>
+  </div>
+  <p class="mb-4">Once the presale ends, you can claim your purchased tokens here.</p>
+  <button onclick="claimTokens()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold">
+    Claim Tokens
+  </button>
+</section>
 
-   <!-- Staking Dashboard -->
+<!-- Staking Dashboard -->
 <section id="staking" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
-  <div class="max-w-5xl mx-auto px-6 text-center">
-
+  <div class="section-container px-6 text-center">
     <!-- Title -->
     <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">
       🐾 FLUFFI Staking Dashboard
@@ -262,7 +547,6 @@ function resetTimer() {
 
     <!-- Dashboard Grid -->
     <div class="grid gap-8 md:grid-cols-3">
-
       <!-- Total Staked -->
       <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Total Staked</h3>
@@ -285,16 +569,16 @@ function resetTimer() {
       </div>
     </div>
 
-        <!-- Staking Section -->
-    <section id="staking" class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
-      <h2 class="section-title">📈 Stake Your $FLUFFI</h2>
+    <!-- Staking Section -->
+    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold mb-4">📈 Stake Your $FLUFFI</h2>
       <p class="mb-4 text-yellow-600 font-semibold">APY: <strong>90%</strong> | Ends at Listing Date</p>
       <input type="number" placeholder="Amount to stake" id="stakeInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-yellow-500" aria-label="Amount to stake">
       <button onclick="stakeFluffi()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg font-semibold">Stake Now</button>
-    </section>
+    </div>
     
     <!-- Claim Rewards -->
-    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+    <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
       <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Claim Progress</h3>
       <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
         <div class="bg-green-500 h-4 rounded-full transition-all duration-500" id="claim-progress" style="width: 25%;"></div>
@@ -305,54 +589,9 @@ function resetTimer() {
     </div>
   </div>
 </section>
-
-<script>
-async function updateStakingDashboard() {
-  // Get values from localStorage (simulated for now)
-  const walletAddress = localStorage.getItem('walletAddress');
   
-  if (walletAddress) {
-    // Retrieve stored staking info
-    const stakingInfo = JSON.parse(localStorage.getItem(`staking_${walletAddress}`) || '{}');
-    const totalStaked = stakingInfo.amount || 0;
-    
-    // Calculate earnings based on APY (90%)
-    const timeDiff = stakingInfo.timestamp ? (Date.now() - stakingInfo.timestamp) / (365 * 24 * 60 * 60 * 1000) : 0;
-    const userEarnings = totalStaked * 0.9 * timeDiff;
-    
-    // Get balance from localStorage
-    const userBalance = parseFloat(localStorage.getItem(`balance_${walletAddress}`) || '0');
-    
-    // Update UI
-    document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
-    document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
-    document.getElementById('user-earnings').textContent = userEarnings.toFixed(2);
-    
-    // Progress based on time until listing (30 days from start)
-    const startTime = new Date('2025-01-27T00:00:00Z').getTime();
-    const listingTime = startTime + (30 * 24 * 60 * 60 * 1000);
-    const now = Date.now();
-    const claimPercent = Math.min(((now - startTime) / (listingTime - startTime)) * 100, 100);
-    
-    document.getElementById('claim-percent').textContent = Math.floor(claimPercent) + "%";
-    document.getElementById('claim-progress').style.width = claimPercent + "%";
-  } else {
-    // Default values when not connected
-    document.getElementById('total-staked').textContent = '0';
-    document.getElementById('user-balance-value').textContent = '0';
-    document.getElementById('user-earnings').textContent = '0';
-    document.getElementById('claim-percent').textContent = "0%";
-    document.getElementById('claim-progress').style.width = "0%";
-  }
-}
-
-// Update on page load and when wallet connects
-document.addEventListener('DOMContentLoaded', updateStakingDashboard);
-window.addEventListener('storage', updateStakingDashboard);
-</script>
-  
-    <!-- Tokenomics Section -->
-   <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
+<!-- Tokenomics Section -->
+<section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12 section-container">
   <h2 class="text-3xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 uppercase tracking-wide">
     📊 Tokenomics
   </h2>
@@ -395,105 +634,111 @@ window.addEventListener('storage', updateStakingDashboard);
   </div>
 </section>
     
-    <!-- FAQ Section -->
-    <section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 max-w-3xl mx-auto">
-      <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
+<!-- FAQ Section -->
+<section id="faq" class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-10 section-container">
+  <h2 class="text-3xl font-bold text-center mb-6 text-purple-700 dark:text-purple-400">❓ FAQ</h2>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          What's the token tax?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          <p>5% total tax on all transactions:</p>
-          <ul class="list-disc list-inside ml-2">
-            <li>3% Marketing</li>
-            <li>2% Automatic Liquidity</li>
-          </ul>
-        </div>
-      </details>
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      What's the token tax?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      <p>5% total tax on all transactions:</p>
+      <ul class="list-disc list-inside ml-2">
+        <li>3% Marketing</li>
+        <li>2% Automatic Liquidity</li>
+      </ul>
+    </div>
+  </details>
 
-       <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          How to claim after presale?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
-        </div>
-      </details>
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      How to claim after presale?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      Tokens will be automatically airdropped to your wallet within 24 hours of launch. No manual claiming needed.
+    </div>
+  </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          What's the vesting schedule?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          <ul class="list-disc list-inside ml-2">
-            <li>Presale tokens: 100% unlocked at TGE</li>
-            <li>Team tokens: 24-month linear vesting</li>
-          </ul>
-        </div>
-      </details>
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      What's the vesting schedule?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      <ul class="list-disc list-inside ml-2">
+        <li>Presale tokens: 100% unlocked at TGE</li>
+        <li>Team tokens: 24-month linear vesting</li>
+      </ul>
+    </div>
+  </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          How do I buy $FLUFFI?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Connect your wallet, enter amount in BNB, and click "Buy Now".
-        </div>
-      </details>
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      How do I buy $FLUFFI?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      Connect your wallet, select your preferred network and currency, enter amount, and click "Buy Now".
+    </div>
+  </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          When does staking end?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Staking ends at the official listing date.
-        </div>
-      </details>
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      When does staking end?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      Staking ends at the official listing date.
+    </div>
+  </details>
 
-      <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-2">
-        <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
-          What chains are supported?
-          <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
-          Currently supporting BNB, with plans for ETH, SOL, and AVAX.
-        </div>
-      </details>
-    </section>
-
-    <div class="split-sections">
+  <details class="group border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+    <summary class="cursor-pointer p-4 font-semibold text-gray-800 dark:text-gray-100 flex justify-between items-center">
+      Which blockchains are supported?
+      <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="px-4 pb-4 text-gray-700 dark:text-gray-300">
+      <p>FLUFFI supports multiple blockchains:</p>
+      <ul class="list-disc list-inside ml-2">
+        <li>Binance Smart Chain (BSC) - Mainnet & Testnet</li>
+        <li>Ethereum - Mainnet & Goerli Testnet</li>
+        <li>Polygon - Mainnet & Mumbai Testnet</li>
+        <li>Avalanche - Mainnet & Fuji Testnet</li>
+        <li>Solana - Mainnet & Devnet (coming soon)</li>
+      </ul>
+      <p class="mt-2">You can switch networks using the dropdown menu.</p>
+    </div>
+  </details>
+</section>
 
 <!-- Why Fluffi Coin Section -->
-<section id="why" class="py-16 px-6 text-center">
+<section id="why" class="py-16 px-6 text-center bg-gray-50 dark:bg-gray-900">
   <h2 class="text-4xl font-bold mb-12 text-green-500">Why Fluffi Coin?</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
 
     <!-- Meme Power -->
-    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-800 transition duration-300">
       <div class="text-5xl mb-4 animate-bounce">🔥</div>
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Meme Power</h3>
       <p class="mt-3 text-gray-700 dark:text-gray-300">
@@ -502,7 +747,7 @@ window.addEventListener('storage', updateStakingDashboard);
     </div>
 
     <!-- Community Driven -->
-    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-800 transition duration-300">
       <div class="text-5xl mb-4 animate-pulse">🎨</div>
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Community Driven</h3>
       <p class="mt-3 text-gray-700 dark:text-gray-300">
@@ -511,31 +756,15 @@ window.addEventListener('storage', updateStakingDashboard);
     </div>
 
     <!-- Fair & Secure -->
-    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 transition duration-300">
+    <div class="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-800 transition duration-300">
       <div class="text-5xl mb-4 animate-sway">⚖️</div>
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Fair & Secure</h3>
       <p class="mt-3 text-gray-700 dark:text-gray-300">
         Locked liquidity, audited contracts, and fair presale stages.
       </p>
     </div>
-
   </div>
 </section>
-
-<style>
-/* Custom sway animation for the scales icon */
-@keyframes sway {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
-}
-
-.animate-sway {
-  animation: sway 2s infinite ease-in-out;
-  display: inline-block;
-}
-</style>
 
 <!-- Trust Section with Live Counters & Full Dark/Light Fix -->
 <section class="py-16 px-6 bg-gray-100 dark:bg-gray-900 text-center transition-colors duration-300">
@@ -586,90 +815,22 @@ window.addEventListener('storage', updateStakingDashboard);
   </div>
 </section>
 
-<style>
-.trust-card img {
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
-}
-
-/* Animations */
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-.animate-bounce { animation: bounce 2s infinite; }
-
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-.animate-pulse { animation: pulse 2s infinite; }
-
-@keyframes sway { 0% { transform: translateX(0);} 50% { transform: translateX(5px);} 100% { transform: translateX(0);} }
-.animate-sway { animation: sway 3s infinite ease-in-out; }
-
-/* Dark mode specific fixes */
-.dark .trust-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .trust-card h3 {
-  color: #f9fafb !important; /* gray-50 */
-}
-
-.dark .trust-card p {
-  color: #d1d5db !important; /* gray-300 */
-}
-</style>
-
-<script>
-// Update follower counts dynamically (replace with real API calls)
-function updateFollowers() {
-  document.getElementById('tg-count').textContent = '5,432';
-  document.getElementById('tw-count').textContent = '10,215';
-  document.getElementById('dc-count').textContent = '3,876';
-}
-updateFollowers();
-</script>
-     
-      <!-- Team Section with two new members -->
-      <section id="team">
-        <h2>Our Team</h2>
-        <div class="team-grid">
-          <div class="team-member">
-            <h3>James Chen</h3>
-            <p>Former Lead Blockchain Architect at ConsenSys. 12 years experience in smart contract development and protocol design.</p>
-          </div>
-          <div class="team-member">
-            <h3>Priya Patel</h3>
-            <p>Ex-Senior Engineer at Polygon. Specialized in ZK-rollups and Layer 2 scaling solutions.</p>
-          </div>
-          
-          <!-- New team member 1: Former AVAX Developer -->
-          <div class="team-member">
-            <h3>Marcus Johnson</h3>
-            <p>Former Core Developer at Avalanche. 8+ years experience in consensus algorithms and distributed systems.</p>
-          </div>
-          
-          <!-- New team member 2: Marketing Specialist -->
-          <div class="team-member">
-            <h3>Sophia Williams</h3>
-            <p>Ex-Product Lead at Chainlink. Specialized in oracle systems and DeFi integrations.</p>
-          </div>
-        </div>
-      </section>
-    </div>
-  </main>
-
- <!-- ================== COMMUNITY ACTIVITY ================== -->
+<!-- ================== COMMUNITY ACTIVITY ================== -->
 <section id="community-activity" class="py-12 bg-green-50 dark:bg-gray-800">
   <h2 class="text-3xl font-bold text-center text-green-600 dark:text-green-400 mb-8">
     🔥 Live Community Activity
   </h2>
 
   <!-- Live Feed -->
-  <div id="liveFeed" class="max-w-2xl mx-auto bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-lg mb-8 text-center">
-    <p id="feedMessage" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading latest activity...</p>
+  <div class="section-container">
+    <div id="liveFeed" class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-lg mb-8 text-center">
+      <p id="feedMessage" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading latest activity...</p>
+    </div>
   </div>
 
   <!-- Telegram Embed -->
-  <div class="max-w-4xl mx-auto mb-8">
-     <a href="https://t.me/FLUFFISOLANALAYER2
-  Join us on Telegram
-</a>
+  <div class="section-container mb-8">
+    <iframe src="https://t.me/FLUFFISOLANALAYER2" 
       width="100%" height="400" 
       frameborder="0" scrolling="yes"
       class="rounded-2xl shadow-lg bg-white dark:bg-gray-800"></iframe>
@@ -686,199 +847,227 @@ updateFollowers();
     </div>
   </div>
 </section>
+  
+<footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
+  <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
+  <div class="flex gap-4 justify-center md:justify-end">
+    <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
+    </a>
+    <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
+    </a>
+  </div>
+</footer>
 
-<style>
-/* Marquee scrolling effect */
-@keyframes marquee {
-  0%   { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-.animate-marquee {
-  display: inline-block;
-  animation: marquee 20s linear infinite;
-}
+<!-- Wallet Connect Modal -->
+<div id="walletModal" class="wallet-modal">
+  <div class="wallet-modal-content dark:bg-gray-800">
+    <div class="wallet-header">
+      <h3 class="text-xl font-bold">Connect Wallet</h3>
+      <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
+    </div>
+    <div class="wallet-option" onclick="connectWallet('metamask')">
+      <div class="flex items-center w-full">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span class="ml-3">MetaMask</span>
+      </div>
+      <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
+    </div>
+    <div class="wallet-option" onclick="connectWallet('trust')">
+      <div class="flex items-center w-full">
+        <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
+        <span class="ml-3">Trust Wallet</span>
+      </div>
+      <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
+    </div>
+    <div class="wallet-option" onclick="connectWallet('walletconnect')">
+      <div class="flex items-center w-full">
+        <img src="https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg" alt="WalletConnect" class="w-6 h-6">
+        <span class="ml-3">WalletConnect</span>
+      </div>
+      <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
+    </div>
 
-/* Dark mode fixes for community activity */
-.dark #community-activity {
-  background-color: #1f2937; /* gray-800 */
-}
+    <div class="wallet-option" onclick="connectWallet('phantom')">
+      <div class="flex items-center w-full">
+        <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" class="w-6 h-6">
+        <span class="ml-3">Phantom</span>
+      </div>
+      <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
+    </div>
+  </div>
+</div>
 
-.dark #liveFeed {
-  background-color: #374151; /* gray-700 */
-  border: 1px solid #4b5563; /* gray-600 */
-}
-</style>
+<!-- WalletConnect QR Code Modal -->
+<div id="walletConnectModal" class="wallet-connect-modal">
+  <div class="wallet-connect-content dark:bg-gray-800">
+    <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
+    <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
+    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+    <div id="walletConnectQrCode"></div>
+    <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
+  </div>
+</div>
+  
+<!-- Connection Help Modal -->
+<div id="connectionHelpModal" class="help-modal">
+  <div class="help-modal-content dark:bg-gray-800">
+    <span class="help-close" onclick="closeHelpModal()">&times;</span>
+    <div id="helpContent"></div>
+  </div>
+</div>
+
+<!-- Web3Modal v2 (WalletConnect v2) -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  
 <script>
-// Fake live feed data (replace with backend/websocket later)
-const feedMessages = [
-  "🐋 User0x12A just bought 1.2 BNB worth of FLUFFI 🚀",
-  "🔥 User0x9F4 staked 45,000 FLUFFI and is earning 90% APY!",
-  "🎯 User0x33B invited a friend and earned 10% referral bonus",
-  "🚀 User0x77C joined with 0.8 ETH in presale!",
-  "🐾 User0x5A1 bought 65,000 FLUFFI tokens",
-  "🐋 User0xE91 just bought 3.5 BNB worth of FLUFFI 🚀",
-  "🔥 User0x4D7 staked 120,000 FLUFFI for huge rewards!",
-  "🎯 User0xF22 invited 3 friends and earned 30% referral bonus",
-  "🚀 User0x18C joined with 2 ETH in presale!",
-  "🐾 User0x7B9 bought 90,000 FLUFFI tokens",
-  "🐋 User0x82A just bought 0.5 BNB worth of FLUFFI 🚀",
-  "🔥 User0x6C4 staked 75,000 FLUFFI and is earning daily rewards!",
-  "🎯 User0xD88 invited a friend and earned 10% referral bonus",
-  "🚀 User0xB41 joined with 1.5 ETH in presale!",
-  "🐾 User0x34C bought 40,000 FLUFFI tokens",
-  "🐋 User0xAA2 just bought 4.8 BNB worth of FLUFFI 🚀",
-  "🔥 User0x29D staked 25,000 FLUFFI and is compounding daily!",
-  "🎯 User0x66F invited 2 friends and earned 20% referral bonus",
-  "🚀 User0xC11 joined with 0.75 ETH in presale!",
-  "🐾 User0x1F7 bought 55,000 FLUFFI tokens",
-  "🐋 User0xFE9 just bought 6.3 BNB worth of FLUFFI 🚀",
-  "🔥 User0x17B staked 300,000 FLUFFI and is earning 90% APY!",
-  "🎯 User0x92E invited 5 friends and earned 50% referral bonus",
-  "🚀 User0x44D joined with 3 ETH in presale!",
-  "🐾 User0x7AA bought 120,000 FLUFFI tokens",
-  "🐋 User0x223 just bought 0.9 BNB worth of FLUFFI 🚀",
-  "🔥 User0x3BC staked 20,000 FLUFFI for early rewards!",
-  "🎯 User0x551 invited 1 friend and earned 10% referral bonus",
-  "🚀 User0x8F6 joined with 0.25 ETH in presale!",
-  "🐾 User0x19D bought 22,000 FLUFFI tokens",
-  "🐋 User0x40E just bought 7.1 BNB worth of FLUFFI 🚀",
-  "🔥 User0xCD9 staked 500,000 FLUFFI and is farming big rewards!",
-  "🎯 User0x822 invited 4 friends and earned 40% referral bonus",
-  "🚀 User0x77F joined with 5 ETH in presale!",
-  "🐾 User0x2A2 bought 150,000 FLUFFI tokens",
-  "🐋 User0x8DD just bought 2.2 BNB worth of FLUFFI 🚀",
-  "🔥 User0xE77 staked 60,000 FLUFFI and is locked till listing!",
-  "🎯 User0xA13 invited 2 friends and earned 20% referral bonus",
-  "🚀 User0x3FE joined with 0.65 ETH in presale!",
-  "🐾 User0x95B bought 36,000 FLUFFI tokens",
-  "🐋 User0xBB1 just bought 5.6 BNB worth of FLUFFI 🚀",
-  "🔥 User0x47C staked 85,000 FLUFFI and is compounding daily!",
-  "🎯 User0x5E5 invited a friend and earned 10% referral bonus",
-  "🚀 User0xCC7 joined with 1.25 ETH in presale!",
-  "🐾 User0xF4A bought 70,000 FLUFFI tokens",
-  "🐋 User0xD31 just bought 1.8 BNB worth of FLUFFI 🚀",
-  "🔥 User0x63B staked 15,000 FLUFFI early on!",
-  "🎯 User0xACD invited 3 friends and earned 30% referral bonus",
-  "🚀 User0x229 joined with 2.8 ETH in presale!",
-  "🐾 User0x8A0 bought 110,000 FLUFFI tokens",
-  "🐋 User0x6C2 just bought 9.9 BNB worth of FLUFFI 🚀",
-  "🔥 User0x118 staked 1,000,000 FLUFFI for mega rewards!",
-  "🎯 User0x33C invited 6 friends and earned 60% referral bonus",
-  "🚀 User0x94E joined with 10 ETH in presale!",
-  "🐾 User0x41F bought 500,000 FLUFFI tokens",
-  // ... repeat with more random variations ...
-];
-let feedIndex = 0;
-function rotateFeed() {
-  document.getElementById("feedMessage").textContent = feedMessages[feedIndex];
-  feedIndex = (feedIndex + 1) % feedMessages.length;
-}
-setInterval(rotateFeed, 4000); // change every 4s
-rotateFeed();
-</script>
-  
-  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
-    <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
-    <div class="flex gap-4 justify-center md:justify-end">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" class="w-5 h-5" width="20" height="20">
-      </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="Twitter" class="w-5 h-5" width="20" height="20">
-      </a>
-    </div>
-  </footer>
-
-   <!-- Wallet Connect Modal -->
-  <div id="walletModal" class="wallet-modal">
-    <div class="wallet-modal-content dark:bg-gray-800">
-      <div class="wallet-header">
-        <h3 class="text-xl font-bold">Connect Wallet</h3>
-        <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
-      </div>
-      <div class="wallet-option" onclick="connectWallet('metamask')">
-        <div class="flex items-center w-full">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-          <span class="ml-3">MetaMask</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
-      </div>
-      <div class="wallet-option" onclick="connectWallet('trust')">
-        <div class="flex items-center w-full">
-          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
-          <span class="ml-3">Trust Wallet</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
-      </div>
-      <div class="wallet-option" onclick="connectWallet('walletconnect')">
-        <div class="flex items-center w-full">
-          <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6">
-          <span class="ml-3">WalletConnect</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
-      </div>
-
-      <div class="wallet-option" onclick="connectWallet('phantom')">
-        <div class="flex items-center w-full">
-          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
-          <span class="ml-3">Phantom</span>
-        </div>
-        <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WalletConnect QR Code Modal -->
-  <div id="walletConnectModal" class="wallet-connect-modal">
-    <div class="wallet-connect-content dark:bg-gray-800">
-      <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
-      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
-      <div id="walletConnectQrCode"></div>
-      <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
-    </div>
-  </div>
-  
-  <!-- Connection Help Modal -->
-  <div id="connectionHelpModal" class="help-modal">
-    <div class="help-modal-content dark:bg-gray-800">
-      <span class="help-close" onclick="closeHelpModal()">&times;</span>
-      <div id="helpContent"></div>
-    </div>
-  </div>
-
-  <!-- Web3Modal v2 (WalletConnect v2) -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  
-  
-  <script>
 // Configuration
-    let tokenChart = null;
- // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
-  1: "0x...EthereumMainnet",
-  5: "0x...GoerliTestnet",
-  56: "0x...BSCMainnet",
-  97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
-  137: "0x...PolygonMainnet",
-  80001: "0x...PolygonTestnet",
-  43114: "0x...AvalancheMainnet",
-  43113: "0xE47565637b477dc1De60dfcCB98015806fd22176"
-  // Solana handled separately
+  // BSC
+  56: "0xPLACEHOLDER_AVAX_MAINNET_ADDRESS", // BSC Mainnet
+  97: "0x514947bF40Fe6816a606567Be1b4dFDD733B00DA", // BSC Testnet
+  
+  // Ethereum
+  1: "0xPLACEHOLDER_ETH_MAINNET_ADDRESS", // Ethereum Mainnet
+  5: "0xPLACEHOLDER_ETH_GOERLI_ADDRESS", // Ethereum Goerli
+  
+  // Polygon
+  137: "0xPLACEHOLDER_POLYGON_MAINNET_ADDRESS", // Polygon Mainnet
+  80001: "0xPLACEHOLDER_POLYGON_MUMBAI_ADDRESS", // Polygon Mumbai
+  
+  // Avalanche
+  43114: "0xPLACEHOLDER_AVAX_MAINNET_ADDRESS", // Avalanche Mainnet
+  43113: "0xPLACEHOLDER_AVAX_FUJI_ADDRESS", // Avalanche Fuji
+  
+  // Solana (different format)
+  "solana-mainnet": "PLACEHOLDER_SOLANA_MAINNET_ADDRESS",
+  "solana-devnet": "PLACEHOLDER_SOLANA_DEVNET_ADDRESS"
 };
 
-const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ReferralRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REFERRAL_PERCENT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimReferralRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCurrentTokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referralRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+const FLUFFI_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_tokenAddress","type":"address"},{"internalType":"uint256","name":"_tokenPrice","type":"uint256"},{"internalType":"uint256","name":"_presaleDurationHours","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[],"name":"DistributionStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cost","type":"uint256"}],"name":"TokensPurchased","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"staker","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensUnstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"FUND_WALLET","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"}],"name":"distributeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributionStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyStopPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getPresaleStatus","outputs":[{"internalType":"bool","name":"isActive","type":"bool"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"endTime","type":"uint256"},{"internalType":"uint256","name":"tokensSold","type":"uint256"},{"internalType":"uint256","name":"raised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilPresaleEnd","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"uint256","name":"purchasedBalance","type":"uint256"},{"internalType":"uint256","name":"stakedBalance","type":"uint256"},{"internalType":"uint256","name":"availableRewards","type":"uint256"},{"internalType":"uint256","name":"stakingStart","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastRewardCalculationTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleEndTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakedBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakingStartTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startDistribution","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"tokenBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalTokensSold","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"unstakeTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newPrice","type":"uint256"}],"name":"updateTokenPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawUnsoldTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
-// Function to get contract for the current chain
-async function getFluffiContract(provider) {
-  const network = await provider.getNetwork();   // get chainId
-  const contractAddress = CONTRACT_ADDRESSES[network.chainId] || FLUFFI_CONTRACT_ADDRESS;
-  if (!contractAddress) throw new Error("Unsupported chain");
-  return new ethers.Contract(contractAddress, ABI, provider.getSigner());
-}
-    const WALLETCONNECT_CONFIG = {
+const NETWORK_CONFIGS = {
+  // Ethereum
+  1: {
+    name: "Ethereum Mainnet",
+    chainId: "0x1",
+    rpcUrl: "https://mainnet.infura.io/v3/",
+    explorer: "https://etherscan.io",
+    nativeCurrency: {
+      name: "ETH",
+      symbol: "ETH",
+      decimals: 18
+    }
+  },
+  5: {
+    name: "Ethereum Goerli",
+    chainId: "0x5",
+    rpcUrl: "https://goerli.infura.io/v3/",
+    explorer: "https://goerli.etherscan.io",
+    nativeCurrency: {
+      name: "ETH",
+      symbol: "ETH",
+      decimals: 18
+    }
+  },
+  
+  // Binance Smart Chain
+  56: {
+    name: "BSC Mainnet",
+    chainId: "0x38",
+    rpcUrl: "https://bsc-dataseed.binance.org/",
+    explorer: "https://bscscan.com",
+    nativeCurrency: {
+      name: "BNB",
+      symbol: "BNB",
+      decimals: 18
+    }
+  },
+  97: {
+    name: "BSC Testnet",
+    chainId: "0x61",
+    rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    explorer: "https://testnet.bscscan.com",
+    nativeCurrency: {
+      name: "tBNB",
+      symbol: "tBNB",
+      decimals: 18
+    }
+  },
+  
+  // Polygon
+  137: {
+    name: "Polygon Mainnet",
+    chainId: "0x89",
+    rpcUrl: "https://polygon-rpc.com/",
+    explorer: "https://polygonscan.com",
+    nativeCurrency: {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18
+    }
+  },
+  80001: {
+    name: "Polygon Mumbai",
+    chainId: "0x13881",
+    rpcUrl: "https://rpc-mumbai.maticvigil.com/",
+    explorer: "https://mumbai.polygonscan.com",
+    nativeCurrency: {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18
+    }
+  },
+  
+  // Avalanche
+  43114: {
+    name: "Avalanche Mainnet",
+    chainId: "0xA86A",
+    rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
+    explorer: "https://snowtrace.io",
+    nativeCurrency: {
+      name: "AVAX",
+      symbol: "AVAX",
+      decimals: 18
+    }
+  },
+  43113: {
+    name: "Avalanche Fuji",
+    chainId: "0xA869",
+    rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
+    explorer: "https://testnet.snowtrace.io",
+    nativeCurrency: {
+      name: "AVAX",
+      symbol: "AVAX",
+      decimals: 18
+    }
+  },
+  
+  // Solana (placeholder - handled differently)
+  "solana-mainnet": {
+    name: "Solana Mainnet",
+    explorer: "https://explorer.solana.com",
+    nativeCurrency: {
+      name: "SOL",
+      symbol: "SOL",
+      decimals: 9
+    }
+  },
+  "solana-devnet": {
+    name: "Solana Devnet",
+    explorer: "https://explorer.solana.com/?cluster=devnet",
+    nativeCurrency: {
+      name: "SOL",
+      symbol: "SOL",
+      decimals: 9
+    }
+  }
+};
+
+const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [56], // BSC Mainnet
+  chains: [1, 56, 97, 137, 43114, 10, 42161, 8453], // Added BSC Testnet (97)
   showQrModal: false,
   qrModalOptions: {
     themeMode: 'dark',
@@ -898,6 +1087,14 @@ async function getFluffiContract(provider) {
           native: 'trust://',
           universal: 'https://link.trustwallet.com'
         }
+      },
+      {
+        id: 'phantom',
+        name: 'Phantom',
+        links: {
+          native: 'phantom://',
+          universal: 'https://phantom.app/ul/browse'
+        }
       }
     ]
   },
@@ -908,7 +1105,8 @@ async function getFluffiContract(provider) {
     icons: ["https://fluffi.site/logo.png"]
   }
 };
-  // Global variables
+
+// Global variables
 let userWalletAddress = null;
 let tasksCompleted = {
   twitter: false,
@@ -917,12 +1115,25 @@ let tasksCompleted = {
 };
 let countdownInterval = null;
 let provider = null;
+let tokenChart = null; // Chart instance
+
+// Get current network
+function getCurrentNetwork() {
+  return document.getElementById('networkSelect').value;
+}
+
+// Get contract address for current network
+function getContractAddress() {
+  const network = getCurrentNetwork();
+  return CONTRACT_ADDRESSES[network];
+}
 
 // For development - show dev section if URL has ?dev=true
 if (window.location.search.includes('dev=true')) {
   document.getElementById('devSection').classList.remove('hidden');
 }
 
+// Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
   const darkMode = localStorage.getItem('darkMode');
@@ -938,21 +1149,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
-  // Setup form submission
-  document.getElementById('airdropForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    claimAirdrop();
-  });
-  
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
-// Check but don't auto-connect
-const savedAddress = localStorage.getItem('walletAddress');
-// Don't remove the saved data, just don't auto-connect
+  // Check if wallet was previously connected
+  const savedAddress = localStorage.getItem('walletAddress');
+  if (savedAddress) {
+    // Clear the saved address to prevent auto-reconnect attempts
+    localStorage.removeItem('walletAddress');
+    localStorage.removeItem('walletConnected');
+  }
   
   // Initialize countdown timer
-  initializeCountdown();
+  initializeTimer();
   
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
@@ -960,21 +1169,26 @@ const savedAddress = localStorage.getItem('walletAddress');
     tasksCompleted = JSON.parse(savedTasks);
     updateTaskUI();
   }
+  
+  // Initialize token chart
+  initTokenChart();
+  
+  // Initialize live feed
+  initializeLiveFeed();
+  
+  // Initialize staking dashboard
+  updateStakingDashboard();
+  
+  // Initialize community activity
+  initializeCommunityActivity();
 });
 
 // Timer functions
-// Timer variables
 let presaleInterval = null;
-
-// Initialize the timer when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initializeTimer();
-});
 
 function initializeTimer() {
   // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
   const startTime = new Date('2025-08-27T00:00:00Z').getTime();
-  // No need to store in localStorage since it's fixed
   
   // Update timer immediately
   updateTimer(startTime);
@@ -1070,6 +1284,7 @@ function resetTimer() {
   // Reinitialize the timer
   initializeTimer();
 }
+
 // Wallet connection functions
 function openWalletModal() {
   document.getElementById('walletModal').classList.add('active');
@@ -1158,6 +1373,7 @@ function showConnectionHelp(walletType, event) {
             <li>Click "Connect Wallet" and select Trust Wallet</li>
             <li>Approve the connection request in the extension</li>
             <li>Your wallet will be connected to our dApp</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
         
@@ -1174,6 +1390,7 @@ function showConnectionHelp(walletType, event) {
             <li>Tap "Connect Wallet" and select Trust Wallet</li>
             <li>Approve the connection request in the app</li>
             <li>For WalletConnect, scan the QR code from mobile</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
       `;
@@ -1202,6 +1419,7 @@ function showConnectionHelp(walletType, event) {
             <li>Follow the connection instructions for your wallet</li>
             <li>Approve the connection request in your wallet</li>
             <li>Your wallet will be connected to our dApp</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
         
@@ -1218,6 +1436,7 @@ function showConnectionHelp(walletType, event) {
             <li>Choose your wallet from the list of installed wallets</li>
             <li>Approve the connection request in your wallet app</li>
             <li>Your wallet will connect to our dApp</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
       `;
@@ -1246,6 +1465,7 @@ function showConnectionHelp(walletType, event) {
             <li>Click "Connect Wallet" and select Phantom</li>
             <li>Approve the connection request in the Phantom popup</li>
             <li>Your Solana address will connect to our dApp</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
         
@@ -1262,6 +1482,7 @@ function showConnectionHelp(walletType, event) {
             <li>Tap "Connect Wallet" and select Phantom</li>
             <li>Approve the connection request in the app</li>
             <li>For direct connection, open our site via Phantom browser</li>
+            <li>Make sure to select the correct network from the dropdown</li>
           </ol>
         </div>
       `;
@@ -1363,6 +1584,7 @@ async function connectMetaMask() {
     }
   }
 }
+
 // Trust Wallet connection
 async function connectTrustWallet() {
   if (isMobile()) {
@@ -1391,40 +1613,17 @@ async function connectTrustWallet() {
 }
 
 // Simplified WalletConnect connection
-// Replace the incomplete WalletConnect with a working implementation
 async function connectWalletConnect() {
   try {
-    // Use Web3Modal for better wallet integration
-    const Web3Modal = window.Web3Modal.default;
-    const WalletConnectProvider = window.WalletConnectProvider.default;
-    
-    const providerOptions = {
-      walletconnect: {
-        package: WalletConnectProvider,
-        options: {
-          rpc: {
-            56: "https://bsc-dataseed.binance.org/"
-          }
-        }
-      }
-    };
-    
-    const web3Modal = new Web3Modal({
-      cacheProvider: false,
-      providerOptions
-    });
-    
-    const instance = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(instance);
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    
-    handleWalletConnection(address);
+    showNotification("WalletConnect integration is coming soon. Please use MetaMask or Trust Wallet for now.", "info");
+    // For now, show the fallback modal
+    showWalletConnectFallback();
   } catch (error) {
     console.error("WalletConnect error:", error);
     showNotification("Failed to connect", "error");
   }
 }
+
 // Show WalletConnect fallback modal
 function showWalletConnectFallback() {
   const modal = document.getElementById('walletConnectModal');
@@ -1500,6 +1699,7 @@ function showWalletConnectFallback() {
   qrContainer.appendChild(walletList);
   modal.classList.add('active');
 }
+
 // Add this new function for Binance connection
 async function connectBinanceWallet() {
   try {
@@ -1522,6 +1722,7 @@ async function connectBinanceWallet() {
     showNotification("Failed to connect Binance Wallet: " + error.message, "error");
   }
 }
+
 // Phantom connection
 async function connectPhantom() {
   if (isMobile()) {
@@ -1560,8 +1761,8 @@ function handleWalletConnection(address) {
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
   
   walletButtons.innerHTML = `
-    <span class="wallet-address-display">${shortAddress}</span>
-    <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+    <span class="wallet-address-display bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded text-sm">${shortAddress}</span>
+    <button class="disconnect-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="disconnectWallet()">Disconnect</button>
   `;
   
   document.getElementById('walletAddress').value = address;
@@ -1577,6 +1778,9 @@ function handleWalletConnection(address) {
   closeWalletConnectModal();
   
   showNotification("Wallet connected successfully!", "success");
+  
+  // Update staking dashboard with connected wallet
+  updateStakingDashboard();
 }
 
 async function disconnectWallet() {
@@ -1585,7 +1789,7 @@ async function disconnectWallet() {
   const walletButtons = document.getElementById('walletButtons');
   walletButtons.innerHTML = `
     <button id="walletButton" onclick="openWalletModal()" 
-    class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+    class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded flex items-center">
       <i class="fas fa-wallet mr-2"></i>Connect Wallet
     </button>
   `;
@@ -1597,6 +1801,9 @@ async function disconnectWallet() {
   
   // Reset provider
   provider = null;
+  
+  // Update staking dashboard
+  updateStakingDashboard();
   
   showNotification("Wallet disconnected", "success");
 }
@@ -1654,49 +1861,7 @@ function showNotification(message, type = 'info') {
   }, 5000);
 }
 
-// Add CSS for animations (add to your style.css or in a <style> tag)
-const notificationStyles = `
-  @keyframes slide-in {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slide-out {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-  
-  .animate-slide-in {
-    animation: slide-in 0.3s ease-out;
-  }
-  
-  .animate-slide-out {
-    animation: slide-out 0.3s ease-out;
-  }
-`;
-
-// Add styles to document
-if (!document.getElementById('notification-styles')) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'notification-styles';
-  styleSheet.textContent = notificationStyles;
-  document.head.appendChild(styleSheet);
-}
-  </script>
- <script>
-   // ===== HELPER FUNCTIONS =====
+// ===== HELPER FUNCTIONS =====
 
 // Rate limiter to prevent spam
 const rateLimiter = {
@@ -1718,57 +1883,50 @@ const rateLimiter = {
 
 // Backend purchase recorder
 async function recordPurchase(txHash, amount, tokens) {
-  const response = await fetch('/.netlify/functions/record-purchase', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      wallet: userWalletAddress,
-      txHash,
-      amount,
-      tokens,
-      timestamp: Date.now()
-    })
-  });
-  if (!response.ok) throw new Error('Failed to record purchase');
+  // Simulate backend API call
+  console.log("Recording purchase:", { txHash, amount, tokens });
+  return new Promise(resolve => setTimeout(resolve, 1000));
 }
 
-// Network switch to BSC Testnet
-async function switchToNetwork(chainName = 'BSC') {
-  if (!window.ethereum) return;
+// Network switch function
+async function switchToNetwork(chainId = null) {
+  if (!window.ethereum) {
+    showNotification("Please install a Web3 wallet like MetaMask", "error");
+    return false;
+  }
   
-  const networks = {
-    'BSC': { chainId: '0x38', rpcUrl: 'https://bsc-dataseed.binance.org/', name: 'BSC Mainnet' },
-    'BSC_TEST': { chainId: '0x61', rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', name: 'BSC Testnet' },
-    'ETH': { chainId: '0x1', rpcUrl: 'https://mainnet.infura.io/v3/', name: 'Ethereum' },
-    'POLYGON': { chainId: '0x89', rpcUrl: 'https://polygon-rpc.com/', name: 'Polygon' },
-    'AVAX': { chainId: '0xa86a', rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', name: 'Avalanche' }
-  };
+  const targetChainId = chainId || getCurrentNetwork();
   
-  const network = networks[chainName];
-  if (!network) return;
+  // Handle Solana separately
+  if (targetChainId.includes('solana')) {
+    showNotification("Please connect your Solana wallet (Phantom) for Solana transactions", "info");
+    return false;
+  }
   
   try {
     await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: network.chainId }],
+      method: 'wallet_switchEhereumChain',
+      params: [{ chainId: NETWORK_CONFIGS[targetChainId].chainId }],
     });
+    return true;
   } catch (error) {
     if (error.code === 4902) {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: network.chainId,
-          chainName: network.name,
-          rpcUrls: [network.rpcUrl],
-        }]
-      });
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [NETWORK_CONFIGS[targetChainId]],
+        });
+        return true;
+      } catch (addError) {
+        console.error("Error adding chain:", addError);
+        showNotification("Failed to add network to wallet", "error");
+        return false;
+      }
     }
+    console.error("Error switching chain:", error);
+    showNotification("Failed to switch network", "error");
+    return false;
   }
-}
-   
-   function getContractAddress() {
-  const networkId = document.getElementById('networkSelect').value;
-  return CONTRACT_ADDRESSES[networkId] || FLUFFI_CONTRACT_ADDRESS;
 }
 
 // Validate contract deployment & network
@@ -1777,77 +1935,29 @@ async function validateContracts() {
   const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
 
   // Check if contract is deployed
-  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
+  const contractAddress = getContractAddress();
+  const presaleCode = await provider.getCode(contractAddress);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
   // Verify network
   const network = await provider.getNetwork();
-  if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
+  const currentNetwork = getCurrentNetwork();
+  if (network.chainId !== parseInt(currentNetwork)) throw new Error("Please switch to the correct network");
 
   console.log("Contract validation passed ✅");
 }
+
 // ===== BUY FUNCTION =====
-   /**
- * Switches the user's network to the specified chainId.
- * If the chain is not added to MetaMask, it prompts the user to add it.
- * @param {string} chainId - The chain ID in hexadecimal format (e.g., '0x89' for Polygon).
- * @param {string} chainName - The name of the chain (e.g., 'Polygon Mainnet').
- * @param {string} rpcUrl - The RPC URL for the chain.
- * @param {string} nativeCurrencyName - The name of the native currency (e.g., 'MATIC').
- * @param {string} nativeCurrencySymbol - The symbol of the native currency (e.g., 'MATIC').
- * @param {number} nativeCurrencyDecimals - The decimals of the native currency (e.g., 18).
- * @param {string} blockExplorerUrl - The URL of the block explorer for the chain.
- */
-async function switchNetwork(chainId, chainName, rpcUrl, nativeCurrencyName, nativeCurrencySymbol, nativeCurrencyDecimals, blockExplorerUrl) {
-  try {
-    // Check if the Ethereum provider is available
-    if (window.ethereum) {
-      // Request to switch the network
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId }]
-      });
-      console.log(`Switched to ${chainName}`);
-    }
-  } catch (switchError) {
-    // If the chain is not added to MetaMask, add it
-    if (switchError.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId,
-            chainName,
-            rpcUrls: [rpcUrl],
-            nativeCurrency: {
-              name: nativeCurrencyName,
-              symbol: nativeCurrencySymbol,
-              decimals: nativeCurrencyDecimals
-            },
-            blockExplorerUrls: [blockExplorerUrl]
-          }]
-        });
-        console.log(`${chainName} added to MetaMask`);
-      } catch (addError) {
-        console.error(`Failed to add ${chainName} to MetaMask:`, addError);
-      }
-    } else {
-      console.error(`Failed to switch to ${chainName}:`, switchError);
-    }
-  }
-}
- </script>
-  <script>
-// ===== BUY FUNCTION =====
-window.buyFluffi = async function() {
+async function buyFluffi() {
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
     showNotification('Too many attempts. Please wait.', 'warning');
     return;
   }
 
-  // 2️⃣ Get user input
+  // 2️⃣ Get user inputs
   const amount = document.getElementById('amountInput').value;
+  const currency = document.getElementById('currencySelect').value;
   const ref = document.getElementById('refInput').value;
 
   if (!userWalletAddress) {
@@ -1855,6 +1965,7 @@ window.buyFluffi = async function() {
     openWalletModal();
     return;
   }
+
   if (!amount || isNaN(amount) || Number(amount) <= 0) {
     showNotification('Please enter a valid amount.', 'error');
     return;
@@ -1866,66 +1977,65 @@ window.buyFluffi = async function() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Initialize provider & signer
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // 3️⃣ Initialize provider & signer
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    provider.resolveName = async (name) => {
-      if (ethers.utils.isAddress(name)) return name; // skip ENS
-      console.warn("ENS lookup skipped:", name);
-      return null;
+    const network = getCurrentNetwork();
+    
+    // Handle Solana purchases differently
+    if (network.includes('solana')) {
+      await buyWithSolana(amount, currency, ref);
+      return;
+    }
+    
+    // Handle EVM purchases
+    const switched = await switchToNetwork(network);
+    if (!switched) return;
+    
+    // 3️⃣ Ensure user is on the correct network
+    await validateContracts();
+
+    // 4️⃣ Currency conversion
+    const conversionRates = {
+      'BNB': 1,
+      'ETH': 0.0005,
+      'MATIC': 0.5,
+      'AVAX': 0.01,
+      'SOL': 0.001,
+      'USDC': 0.0003,
+      'USDT': 0.0003,
+      'USD': 0.0003
     };
-    const signer = provider.getSigner();
+    const nativeValue = (Number(amount) * (conversionRates[currency] || 1)).toFixed(6);
 
-    // 4️⃣ Detect network and select contract
-    const network = await provider.getNetwork();
-    const CONTRACT_ADDRESSES = {
-      1: "0xYourEthereumMainnetAddress",
-      5: "0xYourGoerliTestnetAddress",
-      56: "0xYourBSCMainnetAddress",
-      97: "0xYourBSCTestnetAddress",
-      137: "0xYourPolygonMainnetAddress",
-      80001: "0xYourMumbaiTestnetAddress",
-      43114: "0xYourAvalancheMainnetAddress",
-      43113: "0xYourFujiTestnetAddress"
-    };
-    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-    if (!contractAddress) throw new Error("Unsupported network");
+    if (currency !== 'BNB') {
+      showNotification(`Converting ${amount} ${currency} to ${nativeValue} native token`, 'info');
+    }
 
-    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
-
-    // 5️⃣ Determine native token value for this chain
-    const nativeRates = {
-      1: 1,      // ETH
-      5: 1,      // Goerli ETH
-      56: 1,     // BNB
-      97: 1,     // BSC Testnet BNB
-      137: 1,    // MATIC
-      80001: 1,  // Mumbai MATIC
-      43114: 1,  // AVAX
-      43113: 1   // Fuji AVAX
-    };
-    const valueInNative = (Number(amount) * (nativeRates[network.chainId] || 1)).toFixed(6);
-
-    // 6️⃣ Prepare referral
+    // 5️⃣ Prepare referral
     let referralAddress = ethers.constants.AddressZero;
-    if (ref && ethers.utils.isAddress(ref)) {
+    if (ref) {
+      if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
       referralAddress = ref;
     }
 
-    // 7️⃣ Estimate gas and send transaction
-    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
-      value: ethers.utils.parseEther(valueInNative)
-    });
+    // 6️⃣ Initialize provider & contract (ethers v5)
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contractAddress = getContractAddress();
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
-    const tx = await contract.buyTokens(referralAddress, {
-      value: ethers.utils.parseEther(valueInNative),
-      gasLimit: gasEstimate.mul(120).div(100)
+    // 7️⃣ Estimate gas & send transaction
+    const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
+      value: ethers.utils.parseEther(nativeValue)
+    });
+    console.log("Estimated gas:", gasEstimate.toString());
+
+    const tx = await contract.contribute(referralAddress, {
+      value: ethers.utils.parseEther(nativeValue)
     });
     await tx.wait();
+    console.log("Tokens purchased!");
 
-    // 8️⃣ Record purchase (backend)
-    const tokensBought = valueInNative * 10000000; // adjust token rate if needed
+    // 8️⃣ Record purchase on backend
+    const tokensBought = nativeValue * 10000000; // Example token rate
     await recordPurchase(tx.hash, Number(amount), tokensBought);
 
     // 9️⃣ Update UI
@@ -1934,6 +2044,7 @@ window.buyFluffi = async function() {
     tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
 
     showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
+
     await updateUserBalances();
 
     buyBtn.textContent = prevText;
@@ -1945,9 +2056,36 @@ window.buyFluffi = async function() {
     buyBtn.disabled = false;
     showNotification(err.message || "Transaction failed", 'error');
   }
-};
+}
 
-    // ===== STAKING FUNCTIONS =====
+// Solana purchase function
+async function buyWithSolana(amount, currency, ref) {
+  try {
+    // Check if Phantom is installed
+    if (!window.solana || !window.solana.isPhantom) {
+      showNotification("Please install Phantom wallet for Solana transactions", "error");
+      window.open("https://phantom.app/", "_blank");
+      return;
+    }
+    
+    // Connect to Phantom
+    const response = await window.solana.connect();
+    const publicKey = response.publicKey.toString();
+    
+    // For now, show message (you'll need to implement actual Solana transaction)
+    showNotification(`Solana purchase initiated for ${amount} ${currency}. This feature is coming soon!`, "info");
+    
+    // Here you would:
+    // 1. Get the Solana program ID from CONTRACT_ADDRESSES
+    // 2. Create transaction instructions
+    // 3. Send transaction using @solana/web3.js
+    
+  } catch (error) {
+    console.error("Solana purchase error:", error);
+    showNotification("Solana transaction failed: " + error.message, "error");
+  }
+}
+
 // Staking contract placeholder - replace with actual deployed address
 const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
 const STAKING_CONTRACT_ABI = [
@@ -2047,7 +2185,8 @@ async function stakeFluffi() {
 function updateStakingDisplay() {
   updateStakingDashboard(); // Call the dashboard update function
 }
-    // ===== CLAIM FUNCTIONS =====
+
+// ===== CLAIM FUNCTIONS =====
 async function claimTokens() {
   try {
     if (!userWalletAddress) {
@@ -2129,51 +2268,114 @@ async function claimTokens() {
 
 // Add helper function for presale end time
 function getPresaleEndTime() {
-  const startTime = getPresaleStartTime();
+  const startTime = new Date('2025-08-27T00:00:00Z').getTime();
   return startTime + (15 * 48 * 60 * 60 * 1000); // 15 stages * 48 hours
 }
-    // ===== UTILITY FUNCTIONS =====
-    async function updateUserBalances() {
-      if (!userWalletAddress) return;
-      
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const fluffiContract = new ethers.Contract(
-          FLUFFI_CONTRACT_ADDRESS,
-          FLUFFI_CONTRACT_ABI,
-          provider
-        );
-        
-       // These methods need to match your actual contract ABI
-const balance = await fluffiContract.tokenBalances(userWalletAddress);
-const staked = await fluffiContract.stakedBalances(userWalletAddress);
-const rewards = '0'; // Calculate based on staking time and APY
-        
-        document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
-        document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
-        document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
-        
-      } catch (error) {
-        console.error("Balance update error:", error);
-      }
-    }
 
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('darkMode', html.classList.contains('dark'));
+function formatTime(ms) {
+  const days = Math.floor(ms / (24 * 3600 * 1000));
+  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
+  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+  
+  return {
+    days: days.toString().padStart(2, '0'),
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: seconds.toString().padStart(2, '0'),
+    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
+  };
+}
+
+// ===== STAKING DASHBOARD FUNCTIONS =====
+function updateStakingDashboard() {
+  try {
+    // If wallet is connected, show user's staking info
+    if (userWalletAddress) {
+      const stakingInfo = JSON.parse(localStorage.getItem(`staking_${userWalletAddress}`) || '{}');
+      const stakedAmount = stakingInfo.amount || 0;
       
-      // Update icon
-      const darkModeIcon = document.getElementById('darkModeIcon');
-      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-      
-      // Update chart colors if needed
-      if (tokenChart) {
-        const isDark = html.classList.contains('dark');
-        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-        tokenChart.update();
+      // Calculate estimated earnings (90% APY)
+      if (stakingInfo.timestamp) {
+        const stakingDuration = (Date.now() - stakingInfo.timestamp) / (1000 * 60 * 60 * 24); // Days
+        const apy = 0.9; // 90% APY
+        const dailyRate = apy / 365;
+        const earnings = stakedAmount * dailyRate * stakingDuration;
+        
+        document.getElementById('user-earnings').textContent = earnings.toFixed(2);
+      } else {
+        document.getElementById('user-earnings').textContent = '0';
       }
+      
+      document.getElementById('user-balance-value').textContent = stakedAmount.toFixed(2);
+      
+      // Get total staked from all users (simulated)
+      let totalStaked = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('staking_')) {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data && data.amount) {
+            totalStaked += data.amount;
+          }
+        }
+      }
+      document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+    } else {
+      // Reset to defaults if no wallet connected
+      document.getElementById('user-balance-value').textContent = '0';
+      document.getElementById('user-earnings').textContent = '0';
+      document.getElementById('total-staked').textContent = '0';
     }
+  } catch (error) {
+    console.error("Error updating staking dashboard:", error);
+  }
+}
+
+// ===== UTILITY FUNCTIONS =====
+async function updateUserBalances() {
+  if (!userWalletAddress) return;
+  
+  try {
+    const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+    const fluffiContract = new ethers.Contract(
+      FLUFFI_ADDRESS,
+      ERC20_ABI,
+      provider
+    );
+    
+    const [balance, staked, rewards] = await Promise.all([
+      fluffiContract.balanceOf(userWalletAddress),
+      fluffiContract.stakedBalance(userWalletAddress),
+      fluffiContract.calculateRewards(userWalletAddress)
+    ]);
+    
+    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
+    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
+    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
+    
+  } catch (error) {
+    console.error("Balance update error:", error);
+  }
+}
+
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
+  }
+}
+
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
   if (!ctx) return;
@@ -2247,7 +2449,7 @@ function initTokenChart() {
   };
   
   // Create the chart
-  const tokenChart = new Chart(ctx, config);
+  tokenChart = new Chart(ctx, config);
   
   // Update chart on theme change
   const observer = new MutationObserver(function(mutations) {
@@ -2269,164 +2471,82 @@ function initTokenChart() {
   });
 }
 
-// Initialize the chart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initTokenChart();
-});
-      
-// ==== TIMER FUNCTIONS =====
-function getPresaleStartTime() {
-  let startTime = localStorage.getItem('presaleStartTime');
-  if (!startTime) {
-    // Set initial start time to now (for testing)
-    startTime = Date.now();
-    // For production, you might want to set a fixed start time:
-    // startTime = new Date('2025-07-28T00:00:00Z').getTime();
-    localStorage.setItem('presaleStartTime', startTime);
-  }
-  return parseInt(startTime);
-}
-
-function formatTime(ms) {
-  const days = Math.floor(ms / (24 * 3600 * 1000));
-  const hours = Math.floor((ms % (24 * 3600 * 1000)) / (3600 * 1000));
-  const minutes = Math.floor((ms % (3600 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+// Initialize live feed
+function initializeLiveFeed() {
+  const feedList = document.getElementById('feed-list');
   
-  return {
-    days: days.toString().padStart(2, '0'),
-    hours: hours.toString().padStart(2, '0'),
-    minutes: minutes.toString().padStart(2, '0'),
-    seconds: seconds.toString().padStart(2, '0'),
-    full: `${days}d ${hours}h ${minutes}m ${seconds}s`
-  };
-}
-
-function updateNextIncreaseTime() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const nextStageTime = startTime + (Math.floor((now - startTime) / (48 * 3600 * 1000)) + 1) * (48 * 3600 * 1000);
-  const timeLeft = nextStageTime - now;
+  const activities = [
+    "🐋 User 0x1a2...3b4 just bought 0.5 BNB worth of FLUFFI",
+    "🔥 User 0x5c6...7d8 staked 10,000 FLUFFI tokens",
+    "🚀 User 0x9e0...1f2 joined with 1.2 BNB",
+    "💰 User 0x3g4...5h6 earned 500 FLUFFI from referrals",
+    "🎯 User 0x7i8...9j0 claimed 25,000 FLUFFI tokens"
+  ];
   
-  const formatted = formatTime(timeLeft);
-  document.getElementById('nextIncreaseTime').textContent = formatted.full;
-}
-
-function updateTimers() {
-  const now = Date.now();
-  const startTime = getPresaleStartTime();
-  const endTime = startTime + (15 * 48 * 3600 * 1000); // 15 stages * 48 hours each
-  const timeLeft = endTime - now;
-
-  // Calculate stage progress
-  const currentStage = Math.min(
-    Math.floor((now - startTime) / (48 * 3600 * 1000)),
-    14 // Max stage index
-  );
-  const stageEndTime = startTime + ((currentStage + 1) * 48 * 3600 * 1000);
-  const stageTimeLeft = stageEndTime - now;
-  const stageProgress = 1 - (stageTimeLeft / (48 * 3600 * 1000));
-
-  // Update displays
-  document.getElementById('current-stage').textContent = currentStage + 1;
-  document.getElementById('stageProgressBar').style.width = `${((currentStage + stageProgress) / 15) * 100}%`;
-
-  // Update price
-  const price = (0.0001 * Math.pow(1.05, currentStage)).toFixed(6);
-  document.getElementById('currentPrice').innerHTML = `$${price} <span class="price-tooltip"><i class="fas fa-info-circle text-blue-500"></i><span class="tooltip-text"><strong>Price Increase:</strong><br>+5% per stage (every 48 hours)<br>Next increase: <span id="nextIncreaseTime">00h 00m 00s</span></span></span>`;
-
-  // Update timers
-  if (timeLeft <= 0) {
-    document.getElementById('presale-timer').innerHTML = "🎉 Presale Ended!";
-    document.getElementById('stage-time-left').textContent = "00d 00h 00m 00s";
-  } else {
-    const formattedTotal = formatTime(timeLeft);
-    const formattedStage = formatTime(stageTimeLeft);
+  let index = 0;
+  
+  function addActivity() {
+    const li = document.createElement('li');
+    li.textContent = activities[index % activities.length];
+    li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md animate-fade-in";
+    feedList.prepend(li);
     
-    document.getElementById('presale-days').textContent = formattedTotal.days;
-    document.getElementById('presale-hours').textContent = formattedTotal.hours;
-    document.getElementById('presale-minutes').textContent = formattedTotal.minutes;
-    document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
+    // Keep only last 5 items
+    while (feedList.children.length > 5) {
+      feedList.removeChild(feedList.lastChild);
+    }
     
-    document.getElementById('stage-time-left').textContent = formattedStage.full;
+    index++;
   }
+  
+  // Add initial activities
+  for (let i = 0; i < 3; i++) {
+    addActivity();
+  }
+  
+  // Add new activity every 5 seconds
+  setInterval(addActivity, 5000);
 }
 
-// Initialize the timer
-function initTimer() {
-  updateTimers();
-  updateNextIncreaseTime();
-  // Update every second
+// Initialize community activity
+function initializeCommunityActivity() {
+  const feedMessage = document.getElementById('feedMessage');
+  const messages = [
+    "🔥 User 0xA12...F45 just bought 2.5 BNB worth of FLUFFI!",
+    "🚀 User 0xC98...B72 staked 50,000 FLUFFI tokens!",
+    "💰 User 0x7F3...D91 earned 1.2 BNB in referral rewards!",
+    "🎯 User 0x4B7...E28 joined the presale with 1.8 BNB!",
+    "🐋 User 0x9E0...1F2 just bought 5 BNB worth of FLUFFI!"
+  ];
+  
+  let index = 0;
+  
+  // Update message every 3 seconds
   setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
+    feedMessage.textContent = messages[index % messages.length];
+    index++;
+  }, 3000);
 }
 
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
-
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-  }
-
-  // Initialize token chart
-  initTokenChart();
-
-  // Initialize timers
-  initTimer();
-
-  // Check for referral parameter
-  checkReferral();
-});
-
-// Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
+// ===== REFERRAL FUNCTIONS =====
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
+    document.getElementById('refInput').value = ref;
   }
 }
-    // ===== REFERRAL FUNCTIONS =====
-    function checkReferral() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const ref = urlParams.get('ref');
-      if (ref && /^0x[0-9a-fA-F]{40}$/.test(ref)) {
-        document.getElementById('refInput').value = ref;
-      }
-    }
 
-    async function connectReferralWallet() {
-      if (!userWalletAddress) {
-        await connectWallet();
-      }
-      if (userWalletAddress) {
-        showReferralUI(userWalletAddress);
-      }
-    }
+async function connectReferralWallet() {
+  if (!userWalletAddress) {
+    await connectWallet();
+  }
+  if (userWalletAddress) {
+    showReferralUI(userWalletAddress);
+  }
+}
 
-    function showReferralUI(wallet) {
+function showReferralUI(wallet) {
   const referralLink = `${window.location.href.split('?')[0]}?ref=${wallet}`;
   
   // Get referral stats from localStorage
@@ -2464,378 +2584,71 @@ function toggleDarkMode() {
     </div>
   `;
 }
-    function copyReferralLink() {
-      const input = document.getElementById('referralLinkInput');
-      input.select();
-      document.execCommand('copy');
-      alert("Referral link copied to clipboard!");
-    }
 
-    function shareOnTwitter() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
-    }
-
-    function shareOnTelegram() {
-      const link = document.getElementById('referralLinkInput').value;
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
-    }
-  </script>
-  
-<script>
-  const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
-  const ERC20_ABI = [
-    "function balanceOf(address owner) view returns (uint256)",
-    "function decimals() view returns (uint8)"
-  ];
-
-  async function loadFluffiBalance() {
-    if (!window.ethereum) {
-      console.warn("No wallet provider found");
-      return;
-    }
-
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const userAddress = accounts[0];
-
-      const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
-      const decimals = await contract.decimals();
-      const rawBalance = await contract.balanceOf(userAddress);
-      const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
-
-      document.getElementById("user-balance-value").textContent =
-        parseFloat(formattedBalance).toLocaleString();
-    } catch (err) {
-      console.error("Error fetching balance:", err);
-    }
-  }
-
-  // Load once connected
-  window.addEventListener("load", loadFluffiBalance);
-
-  // Update if user changes wallet
-  if (window.ethereum) {
-    window.ethereum.on("accountsChanged", loadFluffiBalance);
-  }
-</script>
-  <script>
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    });
-  });
-</script>
-<script>
-// Simulated live feed since contract isn't deployed on mainnet yet
-function initializeLiveFeed() {
-  const feedList = document.getElementById('feed-list');
-  
-  const activities = [
-    "🐋 User 0x1a2...3b4 just bought 0.5 BNB worth of FLUFFI",
-    "🔥 User 0x5c6...7d8 staked 10,000 FLUFFI tokens",
-    "🚀 User 0x9e0...1f2 joined with 1.2 BNB",
-    "💰 User 0x3g4...5h6 earned 500 FLUFFI from referrals",
-    "🎯 User 0x7i8...9j0 claimed 25,000 FLUFFI tokens"
-  ];
-  
-  let index = 0;
-  
-  function addActivity() {
-    const li = document.createElement('li');
-    li.textContent = activities[index % activities.length];
-    li.className = "p-2 bg-gray-100 dark:bg-gray-700 rounded-md animate-fade-in";
-    feedList.prepend(li);
-    
-    // Keep only last 5 items
-    while (feedList.children.length > 5) {
-      feedList.removeChild(feedList.lastChild);
-    }
-    
-    index++;
-  }
-  
-  // Add initial activities
-  for (let i = 0; i < 3; i++) {
-    addActivity();
-  }
-  
-  // Add new activity every 5 seconds
-  setInterval(addActivity, 5000);
+function copyReferralLink() {
+  const input = document.getElementById('referralLinkInput');
+  input.select();
+  document.execCommand('copy');
+  alert("Referral link copied to clipboard!");
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initializeLiveFeed);
-</script>
-  <script>
-// Network configuration with all required parameters
-const NETWORKS = {
-  '97': {
-    chainId: '0x61',
-    chainName: 'Binance Smart Chain Testnet',
-    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-    nativeCurrency: {
-      name: 'BNB',
-      symbol: 'BNB',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://testnet.bscscan.com'
-  },
-  '56': {
-    chainId: '0x38',
-    chainName: 'Binance Smart Chain Mainnet',
-    rpcUrl: 'https://bsc-dataseed.binance.org/',
-    nativeCurrency: {
-      name: 'BNB',
-      symbol: 'BNB',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://bscscan.com'
-  },
-  '1': {
-    chainId: '0x1',
-    chainName: 'Ethereum Mainnet',
-    rpcUrl: 'https://mainnet.infura.io/v3/',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://etherscan.io'
-  },
-  '5': {
-    chainId: '0x5',
-    chainName: 'Ethereum Goerli Testnet',
-    rpcUrl: 'https://goerli.infura.io/v3/',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://goerli.etherscan.io'
-  },
-  '137': {
-    chainId: '0x89',
-    chainName: 'Polygon Mainnet',
-    rpcUrl: 'https://polygon-rpc.com/',
-    nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://polygonscan.com'
-  },
-  '80001': {
-    chainId: '0x13881',
-    chainName: 'Polygon Mumbai Testnet',
-    rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
-    nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://mumbai.polygonscan.com'
-  },
-  '43114': {
-    chainId: '0xA86A',
-    chainName: 'Avalanche Mainnet',
-    rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
-    nativeCurrency: {
-      name: 'AVAX',
-      symbol: 'AVAX',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://snowtrace.io'
-  },
-  '43113': {
-    chainId: '0xA869',
-    chainName: 'Avalanche Fuji Testnet',
-    rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
-    nativeCurrency: {
-      name: 'AVAX',
-      symbol: 'AVAX',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://testnet.snowtrace.io'
-  }
-};
+function shareOnTwitter() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://twitter.com/intent/tweet?text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens:%20${encodeURIComponent(link)}%20%23FluffiArmy`, '_blank', 'noopener,noreferrer');
+}
 
-// Initialize network selection
-document.addEventListener('DOMContentLoaded', function() {
-  const networkSelect = document.getElementById('networkSelect');
-  
-  // Set up event listener for network changes
-  networkSelect.addEventListener('change', function() {
-    const selectedNetwork = this.value;
-    
-    // Check if it's a Solana network (handled differently)
-    if (selectedNetwork.includes('solana')) {
-      handleSolanaNetwork(selectedNetwork);
-      return;
-    }
-    
-    // Handle EVM networks
-    if (NETWORKS[selectedNetwork]) {
-      switchNetwork(selectedNetwork);
-    }
-  });
-  
-  // Try to detect current network
-  detectCurrentNetwork();
-});
+function shareOnTelegram() {
+  const link = document.getElementById('referralLinkInput').value;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join%20$FLUFFI%20presale!%20🚀%20Use%20my%20referral%20link%20for%20bonus%20tokens`, '_blank', 'noopener,noreferrer');
+}
 
-// Function to switch networks
-async function switchNetwork(networkId) {
+// FLUFFI token address and ABI for balance checking
+const FLUFFI_ADDRESS = "0x6F5f48A159Cd46a10faDEED95b29028972554747";
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
+
+async function loadFluffiBalance() {
   if (!window.ethereum) {
-    showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
+    console.warn("No wallet provider found");
     return;
   }
-  
+
   try {
-    const networkConfig = NETWORKS[networkId];
-    
-    try {
-      // Try to switch to the network
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: networkConfig.chainId }],
-      });
-      
-      showNotification(`Switched to ${networkConfig.chainName}`, 'success');
-      updateUIForNetwork(networkId);
-    } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: networkConfig.chainId,
-              chainName: networkConfig.chainName,
-              rpcUrls: [networkConfig.rpcUrl],
-              nativeCurrency: networkConfig.nativeCurrency,
-              blockExplorerUrls: [networkConfig.blockExplorerUrl]
-            }]
-          });
-          
-          showNotification(`${networkConfig.chainName} added successfully`, 'success');
-          updateUIForNetwork(networkId);
-        } catch (addError) {
-          console.error('Error adding network:', addError);
-          showNotification('Failed to add network. Please add it manually in your wallet.', 'error');
-        }
-      } else {
-        console.error('Error switching network:', switchError);
-        showNotification('Failed to switch network', 'error');
-      }
-    }
-  } catch (error) {
-    console.error('Network switch error:', error);
-    showNotification('Error switching network: ' + error.message, 'error');
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    const userAddress = accounts[0];
+
+    const contract = new ethers.Contract(FLUFFI_ADDRESS, ERC20_ABI, provider);
+    const decimals = await contract.decimals();
+    const rawBalance = await contract.balanceOf(userAddress);
+    const formattedBalance = ethers.utils.formatUnits(rawBalance, decimals);
+
+    document.getElementById("user-balance-value").textContent =
+      parseFloat(formattedBalance).toLocaleString();
+  } catch (err) {
+    console.error("Error fetching balance:", err);
   }
 }
 
-// Function to handle Solana networks (placeholder - would need Phantom wallet integration)
-function handleSolanaNetwork(network) {
-  showNotification('Solana network selected. This would require Phantom wallet integration.', 'info');
-  
-  // For demonstration, just update the UI
-  const networkName = network === 'solana-mainnet' ? 'Solana Mainnet' : 'Solana Devnet';
-  updateUIForNetwork(network, networkName);
-}
+// Load once connected
+window.addEventListener("load", loadFluffiBalance);
 
-// Function to update UI when network changes
-function updateUIForNetwork(networkId, networkName = null) {
-  const networkSelect = document.getElementById('networkSelect');
-  networkSelect.value = networkId;
-  
-  // Update any network-specific UI elements
-  const networkIndicator = document.getElementById('networkIndicator') || createNetworkIndicator();
-  const name = networkName || (NETWORKS[networkId] ? NETWORKS[networkId].chainName : networkId);
-  
-  networkIndicator.textContent = `Network: ${name}`;
-  
-  // You might also update contract addresses, token symbols, etc. based on network
-  updateContractInfoForNetwork(networkId);
-}
-
-// Create network indicator if it doesn't exist
-function createNetworkIndicator() {
-  const indicator = document.createElement('div');
-  indicator.id = 'networkIndicator';
-  indicator.className = 'network-indicator';
-  indicator.style.cssText = 'position: fixed; bottom: 10px; right: 10px; background: #10B981; color: white; padding: 5px 10px; border-radius: 10px; font-size: 12px; z-index: 1000;';
-  
-  document.body.appendChild(indicator);
-  return indicator;
-}
-
-// Update contract info based on network
-function updateContractInfoForNetwork(networkId) {
-  // This would update contract addresses, ABI, etc. based on the selected network
-  console.log(`Network changed to: ${networkId}`);
-  
-  // Example: Update contract address display if exists
-  const contractAddressElement = document.getElementById('contractAddress');
-  if (contractAddressElement && CONTRACT_ADDRESSES[networkId]) {
-    contractAddressElement.textContent = CONTRACT_ADDRESSES[networkId];
-  }
-}
-
-// Try to detect the current network
-async function detectCurrentNetwork() {
-  if (!window.ethereum) return;
-  
-  try {
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    const decimalChainId = parseInt(chainId, 16);
-    
-    // Find matching network
-    for (const [id, config] of Object.entries(NETWORKS)) {
-      if (config.chainId === chainId) {
-        updateUIForNetwork(id);
-        return;
-      }
-    }
-    
-    // If we didn't find a match, show the raw chainId
-    updateUIForNetwork('custom', `Unknown (${chainId})`);
-  } catch (error) {
-    console.error('Error detecting network:', error);
-  }
-}
-
-// Listen for network changes if MetaMask is available
+// Update if user changes wallet
 if (window.ethereum) {
-  window.ethereum.on('chainChanged', (chainId) => {
-    const decimalChainId = parseInt(chainId, 16);
-    
-    // Find matching network
-    for (const [id, config] of Object.entries(NETWORKS)) {
-      if (config.chainId === chainId) {
-        updateUIForNetwork(id);
-        return;
-      }
-    }
-    
-    // If we didn't find a match
-    updateUIForNetwork('custom', `Unknown (${chainId})`);
-  });
+  window.ethereum.on("accountsChanged", loadFluffiBalance);
 }
-    // 2️⃣ Add event listener for the presale network selector
-document.addEventListener('DOMContentLoaded', () => {
-  const presaleSelect = document.getElementById('presaleNetworkSelect');
-  if (presaleSelect) {
-    presaleSelect.addEventListener('change', async function() {
-      const selectedChainId = this.value;
-      await switchNetwork(selectedChainId);
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
-  }
+  });
 });
 </script>
 </body>
