@@ -1933,9 +1933,11 @@ function handleWalletConnection(address) {
   // Close any open modals
   closeWalletConnectModal();
   
+  // UPDATE: Call network info update after connection
+  detectAndDisplayNetwork();
+  
   showNotification("Wallet connected successfully!", "success");
 }
-
 async function disconnectWallet() {
   userWalletAddress = null;
   
@@ -2009,6 +2011,47 @@ function showNotification(message, type = 'info') {
       setTimeout(() => notification.remove(), 300);
     }
   }, 5000);
+}
+    // ===== NETWORK FUNCTIONS =====
+async function detectAndDisplayNetwork() {
+  if (!window.ethereum) return;
+  
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+    const networkConfig = NETWORK_CONFIGS[network.chainId];
+    
+    // Update network select dropdown
+    const networkSelect = document.getElementById('networkSelect');
+    if (networkSelect) {
+      networkSelect.value = network.chainId;
+    }
+    
+    // Display network info
+    let networkInfoEl = document.getElementById('networkInfo');
+    if (!networkInfoEl) {
+      networkInfoEl = document.createElement('div');
+      networkInfoEl.id = 'networkInfo';
+      networkInfoEl.className = 'network-info';
+      // Add it to a specific container instead of document.body
+      const container = document.getElementById('headerContainer') || document.body;
+      container.appendChild(networkInfoEl);
+    }
+    
+    if (networkConfig) {
+      networkInfoEl.innerHTML = `
+        <span class="network-name">${networkConfig.name}</span>
+        <span class="network-currency">${networkConfig.currency}</span>
+      `;
+    } else {
+      networkInfoEl.innerHTML = `
+        <span class="network-warning">Unsupported Network (${network.chainId})</span>
+        <button onclick="switchToNetwork(97)">Switch to BSC Testnet</button>
+      `;
+    }
+  } catch (error) {
+    console.error("Error detecting network:", error);
+  }
 }
 
 // Add CSS for animations (add to your style.css or in a <style> tag)
@@ -2153,10 +2196,9 @@ const presaleCode = await provider.getCode(contractAddress);
 async function buyFluffi() {
   if (!window.ethereum) {
     showNotification("Please install a Web3 wallet like MetaMask", "error");
-    return false;
+    return;
   }
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-const network = await provider.getNetwork();
+
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
     showNotification('Too many attempts. Please wait.', 'warning');
@@ -2185,9 +2227,20 @@ const network = await provider.getNetwork();
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Ensure user is on Testnet
-    await switchToNetwork(97); // BSC Testnet chain ID
-    await validateContracts();
+    // Get current network
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+    
+    // Check if current network is supported
+    if (!CONTRACT_ADDRESSES[network.chainId]) {
+      const shouldSwitch = confirm(`This network is not supported. Would you like to switch to BSC Testnet?`);
+      if (shouldSwitch) {
+        await switchToNetwork(97); // BSC Testnet
+        return;
+      } else {
+        throw new Error("Unsupported network");
+      }
+    }
 
     // 4️⃣ Currency conversion
     const conversionRates = {
@@ -2211,22 +2264,25 @@ const network = await provider.getNetwork();
       referralAddress = ref;
     }
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const network = await provider.getNetwork(); // Add this line
-const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-if (!contractAddress) throw new Error("No contract address for this network");
-const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
+    // 6️⃣ Initialize provider & contract
+    const signer = provider.getSigner();
+    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+    if (!contractAddress) throw new Error("No contract address for this network");
+    
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
-    // 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue)
-});
+    // 7️⃣ Estimate gas & send transaction - FIXED FUNCTION NAME
+    const value = ethers.utils.parseEther(bnbValue.toString());
+    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
+      value: value
+    });
 
-const tx = await contract.buyTokens(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue),
-  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-});
+    const tx = await contract.buyTokens(referralAddress, {
+      value: value,
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
+    
+    showNotification("Transaction sent. Waiting for confirmation...", "info");
     await tx.wait();
 
     // 8️⃣ Record purchase on backend
@@ -2242,41 +2298,12 @@ const tx = await contract.buyTokens(referralAddress, {
 
     await updateUserBalances();
 
-    buyBtn.textContent = prevText;
-    buyBtn.disabled = false;
-
   } catch (err) {
     console.error("Buy error:", err);
-    buyBtn.textContent = '🚀 Buy Now';
-    buyBtn.disabled = false;
     showNotification(err.message || "Transaction failed", 'error');
-  }
-}
-   // Solana purchase function
-async function buyWithSolana(amount, currency, ref) {
-  try {
-    // Check if Phantom is installed
-    if (!window.solana || !window.solana.isPhantom) {
-      showNotification("Please install Phantom wallet for Solana transactions", "error");
-      window.open("https://phantom.app/", "_blank");
-      return;
-    }
-    
-    // Connect to Phantom
-    const response = await window.solana.connect();
-    const publicKey = response.publicKey.toString();
-    
-    // For now, show message (you'll need to implement actual Solana transaction)
-    showNotification(`Solana purchase initiated for ${amount} ${currency}. This feature is coming soon!`, "info");
-    
-    // Here you would:
-    // 1. Get the Solana program ID from CONTRACT_ADDRESSES
-    // 2. Create transaction instructions
-    // 3. Send transaction using @solana/web3.js
-    
-  } catch (error) {
-    console.error("Solana purchase error:", error);
-    showNotification("Solana transaction failed: " + error.message, "error");
+  } finally {
+    buyBtn.textContent = prevText;
+    buyBtn.disabled = false;
   }
 }
     // ===== STAKING FUNCTIONS =====
@@ -2348,12 +2375,13 @@ async function stakeFluffi() {
         const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
         
         // First approve FLUFFI tokens for staking contract
-        const fluffiContract = new ethers.Contract(
-        const network = await provider.getNetwork();
-        CONTRACT_ADDRESSES[network.chainId],
-        ["function approve(address spender, uint256 amount) returns (bool)"],
-        signer
-        );
+       const network = await provider.getNetwork();
+const fluffiContractAddress = CONTRACT_ADDRESSES[network.chainId];
+const fluffiContract = new ethers.Contract(
+  fluffiContractAddress,
+  ["function approve(address spender, uint256 amount) returns (bool)"],
+  signer
+);
         const approveTx = await fluffiContract.approve(STAKING_CONTRACT_ADDRESS, amountWei);
         await approveTx.wait();
         
@@ -2469,32 +2497,33 @@ function getPresaleEndTime() {
   return startTime + (15 * 48 * 60 * 60 * 1000); // 15 stages * 48 hours
 }
     // ===== UTILITY FUNCTIONS =====
-    async function updateUserBalances() {
-      if (!userWalletAddress) return;
-      
-      try {
-        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
-       const fluffiContract = new ethers.Contract(
-       CONTRACT_ADDRESSES[network.chainId],
-       FLUFFI_CONTRACT_ABI,
-       provider
-      );
-        
-        const [balance, staked, rewards] = await Promise.all([
-          fluffiContract.balanceOf(userWalletAddress),
-          fluffiContract.stakedBalance(userWalletAddress),
-          fluffiContract.calculateRewards(userWalletAddress)
-        ]);
-        
-        document.getElementById('userBalance').textContent = ethers.utils.formatUnits(balance, 18);
-        document.getElementById('userStaked').textContent = ethers.utils.formatUnits(staked, 18);
-        document.getElementById('userRewards').textContent = ethers.utils.formatUnits(rewards, 18);
-        
-      } catch (error) {
-        console.error("Balance update error:", error);
-      }
-    }
-
+   async function updateUserBalances() {
+  if (!userWalletAddress || !window.ethereum) return;
+  
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+    
+    if (!contractAddress) return; // No contract for this network
+    
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, provider);
+    
+    // Use the correct function names from your ABI
+    const userInfo = await contract.getUserInfo(userWalletAddress);
+    
+    // Update the UI with the user info
+    document.getElementById('userBalance').textContent = ethers.utils.formatUnits(userInfo.purchasedBalance, 18);
+    document.getElementById('userStaked').textContent = ethers.utils.formatUnits(userInfo.stakedBalance, 18);
+    document.getElementById('userRewards').textContent = ethers.utils.formatUnits(userInfo.availableRewards, 18);
+    
+  } catch (error) {
+    console.error("Balance update error:", error);
+    // Fallback to localStorage if contract call fails
+    const balance = parseFloat(localStorage.getItem(`balance_${userWalletAddress}`) || '0');
+    document.getElementById('userBalance').textContent = balance;
+  }
+}
     function toggleDarkMode() {
       const html = document.documentElement;
       html.classList.toggle('dark');
