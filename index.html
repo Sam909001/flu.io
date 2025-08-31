@@ -2651,5 +2651,261 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 </script>
+  <script>
+// Network configuration with all required parameters
+const NETWORKS = {
+  '97': {
+    chainId: '0x61',
+    chainName: 'Binance Smart Chain Testnet',
+    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://testnet.bscscan.com'
+  },
+  '56': {
+    chainId: '0x38',
+    chainName: 'Binance Smart Chain Mainnet',
+    rpcUrl: 'https://bsc-dataseed.binance.org/',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://bscscan.com'
+  },
+  '1': {
+    chainId: '0x1',
+    chainName: 'Ethereum Mainnet',
+    rpcUrl: 'https://mainnet.infura.io/v3/',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://etherscan.io'
+  },
+  '5': {
+    chainId: '0x5',
+    chainName: 'Ethereum Goerli Testnet',
+    rpcUrl: 'https://goerli.infura.io/v3/',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://goerli.etherscan.io'
+  },
+  '137': {
+    chainId: '0x89',
+    chainName: 'Polygon Mainnet',
+    rpcUrl: 'https://polygon-rpc.com/',
+    nativeCurrency: {
+      name: 'MATIC',
+      symbol: 'MATIC',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://polygonscan.com'
+  },
+  '80001': {
+    chainId: '0x13881',
+    chainName: 'Polygon Mumbai Testnet',
+    rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
+    nativeCurrency: {
+      name: 'MATIC',
+      symbol: 'MATIC',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://mumbai.polygonscan.com'
+  },
+  '43114': {
+    chainId: '0xA86A',
+    chainName: 'Avalanche Mainnet',
+    rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
+    nativeCurrency: {
+      name: 'AVAX',
+      symbol: 'AVAX',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://snowtrace.io'
+  },
+  '43113': {
+    chainId: '0xA869',
+    chainName: 'Avalanche Fuji Testnet',
+    rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
+    nativeCurrency: {
+      name: 'AVAX',
+      symbol: 'AVAX',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://testnet.snowtrace.io'
+  }
+};
+
+// Initialize network selection
+document.addEventListener('DOMContentLoaded', function() {
+  const networkSelect = document.getElementById('networkSelect');
+  
+  // Set up event listener for network changes
+  networkSelect.addEventListener('change', function() {
+    const selectedNetwork = this.value;
+    
+    // Check if it's a Solana network (handled differently)
+    if (selectedNetwork.includes('solana')) {
+      handleSolanaNetwork(selectedNetwork);
+      return;
+    }
+    
+    // Handle EVM networks
+    if (NETWORKS[selectedNetwork]) {
+      switchNetwork(selectedNetwork);
+    }
+  });
+  
+  // Try to detect current network
+  detectCurrentNetwork();
+});
+
+// Function to switch networks
+async function switchNetwork(networkId) {
+  if (!window.ethereum) {
+    showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
+    return;
+  }
+  
+  try {
+    const networkConfig = NETWORKS[networkId];
+    
+    try {
+      // Try to switch to the network
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: networkConfig.chainId }],
+      });
+      
+      showNotification(`Switched to ${networkConfig.chainName}`, 'success');
+      updateUIForNetwork(networkId);
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: networkConfig.chainId,
+              chainName: networkConfig.chainName,
+              rpcUrls: [networkConfig.rpcUrl],
+              nativeCurrency: networkConfig.nativeCurrency,
+              blockExplorerUrls: [networkConfig.blockExplorerUrl]
+            }]
+          });
+          
+          showNotification(`${networkConfig.chainName} added successfully`, 'success');
+          updateUIForNetwork(networkId);
+        } catch (addError) {
+          console.error('Error adding network:', addError);
+          showNotification('Failed to add network. Please add it manually in your wallet.', 'error');
+        }
+      } else {
+        console.error('Error switching network:', switchError);
+        showNotification('Failed to switch network', 'error');
+      }
+    }
+  } catch (error) {
+    console.error('Network switch error:', error);
+    showNotification('Error switching network: ' + error.message, 'error');
+  }
+}
+
+// Function to handle Solana networks (placeholder - would need Phantom wallet integration)
+function handleSolanaNetwork(network) {
+  showNotification('Solana network selected. This would require Phantom wallet integration.', 'info');
+  
+  // For demonstration, just update the UI
+  const networkName = network === 'solana-mainnet' ? 'Solana Mainnet' : 'Solana Devnet';
+  updateUIForNetwork(network, networkName);
+}
+
+// Function to update UI when network changes
+function updateUIForNetwork(networkId, networkName = null) {
+  const networkSelect = document.getElementById('networkSelect');
+  networkSelect.value = networkId;
+  
+  // Update any network-specific UI elements
+  const networkIndicator = document.getElementById('networkIndicator') || createNetworkIndicator();
+  const name = networkName || (NETWORKS[networkId] ? NETWORKS[networkId].chainName : networkId);
+  
+  networkIndicator.textContent = `Network: ${name}`;
+  
+  // You might also update contract addresses, token symbols, etc. based on network
+  updateContractInfoForNetwork(networkId);
+}
+
+// Create network indicator if it doesn't exist
+function createNetworkIndicator() {
+  const indicator = document.createElement('div');
+  indicator.id = 'networkIndicator';
+  indicator.className = 'network-indicator';
+  indicator.style.cssText = 'position: fixed; bottom: 10px; right: 10px; background: #10B981; color: white; padding: 5px 10px; border-radius: 10px; font-size: 12px; z-index: 1000;';
+  
+  document.body.appendChild(indicator);
+  return indicator;
+}
+
+// Update contract info based on network
+function updateContractInfoForNetwork(networkId) {
+  // This would update contract addresses, ABI, etc. based on the selected network
+  console.log(`Network changed to: ${networkId}`);
+  
+  // Example: Update contract address display if exists
+  const contractAddressElement = document.getElementById('contractAddress');
+  if (contractAddressElement && CONTRACT_ADDRESSES[networkId]) {
+    contractAddressElement.textContent = CONTRACT_ADDRESSES[networkId];
+  }
+}
+
+// Try to detect the current network
+async function detectCurrentNetwork() {
+  if (!window.ethereum) return;
+  
+  try {
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    const decimalChainId = parseInt(chainId, 16);
+    
+    // Find matching network
+    for (const [id, config] of Object.entries(NETWORKS)) {
+      if (config.chainId === chainId) {
+        updateUIForNetwork(id);
+        return;
+      }
+    }
+    
+    // If we didn't find a match, show the raw chainId
+    updateUIForNetwork('custom', `Unknown (${chainId})`);
+  } catch (error) {
+    console.error('Error detecting network:', error);
+  }
+}
+
+// Listen for network changes if MetaMask is available
+if (window.ethereum) {
+  window.ethereum.on('chainChanged', (chainId) => {
+    const decimalChainId = parseInt(chainId, 16);
+    
+    // Find matching network
+    for (const [id, config] of Object.entries(NETWORKS)) {
+      if (config.chainId === chainId) {
+        updateUIForNetwork(id);
+        return;
+      }
+    }
+    
+    // If we didn't find a match
+    updateUIForNetwork('custom', `Unknown (${chainId})`);
+  });
+}
+</script>
 </body>
 </html>
