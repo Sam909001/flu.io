@@ -2138,6 +2138,8 @@ async function validateContracts() {
   const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
 
   // Check if contract is deployed
+  // 👇 get the network FIRST
+  const network = await provider.getNetwork();
   const presaleCode = await provider.getCode(CONTRACT_ADDRESSES[network.chainId]);
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
@@ -2344,6 +2346,7 @@ async function stakeFluffi() {
         
         // First approve FLUFFI tokens for staking contract
         const fluffiContract = new ethers.Contract(
+        const network = await provider.getNetwork();
         CONTRACT_ADDRESSES[network.chainId],
         ["function approve(address spender, uint256 amount) returns (bool)"],
         signer
