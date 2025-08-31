@@ -2142,7 +2142,6 @@ async function validateContracts() {
   if (presaleCode === "0x") throw new Error("Presale contract not deployed");
 
   // Verify network
-  const network = await provider.getNetwork();
   if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
 
   console.log("Contract validation passed ✅");
