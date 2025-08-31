@@ -1143,9 +1143,31 @@ rotateFeed();
   
   <script>
 // Configuration
-    const FLUFFI_CONTRACT_ADDRESS = "0x60A94bc12d0d4F782Fd597e5E1222247CFb7E297";
+        let tokenChart = null;
+ // Your mapping of addresses
+const CONTRACT_ADDRESSES = {
+  1: "0x...EthereumMainnet",
+  5: "0x...GoerliTestnet",
+  56: "0x...BSCMainnet",
+  97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
+  137: "0x...PolygonMainnet",
+  80001: "0x...PolygonTestnet",
+  43114: "0x...AvalancheMainnet",
+  43113: "0xE47565637b477dc1De60dfcCB98015806fd22176"
+  // Solana handled separately
+};
+    
     const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-   const WALLETCONNECT_CONFIG = {
+
+    // Function to get contract for the current chain
+async function getFluffiContract(provider) {
+  const network = await provider.getNetwork();   // get chainId
+  const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+  if (!contractAddress) throw new Error("Unsupported chain");
+  return new ethers.Contract(contractAddress, ABI, provider.getSigner());
+}
+    
+    const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
   chains: [56], // BSC Mainnet
   showQrModal: false,
@@ -2149,8 +2171,33 @@ const tx = await contract.contribute(referralAddress, {
     showNotification(err.message || "Transaction failed", 'error');
   }
 }
- </script>
-    <script>
+   // Solana purchase function
+async function buyWithSolana(amount, currency, ref) {
+  try {
+    // Check if Phantom is installed
+    if (!window.solana || !window.solana.isPhantom) {
+      showNotification("Please install Phantom wallet for Solana transactions", "error");
+      window.open("https://phantom.app/", "_blank");
+      return;
+    }
+    
+    // Connect to Phantom
+    const response = await window.solana.connect();
+    const publicKey = response.publicKey.toString();
+    
+    // For now, show message (you'll need to implement actual Solana transaction)
+    showNotification(`Solana purchase initiated for ${amount} ${currency}. This feature is coming soon!`, "info");
+    
+    // Here you would:
+    // 1. Get the Solana program ID from CONTRACT_ADDRESSES
+    // 2. Create transaction instructions
+    // 3. Send transaction using @solana/web3.js
+    
+  } catch (error) {
+    console.error("Solana purchase error:", error);
+    showNotification("Solana transaction failed: " + error.message, "error");
+  }
+}
     // ===== STAKING FUNCTIONS =====
 // Staking contract placeholder - replace with actual deployed address
 const STAKING_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // PLACEHOLDER - Replace with actual staking contract
