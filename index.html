@@ -318,6 +318,68 @@
     .dark .wallet-status {
       background-color: #374151;
     }
+    // Add this to your existing notification styles or create a new style block
+const networkStyles = `
+  .network-info {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dark .network-info {
+    background: #2d3748;
+    border-color: #4b5563;
+    color: #e2e8f0;
+  }
+  
+  .network-name {
+    font-weight: 600;
+  }
+  
+  .network-currency {
+    background: #10b981;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  .network-warning {
+    color: #e53e3e;
+    font-weight: 600;
+  }
+  
+  .network-info button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  
+  .network-info button:hover {
+    background: #2563eb;
+  }
+`;
+
+// Add to document
+if (!document.getElementById('network-styles')) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'network-styles';
+  styleSheet.textContent = networkStyles;
+  document.head.appendChild(styleSheet);
+}
   </style>
 </head>
   
@@ -1275,6 +1337,16 @@ let provider = null;
 if (window.location.search.includes('dev=true')) {
   document.getElementById('devSection').classList.remove('hidden');
 }
+     // Initialize network detection
+  detectAndDisplayNetwork();
+  
+  // Check if wallet was previously connected
+  const savedAddress = localStorage.getItem('walletAddress');
+  if (savedAddress) {
+    userWalletAddress = savedAddress;
+    handleWalletConnection(savedAddress);
+  }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
