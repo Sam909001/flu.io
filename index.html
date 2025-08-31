@@ -1209,7 +1209,7 @@ rotateFeed();
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
   1: "0x...EthereumMainnet",
-  5: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
+  11155111: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
   56: "0x...BSCMainnet",
   97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
   137: "0x...PolygonMainnet",
@@ -1227,13 +1227,12 @@ const NETWORK_CONFIGS = {
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
     explorer: "https://etherscan.io"
   },
-11155111: {
-  name: "Sepolia Testnet",
-  currency: "ETH",
-  rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f", 
-  explorer: "https://sepolia.etherscan.io"
-},
-
+11155111: {  // Sepolia
+    name: "Sepolia Testnet",
+    currency: "ETH",
+    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f", 
+    explorer: "https://sepolia.etherscan.io"
+  },
   56: {
     name: "BSC Mainnet",
     currency: "BNB",
@@ -3047,17 +3046,17 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://etherscan.io'
   },
- '11155111': {
-  chainId: '0xAA36A7', // 11155111 in hex
-  chainName: 'Ethereum Sepolia Testnet',
-  rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f', // replace with your Infura project ID
-  nativeCurrency: {
-    name: 'ETH',
-    symbol: 'ETH',
-    decimals: 18
+   '11155111': {
+    chainId: '0xAA36A7', // 11155111 in hex
+    chainName: 'Ethereum Sepolia Testnet',
+    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://sepolia.etherscan.io'
   },
-  blockExplorerUrl: 'https://sepolia.etherscan.io'
-},
   '137': {
     chainId: '0x89',
     chainName: 'Polygon Mainnet',
