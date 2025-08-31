@@ -2206,7 +2206,12 @@ async function buyFluffi() {
    // 6️⃣ Initialize provider & contract (ethers v5)
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
-const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+// Get the contract address for the current network
+const network = await provider.getNetwork();
+const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+if (!contractAddress) throw new Error("No contract address for this network");
+
+const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
 const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
