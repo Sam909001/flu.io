@@ -2151,8 +2151,11 @@ const presaleCode = await provider.getCode(contractAddress);
 }
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
-  // Add this at the beginning of your buyFluffi() function:
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+  if (!window.ethereum) {
+    showNotification("Please install a Web3 wallet like MetaMask", "error");
+    return false;
+  }
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
 const network = await provider.getNetwork();
   // 1️⃣ Rate limiter
   if (!rateLimiter.canAttempt('buy', userWalletAddress)) {
