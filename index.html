@@ -1227,12 +1227,17 @@ const NETWORK_CONFIGS = {
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
     explorer: "https://etherscan.io"
   },
-11155111: {  // Sepolia
-    name: "Sepolia Testnet",
-    currency: "ETH",
-    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f", 
-    explorer: "https://sepolia.etherscan.io"
+'11155111': {
+  chainId: '0xAA36A7', // 11155111 in hex (correct format)
+  chainName: 'Ethereum Sepolia Testnet',
+  rpcUrl: 'https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID',
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'ETH',
+    decimals: 18
   },
+  blockExplorerUrl: 'https://sepolia.etherscan.io'
+}
   56: {
     name: "BSC Mainnet",
     currency: "BNB",
@@ -1281,7 +1286,12 @@ async function getFluffiContract(provider) {
     const contractAddress = CONTRACT_ADDRESSES[chainId];
     
     if (!contractAddress) {
-      throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
+      // Check if we have a contract for this network
+      if (Object.keys(CONTRACT_ADDRESSES).includes(chainId.toString())) {
+        throw new Error(`Contract not deployed on ${NETWORKS[chainId]?.chainName || 'this network'}`);
+      } else {
+        throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
+      }
     }
     
     return new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, provider.getSigner());
@@ -1293,7 +1303,7 @@ async function getFluffiContract(provider) {
     
     const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [56], // BSC Mainnet
+  chains: [1, 56, 97, 11155111, 137, 80001, 43114, 43113]
   showQrModal: false,
   qrModalOptions: {
     themeMode: 'dark',
@@ -3111,17 +3121,21 @@ document.addEventListener('DOMContentLoaded', function() {
   networkSelect.addEventListener('change', function() {
     const selectedNetwork = this.value;
     
-    // Check if it's a Solana network (handled differently)
-    if (selectedNetwork.includes('solana')) {
-      handleSolanaNetwork(selectedNetwork);
-      return;
-    }
-    
-    // Handle EVM networks
-    if (NETWORKS[selectedNetwork]) {
-      switchNetwork(selectedNetwork);
-    }
-  });
+ networkSelect.addEventListener('change', function() {
+  const selectedNetwork = this.value;
+  
+  // Handle Solana networks differently
+  if (selectedNetwork.includes('solana')) {
+    handleSolanaNetwork(selectedNetwork);
+    return;
+  }
+  
+  // Handle EVM networks - ensure it's a number
+  const numericNetworkId = parseInt(selectedNetwork);
+  if (NETWORKS[numericNetworkId]) {
+    switchNetwork(numericNetworkId);
+  }
+});
   
   // Try to detect current network
   detectCurrentNetwork();
@@ -3129,10 +3143,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to switch networks
 async function switchNetwork(networkId) {
+  // Convert string to number if needed
+  const numericNetworkId = typeof networkId === 'string' ? parseInt(networkId) : networkId;
+  
   if (!window.ethereum) {
     showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
     return;
   }
+  
+  try {
+    const networkConfig = NETWORKS[numericNetworkId];
+    
+    if (!networkConfig) {
+      showNotification('Unsupported network', 'error');
+      return;
+    }
   
   try {
     const networkConfig = NETWORKS[networkId];
@@ -3233,21 +3258,22 @@ async function detectCurrentNetwork() {
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
     const decimalChainId = parseInt(chainId, 16);
     
-    // Find matching network
-    for (const [id, config] of Object.entries(NETWORKS)) {
-      if (config.chainId === chainId) {
-        updateUIForNetwork(id);
-        return;
+    // Update the network select dropdown
+    const networkSelect = document.getElementById('networkSelect');
+    if (networkSelect) {
+      // Check if this chain ID exists in our supported networks
+      if (NETWORKS[decimalChainId]) {
+        networkSelect.value = decimalChainId;
+      } else if (chainId === '0xaa36a7') { // Handle Sepolia's hex format
+        networkSelect.value = '11155111';
       }
     }
     
-    // If we didn't find a match, show the raw chainId
-    updateUIForNetwork('custom', `Unknown (${chainId})`);
+    // ... rest of your detection logic
   } catch (error) {
     console.error('Error detecting network:', error);
   }
 }
-
 // Listen for network changes if MetaMask is available
 if (window.ethereum) {
   window.ethereum.on('chainChanged', (chainId) => {
