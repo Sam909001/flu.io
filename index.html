@@ -61,7 +61,7 @@
         <option value="1">Ethereum Mainnet</option>
         <option value="11155111">Ethereum Sepolia</option>
         <option value="137">Polygon Mainnet</option>
-        <option value="80001">Polygon Mumbai</option>
+        <option value="80002">Polygon Amoy</option>
         <option value="43114">Avalanche Mainnet</option>
         <option value="43113">Avalanche Fuji</option>
         <option value="solana-mainnet">Solana Mainnet</option>
@@ -866,7 +866,7 @@ const CONTRACT_ADDRESSES = {
   56: "0x...BSCMainnet",
   97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
   137: "0x...PolygonMainnet",
-  80001: "0x...PolygonTestnet",
+  80002: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
   43114: "0x...AvalancheMainnet",
   43113: "0xE47565637b477dc1De60dfcCB98015806fd22176"
   // Solana handled separately
@@ -880,12 +880,12 @@ const NETWORK_CONFIGS = {
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
     explorer: "https://etherscan.io"
   },
- 5: {
-    name: "Goerli Testnet",
+11155111: {
+    name: "Sepolia Testnet",
     currency: "ETH",
-    rpcUrl: "https://goerli.infura.io/v3/YOUR_PROJECT_ID",
-    explorer: "https://goerli.etherscan.io"
-  },
+    rpcUrl: "https://sepolia.infura.io/v3/YOUR_PROJECT_ID",
+    explorer: "https://sepolia.etherscan.io"
+},
   56: {
     name: "BSC Mainnet",
     currency: "BNB",
@@ -904,12 +904,12 @@ const NETWORK_CONFIGS = {
     rpcUrl: "https://polygon-rpc.com/",
     explorer: "https://polygonscan.com"
   },
-  80001: {
-    name: "Mumbai Testnet",
-    currency: "MATIC",
-    rpcUrl: "https://rpc-mumbai.maticvigil.com/",
-    explorer: "https://mumbai.polygonscan.com"
-  },
+80002: {
+    name: "Polygon Amoy Testnet",
+    currency: "POL",
+    rpcUrl: "https://rpc-amoy.polygon.technology",
+    explorer: "https://amoy.polygonscan.com"
+},
   43114: {
     name: "Avalanche Mainnet",
     currency: "AVAX",
@@ -1860,17 +1860,13 @@ async function switchToNetwork(chainName = 'BSC') {
       },
       blockExplorerUrl: 'https://polygonscan.com'
     },
-    'POLYGON_MUMBAI': { 
-      chainId: '0x13881', 
-      rpcUrl: 'https://matic-mumbai.chainstacklabs.com', 
-      name: 'Polygon Mumbai Testnet',
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18
-      },
-      blockExplorerUrl: 'https://mumbai.polygonscan.com'
-    },
+    'POLYGON_AMOY': {
+    name: "Polygon Amoy Testnet",
+    chainId: 80002,
+    rpcUrl: "https://rpc-amoy.polygon.technology",
+    explorer: "https://amoy.polygonscan.com",
+    currency: "POL"
+  },
     'AVAX': { 
       chainId: '0xA86A', 
       rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', 
@@ -2750,17 +2746,17 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://polygonscan.com'
   },
-  '80001': {
-    chainId: '0x13881',
-    chainName: 'Polygon Mumbai Testnet',
-    rpcUrl: 'https://matic-mumbai.chainstacklabs.com',
+ '80002': {
+    chainId: '0x13882',  // replace with actual Amoy chain ID in hex if different
+    chainName: 'Polygon Amoy Testnet',
+    rpcUrl: 'https://rpc-amoy.polygon.technology',
     nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
+      name: 'POL',
+      symbol: 'POL',
       decimals: 18
     },
-    blockExplorerUrl: 'https://mumbai.polygonscan.com'
-  },
+    blockExplorerUrl: 'https://amoy.polygonscan.com'
+},
   '43114': {
     chainId: '0xA86A',
     chainName: 'Avalanche Mainnet',
