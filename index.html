@@ -58,7 +58,7 @@
         <option value="56">BSC Mainnet</option>
         <option value="97">BSC Testnet</option>
         <option value="1">Ethereum Mainnet</option>
-        <option value="11155111">Ethereum Sepolia</option>
+        <option value="5">Ethereum goerli</option>
         <option value="137">Polygon Mainnet</option>
         <option value="80001">Polygon Mumbai</option>
         <option value="43114">Avalanche Mainnet</option>
@@ -845,12 +845,12 @@ rotateFeed();
   
   
   <script>
-    // Configuration
+  // Configuration
         let tokenChart = null;
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
   1: "0x...EthereumMainnet",
-  11155111: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
+  5: "0x...GoerliTestnet",
   56: "0x...BSCMainnet",
   97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
   137: "0x...PolygonMainnet",
@@ -868,11 +868,11 @@ const NETWORK_CONFIGS = {
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
     explorer: "https://etherscan.io"
   },
-11155111: {  // Sepolia
-    name: "Sepolia Testnet",
+ 5: {
+    name: "Goerli Testnet",
     currency: "ETH",
-    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f", 
-    explorer: "https://sepolia.etherscan.io"
+    rpcUrl: "https://goerli.infura.io/v3/YOUR_PROJECT_ID",
+    explorer: "https://goerli.etherscan.io"
   },
   56: {
     name: "BSC Mainnet",
@@ -912,8 +912,27 @@ const NETWORK_CONFIGS = {
   }
 };
     
-    const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-   const WALLETCONNECT_CONFIG = {
+const FLUFFI_CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"}],"name":"Contribution","type":"event"},{"anonymous":false,"inputs":[],"name":"PresaleEnded","type":"event"},{"inputs":[],"name":"RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"contribute","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"contributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endPresale","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getContributorAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"presaleActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"setTokenAddress","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalRaised","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
+    // getFluffiContract function:
+async function getFluffiContract(provider) {
+  try {
+    const network = await provider.getNetwork();
+    const chainId = network.chainId;
+    const contractAddress = CONTRACT_ADDRESSES[chainId];
+    
+    if (!contractAddress) {
+      throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
+    }
+    
+    return new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, provider.getSigner());
+  } catch (error) {
+    console.error("Error getting contract:", error);
+    throw error;
+  }
+}
+    
+    const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
   chains: [56], // BSC Mainnet
   showQrModal: false,
@@ -2580,16 +2599,16 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://etherscan.io'
   },
-   '11155111': {
-    chainId: '0xAA36A7', // 11155111 in hex
-    chainName: 'Ethereum Sepolia Testnet',
-    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+  '5': {
+    chainId: '0x5',
+    chainName: 'Ethereum Goerli Testnet',
+    rpcUrl: 'https://goerli.infura.io/v3/',
     nativeCurrency: {
       name: 'ETH',
       symbol: 'ETH',
       decimals: 18
     },
-    blockExplorerUrl: 'https://sepolia.etherscan.io'
+    blockExplorerUrl: 'https://goerli.etherscan.io'
   },
   '137': {
     chainId: '0x89',
