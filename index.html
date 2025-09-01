@@ -59,7 +59,7 @@
         <option value="56">BSC Mainnet</option>
         <option value="97">BSC Testnet</option>
         <option value="1">Ethereum Mainnet</option>
-        <option value="5">Ethereum goerli</option>
+        <option value="11155111">Ethereum Sepolia</option>
         <option value="137">Polygon Mainnet</option>
         <option value="80001">Polygon Mumbai</option>
         <option value="43114">Avalanche Mainnet</option>
@@ -862,7 +862,7 @@ rotateFeed();
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
   1: "0x...EthereumMainnet",
-  5: "0x...GoerliTestnet",
+  11155111: "0xYourSepoliaContractAddressHere",
   56: "0x...BSCMainnet",
   97: "0x2022443271fCcA5b8Ff2c335607996DE16082B76",
   137: "0x...PolygonMainnet",
@@ -1842,17 +1842,13 @@ async function switchToNetwork(chainName = 'BSC') {
       },
       blockExplorerUrl: 'https://etherscan.io'
     },
-    'ETH_GOERLI': { 
-      chainId: '0x5', 
-      rpcUrl: 'https://goerli.infura.io/v3/', 
-      name: 'Ethereum Goerli Testnet',
-      nativeCurrency: {
-        name: 'ETH',
-        symbol: 'ETH',
-        decimals: 18
-      },
-      blockExplorerUrl: 'https://goerli.etherscan.io'
-    },
+    'ETH_SEPOLIA' : {
+    chainId: "0xAA36A7", 
+    chainName: "Ethereum Sepolia",
+    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+    rpcUrls: ["https://sepolia.infura.io/v3/YOUR_INFURA_ID"], 
+    blockExplorerUrls: ["https://sepolia.etherscan.io"]
+  },
     'POLYGON': { 
       chainId: '0x89', 
       rpcUrl: 'https://polygon-rpc.com/', 
