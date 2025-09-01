@@ -701,7 +701,6 @@ async function updateStakingDashboard() {
 }
 
 // Update on page load and when wallet connects
-document.addEventListener('DOMContentLoaded', updateStakingDashboard);
 window.addEventListener('storage', updateStakingDashboard);
 </script>
   
@@ -1333,23 +1332,11 @@ let tasksCompleted = {
 let countdownInterval = null;
 let provider = null;
 
-// For development - show dev section if URL has ?dev=true
-if (window.location.search.includes('dev=true')) {
-  document.getElementById('devSection').classList.remove('hidden');
-}
-     // Initialize network detection
-  detectAndDisplayNetwork();
-  
-  // Check if wallet was previously connected
-  const savedAddress = localStorage.getItem('walletAddress');
-  if (savedAddress) {
-    userWalletAddress = savedAddress;
-    handleWalletConnection(savedAddress);
-  }
-});
-
+    // ===== SINGLE CONSOLIDATED DOMCONTENTLOADED LISTENER =====
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
+  console.log('Initializing FLUFFI application...');
+  
+  // 1. Initialize dark mode
   const darkMode = localStorage.getItem('darkMode');
   const isDarkMode = darkMode === 'true' || 
                     (darkMode === null && 
@@ -1363,43 +1350,72 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
-  // Setup form submission
-  document.getElementById('airdropForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    claimAirdrop();
-  });
+  // 2. Initialize timer
+  initializeTimer();
   
-  // Setup wallet button
-  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  // 3. Initialize token chart
+  initTokenChart();
   
-// Just check if wallet was previously connected but don't auto-reconnect
-const savedAddress = localStorage.getItem('walletAddress');
-if (savedAddress) {
-  // Clear the saved address to prevent auto-reconnect attempts
-  localStorage.removeItem('walletAddress');
-  localStorage.removeItem('walletConnected');
-}
+  // 4. Initialize staking dashboard
+  updateStakingDashboard();
   
-  // Initialize countdown timer
-  initializeCountdown();
+  // 5. Initialize live feed
+  initializeLiveFeed();
   
-  // Load completed tasks from localStorage
-  const savedTasks = localStorage.getItem('completedTasks');
-  if (savedTasks) {
-    tasksCompleted = JSON.parse(savedTasks);
-    updateTaskUI();
+  // 6. Check for referral parameter in URL
+  checkReferral();
+  
+  // 7. Initialize network detection
+  detectAndDisplayNetwork();
+  
+  // 8. Initialize network selection dropdown
+  const networkSelect = document.getElementById('networkSelect');
+  if (networkSelect) {
+    networkSelect.addEventListener('change', function() {
+      const selectedNetwork = this.value;
+      
+      // Check if it's a Solana network (handled differently)
+      if (selectedNetwork.includes('solana')) {
+        handleSolanaNetwork(selectedNetwork);
+        return;
+      }
+      
+      // Handle EVM networks
+      if (NETWORKS[selectedNetwork]) {
+        switchNetwork(selectedNetwork);
+      }
+    });
   }
+  
+  // 9. Try to detect current network
+  detectCurrentNetwork();
+  
+  // 10. Check if wallet was previously connected (but don't auto-connect)
+  const savedAddress = localStorage.getItem('walletAddress');
+  if (savedAddress) {
+    // Clear the saved address to prevent auto-reconnect attempts
+    localStorage.removeItem('walletAddress');
+    localStorage.removeItem('walletConnected');
+  }
+  
+  // 11. Check if MetaMask is installed (only if element exists)
+  const metamaskBadge = document.getElementById('metamaskInstalledBadge');
+  if (metamaskBadge && window.ethereum?.isMetaMask) {
+    metamaskBadge.classList.remove('hidden');
+  }
+  
+  // 12. Setup wallet button click handler (if button exists)
+  const walletButton = document.getElementById('walletButton');
+  if (walletButton) {
+    walletButton.addEventListener('click', openWalletModal);
+  }
+  
+  console.log('FLUFFI application initialized successfully!');
 });
-
-// Timer functions
+    
 // Timer variables
 let presaleInterval = null;
-
-// Initialize the timer when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initializeTimer();
-});
-
+    
 function initializeTimer() {
   // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
   const startTime = new Date('2025-08-27T00:00:00Z').getTime();
@@ -2706,11 +2722,6 @@ function initTokenChart() {
     attributeFilter: ['class']
   });
 }
-
-// Initialize the chart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  initTokenChart();
-});
       
 // ==== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
@@ -2800,34 +2811,6 @@ function initTimer() {
     updateNextIncreaseTime();
   }, 1000);
 }
-
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
-  }
-
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
-  }
-
-  // Initialize token chart
-  initTokenChart();
-
-  // Initialize timers
-  initTimer();
-
-  // Check for referral parameter
-  checkReferral();
-});
 
 // Toggle dark mode function
 function toggleDarkMode() {
@@ -3006,9 +2989,6 @@ function initializeLiveFeed() {
   // Add new activity every 5 seconds
   setInterval(addActivity, 5000);
 }
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initializeLiveFeed);
 </script>
   <script>
 // Network configuration with all required parameters
@@ -3102,31 +3082,7 @@ const NETWORKS = {
     blockExplorerUrl: 'https://testnet.snowtrace.io'
   }
 };
-
-// Initialize network selection
-document.addEventListener('DOMContentLoaded', function() {
-  const networkSelect = document.getElementById('networkSelect');
-  
-  // Set up event listener for network changes
-  networkSelect.addEventListener('change', function() {
-    const selectedNetwork = this.value;
     
-    // Check if it's a Solana network (handled differently)
-    if (selectedNetwork.includes('solana')) {
-      handleSolanaNetwork(selectedNetwork);
-      return;
-    }
-    
-    // Handle EVM networks
-    if (NETWORKS[selectedNetwork]) {
-      switchNetwork(selectedNetwork);
-    }
-  });
-  
-  // Try to detect current network
-  detectCurrentNetwork();
-});
-
 // Function to switch networks
 async function switchNetwork(networkId) {
   if (!window.ethereum) {
