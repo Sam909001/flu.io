@@ -318,7 +318,8 @@
     .dark .wallet-status {
       background-color: #374151;
     }
-    // Add this to your existing notification styles or create a new style block
+
+// Replace the entire block with:
 const networkStyles = `
   .network-info {
     position: absolute;
@@ -2799,17 +2800,6 @@ function updateTimers() {
     
     document.getElementById('stage-time-left').textContent = formattedStage.full;
   }
-}
-
-// Initialize the timer
-function initTimer() {
-  updateTimers();
-  updateNextIncreaseTime();
-  // Update every second
-  setInterval(() => {
-    updateTimers();
-    updateNextIncreaseTime();
-  }, 1000);
 }
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
