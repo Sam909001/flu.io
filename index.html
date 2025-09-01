@@ -2705,10 +2705,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Try to detect current network
   detectCurrentNetwork();
 });
-
+      
 <script>
 // Replace your current switchToNetwork function with this improved version
-async function switchToNetwork(networkId) {
+async function switchNetwork(networkId) {
   if (!window.ethereum) {
     showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
     return;
