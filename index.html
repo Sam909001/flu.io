@@ -1415,7 +1415,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   console.log('FLUFFI application initialized successfully!');
 });
-    
+      // Prevent multiple clicks on wallet buttons
+  const walletButtons = document.querySelectorAll('[onclick*="connectWallet"]');
+  walletButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      if (this.disabled || this.classList.contains('processing')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      
+      this.classList.add('processing');
+      setTimeout(() => {
+        this.classList.remove('processing');
+      }, 3000);
+    });
+  });
+});
 // Timer variables
 let presaleInterval = null;
     
@@ -1726,9 +1742,11 @@ function closeHelpModal() {
 }
 
 // Main wallet connection function
+// Main wallet connection function with connection state tracking
 async function connectWallet(walletType) {
+  // Check if already connecting
   if (isConnecting) {
-    console.log("Connection already in progress");
+    showNotification("Already connecting to wallet. Please wait...", "info");
     return;
   }
   
@@ -1742,23 +1760,36 @@ async function connectWallet(walletType) {
     walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
     walletButton.disabled = true;
     
-    if (walletType === 'metamask') {
-      await connectMetaMask();
+    let provider;
+    
+    switch(walletType) {
+      case 'metamask':
+        provider = await connectMetaMask();
+        break;
+      case 'trust':
+        provider = await connectTrustWallet();
+        break;
+      case 'walletconnect':
+        provider = await connectWalletConnect();
+        break;
+      case 'phantom':
+        provider = await connectPhantom();
+        break;
+      default:
+        throw new Error("Unsupported wallet type");
     }
-    else if (walletType === 'trust') {
-      await connectTrustWallet();
+    
+    if (provider) {
+      // Set up event listeners for network changes
+      setupNetworkListeners(provider);
     }
-    else if (walletType === 'walletconnect') {
-      await connectWalletConnect();
-    }
-    else if (walletType === 'phantom') {
-      await connectPhantom();
-    }
+    
   } catch (error) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
   } finally {
-    isConnecting = false;
+    isConnecting = false; // Reset connection state
+    
     // Reset wallet button state
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
@@ -1771,7 +1802,17 @@ async function connectWallet(walletType) {
 }
 
 // MetaMask connection
+// MetaMask connection with better error handling
 async function connectMetaMask() {
+  if (!window.ethereum) {
+    throw new Error("MetaMask is not installed. Please install it first.");
+  }
+
+  // Check if we're already processing a request
+  if (window.ethereum._state && window.ethereum._state.isProcessingEthRequest) {
+    throw new Error("MetaMask is already processing a connection request. Please wait.");
+  }
+
   if (isMobile()) {
     // Check if we're already in MetaMask browser
     const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
@@ -1788,11 +1829,18 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
-        return; // Exit here to prevent redirect
+        return window.ethereum; // Return the provider
       } catch (error) {
         console.error("MetaMask connection error:", error);
-        showNotification("Connection failed: " + error.message, "error");
-        return;
+        
+        // Handle specific error cases
+        if (error.code === 4001) {
+          throw new Error("Connection rejected by user");
+        } else if (error.code === -32002) {
+          throw new Error("Already processing connection request. Please check MetaMask.");
+        } else {
+          throw new Error("Connection failed: " + error.message);
+        }
       }
     }
     
@@ -1802,30 +1850,46 @@ async function connectMetaMask() {
       window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
     }
   } else {
-    // Desktop logic remains the same
+    // Desktop logic
     if (window.ethereum && window.ethereum.isMetaMask) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleWalletConnection(accounts[0]);
-      
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+        
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            handleWalletConnection(accounts[0]);
+          }
+        });
+        
+        return window.ethereum;
+      } catch (error) {
+        console.error("MetaMask connection error:", error);
+        
+        if (error.code === 4001) {
+          throw new Error("Connection rejected by user");
+        } else if (error.code === -32002) {
+          throw new Error("Already processing connection request. Please check MetaMask.");
         } else {
-          handleWalletConnection(accounts[0]);
+          throw new Error("Please install MetaMask extension");
         }
-      });
+      }
     } else {
       throw new Error("Please install MetaMask extension");
     }
   }
 }
 // Trust Wallet connection
+// Trust Wallet connection with safe request
 async function connectTrustWallet() {
   if (isMobile()) {
     if (window.ethereum && window.ethereum.isTrust) {
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await safeWalletRequest('eth_requestAccounts');
         handleWalletConnection(accounts[0]);
+        return window.ethereum;
       } catch (error) {
         window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
       }
@@ -1835,19 +1899,18 @@ async function connectTrustWallet() {
   } else {
     if (window.ethereum && window.ethereum.isTrust) {
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await safeWalletRequest('eth_requestAccounts');
         handleWalletConnection(accounts[0]);
+        return window.ethereum;
       } catch (error) {
-        throw new Error("Failed to connect Trust Wallet");
+        throw new Error("Failed to connect Trust Wallet: " + error.message);
       }
     } else {
       throw new Error("Please install Trust Wallet extension");
     }
   }
 }
-
 // Simplified WalletConnect connection
-// Replace the incomplete WalletConnect with a working implementation
 async function connectWalletConnect() {
   try {
     // Use Web3Modal for better wallet integration
@@ -1925,6 +1988,51 @@ function showWalletConnectFallback() {
       .wallet-list-item span {
         font-weight: 500;
       }
+      /* Add to your existing styles */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.wallet-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.connection-status {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  z-index: 1000;
+  font-weight: bold;
+}
+
+.connection-status.connecting {
+  background-color: #ff9800;
+  color: white;
+}
+
+.connection-status.connected {
+  background-color: #4caf50;
+  color: white;
+}
+
+.connection-status.error {
+  background-color: #f44336;
+  color: white;
+}
     </style>
     <div class="wallet-list">
       <div class="wallet-list-item" onclick="window.open('https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}', '_blank')">
