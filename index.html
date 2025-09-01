@@ -1986,24 +1986,28 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-   // 3️⃣ Ensure user is on the selected network (EVM only)
-const networkSelect = document.getElementById('networkSelect');
-const selectedNetwork = networkSelect.value;
+    // 3️⃣ Initialize provider & signer FIRST
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
 
-if (!NETWORKS[selectedNetwork]) {
-  throw new Error('Please pick a supported EVM network.');
-}
+    // 4️⃣ Ensure user is on the selected network
+    const networkSelect = document.getElementById('networkSelect');
+    const selectedNetwork = networkSelect.value;
 
-const current = await provider.getNetwork();
-const currentId = String(current.chainId);
-const wantedId = String(parseInt(selectedNetwork, 10));
+    if (!NETWORKS[selectedNetwork]) {
+      throw new Error('Please pick a supported EVM network.');
+    }
 
-if (currentId !== wantedId) {
-  await switchNetwork(selectedNetwork);          // use the newer generic switcher
-  await provider.send('eth_requestAccounts', []); // refresh provider context
-}
-    
-    // 4️⃣ Currency conversion
+    const current = await provider.getNetwork();
+    const currentId = String(current.chainId);
+    const wantedId = String(parseInt(selectedNetwork, 10));
+
+    if (currentId !== wantedId) {
+      await switchNetwork(selectedNetwork);          // use the newer generic switcher
+      await provider.send('eth_requestAccounts', []); // refresh provider context
+    }
+
+    // 5️⃣ Currency conversion
     const conversionRates = {
       'BNB': 1,
       'SOL': 0.0015,
@@ -2018,28 +2022,24 @@ if (currentId !== wantedId) {
       showNotification(`Converting ${amount} ${currency} to ${bnbValue} BNB`, 'info');
     }
 
-    // 5️⃣ Prepare referral
+    // 6️⃣ Prepare referral
     let referralAddress = ethers.constants.AddressZero;
     if (ref) {
       if (!ethers.utils.isAddress(ref)) throw new Error("Invalid referral address");
       referralAddress = ref;
     }
 
-    // 6️⃣ Initialize provider & contract
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    
-    // Get the correct contract address for the current network
+    // 7️⃣ Get correct contract address for the current network
     const network = await provider.getNetwork();
     const contractAddress = CONTRACT_ADDRESSES[network.chainId];
-    
+
     if (!contractAddress || contractAddress === "0x...") {
       throw new Error(`Contract not deployed on this network (Chain ID: ${network.chainId})`);
     }
-    
+
     const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
-    // 7️⃣ Estimate gas & send transaction
+    // 8️⃣ Estimate gas & send transaction
     const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
       value: ethers.utils.parseEther(bnbValue)
     });
@@ -2048,21 +2048,16 @@ if (currentId !== wantedId) {
       value: ethers.utils.parseEther(bnbValue),
       gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
     });
-    
+
     await tx.wait();
 
-    // 8️⃣ Record purchase on backend (simulated for now)
-    const tokensBought = bnbValue * 10000000; // Example token rate
-    // await recordPurchase(tx.hash, Number(amount), tokensBought);
-
     // 9️⃣ Update UI
+    const tokensBought = bnbValue * 10000000; // Example token rate
     const tokensSold = document.getElementById('tokensSold');
     const currentSold = parseFloat(tokensSold.textContent.replace(/,/g, '')) || 0;
     tokensSold.textContent = (currentSold + tokensBought).toLocaleString();
 
     showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
-
-    // await updateUserBalances();
 
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
