@@ -1520,6 +1520,7 @@ function resetTimer() {
 }
 // Wallet connection functions
 function openWalletModal() {
+  isConnecting = false;
   document.getElementById('walletModal').classList.add('active');
 }
 
@@ -1771,6 +1772,7 @@ async function connectWallet(walletType) {
 
 // MetaMask connection
 async function connectMetaMask() {
+    if (isConnecting) return;
   if (isMobile()) {
     // Check if we're already in MetaMask browser
     const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
@@ -1820,6 +1822,7 @@ async function connectMetaMask() {
 }
 // Trust Wallet connection
 async function connectTrustWallet() {
+  if (isConnecting) return;
   if (isMobile()) {
     if (window.ethereum && window.ethereum.isTrust) {
       try {
@@ -1848,6 +1851,7 @@ async function connectTrustWallet() {
 // Simplified WalletConnect connection
 // Replace the incomplete WalletConnect with a working implementation
 async function connectWalletConnect() {
+  if (isConnecting) return;
   try {
     // Use Web3Modal for better wallet integration
     const Web3Modal = window.Web3Modal.default;
@@ -1979,6 +1983,7 @@ async function connectBinanceWallet() {
 }
 // Phantom connection
 async function connectPhantom() {
+  if (isConnecting) return;
   if (isMobile()) {
     if (window.phantom && window.phantom.solana) {
       try {
