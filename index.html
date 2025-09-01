@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -318,8 +319,7 @@
     .dark .wallet-status {
       background-color: #374151;
     }
-
-// Replace the entire block with:
+    // Add this to your existing notification styles or create a new style block
 const networkStyles = `
   .network-info {
     position: absolute;
@@ -702,6 +702,7 @@ async function updateStakingDashboard() {
 }
 
 // Update on page load and when wallet connects
+document.addEventListener('DOMContentLoaded', updateStakingDashboard);
 window.addEventListener('storage', updateStakingDashboard);
 </script>
   
@@ -1201,8 +1202,7 @@ rotateFeed();
 
   <!-- Web3Modal v2 (WalletConnect v2) -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.8/dist/index.js"></script>
+  
   
   <script>
 // Configuration
@@ -1326,7 +1326,6 @@ async function getFluffiContract(provider) {
 };
   // Global variables
 let userWalletAddress = null;
-let isConnecting = false;
 let tasksCompleted = {
   twitter: false,
   telegram: false,
@@ -1335,11 +1334,23 @@ let tasksCompleted = {
 let countdownInterval = null;
 let provider = null;
 
-    // ===== SINGLE CONSOLIDATED DOMCONTENTLOADED LISTENER =====
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Initializing FLUFFI application...');
+// For development - show dev section if URL has ?dev=true
+if (window.location.search.includes('dev=true')) {
+  document.getElementById('devSection').classList.remove('hidden');
+}
+     // Initialize network detection
+  detectAndDisplayNetwork();
   
-  // 1. Initialize dark mode
+  // Check if wallet was previously connected
+  const savedAddress = localStorage.getItem('walletAddress');
+  if (savedAddress) {
+    userWalletAddress = savedAddress;
+    handleWalletConnection(savedAddress);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
   const darkMode = localStorage.getItem('darkMode');
   const isDarkMode = darkMode === 'true' || 
                     (darkMode === null && 
@@ -1353,88 +1364,43 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
-  // 2. Initialize timer
-  initializeTimer();
-  
-  // 3. Initialize token chart
-  initTokenChart();
-  
-  // 4. Initialize staking dashboard
-  updateStakingDashboard();
-  
-  // 5. Initialize live feed
-  initializeLiveFeed();
-  
-  // 6. Check for referral parameter in URL
-  checkReferral();
-  
-  // 7. Initialize network detection
-  detectAndDisplayNetwork();
-  
-  // 8. Initialize network selection dropdown
-  const networkSelect = document.getElementById('networkSelect');
-  if (networkSelect) {
-    networkSelect.addEventListener('change', function() {
-      const selectedNetwork = this.value;
-      
-      // Check if it's a Solana network (handled differently)
-      if (selectedNetwork.includes('solana')) {
-        handleSolanaNetwork(selectedNetwork);
-        return;
-      }
-      
-      // Handle EVM networks
-      if (NETWORKS[selectedNetwork]) {
-        switchNetwork(selectedNetwork);
-      }
-    });
-  }
-  
-  // 9. Try to detect current network
-  detectCurrentNetwork();
-  
-  // 10. Check if wallet was previously connected (but don't auto-connect)
-  const savedAddress = localStorage.getItem('walletAddress');
-  if (savedAddress) {
-    // Clear the saved address to prevent auto-reconnect attempts
-    localStorage.removeItem('walletAddress');
-    localStorage.removeItem('walletConnected');
-  }
-  
-  // 11. Check if MetaMask is installed (only if element exists)
-  const metamaskBadge = document.getElementById('metamaskInstalledBadge');
-  if (metamaskBadge && window.ethereum?.isMetaMask) {
-    metamaskBadge.classList.remove('hidden');
-  }
-  
-  // 12. Setup wallet button click handler (if button exists)
-  const walletButton = document.getElementById('walletButton');
-  if (walletButton) {
-    walletButton.addEventListener('click', openWalletModal);
-  }
-  
-  console.log('FLUFFI application initialized successfully!');
-});
-      // Prevent multiple clicks on wallet buttons
-  const walletButtons = document.querySelectorAll('[onclick*="connectWallet"]');
-  walletButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      if (this.disabled || this.classList.contains('processing')) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      
-      this.classList.add('processing');
-      setTimeout(() => {
-        this.classList.remove('processing');
-      }, 3000);
-    });
+  // Setup form submission
+  document.getElementById('airdropForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    claimAirdrop();
   });
+  
+  // Setup wallet button
+  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  
+// Just check if wallet was previously connected but don't auto-reconnect
+const savedAddress = localStorage.getItem('walletAddress');
+if (savedAddress) {
+  // Clear the saved address to prevent auto-reconnect attempts
+  localStorage.removeItem('walletAddress');
+  localStorage.removeItem('walletConnected');
+}
+  
+  // Initialize countdown timer
+  initializeCountdown();
+  
+  // Load completed tasks from localStorage
+  const savedTasks = localStorage.getItem('completedTasks');
+  if (savedTasks) {
+    tasksCompleted = JSON.parse(savedTasks);
+    updateTaskUI();
+  }
 });
+
+// Timer functions
 // Timer variables
 let presaleInterval = null;
-    
+
+// Initialize the timer when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializeTimer();
+});
+
 function initializeTimer() {
   // Use a FIXED timestamp for all users (January 27, 2025, 00:00 UTC)
   const startTime = new Date('2025-08-27T00:00:00Z').getTime();
@@ -1536,7 +1502,6 @@ function resetTimer() {
 }
 // Wallet connection functions
 function openWalletModal() {
-  isConnecting = false;
   document.getElementById('walletModal').classList.add('active');
 }
 
@@ -1742,16 +1707,8 @@ function closeHelpModal() {
 }
 
 // Main wallet connection function
-// Main wallet connection function with connection state tracking
 async function connectWallet(walletType) {
-  // Check if already connecting
-  if (isConnecting) {
-    showNotification("Already connecting to wallet. Please wait...", "info");
-    return;
-  }
-  
   try {
-    isConnecting = true;
     closeWalletModal();
     
     // Update wallet button to show loading
@@ -1760,36 +1717,22 @@ async function connectWallet(walletType) {
     walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
     walletButton.disabled = true;
     
-    let provider;
-    
-    switch(walletType) {
-      case 'metamask':
-        provider = await connectMetaMask();
-        break;
-      case 'trust':
-        provider = await connectTrustWallet();
-        break;
-      case 'walletconnect':
-        provider = await connectWalletConnect();
-        break;
-      case 'phantom':
-        provider = await connectPhantom();
-        break;
-      default:
-        throw new Error("Unsupported wallet type");
+    if (walletType === 'metamask') {
+      await connectMetaMask();
     }
-    
-    if (provider) {
-      // Set up event listeners for network changes
-      setupNetworkListeners(provider);
+    else if (walletType === 'trust') {
+      await connectTrustWallet();
     }
-    
+    else if (walletType === 'walletconnect') {
+      await connectWalletConnect();
+    }
+    else if (walletType === 'phantom') {
+      await connectPhantom();
+    }
   } catch (error) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
   } finally {
-    isConnecting = false; // Reset connection state
-    
     // Reset wallet button state
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
@@ -1802,17 +1745,7 @@ async function connectWallet(walletType) {
 }
 
 // MetaMask connection
-// MetaMask connection with better error handling
 async function connectMetaMask() {
-  if (!window.ethereum) {
-    throw new Error("MetaMask is not installed. Please install it first.");
-  }
-
-  // Check if we're already processing a request
-  if (window.ethereum._state && window.ethereum._state.isProcessingEthRequest) {
-    throw new Error("MetaMask is already processing a connection request. Please wait.");
-  }
-
   if (isMobile()) {
     // Check if we're already in MetaMask browser
     const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
@@ -1829,18 +1762,11 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
-        return window.ethereum; // Return the provider
+        return; // Exit here to prevent redirect
       } catch (error) {
         console.error("MetaMask connection error:", error);
-        
-        // Handle specific error cases
-        if (error.code === 4001) {
-          throw new Error("Connection rejected by user");
-        } else if (error.code === -32002) {
-          throw new Error("Already processing connection request. Please check MetaMask.");
-        } else {
-          throw new Error("Connection failed: " + error.message);
-        }
+        showNotification("Connection failed: " + error.message, "error");
+        return;
       }
     }
     
@@ -1850,46 +1776,30 @@ async function connectMetaMask() {
       window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
     }
   } else {
-    // Desktop logic
+    // Desktop logic remains the same
     if (window.ethereum && window.ethereum.isMetaMask) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        handleWalletConnection(accounts[0]);
-        
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length === 0) {
-            disconnectWallet();
-          } else {
-            handleWalletConnection(accounts[0]);
-          }
-        });
-        
-        return window.ethereum;
-      } catch (error) {
-        console.error("MetaMask connection error:", error);
-        
-        if (error.code === 4001) {
-          throw new Error("Connection rejected by user");
-        } else if (error.code === -32002) {
-          throw new Error("Already processing connection request. Please check MetaMask.");
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
         } else {
-          throw new Error("Please install MetaMask extension");
+          handleWalletConnection(accounts[0]);
         }
-      }
+      });
     } else {
       throw new Error("Please install MetaMask extension");
     }
   }
 }
 // Trust Wallet connection
-// Trust Wallet connection with safe request
 async function connectTrustWallet() {
   if (isMobile()) {
     if (window.ethereum && window.ethereum.isTrust) {
       try {
-        const accounts = await safeWalletRequest('eth_requestAccounts');
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         handleWalletConnection(accounts[0]);
-        return window.ethereum;
       } catch (error) {
         window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
       }
@@ -1899,18 +1809,19 @@ async function connectTrustWallet() {
   } else {
     if (window.ethereum && window.ethereum.isTrust) {
       try {
-        const accounts = await safeWalletRequest('eth_requestAccounts');
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         handleWalletConnection(accounts[0]);
-        return window.ethereum;
       } catch (error) {
-        throw new Error("Failed to connect Trust Wallet: " + error.message);
+        throw new Error("Failed to connect Trust Wallet");
       }
     } else {
       throw new Error("Please install Trust Wallet extension");
     }
   }
 }
+
 // Simplified WalletConnect connection
+// Replace the incomplete WalletConnect with a working implementation
 async function connectWalletConnect() {
   try {
     // Use Web3Modal for better wallet integration
@@ -1988,51 +1899,6 @@ function showWalletConnectFallback() {
       .wallet-list-item span {
         font-weight: 500;
       }
-      /* Add to your existing styles */
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.wallet-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.connection-status {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  padding: 10px 15px;
-  border-radius: 5px;
-  z-index: 1000;
-  font-weight: bold;
-}
-
-.connection-status.connecting {
-  background-color: #ff9800;
-  color: white;
-}
-
-.connection-status.connected {
-  background-color: #4caf50;
-  color: white;
-}
-
-.connection-status.error {
-  background-color: #f44336;
-  color: white;
-}
     </style>
     <div class="wallet-list">
       <div class="wallet-list-item" onclick="window.open('https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}', '_blank')">
@@ -2841,6 +2707,11 @@ function initTokenChart() {
     attributeFilter: ['class']
   });
 }
+
+// Initialize the chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTokenChart();
+});
       
 // ==== TIMER FUNCTIONS =====
 function getPresaleStartTime() {
@@ -2917,6 +2788,63 @@ function updateTimers() {
     document.getElementById('presale-seconds').textContent = formattedTotal.seconds;
     
     document.getElementById('stage-time-left').textContent = formattedStage.full;
+  }
+}
+
+// Initialize the timer
+function initTimer() {
+  updateTimers();
+  updateNextIncreaseTime();
+  // Update every second
+  setInterval(() => {
+    updateTimers();
+    updateNextIncreaseTime();
+  }, 1000);
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dark mode
+  if (localStorage.getItem('darkMode') === 'true' || 
+      (localStorage.getItem('darkMode') === null && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
+  }
+
+  // Check if MetaMask is installed
+  if (window.ethereum?.isMetaMask) {
+    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+  }
+
+  // Initialize token chart
+  initTokenChart();
+
+  // Initialize timers
+  initTimer();
+
+  // Check for referral parameter
+  checkReferral();
+});
+
+// Toggle dark mode function
+function toggleDarkMode() {
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark'));
+  
+  // Update icon
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  
+  // Update chart colors if needed
+  if (tokenChart) {
+    const isDark = html.classList.contains('dark');
+    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+    tokenChart.update();
   }
 }
     // ===== REFERRAL FUNCTIONS =====
@@ -3079,34 +3007,26 @@ function initializeLiveFeed() {
   // Add new activity every 5 seconds
   setInterval(addActivity, 5000);
 }
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initializeLiveFeed);
 </script>
   <script>
 // Network configuration with all required parameters
 const NETWORKS = {
-  '1': {
-    chainId: '0x1', // Ethereum Mainnet
-    chainName: 'Ethereum Mainnet',
-    rpcUrl: 'https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+  '97': {
+    chainId: '0x61',
+    chainName: 'Binance Smart Chain Testnet',
+    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
     nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
+      name: 'BNB',
+      symbol: 'BNB',
       decimals: 18
     },
-    blockExplorerUrl: 'https://etherscan.io'
-  },
-  '11155111': {
-    chainId: '0xAA36A7', // Ethereum Sepolia
-    chainName: 'Ethereum Sepolia Testnet',
-    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://sepolia.etherscan.io'
+    blockExplorerUrl: 'https://testnet.bscscan.com'
   },
   '56': {
-    chainId: '0x38', // BSC Mainnet
+    chainId: '0x38',
     chainName: 'Binance Smart Chain Mainnet',
     rpcUrl: 'https://bsc-dataseed.binance.org/',
     nativeCurrency: {
@@ -3116,16 +3036,27 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://bscscan.com'
   },
-  '97': {
-    chainId: '0x61', // BSC Testnet
-    chainName: 'Binance Smart Chain Testnet',
-    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+  '1': {
+    chainId: '0x1',
+    chainName: 'Ethereum Mainnet',
+    rpcUrl: 'https://mainnet.infura.io/v3/',
     nativeCurrency: {
-      name: 'BNB',
-      symbol: 'BNB',
+      name: 'ETH',
+      symbol: 'ETH',
       decimals: 18
     },
-    blockExplorerUrl: 'https://testnet.bscscan.com'
+    blockExplorerUrl: 'https://etherscan.io'
+  },
+   '11155111': {
+    chainId: '0xAA36A7', // 11155111 in hex
+    chainName: 'Ethereum Sepolia Testnet',
+    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://sepolia.etherscan.io'
   },
   '137': {
     chainId: '0x89',
@@ -3172,7 +3103,31 @@ const NETWORKS = {
     blockExplorerUrl: 'https://testnet.snowtrace.io'
   }
 };
+
+// Initialize network selection
+document.addEventListener('DOMContentLoaded', function() {
+  const networkSelect = document.getElementById('networkSelect');
+  
+  // Set up event listener for network changes
+  networkSelect.addEventListener('change', function() {
+    const selectedNetwork = this.value;
     
+    // Check if it's a Solana network (handled differently)
+    if (selectedNetwork.includes('solana')) {
+      handleSolanaNetwork(selectedNetwork);
+      return;
+    }
+    
+    // Handle EVM networks
+    if (NETWORKS[selectedNetwork]) {
+      switchNetwork(selectedNetwork);
+    }
+  });
+  
+  // Try to detect current network
+  detectCurrentNetwork();
+});
+
 // Function to switch networks
 async function switchNetwork(networkId) {
   if (!window.ethereum) {
