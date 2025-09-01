@@ -1201,7 +1201,8 @@ rotateFeed();
 
   <!-- Web3Modal v2 (WalletConnect v2) -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.8/dist/index.js"></script>
   
   <script>
 // Configuration
@@ -2965,19 +2966,30 @@ function initializeLiveFeed() {
   <script>
 // Network configuration with all required parameters
 const NETWORKS = {
-  '97': {
-    chainId: '0x61',
-    chainName: 'Binance Smart Chain Testnet',
-    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+  '1': {
+    chainId: '0x1', // Ethereum Mainnet
+    chainName: 'Ethereum Mainnet',
+    rpcUrl: 'https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
     nativeCurrency: {
-      name: 'BNB',
-      symbol: 'BNB',
+      name: 'ETH',
+      symbol: 'ETH',
       decimals: 18
     },
-    blockExplorerUrl: 'https://testnet.bscscan.com'
+    blockExplorerUrl: 'https://etherscan.io'
+  },
+  '11155111': {
+    chainId: '0xAA36A7', // Ethereum Sepolia
+    chainName: 'Ethereum Sepolia Testnet',
+    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://sepolia.etherscan.io'
   },
   '56': {
-    chainId: '0x38',
+    chainId: '0x38', // BSC Mainnet
     chainName: 'Binance Smart Chain Mainnet',
     rpcUrl: 'https://bsc-dataseed.binance.org/',
     nativeCurrency: {
@@ -2987,27 +2999,16 @@ const NETWORKS = {
     },
     blockExplorerUrl: 'https://bscscan.com'
   },
-  '1': {
-    chainId: '0x1',
-    chainName: 'Ethereum Mainnet',
-    rpcUrl: 'https://mainnet.infura.io/v3/',
+  '97': {
+    chainId: '0x61', // BSC Testnet
+    chainName: 'Binance Smart Chain Testnet',
+    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
     nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
+      name: 'BNB',
+      symbol: 'BNB',
       decimals: 18
     },
-    blockExplorerUrl: 'https://etherscan.io'
-  },
-   '11155111': {
-    chainId: '0xAA36A7', // 11155111 in hex
-    chainName: 'Ethereum Sepolia Testnet',
-    rpcUrl: 'https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    blockExplorerUrl: 'https://sepolia.etherscan.io'
+    blockExplorerUrl: 'https://testnet.bscscan.com'
   },
   '137': {
     chainId: '0x89',
