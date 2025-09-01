@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -399,13 +400,13 @@ if (!document.getElementById('network-styles')) {
    
 <!-- Replace your current navigation with this -->
 <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold items-center">
-  <a href="Airdrop.html" target="_blank" class="text-white hover:underline">Join Airdrop</a>
+  <a class='text-white hover:underline' href='/airdrop' target='_blank'>Join Airdrop</a>
   <a href="#presale" class="text-white hover:underline">Presale</a>
   <a href="#staking" class="text-white hover:underline">Staking</a>
   <a href="#faq" class="text-white hover:underline">FAQ</a>
-  <a href="referral.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Referral</a>
+  <a class='text-white hover:underline' href='/referral' rel='noopener noreferrer' target='_blank'>Referral</a>
   <a href="Fluffi_Whitepaper_Detailed.pdf" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">Whitepaper</a>
-  <a href="how-to-buy.html" target="_blank" rel="noopener noreferrer" class="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded">
+  <a class='bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded' href='/how-to-buy' rel='noopener noreferrer' target='_blank'>
     How to Buy FLUFFI
   </a>
   <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
@@ -978,7 +979,7 @@ function updateFollowers() {
 }
 updateFollowers();
 </script>
-      
+     
       <!-- Team Section with two new members -->
       <section id="team">
         <h2>Our Team</h2>
@@ -1225,57 +1226,49 @@ const NETWORK_CONFIGS = {
     name: "Ethereum Mainnet",
     currency: "ETH",
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-    explorer: "https://etherscan.io",
-    chainId: '0x1'
+    explorer: "https://etherscan.io"
   },
-  11155111: {
-    name: "Ethereum Sepolia Testnet",
-    currency: "ETH", 
-    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-    explorer: "https://sepolia.etherscan.io",
-    chainId: '0xAA36A7'
+11155111: {  // Sepolia
+    name: "Sepolia Testnet",
+    currency: "ETH",
+    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f", 
+    explorer: "https://sepolia.etherscan.io"
   },
   56: {
     name: "BSC Mainnet",
     currency: "BNB",
     rpcUrl: "https://bsc-dataseed.binance.org/",
-    explorer: "https://bscscan.com",
-    chainId: '0x38'
+    explorer: "https://bscscan.com"
   },
   97: {
     name: "BSC Testnet",
     currency: "BNB",
     rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    explorer: "https://testnet.bscscan.com",
-    chainId: '0x61'
+    explorer: "https://testnet.bscscan.com"
   },
   137: {
     name: "Polygon Mainnet",
     currency: "MATIC",
     rpcUrl: "https://polygon-rpc.com/",
-    explorer: "https://polygonscan.com",
-    chainId: '0x89'
+    explorer: "https://polygonscan.com"
   },
   80001: {
     name: "Mumbai Testnet",
     currency: "MATIC",
     rpcUrl: "https://rpc-mumbai.maticvigil.com/",
-    explorer: "https://mumbai.polygonscan.com",
-    chainId: '0x13881'
+    explorer: "https://mumbai.polygonscan.com"
   },
   43114: {
     name: "Avalanche Mainnet",
     currency: "AVAX",
     rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
-    explorer: "https://snowtrace.io",
-    chainId: '0xA86A'
+    explorer: "https://snowtrace.io"
   },
   43113: {
     name: "Avalanche Testnet",
     currency: "AVAX",
     rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
-    explorer: "https://testnet.snowtrace.io",
-    chainId: '0xA869'
+    explorer: "https://testnet.snowtrace.io"
   }
 };
     
@@ -1289,12 +1282,7 @@ async function getFluffiContract(provider) {
     const contractAddress = CONTRACT_ADDRESSES[chainId];
     
     if (!contractAddress) {
-      // Check if we have a contract for this network
-      if (Object.keys(CONTRACT_ADDRESSES).includes(chainId.toString())) {
-        throw new Error(`Contract not deployed on ${NETWORKS[chainId]?.chainName || 'this network'}`);
-      } else {
-        throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
-      }
+      throw new Error(`Unsupported chain: ${chainId}. Please switch to a supported network.`);
     }
     
     return new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, provider.getSigner());
@@ -1304,9 +1292,9 @@ async function getFluffiContract(provider) {
   }
 }
     
-const WALLETCONNECT_CONFIG = {
+    const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [1, 56, 97, 11155111, 137, 80001, 43114, 43113],  // ← Comma added
+  chains: [56], // BSC Mainnet
   showQrModal: false,
   qrModalOptions: {
     themeMode: 'dark',
@@ -1337,7 +1325,6 @@ const WALLETCONNECT_CONFIG = {
   }
 };
   // Global variables
-let isConnecting = false;
 let userWalletAddress = null;
 let tasksCompleted = {
   twitter: false,
@@ -1360,6 +1347,7 @@ if (window.location.search.includes('dev=true')) {
     userWalletAddress = savedAddress;
     handleWalletConnection(savedAddress);
   }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
@@ -1720,14 +1708,6 @@ function closeHelpModal() {
 
 // Main wallet connection function
 async function connectWallet(walletType) {
-  // Prevent multiple simultaneous connection attempts
-  if (isConnecting) {
-    showNotification("Already connecting to wallet. Please wait...", "info");
-    return;
-  }
-  
-  isConnecting = true;
-  
   try {
     closeWalletModal();
     
@@ -1753,8 +1733,7 @@ async function connectWallet(walletType) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
   } finally {
-    // Reset connection lock and wallet button state
-    isConnecting = false;
+    // Reset wallet button state
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
       if (walletButton && !userWalletAddress) {
@@ -1767,39 +1746,12 @@ async function connectWallet(walletType) {
 
 // MetaMask connection
 async function connectMetaMask() {
-  try {
-    if (isMobile()) {
-      // Check if we're already in MetaMask browser
-      const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
-      
-      if (isMetaMaskBrowser) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          handleWalletConnection(accounts[0]);
-          
-          window.ethereum.on('accountsChanged', (accounts) => {
-            if (accounts.length === 0) {
-              disconnectWallet();
-            } else {
-              handleWalletConnection(accounts[0]);
-            }
-          });
-          return; // Exit here to prevent redirect
-        } catch (error) {
-          console.error("MetaMask connection error:", error);
-          showNotification("Connection failed: " + error.message, "error");
-          return;
-        }
-      }
-      
-      // Only redirect if not in MetaMask browser
-      const currentUrl = window.location.href;
-      if (!currentUrl.includes('metamask')) {
-        window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-      }
-    } else {
-      // Desktop logic remains the same
-      if (window.ethereum && window.ethereum.isMetaMask) {
+  if (isMobile()) {
+    // Check if we're already in MetaMask browser
+    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
+    
+    if (isMetaMaskBrowser) {
+      try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         handleWalletConnection(accounts[0]);
         
@@ -1810,12 +1762,35 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
-      } else {
-        throw new Error("Please install MetaMask extension");
+        return; // Exit here to prevent redirect
+      } catch (error) {
+        console.error("MetaMask connection error:", error);
+        showNotification("Connection failed: " + error.message, "error");
+        return;
       }
     }
-  } catch (error) {
-    throw error;
+    
+    // Only redirect if not in MetaMask browser
+    const currentUrl = window.location.href;
+    if (!currentUrl.includes('metamask')) {
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+    }
+  } else {
+    // Desktop logic remains the same
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          handleWalletConnection(accounts[0]);
+        }
+      });
+    } else {
+      throw new Error("Please install MetaMask extension");
+    }
   }
 }
 // Trust Wallet connection
@@ -2117,11 +2092,11 @@ async function detectAndDisplayNetwork() {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const network = await provider.getNetwork();
-    const networkConfig = NETWORKS[network.chainId]; // Use NETWORKS instead of NETWORK_CONFIGS
+    const networkConfig = NETWORK_CONFIGS[network.chainId];
     
     // Update network select dropdown
     const networkSelect = document.getElementById('networkSelect');
-    if (networkSelect && networkConfig) {
+    if (networkSelect) {
       networkSelect.value = network.chainId;
     }
     
@@ -2131,7 +2106,9 @@ async function detectAndDisplayNetwork() {
       networkInfoEl = document.createElement('div');
       networkInfoEl.id = 'networkInfo';
       networkInfoEl.className = 'network-info';
-      document.body.appendChild(networkInfoEl);
+      // Add it to a specific container instead of document.body
+      const container = document.getElementById('headerContainer') || document.body;
+      container.appendChild(networkInfoEl);
     }
     
     if (networkConfig) {
@@ -3135,35 +3112,31 @@ document.addEventListener('DOMContentLoaded', function() {
   networkSelect.addEventListener('change', function() {
     const selectedNetwork = this.value;
     
-    // Handle Solana networks differently
+    // Check if it's a Solana network (handled differently)
     if (selectedNetwork.includes('solana')) {
       handleSolanaNetwork(selectedNetwork);
       return;
     }
     
-    // Handle EVM networks - ensure it's a number
-    const numericNetworkId = parseInt(selectedNetwork);
-    if (NETWORKS[numericNetworkId]) {
-      switchNetwork(numericNetworkId);
+    // Handle EVM networks
+    if (NETWORKS[selectedNetwork]) {
+      switchNetwork(selectedNetwork);
     }
   });
   
   // Try to detect current network
   detectCurrentNetwork();
 });
-  
+
+// Function to switch networks
+async function switchNetwork(networkId) {
   if (!window.ethereum) {
     showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
     return;
   }
   
   try {
-    const networkConfig = NETWORKS[numericNetworkId];
-    
-    if (!networkConfig) {
-      showNotification('Unsupported network', 'error');
-      return;
-    }
+    const networkConfig = NETWORKS[networkId];
     
     try {
       // Try to switch to the network
@@ -3172,8 +3145,8 @@ document.addEventListener('DOMContentLoaded', function() {
         params: [{ chainId: networkConfig.chainId }],
       });
       
-      showNotification(`Switched to ${networkConfig.name}`, 'success');
-      updateUIForNetwork(numericNetworkId);
+      showNotification(`Switched to ${networkConfig.chainName}`, 'success');
+      updateUIForNetwork(networkId);
     } catch (switchError) {
       // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
@@ -3182,15 +3155,15 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: networkConfig.chainId,
-              chainName: networkConfig.name,
+              chainName: networkConfig.chainName,
               rpcUrls: [networkConfig.rpcUrl],
               nativeCurrency: networkConfig.nativeCurrency,
-              blockExplorerUrls: [networkConfig.explorer]
+              blockExplorerUrls: [networkConfig.blockExplorerUrl]
             }]
           });
           
-          showNotification(`${networkConfig.name} added successfully`, 'success');
-          updateUIForNetwork(numericNetworkId);
+          showNotification(`${networkConfig.chainName} added successfully`, 'success');
+          updateUIForNetwork(networkId);
         } catch (addError) {
           console.error('Error adding network:', addError);
           showNotification('Failed to add network. Please add it manually in your wallet.', 'error');
@@ -3205,7 +3178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     showNotification('Error switching network: ' + error.message, 'error');
   }
 }
-    
+
 // Function to handle Solana networks (placeholder - would need Phantom wallet integration)
 function handleSolanaNetwork(network) {
   showNotification('Solana network selected. This would require Phantom wallet integration.', 'info');
@@ -3261,22 +3234,21 @@ async function detectCurrentNetwork() {
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
     const decimalChainId = parseInt(chainId, 16);
     
-    // Update the network select dropdown
-    const networkSelect = document.getElementById('networkSelect');
-    if (networkSelect) {
-      // Check if this chain ID exists in our supported networks
-      if (NETWORKS[decimalChainId]) {
-        networkSelect.value = decimalChainId;
-      } else if (chainId === '0xaa36a7') { // Handle Sepolia's hex format
-        networkSelect.value = '11155111';
+    // Find matching network
+    for (const [id, config] of Object.entries(NETWORKS)) {
+      if (config.chainId === chainId) {
+        updateUIForNetwork(id);
+        return;
       }
     }
     
-    // ... rest of your detection logic
+    // If we didn't find a match, show the raw chainId
+    updateUIForNetwork('custom', `Unknown (${chainId})`);
   } catch (error) {
     console.error('Error detecting network:', error);
   }
 }
+
 // Listen for network changes if MetaMask is available
 if (window.ethereum) {
   window.ethereum.on('chainChanged', (chainId) => {
