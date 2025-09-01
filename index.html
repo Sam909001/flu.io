@@ -1726,7 +1726,13 @@ function closeHelpModal() {
 
 // Main wallet connection function
 async function connectWallet(walletType) {
+  if (isConnecting) {
+    console.log("Connection already in progress");
+    return;
+  }
+  
   try {
+    isConnecting = true;
     closeWalletModal();
     
     // Update wallet button to show loading
@@ -1751,6 +1757,7 @@ async function connectWallet(walletType) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
   } finally {
+    isConnecting = false;
     // Reset wallet button state
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
