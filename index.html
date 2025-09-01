@@ -1337,6 +1337,7 @@ const WALLETCONNECT_CONFIG = {
   }
 };
   // Global variables
+let isConnecting = false;
 let userWalletAddress = null;
 let tasksCompleted = {
   twitter: false,
@@ -1719,6 +1720,14 @@ function closeHelpModal() {
 
 // Main wallet connection function
 async function connectWallet(walletType) {
+  // Prevent multiple simultaneous connection attempts
+  if (isConnecting) {
+    showNotification("Already connecting to wallet. Please wait...", "info");
+    return;
+  }
+  
+  isConnecting = true;
+  
   try {
     closeWalletModal();
     
@@ -1744,7 +1753,8 @@ async function connectWallet(walletType) {
     console.error("Wallet connection error:", error);
     showNotification("Failed to connect wallet: " + error.message, "error");
   } finally {
-    // Reset wallet button state
+    // Reset connection lock and wallet button state
+    isConnecting = false;
     setTimeout(() => {
       const walletButton = document.getElementById('walletButton');
       if (walletButton && !userWalletAddress) {
@@ -1757,12 +1767,39 @@ async function connectWallet(walletType) {
 
 // MetaMask connection
 async function connectMetaMask() {
-  if (isMobile()) {
-    // Check if we're already in MetaMask browser
-    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
-    
-    if (isMetaMaskBrowser) {
-      try {
+  try {
+    if (isMobile()) {
+      // Check if we're already in MetaMask browser
+      const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
+      
+      if (isMetaMaskBrowser) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          handleWalletConnection(accounts[0]);
+          
+          window.ethereum.on('accountsChanged', (accounts) => {
+            if (accounts.length === 0) {
+              disconnectWallet();
+            } else {
+              handleWalletConnection(accounts[0]);
+            }
+          });
+          return; // Exit here to prevent redirect
+        } catch (error) {
+          console.error("MetaMask connection error:", error);
+          showNotification("Connection failed: " + error.message, "error");
+          return;
+        }
+      }
+      
+      // Only redirect if not in MetaMask browser
+      const currentUrl = window.location.href;
+      if (!currentUrl.includes('metamask')) {
+        window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+      }
+    } else {
+      // Desktop logic remains the same
+      if (window.ethereum && window.ethereum.isMetaMask) {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         handleWalletConnection(accounts[0]);
         
@@ -1773,35 +1810,12 @@ async function connectMetaMask() {
             handleWalletConnection(accounts[0]);
           }
         });
-        return; // Exit here to prevent redirect
-      } catch (error) {
-        console.error("MetaMask connection error:", error);
-        showNotification("Connection failed: " + error.message, "error");
-        return;
+      } else {
+        throw new Error("Please install MetaMask extension");
       }
     }
-    
-    // Only redirect if not in MetaMask browser
-    const currentUrl = window.location.href;
-    if (!currentUrl.includes('metamask')) {
-      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-    }
-  } else {
-    // Desktop logic remains the same
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      handleWalletConnection(accounts[0]);
-      
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          handleWalletConnection(accounts[0]);
-        }
-      });
-    } else {
-      throw new Error("Please install MetaMask extension");
-    }
+  } catch (error) {
+    throw error;
   }
 }
 // Trust Wallet connection
@@ -3120,17 +3134,23 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up event listener for network changes
   networkSelect.addEventListener('change', function() {
     const selectedNetwork = this.value;
+    
+    // Handle Solana networks differently
+    if (selectedNetwork.includes('solana')) {
+      handleSolanaNetwork(selectedNetwork);
+      return;
+    }
+    
+    // Handle EVM networks - ensure it's a number
+    const numericNetworkId = parseInt(selectedNetwork);
+    if (NETWORKS[numericNetworkId]) {
+      switchNetwork(numericNetworkId);
+    }
+  });
   
-  // Handle Solana networks differently
-  if (selectedNetwork.includes('solana')) {
-    handleSolanaNetwork(selectedNetwork);
-    return;
-  }
-  
-  // Handle EVM networks - ensure it's a number
- async function switchNetwork(networkId) {
-  // Convert string to number if needed
-  const numericNetworkId = typeof networkId === 'string' ? parseInt(networkId) : networkId;
+  // Try to detect current network
+  detectCurrentNetwork();
+});
   
   if (!window.ethereum) {
     showNotification('Please install a Web3 wallet like MetaMask to switch networks', 'error');
