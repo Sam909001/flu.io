@@ -184,14 +184,19 @@ function resetTimer() {
 
       <div class="flex gap-2 mb-4">
         <input type="number" placeholder="Amount in BNB" id="amountInput" class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Amount to purchase">
-        <select id="currencySelect" class="p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Currency selection">
-  <option value="BNB">BNB</option>
-  <option value="SOL">SOL</option>
-  <option value="AVAX">AVAX</option>
-  <option value="MATIC">MATIC</option>
-  <option value="USDC">USDC</option>
-  <option value="USD">USD (Card)</option>
-</select>
+        <!-- Network Selection - Added BSC Testnet -->
+      <select id="networkSelect" class="p-2 border rounded-lg text-black dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Network selection">
+        <option value="56">BSC Mainnet</option>
+        <option value="97">BSC Testnet</option>
+        <option value="1">Ethereum Mainnet</option>
+        <option value="5">Ethereum goerli</option>
+        <option value="137">Polygon Mainnet</option>
+        <option value="80001">Polygon Mumbai</option>
+        <option value="43114">Avalanche Mainnet</option>
+        <option value="43113">Avalanche Fuji</option>
+        <option value="solana-mainnet">Solana Mainnet</option>
+        <option value="solana-devnet">Solana Devnet</option>
+      </select>
       </div>
       <input type="text" placeholder="Referral wallet (optional)" id="refInput" class="w-full p-3 border rounded-lg mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Referral wallet address">
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
