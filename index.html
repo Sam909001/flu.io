@@ -1803,20 +1803,106 @@ async function recordPurchase(txHash, amount, tokens) {
   if (!response.ok) throw new Error('Failed to record purchase');
 }
 
-// Network switch to BSC Testnet
+// Network switch function with all supported chains
 async function switchToNetwork(chainName = 'BSC') {
   if (!window.ethereum) return;
   
   const networks = {
-    'BSC': { chainId: '0x38', rpcUrl: 'https://bsc-dataseed.binance.org/', name: 'BSC Mainnet' },
-    'BSC_TEST': { chainId: '0x61', rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', name: 'BSC Testnet' },
-    'ETH': { chainId: '0x1', rpcUrl: 'https://mainnet.infura.io/v3/', name: 'Ethereum' },
-    'POLYGON': { chainId: '0x89', rpcUrl: 'https://polygon-rpc.com/', name: 'Polygon' },
-    'AVAX': { chainId: '0xa86a', rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', name: 'Avalanche' }
+    'BSC': { 
+      chainId: '0x38', 
+      rpcUrl: 'https://bsc-dataseed.binance.org/', 
+      name: 'Binance Smart Chain Mainnet',
+      nativeCurrency: {
+        name: 'BNB',
+        symbol: 'BNB',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://bscscan.com'
+    },
+    'BSC_TEST': { 
+      chainId: '0x61', 
+      rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', 
+      name: 'Binance Smart Chain Testnet',
+      nativeCurrency: {
+        name: 'BNB',
+        symbol: 'BNB',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://testnet.bscscan.com'
+    },
+    'ETH': { 
+      chainId: '0x1', 
+      rpcUrl: 'https://mainnet.infura.io/v3/', 
+      name: 'Ethereum Mainnet',
+      nativeCurrency: {
+        name: 'ETH',
+        symbol: 'ETH',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://etherscan.io'
+    },
+    'ETH_GOERLI': { 
+      chainId: '0x5', 
+      rpcUrl: 'https://goerli.infura.io/v3/', 
+      name: 'Ethereum Goerli Testnet',
+      nativeCurrency: {
+        name: 'ETH',
+        symbol: 'ETH',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://goerli.etherscan.io'
+    },
+    'POLYGON': { 
+      chainId: '0x89', 
+      rpcUrl: 'https://polygon-rpc.com/', 
+      name: 'Polygon Mainnet',
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://polygonscan.com'
+    },
+    'POLYGON_MUMBAI': { 
+      chainId: '0x13881', 
+      rpcUrl: 'https://matic-mumbai.chainstacklabs.com', 
+      name: 'Polygon Mumbai Testnet',
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://mumbai.polygonscan.com'
+    },
+    'AVAX': { 
+      chainId: '0xA86A', 
+      rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', 
+      name: 'Avalanche Mainnet',
+      nativeCurrency: {
+        name: 'AVAX',
+        symbol: 'AVAX',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://snowtrace.io'
+    },
+    'AVAX_FUJI': { 
+      chainId: '0xA869', 
+      rpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc', 
+      name: 'Avalanche Fuji Testnet',
+      nativeCurrency: {
+        name: 'AVAX',
+        symbol: 'AVAX',
+        decimals: 18
+      },
+      blockExplorerUrl: 'https://testnet.snowtrace.io'
+    }
   };
   
   const network = networks[chainName];
-  if (!network) return;
+  if (!network) {
+    console.error('Network not supported:', chainName);
+    return;
+  }
   
   try {
     await window.ethereum.request({
@@ -1825,32 +1911,85 @@ async function switchToNetwork(chainName = 'BSC') {
     });
   } catch (error) {
     if (error.code === 4902) {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: network.chainId,
-          chainName: network.name,
-          rpcUrls: [network.rpcUrl],
-        }]
-      });
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: network.chainId,
+            chainName: network.name,
+            rpcUrls: [network.rpcUrl],
+            nativeCurrency: network.nativeCurrency,
+            blockExplorerUrls: [network.blockExplorerUrl]
+          }]
+        });
+      } catch (addError) {
+        console.error('Error adding network:', addError);
+        throw new Error(`Failed to add ${network.name} to wallet`);
+      }
+    } else {
+      console.error('Error switching network:', error);
+      throw new Error(`Failed to switch to ${network.name}`);
     }
   }
 }
 
-// Validate contract deployment & network
-async function validateContracts() {
+// Enhanced contract validation that supports multiple networks
+async function validateContracts(networkId = 97) {
+  let rpcUrl;
+  
+  // Set the appropriate RPC URL based on network
+  switch (parseInt(networkId)) {
+    case 1: // Ethereum Mainnet
+      rpcUrl = "https://mainnet.infura.io/v3/";
+      break;
+    case 5: // Ethereum Goerli
+      rpcUrl = "https://goerli.infura.io/v3/";
+      break;
+    case 56: // BSC Mainnet
+      rpcUrl = "https://bsc-dataseed.binance.org/";
+      break;
+    case 97: // BSC Testnet
+      rpcUrl = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+      break;
+    case 137: // Polygon Mainnet
+      rpcUrl = "https://polygon-rpc.com/";
+      break;
+    case 80001: // Polygon Mumbai
+      rpcUrl = "https://matic-mumbai.chainstacklabs.com";
+      break;
+    case 43114: // Avalanche Mainnet
+      rpcUrl = "https://api.avax.network/ext/bc/C/rpc";
+      break;
+    case 43113: // Avalanche Fuji
+      rpcUrl = "https://api.avax-test.network/ext/bc/C/rpc";
+      break;
+    default:
+      throw new Error("Unsupported network");
+  }
+  
   // Use ethers v5 syntax
-  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+
+  // Get the correct contract address for the network
+  const contractAddress = CONTRACT_ADDRESSES[networkId];
+  if (!contractAddress || contractAddress === "0x...") {
+    throw new Error(`Contract not deployed on network ${networkId}`);
+  }
 
   // Check if contract is deployed
-  const presaleCode = await provider.getCode(FLUFFI_CONTRACT_ADDRESS);
-  if (presaleCode === "0x") throw new Error("Presale contract not deployed");
+  const presaleCode = await provider.getCode(contractAddress);
+  if (presaleCode === "0x") {
+    throw new Error("Presale contract not deployed on this network");
+  }
 
   // Verify network
   const network = await provider.getNetwork();
-  if (network.chainId !== 97) throw new Error("Please switch to BSC Testnet");
+  if (network.chainId !== parseInt(networkId)) {
+    throw new Error(`Please switch to network ID: ${networkId}`);
+  }
 
   console.log("Contract validation passed ✅");
+  return true;
 }
 // ===== BUY FUNCTION =====
 async function buyFluffi() {
