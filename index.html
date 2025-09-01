@@ -1934,59 +1934,23 @@ async function switchToNetwork(chainName = 'BSC') {
   }
 }
 
-// Enhanced contract validation that supports multiple networks
-async function validateContracts(networkId = 97) {
-  let rpcUrl;
-  
-  // Set the appropriate RPC URL based on network
-  switch (parseInt(networkId)) {
-    case 1: // Ethereum Mainnet
-      rpcUrl = "https://mainnet.infura.io/v3/";
-      break;
-    case 5: // Ethereum Goerli
-      rpcUrl = "https://goerli.infura.io/v3/";
-      break;
-    case 56: // BSC Mainnet
-      rpcUrl = "https://bsc-dataseed.binance.org/";
-      break;
-    case 97: // BSC Testnet
-      rpcUrl = "https://data-seed-prebsc-1-s1.binance.org:8545/";
-      break;
-    case 137: // Polygon Mainnet
-      rpcUrl = "https://polygon-rpc.com/";
-      break;
-    case 80001: // Polygon Mumbai
-      rpcUrl = "https://matic-mumbai.chainstacklabs.com";
-      break;
-    case 43114: // Avalanche Mainnet
-      rpcUrl = "https://api.avax.network/ext/bc/C/rpc";
-      break;
-    case 43113: // Avalanche Fuji
-      rpcUrl = "https://api.avax-test.network/ext/bc/C/rpc";
-      break;
-    default:
-      throw new Error("Unsupported network");
-  }
-  
-  // Use ethers v5 syntax
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+// Enhanced contract validation (works for any supported network)
+async function validateContracts() {
+  if (!window.ethereum) throw new Error("No wallet found");
 
-  // Get the correct contract address for the network
-  const contractAddress = CONTRACT_ADDRESSES[networkId];
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const { chainId } = await provider.getNetwork();
+
+  // Get the correct contract address for the active chain
+  const contractAddress = CONTRACT_ADDRESSES[chainId];
   if (!contractAddress || contractAddress === "0x...") {
-    throw new Error(`Contract not deployed on network ${networkId}`);
+    throw new Error(`Contract not deployed on this network (Chain ID: ${chainId})`);
   }
 
   // Check if contract is deployed
   const presaleCode = await provider.getCode(contractAddress);
   if (presaleCode === "0x") {
     throw new Error("Presale contract not deployed on this network");
-  }
-
-  // Verify network
-  const network = await provider.getNetwork();
-  if (network.chainId !== parseInt(networkId)) {
-    throw new Error(`Please switch to network ID: ${networkId}`);
   }
 
   console.log("Contract validation passed ✅");
@@ -2022,14 +1986,22 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Ensure user is on the correct network
-    const networkSelect = document.getElementById('networkSelect');
-    const selectedNetwork = networkSelect.value;
-    
-    // For now, we'll focus on BSC Testnet (97)
-    if (selectedNetwork !== '97') {
-      await switchToNetwork('BSC_TEST');
-    }
+   // 3️⃣ Ensure user is on the selected network (EVM only)
+const networkSelect = document.getElementById('networkSelect');
+const selectedNetwork = networkSelect.value;
+
+if (!NETWORKS[selectedNetwork]) {
+  throw new Error('Please pick a supported EVM network.');
+}
+
+const current = await provider.getNetwork();
+const currentId = String(current.chainId);
+const wantedId = String(parseInt(selectedNetwork, 10));
+
+if (currentId !== wantedId) {
+  await switchNetwork(selectedNetwork);          // use the newer generic switcher
+  await provider.send('eth_requestAccounts', []); // refresh provider context
+}
     
     // 4️⃣ Currency conversion
     const conversionRates = {
