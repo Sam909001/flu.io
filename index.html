@@ -2811,24 +2811,6 @@ function initTimer() {
     updateNextIncreaseTime();
   }, 1000);
 }
-
-// Toggle dark mode function
-function toggleDarkMode() {
-  const html = document.documentElement;
-  html.classList.toggle('dark');
-  localStorage.setItem('darkMode', html.classList.contains('dark'));
-  
-  // Update icon
-  const darkModeIcon = document.getElementById('darkModeIcon');
-  darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
-  
-  // Update chart colors if needed
-  if (tokenChart) {
-    const isDark = html.classList.contains('dark');
-    tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
-    tokenChart.update();
-  }
-}
     // ===== REFERRAL FUNCTIONS =====
     function checkReferral() {
       const urlParams = new URLSearchParams(window.location.search);
