@@ -530,6 +530,17 @@ window.addEventListener('storage', updateStakingDashboard);
   animation: sway 2s infinite ease-in-out;
   display: inline-block;
 }
+  .network-indicator {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: #10B981;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  z-index: 1000;
+}
 </style>
 
 <!-- Trust Section with Live Counters & Full Dark/Light Fix -->
@@ -1871,10 +1882,15 @@ async function buyFluffi() {
   buyBtn.disabled = true;
 
   try {
-    // 3️⃣ Ensure user is on Testnet
-    await switchToNetwork('BSC_TEST');
-    await validateContracts();
-
+    // 3️⃣ Ensure user is on the correct network
+    const networkSelect = document.getElementById('networkSelect');
+    const selectedNetwork = networkSelect.value;
+    
+    // For now, we'll focus on BSC Testnet (97)
+    if (selectedNetwork !== '97') {
+      await switchToNetwork('BSC_TEST');
+    }
+    
     // 4️⃣ Currency conversion
     const conversionRates = {
       'BNB': 1,
@@ -1897,25 +1913,35 @@ async function buyFluffi() {
       referralAddress = ref;
     }
 
-   // 6️⃣ Initialize provider & contract (ethers v5)
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const contract = new ethers.Contract(FLUFFI_CONTRACT_ADDRESS, FLUFFI_CONTRACT_ABI, signer);
+    // 6️⃣ Initialize provider & contract
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    
+    // Get the correct contract address for the current network
+    const network = await provider.getNetwork();
+    const contractAddress = CONTRACT_ADDRESSES[network.chainId];
+    
+    if (!contractAddress || contractAddress === "0x...") {
+      throw new Error(`Contract not deployed on this network (Chain ID: ${network.chainId})`);
+    }
+    
+    const contract = new ethers.Contract(contractAddress, FLUFFI_CONTRACT_ABI, signer);
 
     // 7️⃣ Estimate gas & send transaction
-const gasEstimate = await contract.estimateGas.contribute(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue)
-});
+    const gasEstimate = await contract.estimateGas.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue)
+    });
 
-const tx = await contract.contribute(referralAddress, {
-  value: ethers.utils.parseEther(bnbValue),
-  gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
-});
+    const tx = await contract.buyTokens(referralAddress, {
+      value: ethers.utils.parseEther(bnbValue),
+      gasLimit: gasEstimate.mul(120).div(100) // 20% buffer
+    });
+    
     await tx.wait();
 
-    // 8️⃣ Record purchase on backend
+    // 8️⃣ Record purchase on backend (simulated for now)
     const tokensBought = bnbValue * 10000000; // Example token rate
-    await recordPurchase(tx.hash, Number(amount), tokensBought);
+    // await recordPurchase(tx.hash, Number(amount), tokensBought);
 
     // 9️⃣ Update UI
     const tokensSold = document.getElementById('tokensSold');
@@ -1924,7 +1950,7 @@ const tx = await contract.contribute(referralAddress, {
 
     showNotification(`🎉 Purchase successful! You bought ${tokensBought.toLocaleString()} FLUFFI`, 'success');
 
-    await updateUserBalances();
+    // await updateUserBalances();
 
     buyBtn.textContent = prevText;
     buyBtn.disabled = false;
