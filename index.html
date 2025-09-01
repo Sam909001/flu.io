@@ -1225,54 +1225,57 @@ const NETWORK_CONFIGS = {
     name: "Ethereum Mainnet",
     currency: "ETH",
     rpcUrl: "https://mainnet.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
-    explorer: "https://etherscan.io"
+    explorer: "https://etherscan.io",
+    chainId: '0x1'
   },
-'11155111': {
-  chainId: '0xAA36A7', // 11155111 in hex (correct format)
-  chainName: 'Ethereum Sepolia Testnet',
-  rpcUrl: 'https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID',
-  nativeCurrency: {
-    name: 'ETH',
-    symbol: 'ETH',
-    decimals: 18
+  11155111: {
+    name: "Ethereum Sepolia Testnet",
+    currency: "ETH", 
+    rpcUrl: "https://sepolia.infura.io/v3/f09a42b35c814e08ad7e92837f8db27f",
+    explorer: "https://sepolia.etherscan.io",
+    chainId: '0xAA36A7'
   },
-  blockExplorerUrl: 'https://sepolia.etherscan.io'
-}
   56: {
     name: "BSC Mainnet",
     currency: "BNB",
     rpcUrl: "https://bsc-dataseed.binance.org/",
-    explorer: "https://bscscan.com"
+    explorer: "https://bscscan.com",
+    chainId: '0x38'
   },
   97: {
     name: "BSC Testnet",
     currency: "BNB",
     rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    explorer: "https://testnet.bscscan.com"
+    explorer: "https://testnet.bscscan.com",
+    chainId: '0x61'
   },
   137: {
     name: "Polygon Mainnet",
     currency: "MATIC",
     rpcUrl: "https://polygon-rpc.com/",
-    explorer: "https://polygonscan.com"
+    explorer: "https://polygonscan.com",
+    chainId: '0x89'
   },
   80001: {
     name: "Mumbai Testnet",
     currency: "MATIC",
     rpcUrl: "https://rpc-mumbai.maticvigil.com/",
-    explorer: "https://mumbai.polygonscan.com"
+    explorer: "https://mumbai.polygonscan.com",
+    chainId: '0x13881'
   },
   43114: {
     name: "Avalanche Mainnet",
     currency: "AVAX",
     rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
-    explorer: "https://snowtrace.io"
+    explorer: "https://snowtrace.io",
+    chainId: '0xA86A'
   },
   43113: {
     name: "Avalanche Testnet",
     currency: "AVAX",
     rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
-    explorer: "https://testnet.snowtrace.io"
+    explorer: "https://testnet.snowtrace.io",
+    chainId: '0xA869'
   }
 };
     
@@ -1301,9 +1304,9 @@ async function getFluffiContract(provider) {
   }
 }
     
-    const WALLETCONNECT_CONFIG = {
+const WALLETCONNECT_CONFIG = {
   projectId: 'b74a733c47def7b6672eb9ad072c4e8a',
-  chains: [1, 56, 97, 11155111, 137, 80001, 43114, 43113]
+  chains: [1, 56, 97, 11155111, 137, 80001, 43114, 43113],  // ← Comma added
   showQrModal: false,
   qrModalOptions: {
     themeMode: 'dark',
@@ -1356,7 +1359,6 @@ if (window.location.search.includes('dev=true')) {
     userWalletAddress = savedAddress;
     handleWalletConnection(savedAddress);
   }
-});
 
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize dark mode
@@ -2101,11 +2103,11 @@ async function detectAndDisplayNetwork() {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const network = await provider.getNetwork();
-    const networkConfig = NETWORK_CONFIGS[network.chainId];
+    const networkConfig = NETWORKS[network.chainId]; // Use NETWORKS instead of NETWORK_CONFIGS
     
     // Update network select dropdown
     const networkSelect = document.getElementById('networkSelect');
-    if (networkSelect) {
+    if (networkSelect && networkConfig) {
       networkSelect.value = network.chainId;
     }
     
@@ -2115,9 +2117,7 @@ async function detectAndDisplayNetwork() {
       networkInfoEl = document.createElement('div');
       networkInfoEl.id = 'networkInfo';
       networkInfoEl.className = 'network-info';
-      // Add it to a specific container instead of document.body
-      const container = document.getElementById('headerContainer') || document.body;
-      container.appendChild(networkInfoEl);
+      document.body.appendChild(networkInfoEl);
     }
     
     if (networkConfig) {
@@ -3120,9 +3120,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up event listener for network changes
   networkSelect.addEventListener('change', function() {
     const selectedNetwork = this.value;
-    
- networkSelect.addEventListener('change', function() {
-  const selectedNetwork = this.value;
   
   // Handle Solana networks differently
   if (selectedNetwork.includes('solana')) {
@@ -3131,18 +3128,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Handle EVM networks - ensure it's a number
-  const numericNetworkId = parseInt(selectedNetwork);
-  if (NETWORKS[numericNetworkId]) {
-    switchNetwork(numericNetworkId);
-  }
-});
-  
-  // Try to detect current network
-  detectCurrentNetwork();
-});
-
-// Function to switch networks
-async function switchNetwork(networkId) {
+ async function switchNetwork(networkId) {
   // Convert string to number if needed
   const numericNetworkId = typeof networkId === 'string' ? parseInt(networkId) : networkId;
   
@@ -3158,9 +3144,6 @@ async function switchNetwork(networkId) {
       showNotification('Unsupported network', 'error');
       return;
     }
-  
-  try {
-    const networkConfig = NETWORKS[networkId];
     
     try {
       // Try to switch to the network
@@ -3169,8 +3152,8 @@ async function switchNetwork(networkId) {
         params: [{ chainId: networkConfig.chainId }],
       });
       
-      showNotification(`Switched to ${networkConfig.chainName}`, 'success');
-      updateUIForNetwork(networkId);
+      showNotification(`Switched to ${networkConfig.name}`, 'success');
+      updateUIForNetwork(numericNetworkId);
     } catch (switchError) {
       // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
@@ -3179,15 +3162,15 @@ async function switchNetwork(networkId) {
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: networkConfig.chainId,
-              chainName: networkConfig.chainName,
+              chainName: networkConfig.name,
               rpcUrls: [networkConfig.rpcUrl],
               nativeCurrency: networkConfig.nativeCurrency,
-              blockExplorerUrls: [networkConfig.blockExplorerUrl]
+              blockExplorerUrls: [networkConfig.explorer]
             }]
           });
           
-          showNotification(`${networkConfig.chainName} added successfully`, 'success');
-          updateUIForNetwork(networkId);
+          showNotification(`${networkConfig.name} added successfully`, 'success');
+          updateUIForNetwork(numericNetworkId);
         } catch (addError) {
           console.error('Error adding network:', addError);
           showNotification('Failed to add network. Please add it manually in your wallet.', 'error');
@@ -3202,7 +3185,7 @@ async function switchNetwork(networkId) {
     showNotification('Error switching network: ' + error.message, 'error');
   }
 }
-
+    
 // Function to handle Solana networks (placeholder - would need Phantom wallet integration)
 function handleSolanaNetwork(network) {
   showNotification('Solana network selected. This would require Phantom wallet integration.', 'info');
