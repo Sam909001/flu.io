@@ -827,6 +827,43 @@
     .dark .subtitle-text {
   color: #d1d5db !important;
 }
+
+    /* Rate limit message styling */
+    .rate-limit-message {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dark .rate-limit-message {
+      background-color: #7f1d1d;
+      border-color: #ef4444;
+      color: #fecaca;
+    }
+    
+    .already-claimed {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #16a34a;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dark .already-claimed {
+      background-color: #14532d;
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
   </style>
 </head>
 
@@ -1056,6 +1093,10 @@
           <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center transition-colors duration-300">
             Claim Airdrop
           </button>
+          
+          <!-- Rate limit message container -->
+          <div id="rateLimitMessage" class="hidden"></div>
+          
 <p class="mt-3 text-sm text-red-600 dark:text-red-400 font-medium text-center max-w-md mx-auto transition-colors duration-300">
   🚨 Please make sure you have Followed on Twitter, Retweeted the pinned post, and Joined our Telegram group. Manual verification will be conducted before airdrop distribution.
 </p>
@@ -1082,6 +1123,9 @@
         <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Set Timer to 1 Hour
         </button>
+        <button onclick="clearRateLimit()" class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded transition-colors duration-300">
+          Clear Rate Limit
+        </button>
       </div>
     </div>
   </main>
@@ -1091,7 +1135,7 @@
     <div class="flex gap-4 justify-center md:justify-end">
       <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75 transition-opacity duration-300">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.150-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.020.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.150-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
         </svg>
       </a>
       <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75 transition-opacity duration-300">
@@ -1205,6 +1249,9 @@
       // Check if wallet is already connected
       if (localStorage.getItem('walletConnected') === 'true' && localStorage.getItem('walletAddress')) {
         handleWalletConnection(localStorage.getItem('walletAddress'));
+        
+        // Check if this wallet has already claimed the airdrop
+        checkAirdropStatus(localStorage.getItem('walletAddress'));
       }
       
       // Initialize countdown timer
@@ -1640,6 +1687,37 @@
       
       localStorage.setItem('walletConnected', 'true');
       localStorage.setItem('walletAddress', address);
+      
+      // Check if this wallet has already claimed the airdrop
+      checkAirdropStatus(address);
+    }
+    
+    // Check if a wallet has already claimed the airdrop
+    function checkAirdropStatus(walletAddress) {
+      const claimedWallets = JSON.parse(localStorage.getItem('claimedWallets') || '[]');
+      const messageContainer = document.getElementById('rateLimitMessage');
+      
+      if (claimedWallets.includes(walletAddress)) {
+        messageContainer.innerHTML = `
+          <div class="already-claimed">
+            <i class="fas fa-check-circle"></i>
+            <span>You have already claimed the airdrop with this wallet address. Each wallet can only claim once.</span>
+          </div>
+        `;
+        messageContainer.classList.remove('hidden');
+        
+        // Disable the claim button
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        messageContainer.classList.add('hidden');
+        
+        // Enable the claim button
+        const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
     }
 
     function disconnectWallet() {
@@ -1653,6 +1731,14 @@
       document.getElementById('walletButton').addEventListener('click', openWalletModal);
       
       document.getElementById('walletAddress').value = '';
+      
+      // Hide rate limit message
+      document.getElementById('rateLimitMessage').classList.add('hidden');
+      
+      // Enable the claim button
+      const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
       
       localStorage.removeItem('walletConnected');
       localStorage.removeItem('walletAddress');
@@ -1866,6 +1952,17 @@
       updateTaskUI();
       alert("Tasks reset successfully!");
     }
+    
+    // Clear rate limit for development
+    function clearRateLimit() {
+      localStorage.removeItem('claimedWallets');
+      alert("Rate limit cleared. All wallets can now claim the airdrop again.");
+      
+      // Refresh the status if a wallet is connected
+      if (userWalletAddress) {
+        checkAirdropStatus(userWalletAddress);
+      }
+    }
 
     // Confetti effect
     function createConfetti() {
@@ -1904,6 +2001,13 @@
         return;
       }
       
+      // Check rate limit
+      const claimedWallets = JSON.parse(localStorage.getItem('claimedWallets') || '[]');
+      if (claimedWallets.includes(walletAddress)) {
+        showWalletError("This wallet has already claimed the airdrop. Each wallet can only claim once.");
+        return;
+      }
+      
       try {
         const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
         const originalText = submitBtn.textContent;
@@ -1923,8 +2027,16 @@
         if (tasksCompleted.telegram) bonusTokens += 10000;
         if (tasksCompleted.retweet) bonusTokens += 30000;
         
+        // Add wallet to claimed list
+        claimedWallets.push(walletAddress);
+        localStorage.setItem('claimedWallets', JSON.stringify(claimedWallets));
+        
         createConfetti();
         alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
+        
+        // Update UI to show this wallet has claimed
+        checkAirdropStatus(walletAddress);
+        
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       } catch (error) {
