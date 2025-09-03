@@ -1081,13 +1081,148 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
     }
+  /* extra styles you can remove */
+     /* Enhanced background styles for FLUFFI Airdrop */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    color: #1a1a1a;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light theme background */
+  body {
+    background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 50%, #ebf4ff 100%);
+  }
+
+  /* Dark theme background */
+  .dark body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+
+  /* Animated background elements */
+  .bg-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1;
+    background-image: 
+      radial-gradient(circle at 5% 10%, rgba(16, 185, 129, 0.4) 0px, transparent 50%),
+      radial-gradient(circle at 95% 20%, rgba(59, 130, 246, 0.4) 0px, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.4) 0px, transparent 50%);
+    background-size: 100% 100%;
+  }
+
+  /* Floating particles animation */
+  .floating-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float 20s infinite linear;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-100vh) rotate(360deg);
+    }
+  }
+
+  /* Animated gradient background option */
+  .animated-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    opacity: 0.1;
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Geometric pattern overlay */
+  .geometric-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.05;
+    background-image: 
+      linear-gradient(30deg, #10B981 12%, transparent 12.5%, transparent 87%, #10B981 87.5%, #10B981),
+      linear-gradient(150deg, #10B981 12%, transparent 12.5%, transparent 87%, #10B981 87.5%, #10B981),
+      linear-gradient(30deg, #10B981 12%, transparent 12.5%, transparent 87%, #10B981 87.5%, #10B981),
+      linear-gradient(150deg, #10B981 12%, transparent 12.5%, transparent 87%, #10B981 87.5%, #10B981),
+      linear-gradient(60deg, rgba(16, 185, 129, 0.5) 25%, transparent 25.5%, transparent 75%, rgba(16, 185, 129, 0.5) 75%, rgba(16, 185, 129, 0.5)),
+      linear-gradient(60deg, rgba(16, 185, 129, 0.5) 25%, transparent 25.5%, transparent 75%, rgba(16, 185, 129, 0.5) 75%, rgba(16, 185, 129, 0.5));
+    background-size: 80px 140px;
+    background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+  }
+
+  /* Content container with glassmorphism effect */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .dark .glass-card {
+    background: rgba(26, 32, 44, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Enhanced button styles */
+  .btn-glow {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .btn-glow:hover {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.8);
+    transform: translateY(-2px);
+  }
   </style>
 </head>
 
 <body class="text-gray-800 dark:text-white transition-colors duration-300">
   <!-- Floating particles -->
   <div class="floating-particles" id="particles"></div>
-  
+  <div class="bg-pattern"></div>
+<div class="floating-particles" id="particles-container"></div>
   <!-- Header -->
   <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10 transition-colors duration-300">
     <div class="flex items-center gap-4">
@@ -2308,5 +2443,46 @@
       darkModeIcon.textContent = isDark ? '☀️' : '🌙';
     }
   </script>
+  <script>
+  // Function to create floating particles
+  function createParticles() {
+    const container = document.getElementById('particles-container');
+    const colors = ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899'];
+    
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      // Random properties
+      const size = Math.random() * 20 + 5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.background = color;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+      particle.style.animationDelay = `${Math.random() * 5}s`;
+      
+      container.appendChild(particle);
+    }
+  }
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    createParticles();
+    
+    // Add glass effect to cards
+    document.querySelectorAll('.bg-white, .dark\\:bg-gray-800').forEach(card => {
+      card.classList.add('glass-card');
+    });
+    
+    // Add glow effect to buttons
+    document.querySelectorAll('.bg-green-500, .bg-green-700').forEach(btn => {
+      btn.classList.add('btn-glow');
+    });
+  });
+</script>
 </body>
 </html>
