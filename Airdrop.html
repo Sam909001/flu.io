@@ -21,8 +21,14 @@
       color: #1a1a1a;
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
     }
     
+    .dark body {
+      background: linear-gradient(to bottom, #111827, #1f2937) !important;
+      color: #f0f0f0 !important;
+    }
+
     .dark {
       background: #111827 !important;
       color: #f0f0f0 !important;
@@ -31,6 +37,7 @@
     .dark .bg-white {
       background-color: #1f2937 !important;
       color: #f0f0f0 !important;
+      border-color: #374151;
     }
 
     .logo-float {
@@ -62,7 +69,8 @@
     
     .dark input[type="text"], 
     .dark input[type="email"],
-    .dark select {
+    .dark select,
+    .dark input[type="checkbox"] {
       background-color: #374151;
       color: white !important;
       border-color: #4B5563;
@@ -136,6 +144,7 @@
     .dark .wallet-modal-content {
       background: #1f2937;
       color: #f0f0f0;
+      border: 1px solid #374151;
     }
     
     .wallet-option {
@@ -234,6 +243,7 @@
     .dark .wallet-connect-content {
       background: #1f2937;
       color: #f0f0f0;
+      border: 1px solid #374151;
     }
     
     #walletConnectQrCode {
@@ -241,6 +251,10 @@
       padding: 10px;
       background: white;
       border-radius: 8px;
+    }
+    
+    .dark #walletConnectQrCode {
+      background: white;
     }
     
     .wallet-connect-close {
@@ -280,10 +294,16 @@
     .dark .referral-table th,
     .dark .referral-table td {
       border-bottom-color: #4b5563;
+      color: #f0f0f0;
     }
     
     .referral-table th {
       font-weight: 600;
+      background-color: #f9fafb;
+    }
+    
+    .dark .referral-table th {
+      background-color: #374151;
     }
     
     .referral-rank {
@@ -323,6 +343,7 @@
     
     .dark .wallet-address-display {
       background: rgba(255,255,255,0.1);
+      color: #f0f0f0;
     }
     
     .username-input {
@@ -335,7 +356,7 @@
     }
     
     .dark .username-input {
-      background: #1f2937;
+      background: #374151;
       border-color: #4b5563;
       color: white;
     }
@@ -377,6 +398,7 @@
 
     .dark .timer-digit {
       background: rgba(0, 0, 0, 0.2);
+      color: #f0f0f0;
     }
     
     .timer-reset-btn {
@@ -433,6 +455,8 @@
     
     .dark .guide-section {
       background: #1f2937;
+      color: #f0f0f0;
+      border: 1px solid #374151;
     }
     
     .guide-section:hover {
@@ -481,6 +505,10 @@
       gap: 8px;
     }
     
+    .dark .guide-column h3 {
+      color: var(--primary);
+    }
+    
     .guide-column ul {
       list-style-type: none;
       padding-left: 0;
@@ -490,6 +518,11 @@
       margin-bottom: 10px;
       padding-left: 28px;
       position: relative;
+      color: #4b5563;
+    }
+    
+    .dark .guide-column li {
+      color: #d1d5db;
     }
     
     .guide-column li:before {
@@ -561,6 +594,8 @@
     
     .dark .help-modal-content {
       background: #1f2937;
+      color: #f0f0f0;
+      border: 1px solid #374151;
     }
     
     .help-close {
@@ -706,25 +741,6 @@
       z-index: 10000;
     }
     
-    /* ADDED FIXES */
-    .dark .guide-section {
-      background: #1f2937 !important;
-      color: #f0f0f0 !important;
-      border: 1px solid #374151;
-    }
-    
-    .dark .guide-section h2,
-    .dark .guide-section h3,
-    .dark .guide-section li {
-      color: #f0f0f0 !important;
-    }
-    
-    .dark .wallet-modal-content,
-    .dark .help-modal-content {
-      background: #1f2937 !important;
-      color: #f0f0f0 !important;
-    }
-    
     /* Logo styling */
     .logo-container {
       display: flex;
@@ -748,12 +764,72 @@
       object-fit: cover;
       border-radius: 50%;
     }
+    
+    /* Dark mode improvements for all elements */
+    .dark header {
+      background: #065f46 !important;
+    }
+    
+    .dark footer {
+      background: #1f2937 !important;
+      color: #d1d5db !important;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .bg-green-100 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-green-900 {
+      background-color: #064e3b;
+    }
+    
+    .dark .text-green-800 {
+      color: #6ee7b7;
+    }
+    
+    .dark .text-green-200 {
+      color: #a7f3d0;
+    }
+    
+    .dark .bg-gray-200 {
+      background-color: #374151;
+    }
+    
+    .dark .bg-gray-700 {
+      background-color: #4b5563;
+    }
+    
+    .dark .referral-table {
+      color: #f0f0f0;
+    }
+    
+    /* Make all sections wider */
+    main {
+      max-width: 1200px !important;
+    }
+    
+    .bg-white, .guide-section, .tasks-section, .airdrop-section {
+      width: 100%;
+    }
+    
+    .guide-content {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    
+    .space-y-4 > div {
+      width: 100%;
+    }
   </style>
 </head>
 
-<body class="text-gray-800 dark:text-white">
+<body class="text-gray-800 dark:text-white transition-colors duration-300">
   <!-- Header -->
-  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10">
+  <header class="flex flex-col md:flex-row items-center justify-between px-4 py-3 bg-green-600 shadow sticky top-0 z-10 transition-colors duration-300">
     <div class="flex items-center gap-4">
       <!-- Floating logo with fluffi.jpg -->
       <div class="logo-container logo-float">
@@ -764,28 +840,28 @@
       </h1>
     </div>
     <nav class="flex flex-wrap gap-4 mt-2 md:mt-0 text-sm font-semibold">
-      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white" aria-label="Toggle dark mode">
+      <button onclick="toggleDarkMode()" class="ml-2 bg-gray-300 dark:bg-gray-700 px-2 rounded text-black dark:text-white transition-colors duration-300" aria-label="Toggle dark mode">
         <span id="darkModeIcon">🌙</span>
       </button>
       <div class="wallet-buttons" id="walletButtons">
-        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded">Connect Wallet</button>
+        <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded transition-colors duration-300">Connect Wallet</button>
       </div>
     </nav>
   </header>
 
-  <main class="p-6 mx-auto w-full max-w-7xl">
+  <main class="p-6 mx-auto w-full" style="max-width: 1200px;">
     <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">FLUFFI Token Airdrop</h2>
-      <p class="text-gray-900 dark:text-gray-600">Claim your free FLUFFI tokens by completing simple tasks</p>
+      <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2 transition-colors duration-300">FLUFFI Token Airdrop</h2>
+      <p class="text-gray-900 dark:text-gray-300 transition-colors duration-300">Claim your free FLUFFI tokens by completing simple tasks</p>
     </div>
     
     <!-- Wallet Connection Guide -->
-    <div class="guide-section">
+    <div class="guide-section transition-colors duration-300">
       <div class="guide-header">
         <div class="guide-icon">
           <i class="fas fa-wallet"></i>
         </div>
-        <h2 class="text-2xl font-bold">How to Connect Your Wallet</h2>
+        <h2 class="text-2xl font-bold transition-colors duration-300">How to Connect Your Wallet</h2>
       </div>
       <div class="guide-content">
         <div class="guide-column">
@@ -812,48 +888,48 @@
     </div>
     
     <!-- Airdrop Status -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transition-colors duration-300">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold">Airdrop Status</h3>
-        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+        <h3 class="text-xl font-semibold transition-colors duration-300">Airdrop Status</h3>
+        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300">Active</span>
       </div>
       
       <div class="space-y-4">
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Total Airdrop Allocation</p>
-          <p class="text-2xl font-bold">100,000,000 FLUFFI</p>
+          <p class="text-gray-600 dark:text-gray-300 mb-1 transition-colors duration-300">Total Airdrop Allocation</p>
+          <p class="text-2xl font-bold transition-colors duration-300">100,000,000 FLUFFI</p>
         </div>
         
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Tokens Claimed</p>
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
-            <div class="bg-green-500 h-4 rounded-full" style="width: 38.22%"></div>
+          <p class="text-gray-600 dark:text-gray-300 mb-1 transition-colors duration-300">Tokens Claimed</p>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 transition-colors duration-300">
+            <div class="bg-green-500 h-4 rounded-full transition-all duration-300" style="width: 38.22%"></div>
           </div>
-          <p class="text-right text-sm mt-1 text-gray-600 dark:text-gray-300">38,220,000 FLUFFI (38.22%)</p>
+          <p class="text-right text-sm mt-1 text-gray-600 dark:text-gray-300 transition-colors duration-300">38,220,000 FLUFFI (38.22%)</p>
         </div>
         
         <div>
-          <p class="text-gray-600 dark:text-gray-300 mb-1">Airdrop Ends In</p>
+          <p class="text-gray-600 dark:text-gray-300 mb-1 transition-colors duration-300">Airdrop Ends In</p>
           <div class="flex flex-wrap gap-4 justify-center">
-            <div class="timer-digit">
-              <div id="days" class="text-2xl font-mono font-bold">07</div>
-              <div class="text-sm text-gray-500">Days</div>
+            <div class="timer-digit transition-colors duration-300">
+              <div id="days" class="text-2xl font-mono font-bold transition-colors duration-300">07</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Days</div>
             </div>
-            <div class="timer-digit">
-              <div id="hours" class="text-2xl font-mono font-bold">12</div>
-              <div class="text-sm text-gray-500">Hours</div>
+            <div class="timer-digit transition-colors duration-300">
+              <div id="hours" class="text-2xl font-mono font-bold transition-colors duration-300">12</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Hours</div>
             </div>
-            <div class="timer-digit">
-              <div id="minutes" class="text-2xl font-mono font-bold">45</div>
-              <div class="text-sm text-gray-500">Minutes</div>
+            <div class="timer-digit transition-colors duration-300">
+              <div id="minutes" class="text-2xl font-mono font-bold transition-colors duration-300">45</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Minutes</div>
             </div>
-            <div class="timer-digit">
-              <div id="seconds" class="text-2xl font-mono font-bold">30</div>
-              <div class="text-sm text-gray-500">Seconds</div>
+            <div class="timer-digit transition-colors duration-300">
+              <div id="seconds" class="text-2xl font-mono font-bold transition-colors duration-300">30</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Seconds</div>
             </div>
           </div>
           <div class="text-center mt-2">
-            <button onclick="resetTimer()" class="timer-reset-btn">
+            <button onclick="resetTimer()" class="timer-reset-btn transition-colors duration-300">
               Reset Timer
             </button>
           </div>
@@ -862,10 +938,10 @@
     </div>
     
     <!-- Top Referrals Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-      <h3 class="text-xl font-semibold mb-4">Top Referrals</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transition-colors duration-300">
+      <h3 class="text-xl font-semibold mb-4 transition-colors duration-300">Top Referrals</h3>
       <div class="overflow-x-auto">
-        <table class="referral-table w-full">
+        <table class="referral-table w-full transition-colors duration-300">
           <thead>
             <tr>
               <th>Rank</th>
@@ -913,71 +989,71 @@
     <!-- Reordered sections container -->
     <div class="sections-container">
       <!-- Tasks Section -->
-      <div class="tasks-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-        <h3 class="text-xl font-semibold mb-4">Complete Tasks for Bonus Tokens</h3>
+      <div class="tasks-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 transition-colors duration-300">
+        <h3 class="text-xl font-semibold mb-4 transition-colors duration-300">Complete Tasks for Bonus Tokens</h3>
         
         <div class="space-y-4">
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-300">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task1" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task1" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 transition-colors duration-300" disabled>
+              <label for="task1" class="text-gray-700 dark:text-gray-300 transition-colors duration-300">
                 Follow us on Twitter
               </label>
-              <input type="text" id="twitterUsername" class="username-input" placeholder="@username">
-              <button id="verifyTwitterBtn" class="verify-btn" onclick="verifyTwitterFollow()">Verify</button>
-              <span id="twitterStatus" class="text-sm task-incomplete">(Not verified)</span>
+              <input type="text" id="twitterUsername" class="username-input transition-colors duration-300" placeholder="@username">
+              <button id="verifyTwitterBtn" class="verify-btn transition-colors duration-300" onclick="verifyTwitterFollow()">Verify</button>
+              <span id="twitterStatus" class="text-sm task-incomplete transition-colors duration-300">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+10,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0 transition-colors duration-300">+10,000 FLUFFI</span>
           </div>
           
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-300">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task2" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task2" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 transition-colors duration-300" disabled>
+              <label for="task2" class="text-gray-700 dark:text-gray-300 transition-colors duration-300">
                 Join our Telegram
               </label>
-              <input type="text" id="telegramUsername" class="username-input" placeholder="@username">
-              <button id="verifyTelegramBtn" class="verify-btn" onclick="verifyTelegramJoin()">Verify</button>
-              <span id="telegramStatus" class="text-sm task-incomplete">(Not verified)</span>
+              <input type="text" id="telegramUsername" class="username-input transition-colors duration-300" placeholder="@username">
+              <button id="verifyTelegramBtn" class="verify-btn transition-colors duration-300" onclick="verifyTelegramJoin()">Verify</button>
+              <span id="telegramStatus" class="text-sm task-incomplete transition-colors duration-300">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+10,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0 transition-colors duration-300">+10,000 FLUFFI</span>
           </div>
           
-          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div class="flex flex-wrap items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-300">
             <div class="flex flex-wrap items-center gap-2">
-              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600" disabled>
-              <label for="task3" class="text-gray-700 dark:text-gray-300">
+              <input type="checkbox" id="task3" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 transition-colors duration-300" disabled>
+              <label for="task3" class="text-gray-700 dark:text-gray-300 transition-colors duration-300">
                 Like & Retweet our pinned tweet
               </label>
-              <button id="verifyRetweetBtn" class="verify-btn" onclick="verifyRetweet()">Verify</button>
-              <span id="retweetStatus" class="text-sm task-incomplete">(Not verified)</span>
+              <button id="verifyRetweetBtn" class="verify-btn transition-colors duration-300" onclick="verifyRetweet()">Verify</button>
+              <span id="retweetStatus" class="text-sm task-incomplete transition-colors duration-300">(Not verified)</span>
             </div>
-            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0">+30,000 FLUFFI</span>
+            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium mt-2 md:mt-0 transition-colors duration-300">+30,000 FLUFFI</span>
           </div>
         </div>
       </div>
       
       <!-- Airdrop Form -->
-      <div class="airdrop-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h3 class="text-xl font-semibold mb-4">Claim Your Airdrop</h3>
+      <div class="airdrop-section bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-300">
+        <h3 class="text-xl font-semibold mb-4 transition-colors duration-300">Claim Your Airdrop</h3>
         
         <form id="airdropForm">
           <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-            <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">Email Address</label>
+            <input type="email" id="email" required class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white transition-colors duration-300">
           </div>
           
           <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">Wallet Address</label>
             <input type="text" id="walletAddress" required 
                   placeholder="0x..." 
-                  class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white" readonly>
+                  class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white transition-colors duration-300" readonly>
           </div>
 
-          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center">
+          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg flex items-center justify-center transition-colors duration-300">
             Claim Airdrop
           </button>
-<p class="mt-3 text-sm text-red-600 font-medium text-center max-w-md mx-auto">
+<p class="mt-3 text-sm text-red-600 dark:text-red-400 font-medium text-center max-w-md mx-auto transition-colors duration-300">
   🚨 Please make sure you have Followed on Twitter, Retweeted the pinned post, and Joined our Telegram group. Manual verification will be conducted before airdrop distribution.
 </p>
         </form>
@@ -985,37 +1061,37 @@
     </div>
     
     <!-- Developer Test Section (Hidden in production) -->
-    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden">
-      <h3 class="text-xl font-semibold mb-4">Developer Tools</h3>
+    <div id="devSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mt-6 hidden transition-colors duration-300">
+      <h3 class="text-xl font-semibold mb-4 transition-colors duration-300">Developer Tools</h3>
       <div class="space-y-2">
-        <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+        <button onclick="simulateTwitterFollow()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Simulate Twitter Follow
         </button>
-        <button onclick="simulateTelegramJoin()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+        <button onclick="simulateTelegramJoin()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Simulate Telegram Join
         </button>
-        <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+        <button onclick="simulateRetweet()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Simulate Retweet
         </button>
-        <button onclick="resetTasks()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+        <button onclick="resetTasks()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Reset Tasks
         </button>
-        <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded">
+        <button onclick="setTimer(1, 0, 0)" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded transition-colors duration-300">
           Set Timer to 1 Hour
         </button>
       </div>
     </div>
   </main>
 
-  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8">
+  <footer class="flex flex-col md:flex-row justify-between px-6 py-6 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 mt-8 transition-colors duration-300">
     <div class="mb-4 md:mb-0">© 2025 $FLUFFI Token - All Rights Reserved</div>
     <div class="flex gap-4 justify-center md:justify-end">
-      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75">
+      <a href="https://t.me/FLUFFISOLANALAYER2" target="_blank" rel="noopener noreferrer" title="Telegram" class="hover:opacity-75 transition-opacity duration-300">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.150-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
         </svg>
       </a>
-      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75">
+      <a href="https://x.com/FLUFFIOFFICIAL" target="_blank" rel="noopener noreferrer" title="Twitter" class="hover:opacity-75 transition-opacity duration-300">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
         </svg>
@@ -1025,29 +1101,29 @@
 
   <!-- Wallet Connect Modal -->
   <div id="walletModal" class="wallet-modal">
-    <div class="wallet-modal-content dark:bg-gray-800">
+    <div class="wallet-modal-content dark:bg-gray-800 transition-colors duration-300">
       <div class="wallet-header">
-        <h3 class="text-xl font-bold">Connect Wallet</h3>
+        <h3 class="text-xl font-bold transition-colors duration-300">Connect Wallet</h3>
         <span class="wallet-close" onclick="closeWalletModal()">&times;</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('metamask')">
         <div class="flex items-center w-full">
           <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-          <span class="ml-3">MetaMask</span>
+          <span class="ml-3 transition-colors duration-300">MetaMask</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('metamask', event)">?</div>
       </div>
       <div class="wallet-option" onclick="connectWallet('trust')">
         <div class="flex items-center w-full">
           <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet">
-          <span class="ml-3">Trust Wallet</span>
+          <span class="ml-3 transition-colors duration-300">Trust Wallet</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
       </div>
       <div class="wallet-option" onclick="connectWallet('walletconnect')">
         <div class="flex items-center w-full">
           <img src="https://altcoinsbox.com/wp-content/uploads/2023/04/wallet-connect-logo.png" alt="WalletConnect">
-          <span class="ml-3">WalletConnect</span>
+          <span class="ml-3 transition-colors duration-300">WalletConnect</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('walletconnect', event)">?</div>
       </div>
@@ -1055,7 +1131,7 @@
 <div class="wallet-option" onclick="connectWallet('phantom')">
         <div class="flex items-center w-full">
           <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="w-6 h-6">
-          <span class="ml-3">Phantom</span>
+          <span class="ml-3 transition-colors duration-300">Phantom</span>
         </div>
         <div class="wallet-help-btn" onclick="showConnectionHelp('phantom', event)">?</div>
       </div>
@@ -1064,10 +1140,10 @@
 
   <!-- WalletConnect QR Code Modal -->
   <div id="walletConnectModal" class="wallet-connect-modal">
-    <div class="wallet-connect-content dark:bg-gray-800">
+    <div class="wallet-connect-content dark:bg-gray-800 transition-colors duration-300">
       <span class="wallet-connect-close" onclick="closeWalletConnectModal()">&times;</span>
-      <h3 class="text-lg font-bold mb-2">Scan with WalletConnect</h3>
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Use your mobile wallet to scan this QR code</p>
+      <h3 class="text-lg font-bold mb-2 transition-colors duration-300">Scan with WalletConnect</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 transition-colors duration-300">Use your mobile wallet to scan this QR code</p>
       <div id="walletConnectQrCode"></div>
       <p id="walletConnectLink" class="wallet-connect-link hidden">Or open in wallet app</p>
     </div>
@@ -1075,7 +1151,7 @@
   
   <!-- Connection Help Modal -->
   <div id="connectionHelpModal" class="help-modal">
-    <div class="help-modal-content dark:bg-gray-800">
+    <div class="help-modal-content dark:bg-gray-800 transition-colors duration-300">
       <span class="help-close" onclick="closeHelpModal()">&times;</span>
       <div id="helpContent"></div>
     </div>
