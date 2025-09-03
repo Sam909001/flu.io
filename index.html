@@ -1620,6 +1620,33 @@ async function connectPhantom() {
     }
   }
 }
+    // Only run after Phantom wallet is available
+async function setupProgram() {
+    if (!window.solana || !window.solana.isPhantom) {
+        alert('Please install Phantom wallet!');
+        return;
+    }
+
+    await window.solana.connect(); // connect wallet
+
+    const connection = new solanaWeb3.Connection(
+        solanaWeb3.clusterApiUrl('devnet'),
+        'confirmed'
+    );
+
+    const provider = new anchor.AnchorProvider(connection, window.solana, {});
+    anchor.setProvider(provider);
+
+    const programId = new solanaWeb3.PublicKey("BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ");
+
+    // Fetch IDL
+    const idl = await fetch('/js/fluffi.json').then(res => res.json());
+
+    // Create program interface
+    const program = new anchor.Program(idl, programId, provider);
+
+    return { provider, program };
+}
 
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -2060,6 +2087,50 @@ async function buyFluffi() {
     buyBtn.disabled = false;
     showNotification(err.message || "Transaction failed", 'error');
   }
+}
+   async function buyFluffiSolana() {
+    if (!window.solana || !window.solana.isPhantom) {
+        alert("Please install Phantom wallet!");
+        return;
+    }
+
+    await window.solana.connect();
+
+    const connection = new solanaWeb3.Connection(
+        solanaWeb3.clusterApiUrl('devnet'), // use 'mainnet-beta' later
+        'confirmed'
+    );
+
+    const provider = new anchor.AnchorProvider(connection, window.solana, {});
+    anchor.setProvider(provider);
+
+    const programId = new solanaWeb3.PublicKey("BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ");
+    const idl = await fetch('/js/fluffi.json').then(res => res.json());
+    const program = new anchor.Program(idl, programId, provider);
+
+    const userWallet = provider.wallet.publicKey;
+
+    const [presaleAccount] = await solanaWeb3.PublicKey.findProgramAddress(
+        [Buffer.from('presale'), userWallet.toBuffer()],
+        program.programId
+    );
+
+    try {
+        const tx = await program.methods
+            .initialize() // replace with your actual buy method if different
+            .accounts({
+                presale: presaleAccount,
+                user: userWallet,
+                systemProgram: solanaWeb3.SystemProgram.programId,
+            })
+            .rpc();
+
+        console.log("✅ Solana Tx:", tx);
+        alert("Purchase successful on Solana! Tx: " + tx);
+    } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+    }
 }
  </script>
     <script>
