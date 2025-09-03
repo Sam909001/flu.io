@@ -1562,7 +1562,7 @@
     }
     
     function resetTimer() {
-      const newEndTime = Date.now() + 7 * 极狐 * 60 * 60 * 1000; // 7 days from now
+      const newEndTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days from now
       localStorage.setItem('airdropEndTime', newEndTime.toString());
       startCountdown(newEndTime);
       alert("Timer has been reset to 7 days");
