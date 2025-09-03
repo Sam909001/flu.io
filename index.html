@@ -1,5 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+  // Add this script at the very beginning of your HTML
+<script>
+// Prevent right-click
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  alert('Right-click is disabled');
+});
+
+// Prevent text selection
+document.addEventListener('selectstart', function(e) {
+  e.preventDefault();
+  alert('Text selection is disabled');
+});
+
+// Prevent developer tools (basic protection)
+(function() {
+  var devtools = /./;
+  devtools.toString = function() {
+    this.opened = true;
+  };
+  console.log('%c', devtools);
+  setInterval(function() {
+    if(devtools.opened) {
+      window.location.reload();
+      devtools.opened = false;
+    }
+  }, 1000);
+})();
+</script>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
