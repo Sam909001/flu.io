@@ -22,11 +22,6 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="preload" href="fluffi.jpg" as="image">
-  <!-- Add these before </head> -->
-<script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
-<script src="https://unpkg.com/@project-serum/anchor@0.25.0/dist/browser/anchor.js"></script>
-<script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
-<script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
 </head>
   
 <body class="text-gray-800 dark:text-white">
@@ -203,8 +198,6 @@ function resetTimer() {
       <button onclick="buyFluffi()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg transition-colors">
         🚀 Buy Now
       </button>
-     <input id="solAmountInput" type="number" placeholder="Amount SOL" />
-<button onclick="buyFluffiSolana()">Buy FLUFFI (Solana)</button>
     </section>
   
     <input type="hidden" id="referralLink" value="">
@@ -308,6 +301,51 @@ function resetTimer() {
     </div>
   </div>
 </section>
+
+<script>
+async function updateStakingDashboard() {
+  // Get values from localStorage (simulated for now)
+  const walletAddress = localStorage.getItem('walletAddress');
+  
+  if (walletAddress) {
+    // Retrieve stored staking info
+    const stakingInfo = JSON.parse(localStorage.getItem(`staking_${walletAddress}`) || '{}');
+    const totalStaked = stakingInfo.amount || 0;
+    
+    // Calculate earnings based on APY (90%)
+    const timeDiff = stakingInfo.timestamp ? (Date.now() - stakingInfo.timestamp) / (365 * 24 * 60 * 60 * 1000) : 0;
+    const userEarnings = totalStaked * 0.9 * timeDiff;
+    
+    // Get balance from localStorage
+    const userBalance = parseFloat(localStorage.getItem(`balance_${walletAddress}`) || '0');
+    
+    // Update UI
+    document.getElementById('total-staked').textContent = totalStaked.toLocaleString();
+    document.getElementById('user-balance-value').textContent = userBalance.toLocaleString();
+    document.getElementById('user-earnings').textContent = userEarnings.toFixed(2);
+    
+    // Progress based on time until listing (30 days from start)
+    const startTime = new Date('2025-01-27T00:00:00Z').getTime();
+    const listingTime = startTime + (30 * 24 * 60 * 60 * 1000);
+    const now = Date.now();
+    const claimPercent = Math.min(((now - startTime) / (listingTime - startTime)) * 100, 100);
+    
+    document.getElementById('claim-percent').textContent = Math.floor(claimPercent) + "%";
+    document.getElementById('claim-progress').style.width = claimPercent + "%";
+  } else {
+    // Default values when not connected
+    document.getElementById('total-staked').textContent = '0';
+    document.getElementById('user-balance-value').textContent = '0';
+    document.getElementById('user-earnings').textContent = '0';
+    document.getElementById('claim-percent').textContent = "0%";
+    document.getElementById('claim-progress').style.width = "0%";
+  }
+}
+
+// Update on page load and when wallet connects
+document.addEventListener('DOMContentLoaded', updateStakingDashboard);
+window.addEventListener('storage', updateStakingDashboard);
+</script>
   
     <!-- Tokenomics Section -->
    <section id="tokenomics" class="px-6 py-10 bg-white dark:bg-gray-900 rounded-xl shadow-xl mb-12">
@@ -820,7 +858,7 @@ rotateFeed();
   
   <script>
   // Configuration
-let tokenChart = null;
+        let tokenChart = null;
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
   1: "0x...EthereumMainnet",
@@ -831,15 +869,9 @@ const CONTRACT_ADDRESSES = {
   80002: "0xfcc8e15857AeFee92FE761Bfe5a7300C7D44AdB5",
   43114: "0x...AvalancheMainnet",
   43113: "0xE47565637b477dc1De60dfcCB98015806fd22176"
+  // Solana handled separately
+};
 
-    
-// Solana config
-    const SOLANA_CONFIG = {
-    cluster: "https://api.devnet.solana.com", // devnet
-    programId: "BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ"
-  };
-
-    
     // Add this after your CONTRACT_ADDRESSES:
 const NETWORK_CONFIGS = {
   1: {
@@ -944,17 +976,15 @@ async function getFluffiContract(provider) {
     icons: ["https://fluffi.site/logo.png"]
   }
 };
-// Initialize all global variables
+  // Global variables
 let userWalletAddress = null;
-let provider = null;
-let tokenChart = null;
-let presaleInterval = null;
-let countdownInterval = null;
 let tasksCompleted = {
   twitter: false,
   telegram: false,
   retweet: false
 };
+let countdownInterval = null;
+let provider = null;
 
 // For development - show dev section if URL has ?dev=true
 if (window.location.search.includes('dev=true')) {
@@ -976,6 +1006,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('darkModeIcon').textContent = '🌙';
   }
   
+  // Setup form submission
+  document.getElementById('airdropForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    claimAirdrop();
+  });
+  
   // Setup wallet button
   document.getElementById('walletButton').addEventListener('click', openWalletModal);
   
@@ -988,8 +1024,7 @@ if (savedAddress) {
 }
   
   // Initialize countdown timer
-// Initialize countdown timer
-// initializeCountdown(); // Comment out - this function doesn't exist
+  initializeCountdown();
   
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
@@ -998,6 +1033,10 @@ if (savedAddress) {
     updateTaskUI();
   }
 });
+
+// Timer functions
+// Timer variables
+let presaleInterval = null;
 
 // Initialize the timer when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -1424,13 +1463,9 @@ async function connectTrustWallet() {
 }
 
 // Simplified WalletConnect connection
-// ADD null check:
+// Replace the incomplete WalletConnect with a working implementation
 async function connectWalletConnect() {
   try {
-    if (!window.Web3Modal || !window.WalletConnectProvider) {
-      showWalletConnectFallback();
-      return;
-    }
     // Use Web3Modal for better wallet integration
     const Web3Modal = window.Web3Modal.default;
     const WalletConnectProvider = window.WalletConnectProvider.default;
@@ -1585,55 +1620,6 @@ async function connectPhantom() {
     }
   }
 }
-    // Only run after Phantom wallet is available
-// WRAP the entire function in a try-catch:
-async function setupProgram() {
-    try {
-        if (!window.solana || !window.solana.isPhantom) {
-            console.log('Phantom wallet not found');
-            return null;
-        }
-
-    await window.solana.connect(); // connect wallet
-
-    const connection = new solanaWeb3.Connection(
-        solanaWeb3.clusterApiUrl('devnet'),
-        'confirmed'
-    );
-
-    const provider = new anchor.AnchorProvider(connection, window.solana, {});
-    anchor.setProvider(provider);
-
-    const programId = new solanaWeb3.PublicKey("BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ");
-
-    // Fetch IDL
-const idl = {
-  version: "0.1.0",
-  name: "fluffi_presale",
-  instructions: [
-    {
-      name: "initialize",
-      accounts: [
-        { name: "presale", isMut: true, isSigner: false },
-        { name: "user", isMut: true, isSigner: true },
-        { name: "systemProgram", isMut: false, isSigner: false }
-      ],
-      args: []
-    }
-  ],
-  accounts: []
-};
-
-    // Create program interface
-    const program = new anchor.Program(idl, programId, provider);
-
-    return { provider, program };
-}
-      } catch (error) {
-        console.error('Setup program error:', error);
-        return null;
-    }
-}
 
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1662,9 +1648,7 @@ function handleWalletConnection(address) {
   // Close any open modals
   closeWalletConnectModal();
   
-// ADD at the end of the function:
   showNotification("Wallet connected successfully!", "success");
-  return true; // Add return statement
 }
 
 async function disconnectWallet() {
@@ -1821,7 +1805,7 @@ async function recordPurchase(txHash, amount, tokens) {
 }
 
 // Network switch function with all supported chains
-async function switchNetwork(chainName = 'BSC') {
+async function switchToNetwork(chainName = 'BSC') {
   if (!window.ethereum) return;
   
   const networks = {
@@ -2002,11 +1986,7 @@ async function buyFluffi() {
     const networkSelect = document.getElementById('networkSelect');
     const selectedNetwork = networkSelect.value;
 
-    if (selectedNetwork.includes('solana')) {
-  showNotification('Please use the Solana buy button for SOL purchases', 'info');
-  return;
-}
-if (!NETWORKS[selectedNetwork]) {
+    if (!NETWORKS[selectedNetwork]) {
       throw new Error('Please pick a supported EVM network.');
     }
 
@@ -2081,50 +2061,6 @@ if (!NETWORKS[selectedNetwork]) {
     showNotification(err.message || "Transaction failed", 'error');
   }
 }
-   async function buyFluffiSolana() {
-    if (!window.solana || !window.solana.isPhantom) {
-        alert("Please install Phantom wallet!");
-        return;
-    }
-
-    await window.solana.connect();
-
-    const connection = new solanaWeb3.Connection(
-        solanaWeb3.clusterApiUrl('devnet'), // use 'mainnet-beta' later
-        'confirmed'
-    );
-
-    const provider = new anchor.AnchorProvider(connection, window.solana, {});
-    anchor.setProvider(provider);
-
-    const programId = new solanaWeb3.PublicKey("BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ");
-    const idl = await fetch('/js/fluffi.json').then(res => res.json());
-    const program = new anchor.Program(idl, programId, provider);
-
-    const userWallet = provider.wallet.publicKey;
-
-    const [presaleAccount] = await solanaWeb3.PublicKey.findProgramAddress(
-        [Buffer.from('presale'), userWallet.toBuffer()],
-        program.programId
-    );
-
-    try {
-        const tx = await program.methods
-            .initialize() // replace with your actual buy method if different
-            .accounts({
-                presale: presaleAccount,
-                user: userWallet,
-                systemProgram: solanaWeb3.SystemProgram.programId,
-            })
-            .rpc();
-
-        console.log("✅ Solana Tx:", tx);
-        alert("Purchase successful on Solana! Tx: " + tx);
-    } catch (err) {
-        console.error(err);
-        alert("Error: " + err.message);
-    }
-}
  </script>
     <script>
     // ===== STAKING FUNCTIONS =====
@@ -2161,10 +2097,7 @@ async function stakeFluffi() {
     
     try {
       // Check if staking contract is deployed
-     if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-
-     // ADD AFTER THE EXISTING CHECK:
-      console.log("Using localStorage for staking simulation");
+      if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
         // Fallback to local storage simulation for now
         const stakingInfo = {
           amount: amountNum,
@@ -2319,7 +2252,7 @@ function getPresaleEndTime() {
       if (!userWalletAddress) return;
       
       try {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
         const fluffiContract = new ethers.Contract(
           FLUFFI_CONTRACT_ADDRESS,
           FLUFFI_CONTRACT_ABI,
@@ -2340,13 +2273,26 @@ function getPresaleEndTime() {
         console.error("Balance update error:", error);
       }
     }
-// ADD at the beginning:
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('darkMode', html.classList.contains('dark'));
+      
+      // Update icon
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      darkModeIcon.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+      
+      // Update chart colors if needed
+      if (tokenChart) {
+        const isDark = html.classList.contains('dark');
+        tokenChart.options.plugins.legend.labels.color = isDark ? '#FFFFFF' : '#111827';
+        tokenChart.update();
+      }
+    }
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
-  if (!ctx) {
-    console.warn('Token chart canvas not found');
-    return;
-  }
+  if (!ctx) return;
   
   const isDark = document.documentElement.classList.contains('dark');
   
@@ -2535,63 +2481,30 @@ function initTimer() {
 
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
-  try {
-    // Initialize dark mode
-    if (localStorage.getItem('darkMode') === 'true' ||
+  // Initialize dark mode
+  if (localStorage.getItem('darkMode') === 'true' || 
       (localStorage.getItem('darkMode') === null && 
        window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-      document.getElementById('darkModeIcon').textContent = '☀️';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.getElementById('darkModeIcon').textContent = '🌙';
-    }
-
-    // Check if MetaMask is installed
-    if (window.ethereum?.isMetaMask) {
-      // document.getElementById('metamaskInstalledBadge')?.classList.remove('hidden');
-    }
-
-    // Initialize token chart
-    initTokenChart();
-
-    // Initialize timers
-    initTimer();
-
-    // Check for referral parameter
-    checkReferral();
-  } catch (error) {
-    console.error('Initialization error:', error);
+    document.documentElement.classList.add('dark');
+    document.getElementById('darkModeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.getElementById('darkModeIcon').textContent = '🌙';
   }
-});document.addEventListener('DOMContentLoaded', function() {
-  try {
-    // Initialize dark mode
-    if (localStorage.getItem('darkMode') === 'true' ||
-      (localStorage.getItem('darkMode') === null && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-      document.getElementById('darkModeIcon').textContent = '☀️';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.getElementById('darkModeIcon').textContent = '🌙';
-    }
 
-    // Check if MetaMask is installed
-    if (window.ethereum?.isMetaMask) {
-      // document.getElementById('metamaskInstalledBadge')?.classList.remove('hidden');
-    }
-
-    // Initialize token chart
-    initTokenChart();
-
-    // Initialize timers
-    initTimer();
-
-    // Check for referral parameter
-    checkReferral();
-  } catch (error) {
-    console.error('Initialization error:', error);
+  // Check if MetaMask is installed
+  if (window.ethereum?.isMetaMask) {
+    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
   }
+
+  // Initialize token chart
+  initTokenChart();
+
+  // Initialize timers
+  initTimer();
+
+  // Check for referral parameter
+  checkReferral();
 });
 
 // Toggle dark mode function
@@ -3030,6 +2943,6 @@ if (window.ethereum) {
     updateUIForNetwork('custom', `Unknown (${chainId})`);
   });
 }
-</script>
+</script
 </body>
 </html>
