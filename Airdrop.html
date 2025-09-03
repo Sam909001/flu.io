@@ -824,11 +824,6 @@
     .space-y-4 > div {
       width: 100%;
     }
-    
-    /* FIX: Make the subtitle text visible in dark mode */
-    .dark .subtitle-text {
-      color: #d1d5db !important;
-    }
   </style>
 </head>
 
@@ -857,8 +852,7 @@
   <main class="p-6 mx-auto w-full" style="max-width: 1200px;">
     <div class="text-center mb-8">
       <h2 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2 transition-colors duration-300">FLUFFI Token Airdrop</h2>
-      <!-- Fixed the subtitle text color for dark mode -->
-      <p class="text-gray-900 dark:text-gray-300 subtitle-text transition-colors duration-300">Claim your free FLUFFI tokens by completing simple tasks</p>
+      <p class="text-gray-900 dark:text-gray-100">Claim your free FLUFFI tokens by completing simple tasks</p>
     </div>
     
     <!-- Wallet Connection Guide -->
@@ -1872,7 +1866,7 @@
 
     // Confetti effect
     function createConfetti() {
-      const colors = ['#f44336', '#e91e63', '#9c27b0', #673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+      const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
       
       for (let i = 0; i < 150; i++) {
         const confetti = document.createElement('div');
