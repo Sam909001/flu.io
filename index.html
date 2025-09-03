@@ -988,7 +988,8 @@ if (savedAddress) {
 }
   
   // Initialize countdown timer
-  initializeCountdown();
+// Initialize countdown timer
+// initializeCountdown(); // Comment out - this function doesn't exist
   
   // Load completed tasks from localStorage
   const savedTasks = localStorage.getItem('completedTasks');
@@ -2539,26 +2540,58 @@ document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('darkMode') === 'true' ||
       (localStorage.getItem('darkMode') === null && 
        window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-    document.getElementById('darkModeIcon').textContent = '☀️';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.getElementById('darkModeIcon').textContent = '🌙';
+      document.documentElement.classList.add('dark');
+      document.getElementById('darkModeIcon').textContent = '☀️';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.getElementById('darkModeIcon').textContent = '🌙';
+    }
+
+    // Check if MetaMask is installed
+    if (window.ethereum?.isMetaMask) {
+      // document.getElementById('metamaskInstalledBadge')?.classList.remove('hidden');
+    }
+
+    // Initialize token chart
+    initTokenChart();
+
+    // Initialize timers
+    initTimer();
+
+    // Check for referral parameter
+    checkReferral();
+  } catch (error) {
+    console.error('Initialization error:', error);
   }
+});document.addEventListener('DOMContentLoaded', function() {
+  try {
+    // Initialize dark mode
+    if (localStorage.getItem('darkMode') === 'true' ||
+      (localStorage.getItem('darkMode') === null && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('darkModeIcon').textContent = '☀️';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.getElementById('darkModeIcon').textContent = '🌙';
+    }
 
-  // Check if MetaMask is installed
-  if (window.ethereum?.isMetaMask) {
-    document.getElementById('metamaskInstalledBadge').classList.remove('hidden');
+    // Check if MetaMask is installed
+    if (window.ethereum?.isMetaMask) {
+      // document.getElementById('metamaskInstalledBadge')?.classList.remove('hidden');
+    }
+
+    // Initialize token chart
+    initTokenChart();
+
+    // Initialize timers
+    initTimer();
+
+    // Check for referral parameter
+    checkReferral();
+  } catch (error) {
+    console.error('Initialization error:', error);
   }
-
-  // Initialize token chart
-  initTokenChart();
-
-  // Initialize timers
-  initTimer();
-
-  // Check for referral parameter
-  checkReferral();
 });
 
 // Toggle dark mode function
