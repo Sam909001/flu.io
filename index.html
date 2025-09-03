@@ -820,10 +820,6 @@ rotateFeed();
   
   <script>
   // Configuration
-    // ADD at the beginning of the script:
-let tokenChart = null;
-let presaleInterval = null;
-let provider = null;
 let tokenChart = null;
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
@@ -948,15 +944,17 @@ async function getFluffiContract(provider) {
     icons: ["https://fluffi.site/logo.png"]
   }
 };
-  // Global variables
+// Initialize all global variables
 let userWalletAddress = null;
+let provider = null;
+let tokenChart = null;
+let presaleInterval = null;
+let countdownInterval = null;
 let tasksCompleted = {
   twitter: false,
   telegram: false,
   retweet: false
 };
-let countdownInterval = null;
-let provider = null;
 
 // For development - show dev section if URL has ?dev=true
 if (window.location.search.includes('dev=true')) {
@@ -1006,7 +1004,6 @@ if (savedAddress) {
   }
 });
 
-// Timer functions
 // Timer variables
 let presaleInterval = null;
 
@@ -2011,7 +2008,11 @@ async function buyFluffi() {
     const networkSelect = document.getElementById('networkSelect');
     const selectedNetwork = networkSelect.value;
 
-    if (!NETWORKS[selectedNetwork]) {
+    if (selectedNetwork.includes('solana')) {
+  showNotification('Please use the Solana buy button for SOL purchases', 'info');
+  return;
+}
+if (!NETWORKS[selectedNetwork]) {
       throw new Error('Please pick a supported EVM network.');
     }
 
