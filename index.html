@@ -1670,7 +1670,9 @@ function handleWalletConnection(address) {
   // Close any open modals
   closeWalletConnectModal();
   
+// ADD at the end of the function:
   showNotification("Wallet connected successfully!", "success");
+  return true; // Add return statement
 }
 
 async function disconnectWallet() {
@@ -2346,9 +2348,13 @@ function getPresaleEndTime() {
         console.error("Balance update error:", error);
       }
     }
+// ADD at the beginning:
 function initTokenChart() {
   const ctx = document.getElementById('tokenChart');
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn('Token chart canvas not found');
+    return;
+  }
   
   const isDark = document.documentElement.classList.contains('dark');
   
