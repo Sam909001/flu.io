@@ -820,7 +820,11 @@ rotateFeed();
   
   <script>
   // Configuration
-        let tokenChart = null;
+    // ADD at the beginning of the script:
+let tokenChart = null;
+let presaleInterval = null;
+let provider = null;
+let tokenChart = null;
  // Your mapping of addresses
 const CONTRACT_ADDRESSES = {
   1: "0x...EthereumMainnet",
@@ -1431,9 +1435,13 @@ async function connectTrustWallet() {
 }
 
 // Simplified WalletConnect connection
-// Replace the incomplete WalletConnect with a working implementation
+// ADD null check:
 async function connectWalletConnect() {
   try {
+    if (!window.Web3Modal || !window.WalletConnectProvider) {
+      showWalletConnectFallback();
+      return;
+    }
     // Use Web3Modal for better wallet integration
     const Web3Modal = window.Web3Modal.default;
     const WalletConnectProvider = window.WalletConnectProvider.default;
@@ -1589,11 +1597,13 @@ async function connectPhantom() {
   }
 }
     // Only run after Phantom wallet is available
+// WRAP the entire function in a try-catch:
 async function setupProgram() {
-    if (!window.solana || !window.solana.isPhantom) {
-        alert('Please install Phantom wallet!');
-        return;
-    }
+    try {
+        if (!window.solana || !window.solana.isPhantom) {
+            console.log('Phantom wallet not found');
+            return null;
+        }
 
     await window.solana.connect(); // connect wallet
 
@@ -1608,12 +1618,32 @@ async function setupProgram() {
     const programId = new solanaWeb3.PublicKey("BpP6hRn1JReh3YVQgLQdH4kPTLUt4nty1PmXNN7rARfZ");
 
     // Fetch IDL
-    const idl = await fetch('/js/fluffi.json').then(res => res.json());
+const idl = {
+  version: "0.1.0",
+  name: "fluffi_presale",
+  instructions: [
+    {
+      name: "initialize",
+      accounts: [
+        { name: "presale", isMut: true, isSigner: false },
+        { name: "user", isMut: true, isSigner: true },
+        { name: "systemProgram", isMut: false, isSigner: false }
+      ],
+      args: []
+    }
+  ],
+  accounts: []
+};
 
     // Create program interface
     const program = new anchor.Program(idl, programId, provider);
 
     return { provider, program };
+}
+      } catch (error) {
+        console.error('Setup program error:', error);
+        return null;
+    }
 }
 
 function isMobile() {
@@ -1800,7 +1830,7 @@ async function recordPurchase(txHash, amount, tokens) {
 }
 
 // Network switch function with all supported chains
-async function switchToNetwork(chainName = 'BSC') {
+async function switchNetwork(chainName = 'BSC') {
   if (!window.ethereum) return;
   
   const networks = {
@@ -2136,7 +2166,10 @@ async function stakeFluffi() {
     
     try {
       // Check if staking contract is deployed
-      if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+     if (STAKING_CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+
+     // ADD AFTER THE EXISTING CHECK:
+      console.log("Using localStorage for staking simulation");
         // Fallback to local storage simulation for now
         const stakingInfo = {
           amount: amountNum,
@@ -2291,7 +2324,7 @@ function getPresaleEndTime() {
       if (!userWalletAddress) return;
       
       try {
-        const provider = ethersProvider || new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
         const fluffiContract = new ethers.Contract(
           FLUFFI_CONTRACT_ADDRESS,
           FLUFFI_CONTRACT_ABI,
@@ -2503,8 +2536,9 @@ function initTimer() {
 
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dark mode
-  if (localStorage.getItem('darkMode') === 'true' || 
+  try {
+    // Initialize dark mode
+    if (localStorage.getItem('darkMode') === 'true' ||
       (localStorage.getItem('darkMode') === null && 
        window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');
