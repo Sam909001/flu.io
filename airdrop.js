@@ -56,9 +56,6 @@
     </div>
   </div>
 
-  <!-- JavaScript Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-
   <script>
     // Global variables
     let userWalletAddress = null;
@@ -980,4 +977,13 @@
       btn.classList.add('btn-glow');
     });
   });
+window.openWalletModal = openWalletModal;
+window.closeWalletModal = closeWalletModal;
+window.connectWallet = connectWallet;
+window.closeWalletConnectModal = closeWalletConnectModal;
+window.showConnectionHelp = showConnectionHelp;
+window.closeHelpModal = closeHelpModal;
+window.disconnectWallet = disconnectWallet;
+window.claimAirdrop = claimAirdrop;
+window.toggleDarkMode = toggleDarkMode;
 </script>
