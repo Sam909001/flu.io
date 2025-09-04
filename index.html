@@ -1422,41 +1422,49 @@
     }
   }
 
-  // Phantom connection
+   // Phantom connection - UPDATED FUNCTION
   async function connectPhantom() {
-    isSolanaWallet = true;
-    
-    if (typeof window.solana !== 'undefined' && window.solana.isPhantom) {
-      try {
-        // Connect to Phantom wallet
-        const response = await window.solana.connect();
-        const publicKey = response.publicKey.toString();
-        
-        // Store Solana provider
-        solanaProvider = window.solana;
-        
-        // Handle Solana wallet connection
-        handleWalletConnection(publicKey);
-        
-        // Listen for account changes
-        window.solana.on('accountChanged', (publicKey) => {
-          if (publicKey) {
-            handleWalletConnection(publicKey.toString());
-          } else {
-            disconnectWallet();
-          }
-        });
-      } catch (error) {
-        console.error("Phantom connection error:", error);
-        showNotification("Failed to connect Phantom wallet: " + error.message, "error");
+    try {
+      // Check if Phantom is installed
+      if (typeof window.solana === 'undefined' || !window.solana.isPhantom) {
+        if (isMobile()) {
+          window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+        } else {
+          showNotification("Please install Phantom wallet extension", "error");
+          window.open('https://phantom.app/', '_blank');
+        }
+        return;
       }
-    } else {
-      if (isMobile()) {
-        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-      } else {
-        showNotification("Please install Phantom wallet extension", "error");
-        window.open('https://phantom.app/', '_blank');
+
+      // Set flag
+      isSolanaWallet = true;
+      
+      // Connect to Phantom wallet
+      const response = await window.solana.connect();
+      const publicKey = response.publicKey.toString();
+      
+      // Store Solana provider
+      solanaProvider = window.solana;
+      
+      // Initialize Solana connection if not already done
+      if (!solanaConnection) {
+        initSolanaConnection();
       }
+      
+      // Handle Solana wallet connection
+      handleWalletConnection(publicKey);
+      
+      // Listen for account changes
+      window.solana.on('accountChanged', (publicKey) => {
+        if (publicKey) {
+          handleWalletConnection(publicKey.toString());
+        } else {
+          disconnectWallet();
+        }
+      });
+    } catch (error) {
+      console.error("Phantom connection error:", error);
+      showNotification("Failed to connect Phantom wallet: " + error.message, "error");
     }
   }
 
@@ -1917,13 +1925,20 @@
     buyBtn.disabled = false;
   }
 
-  // Buy with Solana
+   // Buy with Solana - UPDATED FUNCTION
   async function buyWithSolana(amount, currency, ref) {
-    if (!solanaProvider || !solanaConnection) {
-      throw new Error("Solana wallet not connected");
-    }
-
     try {
+      // Check if we have a valid connection
+      if (!solanaProvider || !solanaConnection) {
+        // Try to reinitialize if needed
+        if (window.solana && window.solana.isPhantom) {
+          solanaProvider = window.solana;
+          initSolanaConnection();
+        } else {
+          throw new Error("Solana wallet not connected. Please connect your Phantom wallet.");
+        }
+      }
+
       // Get the current stage to calculate price
       const startTime = new Date('2025-08-27T00:00:00Z').getTime();
       const now = Date.now();
@@ -1948,49 +1963,33 @@
         showNotification(`Converting ${amount} ${currency} to ${solValue} SOL`, 'info');
       }
 
-      // Create transaction
+      // Get the public key from the connected wallet
       const publicKey = new solanaWeb3.PublicKey(userWalletAddress);
-      const fluffiMintAddress = new solanaWeb3.PublicKey(CONTRACT_ADDRESSES["solana-devnet"]);
       
-      // Get associated token account
-      const associatedTokenAccount = await splToken.getAssociatedTokenAddress(
-        fluffiMintAddress,
-        publicKey
-      );
+      // In a real implementation, you would have a presale contract address
+      // For now, we'll use a placeholder
+      const presaleAccount = new solanaWeb3.PublicKey("TreasuryAccountForPresale11111111111111111");
       
-      // Check if token account exists, create if not
-      const accountInfo = await solanaConnection.getAccountInfo(associatedTokenAccount);
-      if (!accountInfo) {
-        const createAccountInstruction = splToken.createAssociatedTokenAccountInstruction(
-          publicKey,
-          associatedTokenAccount,
-          publicKey,
-          fluffiMintAddress
-        );
-        
-        const transaction = new solanaWeb3.Transaction().add(createAccountInstruction);
-        const signature = await solanaProvider.signAndSendTransaction(transaction);
-        await solanaConnection.confirmTransaction(signature, 'confirmed');
-      }
-      
-      // Create transfer instruction (simplified - in reality you'd have a presale contract)
-      const transferInstruction = splToken.createTransferInstruction(
-        // This would be from the presale treasury account in a real implementation
-        new solanaWeb3.PublicKey("TreasuryAccountForPresale11111111111111111"),
-        associatedTokenAccount,
-        new solanaWeb3.PublicKey("TreasuryAccountForPresale11111111111111111"),
-        Number(amount) * 1000000, // Assuming 6 decimals
-      );
-      
-      const transaction = new solanaWeb3.Transaction().add(transferInstruction);
+      // Create transaction
+      const transaction = new solanaWeb3.Transaction();
       transaction.feePayer = publicKey;
       
       // Get recent blockhash
       const { blockhash } = await solanaConnection.getRecentBlockhash();
       transaction.recentBlockhash = blockhash;
       
+      // In a real implementation, you would add actual instructions here
+      // For demonstration, we'll just create a simple transfer
+      const transferInstruction = solanaWeb3.SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: presaleAccount,
+        lamports: solanaWeb3.LAMPORTS_PER_SOL * solValue // Convert to lamports
+      });
+      
+      transaction.add(transferInstruction);
+      
       // Sign and send transaction
-      const signature = await solanaProvider.signAndSendTransaction(transaction);
+      const { signature } = await solanaProvider.signAndSendTransaction(transaction);
       
       // Confirm transaction
       await solanaConnection.confirmTransaction(signature, 'confirmed');
@@ -2008,6 +2007,9 @@
       
     } catch (error) {
       console.error("Solana purchase error:", error);
+      const buyBtn = document.querySelector('button[onclick="buyFluffi()"]');
+      buyBtn.textContent = '🚀 Buy Now';
+      buyBtn.disabled = false;
       throw new Error("Solana transaction failed: " + error.message);
     }
   }
