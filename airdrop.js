@@ -426,22 +426,382 @@ async function connectTrustWallet() {
   }
 }
 
-// Simplified WalletConnect connection
+// WalletConnect connection with real implementation
 async function connectWalletConnect() {
   try {
-    // Simulate WalletConnect flow with QR code for airdrop page
-    const fakeUri = "wc:demo-connection-1234";
-    openWalletConnectModal(fakeUri);
+    // Check if WalletConnect is available
+    if (typeof WalletConnect === 'undefined') {
+      // Load WalletConnect library dynamically
+      await loadWalletConnectLibrary();
+    }
 
-    // Simulate connection after 2 seconds
-    setTimeout(() => {
+    // Initialize WalletConnect
+    const walletConnect = new WalletConnect({
+      bridge: "https://bridge.walletconnect.org", // WalletConnect bridge
+      qrcodeModal: {
+        open: (uri) => {
+          openWalletConnectModal(uri);
+        },
+        close: () => {
+          closeWalletConnectModal();
+        }
+      }
+    });
+
+    // Check if connection is already established
+    if (!walletConnect.connected) {
+      // Create new session
+      await walletConnect.createSession();
+    } else {
+      // If already connected, use existing session
+      const accounts = walletConnect.accounts;
+      if (accounts && accounts.length > 0) {
+        handleWalletConnection(accounts[0]);
+        return;
+      }
+    }
+
+    // Subscribe to connection events
+    walletConnect.on("connect", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+
+      // Close QR code modal
       closeWalletConnectModal();
-      handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
-    }, 2000);
+
+      // Get connected accounts
+      const { accounts } = payload.params[0];
+      handleWalletConnection(accounts[0]);
+
+      showWalletError("WalletConnect connection established!", "success");
+    });
+
+    walletConnect.on("session_update", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+
+      // Get updated accounts
+      const { accounts } = payload.params[0];
+      handleWalletConnection(accounts[0]);
+    });
+
+    walletConnect.on("disconnect", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+
+      // Reset WalletConnect
+      walletConnect = null;
+      disconnectWallet();
+    });
+
+    // Store WalletConnect instance for later use
+    window.walletConnect = walletConnect;
+
   } catch (error) {
     console.error("WalletConnect error:", error);
-    showWalletError("Failed to connect");
+    
+    // Fallback to QR code with wallet options
+    showWalletConnectFallback();
   }
+}
+
+// Load WalletConnect library dynamically
+async function loadWalletConnectLibrary() {
+  return new Promise((resolve, reject) => {
+    if (typeof WalletConnect !== 'undefined') {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+// Enhanced WalletConnect modal with real QR code
+function openWalletConnectModal(uri) {
+  const qrCodeElement = document.getElementById('walletConnectQrCode');
+  
+  // Clear previous content
+  qrCodeElement.innerHTML = '';
+  
+  try {
+    // Generate actual QR code
+    if (typeof QRCode !== 'undefined') {
+      // Use QRCode library if available
+      new QRCode(qrCodeElement, {
+        text: uri,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    } else {
+      // Fallback to simple display
+      qrCodeElement.innerHTML = `
+        <div style="width: 200px; height: 200px; background: white; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center; padding: 10px; border-radius: 8px;">
+          <div>
+            <div style="margin-bottom: 10px;">📱 Scan with WalletConnect</div>
+            <div style="font-size: 10px; color: #666; word-break: break-all; max-width: 180px;">
+              ${uri.substring(0, 50)}...
+            </div>
+            <button onclick="copyWalletConnectUri('${uri}')" style="margin-top: 10px; padding: 5px 10px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Copy URI
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Show connection instructions
+    const linkElement = document.getElementById('walletConnectLink');
+    if (linkElement) {
+      linkElement.classList.remove('hidden');
+      linkElement.innerHTML = `
+        <div style="text-align: center; margin-top: 15px;">
+          <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">
+            Don't have a wallet? Download one:
+          </p>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button onclick="window.open('https://metamask.io/download/', '_blank')" style="padding: 8px 12px; background: #f6851b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+              MetaMask
+            </button>
+            <button onclick="window.open('https://trustwallet.com/', '_blank')" style="padding: 8px 12px; background: #3375bb; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+              Trust Wallet
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+  } catch (error) {
+    console.error("QR code generation error:", error);
+    // Ultimate fallback
+    qrCodeElement.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 16px; margin-bottom: 10px;">🔗 WalletConnect</div>
+        <p style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">
+          Open your wallet app and scan QR code or use the links below:
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button onclick="window.open('https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}', '_blank')" style="padding: 10px; background: #f6851b; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            Open in MetaMask
+          </button>
+          <button onclick="window.open('https://link.trustwallet.com/wc?uri=${encodeURIComponent(uri)}', '_blank')" style="padding: 10px; background: #3375bb; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            Open in Trust Wallet
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  document.getElementById('walletConnectModal').classList.add('active');
+}
+
+// Copy WalletConnect URI to clipboard
+function copyWalletConnectUri(uri) {
+  navigator.clipboard.writeText(uri).then(() => {
+    showWalletError("WalletConnect URI copied to clipboard!", "success");
+  }).catch(() => {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = uri;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showWalletError("WalletConnect URI copied to clipboard!", "success");
+  });
+}
+
+// Enhanced fallback with multiple wallet options
+function showWalletConnectFallback() {
+  const modal = document.getElementById('walletConnectModal');
+  const qrContainer = document.getElementById('walletConnectQrCode');
+  
+  // Clear previous content
+  qrContainer.innerHTML = '';
+  
+  // Create comprehensive wallet options
+  const walletList = document.createElement('div');
+  walletList.innerHTML = `
+    <style>
+      .wallet-connect-fallback {
+        padding: 20px;
+        text-align: center;
+      }
+      .fallback-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #1f2937;
+      }
+      .dark .fallback-title {
+        color: #f9fafb;
+      }
+      .wallet-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .wallet-option-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .dark .wallet-option-card {
+        background: #374151;
+        border-color: #4b5563;
+      }
+      .wallet-option-card:hover {
+        background: #e2e8f0;
+        transform: translateY(-2px);
+      }
+      .dark .wallet-option-card:hover {
+        background: #4b5563;
+      }
+      .wallet-icon {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+      }
+      .wallet-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1f2937;
+      }
+      .dark .wallet-name {
+        color: #f9fafb;
+      }
+      .wallet-description {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+    </style>
+    <div class="wallet-connect-fallback">
+      <div class="fallback-title">Choose Your Wallet</div>
+      <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
+        Select a wallet to connect to $FLUFFI Airdrop
+      </p>
+      
+      <div class="wallet-grid">
+        <div class="wallet-option-card" onclick="connectMetaMask()">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="wallet-icon">
+          <span class="wallet-name">MetaMask</span>
+          <span class="wallet-description">Browser & Mobile</span>
+        </div>
+        
+        <div class="wallet-option-card" onclick="connectTrustWallet()">
+          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="wallet-icon">
+          <span class="wallet-name">Trust Wallet</span>
+          <span class="wallet-description">Mobile</span>
+        </div>
+        
+        <div class="wallet-option-card" onclick="connectBinanceWallet()">
+          <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance" class="wallet-icon">
+          <span class="wallet-name">Binance Wallet</span>
+          <span class="wallet-description">Browser & Mobile</span>
+        </div>
+        
+        <div class="wallet-option-card" onclick="window.open('https://rainbow.me/', '_blank')">
+          <img src="https://avatars.githubusercontent.com/u/48327834?s=280&v=4" alt="Rainbow" class="wallet-icon">
+          <span class="wallet-name">Rainbow</span>
+          <span class="wallet-description">Mobile</span>
+        </div>
+        
+        <div class="wallet-option-card" onclick="window.open('https://argent.xyz/', '_blank')">
+          <img src="https://argent.xyz/favicon.ico" alt="Argent" class="wallet-icon">
+          <span class="wallet-name">Argent</span>
+          <span class="wallet-description">Mobile</span>
+        </div>
+        
+        <div class="wallet-option-card" onclick="connectPhantom()">
+          <img src="https://phantom.app/static/phantom-192x192.png" alt="Phantom" class="wallet-icon">
+          <span class="wallet-name">Phantom</span>
+          <span class="wallet-description">Solana</span>
+        </div>
+      </div>
+      
+      <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+        <p style="font-size: 12px; color: #64748b; margin: 0;">
+          💡 <strong>Tip:</strong> Make sure your wallet is installed and you're on a supported network (BSC, Ethereum, Polygon, etc.)
+        </p>
+      </div>
+    </div>
+  `;
+  
+  qrContainer.appendChild(walletList);
+  modal.classList.add('active');
+}
+
+// Enhanced disconnect to handle WalletConnect
+async function disconnectWallet() {
+  // Disconnect WalletConnect if connected
+  if (window.walletConnect && window.walletConnect.connected) {
+    try {
+      await window.walletConnect.killSession();
+    } catch (error) {
+      console.error("Error disconnecting WalletConnect:", error);
+    }
+    window.walletConnect = null;
+  }
+  
+  userWalletAddress = null;
+  isSolanaWallet = false;
+  solanaProvider = null;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  walletButtons.innerHTML = `
+    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+      <i class="fas fa-wallet mr-2"></i>Connect Wallet
+    </button>
+  `;
+  
+  // Re-add event listener to the new button
+  const newWalletButton = document.getElementById('walletButton');
+  if (newWalletButton) {
+    newWalletButton.addEventListener('click', openWalletModal);
+  }
+  
+  // Only clear walletAddress value if the element exists
+  const walletAddressElement = document.getElementById('walletAddress');
+  if (walletAddressElement) {
+    walletAddressElement.value = '';
+  }
+  
+  localStorage.removeItem('walletConnected');
+  localStorage.removeItem('walletAddress');
+  
+  // Hide rate limit message
+  const rateLimitMessage = document.getElementById('rateLimitMessage');
+  if (rateLimitMessage) {
+    rateLimitMessage.classList.add('hidden');
+  }
+  
+  // Enable the claim button
+  const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+  
+  showWalletError("Wallet disconnected", "success");
 }
 
 // Show WalletConnect fallback modal
