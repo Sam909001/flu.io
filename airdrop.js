@@ -695,6 +695,9 @@ function showWalletConnectFallback() {
         margin-top: 4px;
       }
     </style>
+
+    <button class="modal-close-btn" onclick="closeWalletConnectModal()">×</button>
+    
     <div class="wallet-connect-fallback">
       <div class="fallback-title">Choose Your Wallet</div>
       <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
@@ -738,6 +741,10 @@ function showWalletConnectFallback() {
           <span class="wallet-description">Solana</span>
         </div>
       </div>
+      
+       <button onclick="closeWalletConnectModal()" style="margin-top: 15px; padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%;">
+        Cancel
+      </button>
       
       <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px;">
         <p style="font-size: 12px; color: #64748b; margin: 0;">
