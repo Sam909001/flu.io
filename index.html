@@ -293,74 +293,74 @@
     </div>
   </footer>
 
-  <!-- Wallet Connect Modal -->
-  <div id="walletModal" class="wallet-modal">
-    <div class="wallet-modal-content dark:bg-gray-800 transition-colors duration-300">
-      <div class="wallet-header">
-        <h3 class="font-bold transition-colors duration-300">Connect Wallet</h3>
-        <span class="wallet-close" onclick="closeWalletModal()">×</span>
+<!-- Wallet Connect Modal -->
+<div id="walletModal" class="wallet-modal">
+  <div class="wallet-modal-content dark:bg-gray-800 transition-colors duration-300">
+    <div class="wallet-header">
+      <h3 class="font-bold transition-colors duration-300">Connect Wallet</h3>
+      <span class="wallet-close" onclick="closeWalletModal()">×</span>
+    </div>
+    
+    <div class="space-y-3">
+      <div class="wallet-option" onclick="connectWallet('metamask')">
+        <div class="wallet-icon">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRjY4NTFCIi8+CjxwYXRoIGQ9Ik0yNy45NDE5IDQuNTgxMkwyMC41NjY2IDExLjI1NzVMMjIuMTIxNyA3LjU2ODc1TDI3Ljk0MTkgNC41ODEyWk0yNy4xODE5IDQuMDI0MzJMMjIuMTIxNyA3LjU2ODc1TDI3LjE4MTkgNC4wMjQzMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="MetaMask">
+        </div>
+        <div>
+          <div class="font-medium transition-colors duration-300">MetaMask</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Browser extension</div>
+        </div>
+        <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('metamask')">?</div>
       </div>
       
-      <div class="space-y-3">
-        <div class="wallet-option" onclick="connectWallet('metamask')">
-          <div class="wallet-icon">
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRjY4NTFCIi8+CjxwYXRoIGQ9Ik0yNy45NDE5IDQuNTgxMkwyMC41NjY2IDExLjI1NzVMMjIuMTIxNyA3LjU2ODc1TDI3Ljk0MTkgNC41ODEyWk0yNy4xODE5IDQuMDI0MzJMMjIuMTIxNyA3LjU2ODc1TDI3LjE4MTkgNC4wMjQzMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="MetaMask">
-          </div>
-          <div>
-            <div class="font-medium transition-colors duration-300">MetaMask</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Browser extension</div>
-          </div>
-          <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('metamask')">?</div>
+      <div class="wallet-option" onclick="connectWallet('trust')">
+        <div class="wallet-icon">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMzM3NUJCIi8+CjxwYXRoIGQ9Ik0xNiA2TDI0IDE0VjI0TDE2IDI2TDggMjRWMTRMMTYgNloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="Trust Wallet">
         </div>
-        
-        <div class="wallet-option" onclick="connectWallet('trust')">
-          <div class="wallet-icon">
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMzM3NUJCIi8+CjxwYXRoIGQ9Ik0xNiA2TDI0IDE0VjI0TDE2IDI2TDggMjRWMTRMMTYgNloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="Trust Wallet">
-          </div>
-          <div>
-            <div class="font-medium transition-colors duration-300">Trust Wallet</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Mobile wallet</div>
-          </div>
-          <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('trust')">?</div>
+        <div>
+          <div class="font-medium transition-colors duration-300">Trust Wallet</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Mobile wallet</div>
         </div>
-        
-        <div class="wallet-option" onclick="connectWallet('walletconnect')">
-          <div class="wallet-icon">
-            <img src="walletconnect-seeklogo.png" alt="walletconnect" class="w-6 h-6"><span class="ml-3">WalletConnect</span>
-          </div>
-          <div>
-            <div class="font-medium transition-colors duration-300">WalletConnect</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Scan with mobile</div>
-          </div>
-          <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('walletconnect')">?</div>
+        <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('trust')">?</div>
+      </div>
+      
+      <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <div class="wallet-icon">
+          <img src="walletconnect-seeklogo.png" alt="WalletConnect" class="w-6 h-6">
         </div>
-        
-        <div class="wallet-option" onclick="connectWallet('phantom')">
-          <div class="wallet-icon">
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjNTEzNEZGIi8+CjxwYXRoIGQ9Ik0xNiA2QzI0LjI4NDMgNiAzMSAxMi43MTU3IDMxIDIxQzMxIDI0LjMxMzcgMjguMzEzNyAyNyAyNSAyN0g3QzMuNjg2MjkgMjcgMSAyNC4zMTM3IDEgMjFDMSAxMi43MTU3IDcuNzE1NzMgNiAxNiA2WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="Phantom">
-          </div>
-          <div>
-            <div class="font-medium transition-colors duration-300">Phantom</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Solana wallet</div>
-          </div>
-          <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('phantom')">?</div>
+        <div>
+          <div class="font-medium transition-colors duration-300">WalletConnect</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Scan with mobile</div>
         </div>
+        <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('walletconnect')">?</div>
+      </div>
+      
+      <div class="wallet-option" onclick="connectWallet('phantom')">
+        <div class="wallet-icon">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjNTEzNEZGIi8+CjxwYXRoIGQ9Ik0xNiA2QzI0LjI4NDMgNiAzMSAxMi43MTU3IDMxIDIxQzMxIDI0LjMxMzcgMjguMzEzNyAyNyAyNSAyN0g3QzMuNjg2MjkgMjcgMSAyNC4zMTM3IDEgMjFDMSAxMi43MTU3IDcuNzE1NzMgNiAxNiA2WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="Phantom">
+        </div>
+        <div>
+          <div class="font-medium transition-colors duration-300">Phantom</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Solana wallet</div>
+        </div>
+        <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('phantom')">?</div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- WalletConnect Modal -->
-  <div id="walletConnectModal" class="wallet-connect-modal">
-    <div class="wallet-connect-content dark:bg-gray-800 transition-colors duration-300">
-      <div class="wallet-connect-close" onclick="closeWalletConnectModal()">×</div>
-      <h3 class="text-lg font-bold mb-4 transition-colors duration-300">Scan QR Code</h3>
-      <div id="walletConnectQrCode"></div>
-      <p class="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">Scan the QR code with your mobile wallet app</p>
-      <div class="wallet-connect-link" onclick="openWalletConnectLink()">
-        Can't scan? Try opening the link directly
-      </div>
+<!-- WalletConnect QR Code Modal -->
+<div id="walletConnectModal" class="wallet-connect-modal">
+  <div class="wallet-connect-content dark:bg-gray-800 transition-colors duration-300">
+    <div class="wallet-connect-close" onclick="closeWalletConnectModal()">×</div>
+    <h3 class="text-lg font-bold mb-4 transition-colors duration-300">Scan QR Code</h3>
+    <div id="walletConnectQrCode"></div>
+    <p class="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">Scan the QR code with your mobile wallet app</p>
+    <div class="wallet-connect-link" onclick="openWalletConnectLink()">
+      Can't scan? Try opening the link directly
     </div>
   </div>
+</div>
 
   <!-- Help Modal -->
   <div id="helpModal" class="help-modal">
