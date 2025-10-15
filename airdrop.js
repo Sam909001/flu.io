@@ -621,7 +621,7 @@ function copyWalletConnectUri(uri) {
   });
 }
 
-// Enhanced fallback with multiple wallet options
+// Enhanced fallback with multiple wallet options using LOCAL ICONS
 function showWalletConnectFallback() {
   const modal = document.getElementById('walletConnectModal');
   const qrContainer = document.getElementById('walletConnectQrCode');
@@ -629,7 +629,7 @@ function showWalletConnectFallback() {
   // Clear previous content
   qrContainer.innerHTML = '';
   
-  // Create comprehensive wallet options
+  // Create comprehensive wallet options with LOCAL ICONS
   const walletList = document.createElement('div');
   walletList.innerHTML = `
     <style>
@@ -679,6 +679,7 @@ function showWalletConnectFallback() {
         height: 40px;
         margin-bottom: 8px;
         border-radius: 10px;
+        object-fit: contain;
       }
       .wallet-name {
         font-weight: 600;
@@ -708,31 +709,31 @@ function showWalletConnectFallback() {
         </div>
         
         <div class="wallet-option-card" onclick="connectTrustWallet()">
-          <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="wallet-icon">
+          <img src="Trust_Stacked Logo_Blue.png" alt="Trust Wallet" class="wallet-icon">
           <span class="wallet-name">Trust Wallet</span>
           <span class="wallet-description">Mobile</span>
         </div>
         
         <div class="wallet-option-card" onclick="connectBinanceWallet()">
-          <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance" class="wallet-icon">
+          <img src="binance.png" alt="Binance" class="wallet-icon">
           <span class="wallet-name">Binance Wallet</span>
           <span class="wallet-description">Browser & Mobile</span>
         </div>
         
         <div class="wallet-option-card" onclick="window.open('https://rainbow.me/', '_blank')">
-          <img src="https://avatars.githubusercontent.com/u/48327834?s=280&v=4" alt="Rainbow" class="wallet-icon">
+          <div class="wallet-icon" style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">🌈</div>
           <span class="wallet-name">Rainbow</span>
           <span class="wallet-description">Mobile</span>
         </div>
         
         <div class="wallet-option-card" onclick="window.open('https://argent.xyz/', '_blank')">
-          <img src="https://argent.xyz/favicon.ico" alt="Argent" class="wallet-icon">
+          <div class="wallet-icon" style="background: #FF875B; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">A</div>
           <span class="wallet-name">Argent</span>
           <span class="wallet-description">Mobile</span>
         </div>
         
         <div class="wallet-option-card" onclick="connectPhantom()">
-          <img src="https://phantom.app/static/phantom-192x192.png" alt="Phantom" class="wallet-icon">
+          <img src="Phantom-Icon_App_1200x1200.png" alt="Phantom" class="wallet-icon">
           <span class="wallet-name">Phantom</span>
           <span class="wallet-description">Solana</span>
         </div>
