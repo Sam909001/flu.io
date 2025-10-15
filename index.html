@@ -314,20 +314,17 @@
       </div>
       <div class="wallet-help-btn" onclick="showConnectionHelp('trust', event)">?</div>
     </div>
-      <div class="wallet-option" onclick="connectWallet('walletconnect')">
-  <div class="wallet-icon">
-    <img src="walletconnect-seeklogo.png" alt="WalletConnect" class="w-6 h-6">
-  </div>
-  <div>
-    <div class="font-medium transition-colors duration-300">WalletConnect</div>
-    <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Scan with mobile</div>
-  </div>
-  <div class="flex items-center gap-2">
-    <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('walletconnect')">?</div>
-    <!-- Optional: Add close button to each option -->
-    <div class="wallet-close-btn" onclick="event.stopPropagation(); closeWalletModal()">×</div>
-  </div>
-</div>
+
+    <div class="wallet-option" onclick="connectWallet('walletconnect')">
+        <div class="wallet-icon">
+          <img src="walletconnect-seeklogo.png" alt="WalletConnect" class="w-6 h-6">
+        </div>
+        <div>
+          <div class="font-medium transition-colors duration-300">WalletConnect</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">Scan with mobile</div>
+        </div>
+        <div class="wallet-help-btn" onclick="event.stopPropagation(); showWalletHelp('walletconnect')">?</div>
+      </div>
       
       <div class="wallet-option" onclick="connectWallet('phantom')">
       <div class="flex items-center w-full">
