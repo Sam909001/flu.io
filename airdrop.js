@@ -540,11 +540,18 @@ function handleWalletConnection(address) {
     <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
   `;
   
-  document.getElementById('walletAddress').value = address;
+  // Only set walletAddress value if the element exists
+  const walletAddressElement = document.getElementById('walletAddress');
+  if (walletAddressElement) {
+    walletAddressElement.value = address;
+  }
   
-  // Generate referral link
-  const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
-  document.getElementById('referralLink').value = referralLink;
+  // Only set referralLink value if the element exists (for airdrop page)
+  const referralLinkElement = document.getElementById('referralLink');
+  if (referralLinkElement) {
+    const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
+    referralLinkElement.value = referralLink;
+  }
   
   localStorage.setItem('walletConnected', 'true');
   localStorage.setItem('walletAddress', address);
@@ -570,25 +577,42 @@ function disconnectWallet() {
     </button>
   `;
   
-  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  // Re-add event listener to the new button
+  const newWalletButton = document.getElementById('walletButton');
+  if (newWalletButton) {
+    newWalletButton.addEventListener('click', openWalletModal);
+  }
   
-  document.getElementById('walletAddress').value = '';
+  // Only clear walletAddress value if the element exists
+  const walletAddressElement = document.getElementById('walletAddress');
+  if (walletAddressElement) {
+    walletAddressElement.value = '';
+  }
   
   localStorage.removeItem('walletConnected');
   localStorage.removeItem('walletAddress');
   
   // Hide rate limit message
-  document.getElementById('rateLimitMessage').classList.add('hidden');
+  const rateLimitMessage = document.getElementById('rateLimitMessage');
+  if (rateLimitMessage) {
+    rateLimitMessage.classList.add('hidden');
+  }
   
   // Enable the claim button
   const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-  submitBtn.disabled = false;
-  submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
   
   showWalletError("Wallet disconnected", "success");
 }
 
 function showWalletError(message, type = 'error') {
+  // Remove any existing notifications
+  const existingNotifications = document.querySelectorAll('.notification-toast');
+  existingNotifications.forEach(n => n.remove());
+  
   // Create notification element
   const notification = document.createElement('div');
   notification.className = 'notification-toast';
@@ -643,6 +667,8 @@ function checkAirdropStatus(walletAddress) {
   const claimedWallets = JSON.parse(localStorage.getItem('claimedWallets') || '[]');
   const messageContainer = document.getElementById('rateLimitMessage');
   
+  if (!messageContainer) return;
+  
   if (claimedWallets.includes(walletAddress)) {
     messageContainer.innerHTML = `
       <div class="already-claimed">
@@ -654,15 +680,19 @@ function checkAirdropStatus(walletAddress) {
     
     // Disable the claim button
     const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
   } else {
     messageContainer.classList.add('hidden');
     
     // Enable the claim button
     const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
   }
 }
 
