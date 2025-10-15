@@ -6,6 +6,14 @@ let tasksCompleted = {
   retweet: false
 };
 
+// Timer variables
+let endDate = new Date('2025-12-31T23:59:59').getTime();
+
+// Solana connection variables
+let solanaConnection = null;
+let solanaProvider = null;
+let isSolanaWallet = false;
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
   // Set dark mode based on localStorage
@@ -65,9 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Timer variables
-let endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); // 7 days from now
-
 // Timer functions
 function updateTimer() {
   const now = new Date().getTime();
@@ -78,24 +83,6 @@ function updateTimer() {
     document.getElementById('hours').textContent = '00';
     document.getElementById('minutes').textContent = '00';
     document.getElementById('seconds').textContent = '00';
-    
-    // Show "Airdrop Finished" message
-    document.getElementById('timerContainer').innerHTML = `
-      <div class="text-2xl font-bold text-red-500 text-center">
-        🎉 Airdrop Finished!
-      </div>
-      <p class="text-gray-600 dark:text-gray-400 text-center mt-2">
-        The airdrop period has ended. Thank you for participating!
-      </p>
-    `;
-    
-    // Disable claim button
-    const claimBtn = document.getElementById('claimAirdropBtn');
-    claimBtn.disabled = true;
-    claimBtn.textContent = 'Airdrop Ended';
-    claimBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-    claimBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-    
     return;
   }
   
@@ -111,43 +98,6 @@ function updateTimer() {
 }
 
 function resetTimer() {
-  endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); // Reset to 7 days
-  updateTimer();
-  
-  // Re-enable UI elements if they were disabled
-  const timerContainer = document.getElementById('timerContainer');
-  if (timerContainer.innerHTML.includes('Airdrop Finished')) {
-    // Restore original timer HTML structure
-    timerContainer.innerHTML = `
-      <div class="grid grid-cols-4 gap-4 text-center">
-        <div>
-          <div id="days" class="text-3xl font-bold text-green-500">00</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Days</div>
-        </div>
-        <div>
-          <div id="hours" class="text-3xl font-bold text-green-500">00</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Hours</div>
-        </div>
-        <div>
-          <div id="minutes" class="text-3xl font-bold text-green-500">00</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Minutes</div>
-        </div>
-        <div>
-          <div id="seconds" class="text-3xl font-bold text-green-500">00</div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Seconds</div>
-        </div>
-      </div>
-    `;
-  }
-  
-  // Re-enable claim button
-  const claimBtn = document.getElementById('claimAirdropBtn');
-  claimBtn.disabled = false;
-  claimBtn.textContent = 'Claim Airdrop';
-  claimBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-  claimBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-}
-function resetTimer() {
   endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000) + (12 * 60 * 60 * 1000) + (45 * 60 * 1000) + (30 * 1000);
   updateTimer();
 }
@@ -156,6 +106,8 @@ function setTimer(hours, minutes, seconds) {
   endDate = new Date().getTime() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
   updateTimer();
 }
+
+// ========== UPDATED WALLET CONNECTION FUNCTIONS ==========
 
 // Wallet modal functions
 function openWalletModal() {
@@ -166,6 +118,333 @@ function closeWalletModal() {
   document.getElementById('walletModal').classList.remove('active');
 }
 
+function closeWalletConnectModal() {
+  document.getElementById('walletConnectModal').classList.remove('active');
+}
+
+// Connection Help Modal Functions
+function showWalletHelp(walletType, event) {
+  if (event) event.stopPropagation();
+  closeWalletModal();
+  
+  let content;
+  
+  switch(walletType) {
+    case 'metamask':
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-fox help-icon"></i>
+          </div>
+          <span>MetaMask Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask extension for Chrome, Firefox, Brave, or Edge</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" on our site and select MetaMask</li>
+            <li>Approve the connection request in the MetaMask popup</li>
+            <li>Your wallet address will appear when connected</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install the MetaMask app from your app store</li>
+            <li>Open our website in the MetaMask in-app browser</li>
+            <li>Tap "Connect Wallet" and select MetaMask</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via MetaMask browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'trust':
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-shield-alt help-icon"></i>
+          </div>
+          <span>Trust Wallet Connection Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet extension for your browser</li>
+            <li>Set up your wallet and secure your recovery phrase</li>
+            <li>Click "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the extension</li>
+            <li>Your wallet will be connected to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Trust Wallet from App Store or Play Store</li>
+            <li>Open our website in Trust Wallet's DApp browser</li>
+            <li>Tap "Connect Wallet" and select Trust Wallet</li>
+            <li>Approve the connection request in the app</li>
+            <li>For WalletConnect, scan the QR code from mobile</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'walletconnect':
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-qrcode help-icon"></i>
+          </div>
+          <span>WalletConnect Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Select WalletConnect from the wallet options</li>
+            <li>Choose your preferred wallet from the list</li>
+            <li>Follow the connection instructions for your wallet</li>
+            <li>Approve the connection request in your wallet</li>
+            <li>Your wallet will be connected to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Make sure you have a compatible wallet installed</li>
+            <li>Select WalletConnect from the wallet options</li>
+            <li>Choose your wallet from the list of installed wallets</li>
+            <li>Approve the connection request in your wallet app</li>
+            <li>Your wallet will connect to our dApp</li>
+          </ol>
+        </div>
+      `;
+      break;
+      
+    case 'phantom':
+      content = `
+        <div class="help-title">
+          <div class="help-icon-wrapper">
+            <i class="fas fa-ghost help-icon"></i>
+          </div>
+          <span>Phantom Wallet Guide</span>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <h3>Browser Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom extension for Chrome, Brave, or Firefox</li>
+            <li>Create a new wallet or import an existing one</li>
+            <li>Click "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the Phantom popup</li>
+            <li>Your Solana address will connect to our dApp</li>
+          </ol>
+        </div>
+        
+        <div class="help-platform">
+          <div class="platform-header">
+            <div class="platform-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Instructions</h3>
+          </div>
+          <ol class="help-steps">
+            <li>Install Phantom app from App Store or Play Store</li>
+            <li>Open our website in Phantom's in-app browser</li>
+            <li>Tap "Connect Wallet" and select Phantom</li>
+            <li>Approve the connection request in the app</li>
+            <li>For direct connection, open our site via Phantom browser</li>
+          </ol>
+        </div>
+      `;
+      break;
+  }
+  
+  document.getElementById('helpContent').innerHTML = content;
+  document.getElementById('helpModal').classList.add('active');
+}
+
+function closeHelpModal() {
+  document.getElementById('helpModal').classList.remove('active');
+}
+
+// Main wallet connection function
+async function connectWallet(walletType) {
+  try {
+    closeWalletModal();
+    
+    // Update wallet button to show loading
+    const walletButton = document.getElementById('walletButton');
+    const originalText = walletButton.innerHTML;
+    walletButton.innerHTML = '<span class="spinner"></span> Connecting...';
+    walletButton.disabled = true;
+    
+    if (walletType === 'metamask') {
+      await connectMetaMask();
+    }
+    else if (walletType === 'trust') {
+      await connectTrustWallet();
+    }
+    else if (walletType === 'walletconnect') {
+      await connectWalletConnect();
+    }
+    else if (walletType === 'phantom') {
+      await connectPhantom();
+    }
+  } catch (error) {
+    console.error("Wallet connection error:", error);
+    showWalletError("Failed to connect wallet: " + error.message);
+  } finally {
+    // Reset wallet button state
+    setTimeout(() => {
+      const walletButton = document.getElementById('walletButton');
+      if (walletButton && !userWalletAddress) {
+        walletButton.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+        walletButton.disabled = false;
+      }
+    }, 2000);
+  }
+}
+
+// MetaMask connection
+async function connectMetaMask() {
+  if (isMobile()) {
+    // Check if we're already in MetaMask browser
+    const isMetaMaskBrowser = window.ethereum && window.ethereum.isMetaMask;
+    
+    if (isMetaMaskBrowser) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+        
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length === 0) {
+            disconnectWallet();
+          } else {
+            handleWalletConnection(accounts[0]);
+          }
+        });
+        return; // Exit here to prevent redirect
+      } catch (error) {
+        console.error("MetaMask connection error:", error);
+        showWalletError("Connection failed: " + error.message);
+        return;
+      }
+    }
+    
+    // Only redirect if not in MetaMask browser
+    const currentUrl = window.location.href;
+    if (!currentUrl.includes('metamask')) {
+      window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+    }
+  } else {
+    // Desktop logic remains the same
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+      
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          handleWalletConnection(accounts[0]);
+        }
+      });
+    } else {
+      throw new Error("Please install MetaMask extension");
+    }
+  }
+}
+
+// Trust Wallet connection
+async function connectTrustWallet() {
+  if (isMobile()) {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+      }
+    } else {
+      window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
+    }
+  } else {
+    if (window.ethereum && window.ethereum.isTrust) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        handleWalletConnection(accounts[0]);
+      } catch (error) {
+        throw new Error("Failed to connect Trust Wallet");
+      }
+    } else {
+      throw new Error("Please install Trust Wallet extension");
+    }
+  }
+}
+
+// Simplified WalletConnect connection
+async function connectWalletConnect() {
+  try {
+    // Simulate WalletConnect flow with QR code for airdrop page
+    const fakeUri = "wc:demo-connection-1234";
+    openWalletConnectModal(fakeUri);
+
+    // Simulate connection after 2 seconds
+    setTimeout(() => {
+      closeWalletConnectModal();
+      handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
+    }, 2000);
+  } catch (error) {
+    console.error("WalletConnect error:", error);
+    showWalletError("Failed to connect");
+  }
+}
+
+// Show WalletConnect fallback modal
 function openWalletConnectModal(uri) {
   const qrCodeElement = document.getElementById('walletConnectQrCode');
   
@@ -182,251 +461,67 @@ function openWalletConnectModal(uri) {
   document.getElementById('walletConnectModal').classList.add('active');
 }
 
-function closeWalletConnectModal() {
-  document.getElementById('walletConnectModal').classList.remove('active');
-}
-
-function openWalletConnectLink() {
-  alert('This would normally open your mobile wallet app.');
-}
-
-// Help modal functions
-function showWalletHelp(walletType) {
-  const helpContent = document.getElementById('helpContent');
-  
-  const helpData = {
-    metamask: {
-      title: 'MetaMask Setup Guide',
-      icon: 'fab fa-firefox-browser',
-      platforms: [
-        {
-          name: 'Desktop Browser',
-          icon: 'fas fa-desktop',
-          steps: [
-            'Visit metamask.io and download the browser extension',
-            'Create a new wallet or import existing one',
-            'Set up your password and backup phrase',
-            'Click "Connect Wallet" on this page',
-            'Select MetaMask and approve the connection'
-          ]
-        },
-        {
-          name: 'Mobile App',
-          icon: 'fas fa-mobile-alt',
-          steps: [
-            'Download MetaMask app from App Store or Google Play',
-            'Create or import your wallet',
-            'Open the app and use the built-in browser',
-            'Navigate to this airdrop page',
-            'Tap "Connect Wallet" and select MetaMask'
-          ]
-        }
-      ]
-    },
-    trust: {
-      title: 'Trust Wallet Setup Guide',
-      icon: 'fas fa-shield-alt',
-      platforms: [
-        {
-          name: 'Mobile App',
-          icon: 'fas fa-mobile-alt',
-          steps: [
-            'Download Trust Wallet from App Store or Google Play',
-            'Create a new wallet or import existing one',
-            'Secure your wallet with PIN or biometrics',
-            'Use the DApp browser within Trust Wallet',
-            'Navigate to this page and connect your wallet'
-          ]
-        }
-      ]
-    },
-    walletconnect: {
-      title: 'WalletConnect Setup Guide',
-      icon: 'fas fa-qrcode',
-      platforms: [
-        {
-          name: 'Any Mobile Wallet',
-          icon: 'fas fa-mobile-alt',
-          steps: [
-            'Open your mobile wallet app (Trust, MetaMask, etc.)',
-            'Look for WalletConnect or Scan QR option',
-            'Click "Connect Wallet" on this page',
-            'Select WalletConnect option',
-            'Scan the QR code with your mobile wallet',
-            'Approve the connection in your wallet app'
-          ]
-        }
-      ]
-    },
-    phantom: {
-      title: 'Phantom Wallet Setup Guide',
-      icon: 'fas fa-ghost',
-      platforms: [
-        {
-          name: 'Browser Extension',
-          icon: 'fas fa-desktop',
-          steps: [
-            'Visit phantom.app and install the browser extension',
-            'Create a new Solana wallet or import existing one',
-            'Set up your password and backup phrase',
-            'Click "Connect Wallet" on this page',
-            'Select Phantom and approve the connection'
-          ]
-        },
-        {
-          name: 'Mobile App',
-          icon: 'fas fa-mobile-alt',
-          steps: [
-            'Download Phantom from App Store or Google Play',
-            'Create or import your Solana wallet',
-            'Open the app and use the built-in browser',
-            'Navigate to this airdrop page',
-            'Tap "Connect Wallet" and select Phantom'
-          ]
-        }
-      ]
-    }
-  };
-  
-  const data = helpData[walletType];
-  
-  helpContent.innerHTML = `
-    <div class="help-title">
-      <div class="help-icon-wrapper">
-        <i class="${data.icon} help-icon"></i>
-      </div>
-      ${data.title}
-    </div>
-    
-    ${data.platforms.map(platform => `
-      <div class="help-platform">
-        <div class="platform-header">
-          <div class="platform-icon">
-            <i class="${platform.icon}"></i>
-          </div>
-          <h3>${platform.name}</h3>
-        </div>
-        <ol class="help-steps">
-          ${platform.steps.map(step => `<li>${step}</li>`).join('')}
-        </ol>
-      </div>
-    `).join('')}
-  `;
-  
-  document.getElementById('helpModal').classList.add('active');
-}
-
-function closeHelpModal() {
-  document.getElementById('helpModal').classList.remove('active');
-}
-
-// Wallet connection function
-async function connectWallet(walletType) {
-  closeWalletModal();
-  
+// Add this new function for Binance connection
+async function connectBinanceWallet() {
   try {
+    closeWalletConnectModal(); // Close modal first
     
-    if (walletType === 'metamask') {
-      if (isMobile()) {
-        if (window.ethereum && window.ethereum.isMetaMask) {
-          try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-            
-            window.ethereum.on('accountsChanged', (accounts) => {
-              if (accounts.length === 0) {
-                disconnectWallet();
-              } else {
-                handleWalletConnection(accounts[0]);
-              }
-            });
-          } catch (error) {
-            window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-          }
-        } else {
-          window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-        }
-      } else {
-        if (window.ethereum && window.ethereum.isMetaMask) {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          handleWalletConnection(accounts[0]);
-          
-          window.ethereum.on('accountsChanged', (accounts) => {
-            if (accounts.length === 0) {
-              disconnectWallet();
-            } else {
-              handleWalletConnection(accounts[0]);
-            }
-          });
-        } else {
-          showWalletError("Please install MetaMask extension");
-        }
-      }
-    }
-    else if (walletType === 'trust') {
-      if (isMobile()) {
-        if (window.ethereum && window.ethereum.isTrust) {
-          try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-          } catch (error) {
-            window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-          }
-        } else {
-          window.location.href = `https://link.trustwallet.com/open_url?coin=60&url=${encodeURIComponent(window.location.href)}`;
-        }
-      } else {
-        if (window.ethereum && window.ethereum.isTrust) {
-          try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleWalletConnection(accounts[0]);
-          } catch (error) {
-            showWalletError("Failed to connect Trust Wallet");
-          }
-        } else {
-          showWalletError("Please install Trust Wallet extension");
-        }
-      }
-    }
-    else if (walletType === 'walletconnect') {
-      // Simulate WalletConnect flow with QR code
-      const fakeUri = "wc:demo-connection-1234";
-      openWalletConnectModal(fakeUri);
-
-      // Simulate connection after 2 seconds
+    if (window.BinanceChain) {
+      const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+    } else if (window.ethereum && window.ethereum.isBinance) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      handleWalletConnection(accounts[0]);
+    } else {
+      // Only open new tab if wallet not detected
+      showWalletError("Binance Wallet not detected. Opening download page...");
       setTimeout(() => {
-        closeWalletConnectModal();
-        handleWalletConnection("0x1a2b3c4d5e6f7e8d9c0b1a2b3c4d5e6f7e8d9c0b");
-      }, 2000);
-    }
-    else if (walletType === 'phantom') {
-      if (isMobile()) {
-        if (window.phantom && window.phantom.solana) {
-          try {
-            const response = await window.phantom.solana.connect();
-            handleWalletConnection(response.publicKey.toString());
-          } catch (error) {
-            window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-          }
-        } else {
-          window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
-        }
-      } else {
-        if (window.phantom && window.phantom.solana) {
-          try {
-            const response = await window.phantom.solana.connect();
-            handleWalletConnection(response.publicKey.toString());
-          } catch (error) {
-            showWalletError("Failed to connect Phantom wallet");
-          }
-        } else {
-          showWalletError("Please install Phantom wallet");
-        }
-      }
+        window.open('https://www.bnbchain.org/en/binance-wallet', '_blank');
+      }, 1500);
     }
   } catch (error) {
-    console.error("Wallet connection error:", error);
-    showWalletError("Failed to connect wallet");
+    showWalletError("Failed to connect Binance Wallet: " + error.message);
+  }
+}
+
+// Phantom connection - UPDATED FUNCTION
+async function connectPhantom() {
+  try {
+    // Check if Phantom is installed
+    if (typeof window.solana === 'undefined' || !window.solana.isPhantom) {
+      if (isMobile()) {
+        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=${encodeURIComponent(window.location.origin)}`;
+      } else {
+        showWalletError("Please install Phantom wallet extension");
+        window.open('https://phantom.app/', '_blank');
+      }
+      return;
+    }
+
+    // Set flag
+    isSolanaWallet = true;
+    
+    // Connect to Phantom wallet
+    const response = await window.solana.connect();
+    const publicKey = response.publicKey.toString();
+    
+    // Store Solana provider
+    solanaProvider = window.solana;
+    
+    // Handle Solana wallet connection
+    handleWalletConnection(publicKey);
+    
+    // Listen for account changes
+    window.solana.on('accountChanged', (publicKey) => {
+      if (publicKey) {
+        handleWalletConnection(publicKey.toString());
+      } else {
+        disconnectWallet();
+      }
+    });
+  } catch (error) {
+    console.error("Phantom connection error:", error);
+    showWalletError("Failed to connect Phantom wallet: " + error.message);
   }
 }
 
@@ -447,12 +542,101 @@ function handleWalletConnection(address) {
   
   document.getElementById('walletAddress').value = address;
   
+  // Generate referral link
+  const referralLink = `https://fluffi.io/airdrop?ref=${address}`;
+  document.getElementById('referralLink').value = referralLink;
+  
   localStorage.setItem('walletConnected', 'true');
   localStorage.setItem('walletAddress', address);
+  
+  // Close any open modals
+  closeWalletConnectModal();
+  
+  showWalletError("Wallet connected successfully!", "success");
   
   // Check if this wallet has already claimed the airdrop
   checkAirdropStatus(address);
 }
+
+function disconnectWallet() {
+  userWalletAddress = null;
+  isSolanaWallet = false;
+  solanaProvider = null;
+  
+  const walletButtons = document.getElementById('walletButtons');
+  walletButtons.innerHTML = `
+    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded flex items-center">
+      <i class="fas fa-wallet mr-2"></i>Connect Wallet
+    </button>
+  `;
+  
+  document.getElementById('walletButton').addEventListener('click', openWalletModal);
+  
+  document.getElementById('walletAddress').value = '';
+  
+  localStorage.removeItem('walletConnected');
+  localStorage.removeItem('walletAddress');
+  
+  // Hide rate limit message
+  document.getElementById('rateLimitMessage').classList.add('hidden');
+  
+  // Enable the claim button
+  const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
+  submitBtn.disabled = false;
+  submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  
+  showWalletError("Wallet disconnected", "success");
+}
+
+function showWalletError(message, type = 'error') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = 'notification-toast';
+  
+  // Set type-specific styles
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    warning: 'bg-yellow-500',
+    info: 'bg-blue-500'
+  };
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  
+  notification.innerHTML = `
+    <div class="fixed top-20 right-4 z-50 animate-slide-in">
+      <div class="${colors[type]} text-white px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 max-w-md">
+        <span class="text-2xl">${icons[type]}</span>
+        <div class="flex-1">
+          <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+          <p class="text-sm">${message}</p>
+        </div>
+        <button onclick="this.closest('.notification-toast').remove()" class="ml-4 text-white hover:text-gray-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (notification && notification.parentNode) {
+      notification.classList.add('animate-slide-out');
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+}
+
+// ========== REST OF THE AIRDROP FUNCTIONS ==========
 
 // Check if a wallet has already claimed the airdrop
 function checkAirdropStatus(walletAddress) {
@@ -482,45 +666,6 @@ function checkAirdropStatus(walletAddress) {
   }
 }
 
-function disconnectWallet() {
-  userWalletAddress = null;
-  
-  const walletButtons = document.getElementById('walletButtons');
-  walletButtons.innerHTML = `
-    <button id="walletButton" class="bg-green-700 hover:bg-green-800 text-white py-1 px-3 rounded pulse">Connect Wallet</button>
-  `;
-  
-  document.getElementById('walletButton').addEventListener('click', openWalletModal);
-  
-  document.getElementById('walletAddress').value = '';
-  
-  // Hide rate limit message
-  document.getElementById('rateLimitMessage').classList.add('hidden');
-  
-  // Enable the claim button
-  const submitBtn = document.querySelector('#airdropForm button[type="submit"]');
-  submitBtn.disabled = false;
-  submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-  
-  localStorage.removeItem('walletConnected');
-  localStorage.removeItem('walletAddress');
-}
-
-function showWalletError(message) {
-  // Create error element
-  const errorElement = document.createElement('div');
-  errorElement.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-  errorElement.textContent = message;
-  
-  // Add to document
-  document.body.appendChild(errorElement);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    errorElement.remove();
-  }, 3000);
-}
-
 // Task verification functions
 async function verifyTwitterFollow() {
   if (tasksCompleted.twitter) return;
@@ -547,7 +692,7 @@ async function verifyTwitterFollow() {
       tasksCompleted.twitter = true;
       localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
       updateTaskUI();
-      alert(`Twitter follow verified successfully for @${username}! +10,000 FLUFFI tokens earned.`);
+      showWalletError(`Twitter follow verified successfully for @${username}! +10,000 FLUFFI tokens earned.`, "success");
     } else {
       showWalletError("Could not verify Twitter follow. Please make sure you're following @FLUFFIOFFICIAL.");
     }
@@ -583,7 +728,7 @@ async function verifyTelegramJoin() {
       tasksCompleted.telegram = true;
       localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
       updateTaskUI();
-      alert(`Telegram join verified successfully for @${username}! +10,000 FLUFFI tokens earned.`);
+      showWalletError(`Telegram join verified successfully for @${username}! +10,000 FLUFFI tokens earned.`, "success");
     } else {
       showWalletError("Could not verify Telegram membership. Please join our Telegram group first.");
     }
@@ -622,7 +767,7 @@ async function verifyRetweet() {
         tasksCompleted.retweet = true;
         localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
         updateTaskUI();
-        alert("Retweet verified successfully! +30,000 FLUFFI tokens earned.");
+        showWalletError("Retweet verified successfully! +30,000 FLUFFI tokens earned.", "success");
       } else {
         showWalletError("Could not verify retweet. Please make sure you've liked and retweeted our pinned tweet.");
       }
@@ -682,7 +827,7 @@ function simulateTwitterFollow() {
   tasksCompleted.twitter = true;
   localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
   updateTaskUI();
-  alert("Twitter follow simulated successfully!");
+  showWalletError("Twitter follow simulated successfully!", "success");
 }
 
 function simulateTelegramJoin() {
@@ -690,14 +835,14 @@ function simulateTelegramJoin() {
   tasksCompleted.telegram = true;
   localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
   updateTaskUI();
-  alert("Telegram join simulated successfully!");
+  showWalletError("Telegram join simulated successfully!", "success");
 }
 
 function simulateRetweet() {
   tasksCompleted.retweet = true;
   localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
   updateTaskUI();
-  alert("Retweet simulated successfully!");
+  showWalletError("Retweet simulated successfully!", "success");
 }
 
 function resetTasks() {
@@ -712,13 +857,13 @@ function resetTasks() {
   document.getElementById('twitterUsername').disabled = false;
   document.getElementById('telegramUsername').disabled = false;
   updateTaskUI();
-  alert("Tasks reset successfully!");
+  showWalletError("Tasks reset successfully!", "success");
 }
 
 // Clear rate limit for development
 function clearRateLimit() {
   localStorage.removeItem('claimedWallets');
-  alert("Rate limit cleared. All wallets can now claim the airdrop again.");
+  showWalletError("Rate limit cleared. All wallets can now claim the airdrop again.", "success");
   
   // Refresh the status if a wallet is connected
   if (userWalletAddress) {
@@ -794,7 +939,7 @@ async function claimAirdrop() {
     localStorage.setItem('claimedWallets', JSON.stringify(claimedWallets));
     
     createConfetti();
-    alert(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`);
+    showWalletError(`🎉 Airdrop claimed successfully! You earned ${bonusTokens} bonus FLUFFI tokens. Your tokens will be distributed after the presale ends.`, "success");
     
     // Update UI to show this wallet has claimed
     checkAirdropStatus(walletAddress);
