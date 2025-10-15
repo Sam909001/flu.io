@@ -68,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Timer variables
+let endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); // 7 days from now
+
 // Timer functions
 function updateTimer() {
   const now = new Date().getTime();
@@ -78,6 +81,24 @@ function updateTimer() {
     document.getElementById('hours').textContent = '00';
     document.getElementById('minutes').textContent = '00';
     document.getElementById('seconds').textContent = '00';
+    
+    // Show "Airdrop Finished" message
+    document.getElementById('timerContainer').innerHTML = `
+      <div class="text-2xl font-bold text-red-500 text-center">
+        🎉 Airdrop Finished!
+      </div>
+      <p class="text-gray-600 dark:text-gray-400 text-center mt-2">
+        The airdrop period has ended. Thank you for participating!
+      </p>
+    `;
+    
+    // Disable claim button
+    const claimBtn = document.getElementById('claimAirdropBtn');
+    claimBtn.disabled = true;
+    claimBtn.textContent = 'Airdrop Ended';
+    claimBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+    claimBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    
     return;
   }
   
@@ -92,6 +113,43 @@ function updateTimer() {
   document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
 }
 
+function resetTimer() {
+  endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); // Reset to 7 days
+  updateTimer();
+  
+  // Re-enable UI elements if they were disabled
+  const timerContainer = document.getElementById('timerContainer');
+  if (timerContainer.innerHTML.includes('Airdrop Finished')) {
+    // Restore original timer HTML structure
+    timerContainer.innerHTML = `
+      <div class="grid grid-cols-4 gap-4 text-center">
+        <div>
+          <div id="days" class="text-3xl font-bold text-green-500">00</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Days</div>
+        </div>
+        <div>
+          <div id="hours" class="text-3xl font-bold text-green-500">00</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Hours</div>
+        </div>
+        <div>
+          <div id="minutes" class="text-3xl font-bold text-green-500">00</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Minutes</div>
+        </div>
+        <div>
+          <div id="seconds" class="text-3xl font-bold text-green-500">00</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Seconds</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Re-enable claim button
+  const claimBtn = document.getElementById('claimAirdropBtn');
+  claimBtn.disabled = false;
+  claimBtn.textContent = 'Claim Airdrop';
+  claimBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+  claimBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+}
 function resetTimer() {
   endDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000) + (12 * 60 * 60 * 1000) + (45 * 60 * 1000) + (30 * 1000);
   updateTimer();
