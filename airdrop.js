@@ -6,9 +6,6 @@ let tasksCompleted = {
   retweet: false
 };
 
-// Timer variables
-let endDate = new Date('2025-12-31T23:59:59').getTime();
-
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
   // Set dark mode based on localStorage
