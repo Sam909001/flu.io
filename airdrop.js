@@ -1243,12 +1243,103 @@ function resetTasks() {
     retweet: false
   };
   localStorage.setItem('completedTasks', JSON.stringify(tasksCompleted));
+  
+  // Reset input fields
   document.getElementById('twitterUsername').value = '';
   document.getElementById('telegramUsername').value = '';
+  
+  // Re-enable input fields
   document.getElementById('twitterUsername').disabled = false;
   document.getElementById('telegramUsername').disabled = false;
+  
+  // Reset verification buttons
+  const twitterBtn = document.getElementById('verifyTwitterBtn');
+  const telegramBtn = document.getElementById('verifyTelegramBtn');
+  const retweetBtn = document.getElementById('verifyRetweetBtn');
+  
+  if (twitterBtn) {
+    twitterBtn.textContent = 'Verify';
+    twitterBtn.classList.remove('completed');
+    twitterBtn.disabled = false;
+    twitterBtn.onclick = verifyTwitterFollow;
+  }
+  
+  if (telegramBtn) {
+    telegramBtn.textContent = 'Verify';
+    telegramBtn.classList.remove('completed');
+    telegramBtn.disabled = false;
+    telegramBtn.onclick = verifyTelegramJoin;
+  }
+  
+  if (retweetBtn) {
+    retweetBtn.textContent = 'Verify';
+    retweetBtn.classList.remove('completed');
+    retweetBtn.disabled = false;
+    retweetBtn.onclick = verifyRetweet;
+  }
+  
   updateTaskUI();
-  showWalletError("Tasks reset successfully!", "success");
+  showWalletError("All tasks have been reset successfully!", "success");
+}
+
+function updateTaskUI() {
+  // Update checkboxes
+  document.getElementById('task1').checked = tasksCompleted.twitter;
+  document.getElementById('task2').checked = tasksCompleted.telegram;
+  document.getElementById('task3').checked = tasksCompleted.retweet;
+  
+  // Update status text
+  document.getElementById('twitterStatus').textContent = tasksCompleted.twitter ? '(Verified)' : '(Not verified)';
+  document.getElementById('twitterStatus').className = tasksCompleted.twitter ? 'text-sm task-completed' : 'text-sm task-incomplete';
+  
+  document.getElementById('telegramStatus').textContent = tasksCompleted.telegram ? '(Verified)' : '(Not verified)';
+  document.getElementById('telegramStatus').className = tasksCompleted.telegram ? 'text-sm task-completed' : 'text-sm task-incomplete';
+  
+  document.getElementById('retweetStatus').textContent = tasksCompleted.retweet ? '(Verified)' : '(Not verified)';
+  document.getElementById('retweetStatus').className = tasksCompleted.retweet ? 'text-sm task-completed' : 'text-sm task-incomplete';
+  
+  // Update verification buttons
+  const twitterBtn = document.getElementById('verifyTwitterBtn');
+  const telegramBtn = document.getElementById('verifyTelegramBtn');
+  const retweetBtn = document.getElementById('verifyRetweetBtn');
+  
+  if (tasksCompleted.twitter && twitterBtn) {
+    twitterBtn.textContent = 'Verified';
+    twitterBtn.classList.add('completed');
+    twitterBtn.disabled = true;
+    twitterBtn.onclick = null;
+    document.getElementById('twitterUsername').disabled = true;
+  } else if (twitterBtn) {
+    twitterBtn.textContent = 'Verify';
+    twitterBtn.classList.remove('completed');
+    twitterBtn.disabled = false;
+    twitterBtn.onclick = verifyTwitterFollow;
+  }
+  
+  if (tasksCompleted.telegram && telegramBtn) {
+    telegramBtn.textContent = 'Verified';
+    telegramBtn.classList.add('completed');
+    telegramBtn.disabled = true;
+    telegramBtn.onclick = null;
+    document.getElementById('telegramUsername').disabled = true;
+  } else if (telegramBtn) {
+    telegramBtn.textContent = 'Verify';
+    telegramBtn.classList.remove('completed');
+    telegramBtn.disabled = false;
+    telegramBtn.onclick = verifyTelegramJoin;
+  }
+  
+  if (tasksCompleted.retweet && retweetBtn) {
+    retweetBtn.textContent = 'Verified';
+    retweetBtn.classList.add('completed');
+    retweetBtn.disabled = true;
+    retweetBtn.onclick = null;
+  } else if (retweetBtn) {
+    retweetBtn.textContent = 'Verify';
+    retweetBtn.classList.remove('completed');
+    retweetBtn.disabled = false;
+    retweetBtn.onclick = verifyRetweet;
+  }
 }
 
 // Clear rate limit for development
